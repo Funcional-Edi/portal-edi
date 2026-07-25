@@ -1,0 +1,25 @@
+# dependências
+/node_modules
+
+# next
+/.next
+/out
+
+# produção
+/build
+
+# ambiente (NUNCA commitar segredos)
+.env
+.env.local
+.env*.local
+
+# dados de operação / credenciais
+/data/**/credentials.enc
+
+# logs / SO
+*.log
+.DS_Store
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
