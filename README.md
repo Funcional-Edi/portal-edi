@@ -6,7 +6,7 @@ Construído com a **fundação primeiro** — esqueleto sólido antes de feature
 
 ## Stack
 
-- **Next.js 14** (App Router) — UI + BFF
+- **Next.js 15** (App Router) — UI + BFF
 - **TypeScript** + **Zod** (contratos de dados)
 - **Auth.js v5** — login SSO (mesmo contrato do portal atual) + RBAC
 - **Tailwind CSS**
