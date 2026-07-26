@@ -41,8 +41,21 @@ npm run dev                    # http://localhost:3002
 ## Qualidade
 
 ```bash
-npm run typecheck && npm run lint && npm run build   # = npm run ci
+npm run ci          # typecheck → lint → arch → test → build
 ```
+
+| Comando | O que garante |
+|---------|---------------|
+| `npm run typecheck` | Tipos consistentes |
+| `npm run lint` | Padrão de código |
+| `npm run arch` | **Regra de dependência não foi violada** (`app → modules → core`, módulos isolados, sem ciclos) |
+| `npm run test` | Comportamento da fundação (vitest) |
+| `npm run test:coverage` | Relatório de cobertura |
+| `npm run arch:graph` | Gera `architecture.dot` com o grafo de dependências |
+
+A arquitetura é **verificada por máquina**, não só documentada: importar um
+módulo de dentro de outro, ou fazer `core/` depender de `modules/`, **quebra o
+build**. Ver `docs/arquitetura/adr/0006-arquitetura-enforcada.md`.
 
 ## Como adicionar um módulo
 

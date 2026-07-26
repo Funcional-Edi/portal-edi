@@ -12,8 +12,12 @@
     "start": "next start -p 3002",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx ./**/*.test.ts",
-    "ci": "npm run typecheck && npm run lint && npm run build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "arch": "depcruise app core modules --config .dependency-cruiser.cjs",
+    "arch:graph": "depcruise app core modules --config .dependency-cruiser.cjs --output-type dot > architecture.dot",
+    "ci": "npm run typecheck && npm run lint && npm run arch && npm run test && npm run build"
   },
   "dependencies": {
     "next": "14.2.28",
@@ -26,12 +30,15 @@
     "@types/node": "^20.17.24",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.4.21",
+    "dependency-cruiser": "^17.4.3",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.28",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.10"
   }
 }

@@ -8,6 +8,10 @@
 # produção
 /build
 
+# testes e análise de arquitetura
+/coverage
+architecture.dot
+
 # ambiente (NUNCA commitar segredos)
 .env
 .env.local

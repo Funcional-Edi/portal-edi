@@ -11,5 +11,6 @@ outra referencia a anterior como *Substituída por*).
 | [0003](./0003-sso-contrato.md) | SSO reimplementado com o MESMO contrato do portal atual | Aceita |
 | [0004](./0004-stack-ts-core.md) | Núcleo TypeScript/Next.js; Python só como microserviço de IA quando exigir | Aceita |
 | [0005](./0005-camada-ia.md) | Camada de IA desenhada no dia 1 (provedor único, guardrails, custo) | Aceita |
+| [0006](./0006-arquitetura-enforcada.md) | Arquitetura verificada por máquina (CI) + estratégia de testes | Aceita |
 
 > Template: [`_template.md`](./_template.md).

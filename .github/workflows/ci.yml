@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  qualidade:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,8 +15,20 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run build
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Fronteiras de arquitetura
+        run: npm run arch
+
+      - name: Testes
+        run: npm run test
+
+      - name: Build
+        run: npm run build
         env:
           AUTH_SECRET: ci-not-a-real-secret
