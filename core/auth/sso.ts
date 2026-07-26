@@ -8,6 +8,7 @@
  */
 
 import { CredentialsSignin } from "next-auth";
+import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
 
 export interface SsoUser {
   id: string;
@@ -44,6 +45,12 @@ export async function validateSsoCredentials(
   password: string
 ): Promise<SsoUser> {
   const normalizedLogin = login.trim().toLowerCase();
+
+  const rateLimit = await checkLoginRateLimit(normalizedLogin);
+  if (!rateLimit.allowed) {
+    throw new SsoRateLimitError(rateLimit.retryAfterSec ?? 60);
+  }
+
   try {
     const response = await fetch(getSsoGraphqlUrl(), {
       method: "POST",
@@ -67,6 +74,7 @@ export async function validateSsoCredentials(
     if (!created?.token) throw new Error("createToken não retornou token");
 
     const email = created.user?.email?.trim().toLowerCase() ?? normalizedLogin;
+    resetLoginRateLimit(normalizedLogin).catch(() => undefined);
     return { id: created.user?.id ?? email, email, name: created.user?.name };
   } catch (err) {
     throw classifySsoLoginError(err);
@@ -86,6 +94,16 @@ export class SsoAccountLockedError extends CredentialsSignin {
 }
 export class SsoMfaRequiredError extends CredentialsSignin {
   code = "sso_mfa_required";
+}
+/** Muitas tentativas de login na janela atual (ver core/auth/rate-limit.ts). */
+export class SsoRateLimitError extends CredentialsSignin {
+  code = "sso_rate_limit";
+  readonly retryAfterSec: number;
+
+  constructor(retryAfterSec: number) {
+    super();
+    this.retryAfterSec = retryAfterSec;
+  }
 }
 
 export function classifySsoLoginError(err: unknown): CredentialsSignin {
