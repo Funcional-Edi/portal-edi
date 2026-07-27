@@ -29,20 +29,22 @@ const ALL_MODULES: PortalModule[] = [
 /** Registra todos os módulos conhecidos. Idempotente. */
 export function registerAllModules(): PortalModule[] {
   resetModuleRegistry();
-  for (const module of ALL_MODULES) registerModule(module);
+  for (const portalModule of ALL_MODULES) registerModule(portalModule);
   return listModules();
 }
 
-export function missingCapabilities(module: PortalModule): DataCapability[] {
-  return (module.requiresCapabilities ?? []).filter((c) => !isDatabaseAvailable(c));
+export function missingCapabilities(portalModule: PortalModule): DataCapability[] {
+  return (portalModule.requiresCapabilities ?? []).filter(
+    (c) => !isDatabaseAvailable(c)
+  );
 }
 
 export function listBlockedModules(): Array<{
   module: PortalModule;
   missing: DataCapability[];
 }> {
-  return ALL_MODULES.map((module) => ({
-    module,
-    missing: missingCapabilities(module),
+  return ALL_MODULES.map((portalModule) => ({
+    module: portalModule,
+    missing: missingCapabilities(portalModule),
   })).filter((entry) => entry.missing.length > 0);
 }

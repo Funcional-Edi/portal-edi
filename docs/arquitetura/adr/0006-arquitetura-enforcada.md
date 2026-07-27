@@ -18,7 +18,7 @@ humana constante.
 
 Tornamos a arquitetura **executável e verificada no CI**:
 
-- **`dependency-cruiser`** (`.dependency-cruiser.cjs`, `npm run arch`) valida:
+- **`dependency-cruiser`** (`config/dependency-cruiser.cjs`, `npm run arch`) valida:
   - `core/` não depende de `modules/` nem de `app/`;
   - `modules/` não depende de `app/`;
   - **nenhum módulo importa outro módulo** (exceto `modules/registry.ts`, que só

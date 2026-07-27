@@ -17,12 +17,17 @@ Construído com a **fundação primeiro** — esqueleto sólido antes de feature
 ## Estrutura
 
 ```
-app/            # Next.js (UI + BFF)
-core/           # invariantes: auth, config, db, errors, ai, events, module-registry
-modules/        # bounded contexts (living-docs-externa, manuais-internos,
-                #   fluxogramas, homologacao, assistente-ia)
-docs/arquitetura/adr/   # decisões versionadas (ADRs)
+app/                    # Next.js (UI + BFF)
+core/                   # invariantes: auth, config, db, errors, ai, events, module-registry
+modules/                # bounded contexts (living-docs-externa, manuais-internos,
+                        #   fluxogramas, homologacao, assistente-ia)
+config/                 # configs de ferramentas (dependency-cruiser, vitest)
+docs/
+  arquitetura/adr/      # decisões versionadas (ADRs)
+  estrutura/            # mapa do projeto (mapa-projeto.md)
 ```
+
+Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](docs/estrutura/mapa-projeto.md).
 
 Regra de dependência: `app → modules → core`. Módulos não se importam entre si —
 comunicam-se por eventos (`core/events`).
