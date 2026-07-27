@@ -29,6 +29,8 @@ docs/
 
 Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](docs/estrutura/mapa-projeto.md).
 
+Migração da documentação viva: [`docs/migracao/mapa-documentacao-funcional.md`](docs/migracao/mapa-documentacao-funcional.md) · [`docs/migracao/cronograma.md`](docs/migracao/cronograma.md).
+
 Regra de dependência: `app → modules → core`. Módulos não se importam entre si —
 comunicam-se por eventos (`core/events`).
 

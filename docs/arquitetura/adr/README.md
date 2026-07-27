@@ -14,5 +14,6 @@ outra referencia a anterior como *Substituída por*).
 | [0006](./0006-arquitetura-enforcada.md) | Arquitetura verificada por máquina (CI) + estratégia de testes | Aceita |
 | [0007](./0007-rate-limit-login.md) | Rate limit no login SSO (proteção contra força bruta) | Aceita |
 | [0008](./0008-next-15-react-19.md) | Next.js 15 + React 19 antes da primeira feature | Aceita |
+| [0009](./0009-content-cms-adapter.md) | Persistência `content`: filesystem local + GitHub CMS | Aceita |
 
 > Template: [`_template.md`](./_template.md).

@@ -32,7 +32,7 @@ Regra de dependência: **`app → modules → core`**. Validada por
 
 | ID | Público | Estado |
 |----|---------|--------|
-| `living-docs-externa` | Clientes | planejado |
+| `living-docs-externa` | Clientes | **ativo** (Fase 1: leitor `/manual`) |
 | `manuais-internos` | Time EDI | planejado |
 | `fluxogramas` | Ambos | planejado |
 | `homologacao` | Time EDI | planejado (exige banco) |

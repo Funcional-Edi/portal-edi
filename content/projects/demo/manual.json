@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "title": "Integração IM — Inventário (demo)",
+  "productName": "Inventory Management",
+  "manualVersion": "1.0.0-demo",
+  "referenceTables": [
+    {
+      "id": "operation-type",
+      "title": "operationType — modos de carga",
+      "columns": ["Valor", "Uso"],
+      "rows": [
+        ["INSERT", "Primeira carga do dia ou novos produtos"],
+        ["OVERLAP", "Sobrescreve carga existente na mesma data"],
+        ["DELETE", "Remove produtos informados da carga"]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "kind": "mutation",
+      "name": "createToken",
+      "order": 1,
+      "title": "1. Obter token",
+      "description": "Autentique no gateway antes de saveInventories. Token válido 24h.",
+      "authRequired": false,
+      "businessNotes": [
+        "Use credenciais master do gateway (não o SSO do portal).",
+        "Homologação usa gateway-homologa; produção usa gateway.fidelize.com.br."
+      ],
+      "exampleQuery": "mutation createToken {\n  createToken(\n    login: \"<login>\"\n    password: \"<senha>\"\n  ) {\n    token\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "saveInventories",
+      "order": 2,
+      "title": "2. Enviar carga de estoque",
+      "description": "Informe estoques às indústrias. Até 500 produtos por requisição.",
+      "prerequisites": ["createToken"],
+      "businessNotes": [
+        "Máximo 500 produtos por requisição — divida cargas maiores.",
+        "Produtos sem estoque: supply: 0."
+      ],
+      "exampleQuery": "mutation saveInventories {\n  saveInventories(\n    industryCode: \"FAB\"\n    inventories: [\n      {\n        referenceDate: \"2026-07-01\"\n        customerCode: \"00000000000000\"\n        customerType: WHOLESALER\n        productCode: \"7891106001946\"\n        supply: 400\n        operationType: INSERT\n      }\n    ]\n  ) {\n    status\n    loadId\n    message\n  }\n}"
+    }
+  ]
+}

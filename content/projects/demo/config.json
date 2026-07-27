@@ -1,0 +1,12 @@
+{
+  "slug": "demo",
+  "name": "Demo — Inventário (IM)",
+  "description": "Manual de demonstração com 2 operações (paridade simplificada com IM v1.0.0).",
+  "environment": "homolog",
+  "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+  "gatewaySlug": "gateway-homolog-fidelize",
+  "published": true,
+  "audience": "distribuidor",
+  "createdAt": "2026-07-27T12:00:00.000Z",
+  "updatedAt": "2026-07-27T12:00:00.000Z"
+}

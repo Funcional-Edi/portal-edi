@@ -19,7 +19,7 @@ modules/<contexto>/
 
 | Módulo | Público | Estado | Persistência |
 |--------|---------|--------|--------------|
-| `living-docs-externa` | Clientes | Planejado | `content` |
+| `living-docs-externa` | Clientes | **Ativo** (Fase 1) | `content` |
 | `manuais-internos` | Time EDI | Planejado | `content` |
 | `fluxogramas` | Ambos | Planejado | `content` |
 | `homologacao` | Time EDI | Planejado | **exige banco** (`transactional`, `audit-log`) |

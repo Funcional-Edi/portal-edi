@@ -36,7 +36,15 @@ export const env = {
   get isAiConfigured() {
     return this.aiProvider !== "stub" && !!process.env.AI_API_KEY;
   },
+  get contentRoot() {
+    return process.env.CONTENT_ROOT?.trim() || process.cwd();
+  },
 };
+
+/** Raiz do CMS (content/ + data/). Ver ADR-0009. */
+export function getContentRoot(): string {
+  return env.contentRoot;
+}
 
 /** Validação opt-in do ambiente. Retorna problemas (vazio = ok). */
 export function validateEnv(): string[] {
