@@ -17,3 +17,10 @@ export {
   type ManualOperation,
   type ManualOperationKind,
 } from "@/modules/living-docs-externa/schema/manual";
+
+export {
+  sectionIdSchema,
+  manualSectionSchema,
+  titleFromMarkdown,
+  type ManualSection,
+} from "@/modules/living-docs-externa/schema/section";

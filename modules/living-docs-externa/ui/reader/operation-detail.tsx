@@ -35,7 +35,7 @@ export function OperationDetail({
       </header>
 
       {operation.description ? (
-        <section className="mb-6">
+        <section id="descricao" className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Descrição
           </h2>
@@ -44,7 +44,7 @@ export function OperationDetail({
       ) : null}
 
       {operation.businessNotes && operation.businessNotes.length > 0 ? (
-        <section className="mb-6">
+        <section id="regras-negocio" className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Regras de negócio
           </h2>
@@ -57,7 +57,7 @@ export function OperationDetail({
       ) : null}
 
       {operation.exampleQuery ? (
-        <section className="mb-6">
+        <section id="exemplo-graphql" className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Exemplo GraphQL
           </h2>

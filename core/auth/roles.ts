@@ -14,7 +14,7 @@ export interface PermissionsConfig {
  * um recurso de dados (data/permissions.json ou banco).
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: ["admin@funcionalcorp.com.br", "teste.admin@funcionalcorp.com.br"],
+  admins: ["admin@funcionalcorp.com.br", "sfoliveira@funcionalcorp.com.br"],
   clients: [],
   defaultRole: "client",
 };

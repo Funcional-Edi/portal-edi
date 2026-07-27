@@ -16,10 +16,10 @@ gantt
 
   section Fundação
   Fase 0 Mapa e ADRs           :done, f0, 2026-07-28, 2d
-  Fase 1 Leitor MVP            :active, f1, 2026-07-30, 6d
+  Fase 1 Leitor MVP            :done, f1, 2026-07-30, 6d
 
   section Leitor
-  Fase 2 Seções e shell        :f2, 2026-08-05, 5d
+  Fase 2 Seções e shell        :active, f2, 2026-08-05, 5d
 
   section Admin
   Fase 3 Admin MVP             :f3, 2026-08-11, 10d
@@ -53,22 +53,34 @@ gantt
 
 ---
 
-## Fase 1 — Leitor MVP (30/jul – 4/ago) ← **em andamento**
+## Fase 1 — Leitor MVP (30/jul – 4/ago) ✅
 
 **Objetivo:** distribuidor logado vê catálogo, roteiro e detalhe de operação.
 
-| Entrega | Pasta |
-|---------|-------|
-| Schemas Zod (`ProjectConfig`, `IntegrationManual`) | `modules/living-docs-externa/schema/` |
-| Adapter filesystem | `core/db/adapters/local-content-store.ts` |
-| Repository + services | `repository/`, `services/` |
-| Telas `/manual`, `/manual/[slug]`, operação | `app/manual/`, `ui/reader/` |
-| Login mínimo | `app/login/` |
-| Seed `content/projects/demo/` | `content/` |
-| Testes unitários (listagem, schemas) | `*.test.ts` |
-| Módulo `status: active` | `module.ts` |
+| Entrega | Pasta | Status |
+|---------|-------|--------|
+| Schemas Zod (`ProjectConfig`, `IntegrationManual`) | `modules/living-docs-externa/schema/` | ✅ |
+| Adapter filesystem | `core/db/adapters/local-content-store.ts` | ✅ |
+| Repository + services | `repository/`, `services/` | ✅ |
+| Telas `/manual`, `/manual/[slug]`, operação | `app/manual/`, `ui/reader/` | ✅ |
+| Login mínimo | `app/login/` | ✅ |
+| Seed `content/projects/demo/` | `content/` | ✅ |
+| Testes unitários (listagem, schemas) | `*.test.ts` | ✅ |
+| Módulo `status: active` | `module.ts` | ✅ |
 
-**Critério de done:** `npm run ci` verde; `/manual` lista demo; roteiro renderiza 2 ops.
+**Critério de done:** `npm run ci` verde; `/manual` lista demo; roteiro renderiza 2 ops. ✅
+
+---
+
+### Fase 2 — progresso por etapas (estudo)
+
+| Etapa | Entrega | Status |
+|-------|---------|--------|
+| 2.1 | Render `sections/*.md` no roteiro | ✅ |
+| 2.2 | `ManualShell` completo (sidebar, TOC) | ⏳ |
+| 2.3 | Redirect `/projects/*` → `/manual/*` | ⏳ |
+| 2.4 | Adapter GitHub CMS | ⏳ |
+| 2.5 | Cache `unstable_cache` + tags | ⏳ |
 
 ---
 

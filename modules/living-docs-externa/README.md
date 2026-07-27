@@ -24,4 +24,6 @@ ui/admin/     # (Fase 3+) CRUD projetos, editor
 
 Layout compatível com `documentacao-funcional` (ADR-0009). Seed: `content/projects/demo/`.
 
+Seções Markdown: `content/projects/{slug}/sections/*.md` (etapa 2.1).
+
 Mapa de migração: [`docs/migracao/mapa-documentacao-funcional.md`](../../docs/migracao/mapa-documentacao-funcional.md).

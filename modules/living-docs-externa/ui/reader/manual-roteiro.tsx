@@ -1,12 +1,14 @@
-import type { Project } from "@/modules/living-docs-externa/schema";
+import type { ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
+import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
 import Link from "next/link";
 
 interface ManualRoteiroProps {
   project: Project;
+  sections: ManualSection[];
 }
 
-export function ManualRoteiro({ project }: ManualRoteiroProps) {
+export function ManualRoteiro({ project, sections }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
 
@@ -26,8 +28,23 @@ export function ManualRoteiro({ project }: ManualRoteiroProps) {
         ) : null}
       </header>
 
+      {sections.length > 0 ? (
+        <section id="contexto" className="mb-10 space-y-8 scroll-mt-24">
+          <h2 className="text-lg font-semibold">Contexto</h2>
+          {sections.map((section) => (
+            <div
+              key={section.id}
+              id={`section-${section.id}`}
+              className="rounded-lg border border-slate-200 bg-white p-5"
+            >
+              <MarkdownBody source={section.body} />
+            </div>
+          ))}
+        </section>
+      ) : null}
+
       {manual.referenceTables && manual.referenceTables.length > 0 ? (
-        <section className="mb-10">
+        <section id="tabelas-referencia" className="mb-10 scroll-mt-24">
           <h2 className="mb-4 text-lg font-semibold">Tabelas de referência</h2>
           <div className="space-y-6">
             {manual.referenceTables.map((table) => (
@@ -66,7 +83,7 @@ export function ManualRoteiro({ project }: ManualRoteiroProps) {
         </section>
       ) : null}
 
-      <section>
+      <section id="roteiro-integracao" className="scroll-mt-24">
         <h2 className="mb-4 text-lg font-semibold">Roteiro de integração</h2>
         <ol className="space-y-4">
           {operations.map((op) => (
