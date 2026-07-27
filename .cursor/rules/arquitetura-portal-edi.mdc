@@ -1,0 +1,43 @@
+---
+description: Regras de arquitetura e segurança alinhadas do Portal-Edi
+alwaysApply: true
+---
+
+# Arquitetura Portal-Edi
+
+## Dependências
+
+```text
+app → modules → core
+```
+
+- `core/` = fundação (auth, config, db, ai, events). Sem regra de negócio.
+- `modules/` = bounded contexts isolados. **Não importam uns aos outros.**
+- Comunicação entre módulos só via `core/events`.
+- `core/` **não** importa `modules/` nem `app/`.
+- Validado por `npm run arch` (dependency-cruiser). Violação quebra o CI.
+
+## Módulo novo
+
+Cada módulo em `modules/<contexto>/` com: `module.ts`, `schema/`, `repository/`, `services/`, `ui/` (opcional). Registrar em `modules/registry.ts`.
+
+## Dados
+
+- Stateless-first: **sem banco** até um módulo exigir.
+- Conteúdo atual: `content/` (capability `content`).
+- Módulo declara `requiresCapabilities`; bloqueados aparecem em `/` e `/api/health`.
+
+## Auth e segredos
+
+- SSO via `FUNCIONAL_SSO_GRAPHQL_URL`; senha nunca persistida; JWT 8h httpOnly.
+- `DEV_AUTH_ENABLED=true` só em development — **nunca** em produção.
+- Rate limit login: 10 tentativas / 15 min.
+- `.env.local` nunca no Git; `AUTH_SECRET` obrigatório.
+
+## IA
+
+Toda IA passa por `core/ai`. Guardrails + custo (`AI_MONTHLY_BUDGET_USD`). Chaves só server-side.
+
+## Qualidade
+
+`npm run ci` = typecheck → lint → arch → test → build. Node **20.x**. Porta dev **3002**.

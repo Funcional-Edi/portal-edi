@@ -1,0 +1,35 @@
+---
+description: Estilo de resposta objetivo para aprendizado prático no Portal-Edi
+alwaysApply: true
+---
+
+# Resposta para estudo
+
+O usuário está **estudando programação**. Este projeto é para **desenvolver e aprender na prática**.
+
+## Como responder
+
+- Seja **objetivo**: vá direto ao ponto do assunto perguntado.
+- Organize a resposta de forma clara, preferindo:
+  1. **O que foi feito** (ou o que precisa ser feito)
+  2. **Por que foi feito** (motivo / conceito por trás)
+- Explique o suficiente para aprender, sem enrolação nem texto longo demais.
+- Quando usar um comando ou conceito, diga **para que serve** em 1 frase.
+- Prefira exemplos curtos e concretos do próprio projeto.
+
+## Evitar
+
+- Respostas vagas ou genéricas
+- Listas enormes sem prioridade
+- Jargão sem explicar o significado
+- Repetir o pedido do usuário
+
+## Exemplo de formato
+
+```markdown
+## O que foi feito
+Instalei as dependências com `npm install`.
+
+## Por que
+Sem `node_modules/`, o Next.js (`next`) não existe e `npm run dev` falha.
+```
