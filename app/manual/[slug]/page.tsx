@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ManualRoteiro } from "@/modules/living-docs-externa/ui/reader/manual-roteiro";
+import { ManualShellWithNav } from "@/modules/living-docs-externa/ui/reader/manual-shell-with-nav";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { getPublishedManualSections } from "@/modules/living-docs-externa/services/get-published-manual-sections";
 
@@ -15,5 +16,9 @@ export default async function ManualPage({ params }: ManualPageProps) {
 
   const sections = await getPublishedManualSections(slug);
 
-  return <ManualRoteiro project={project} sections={sections} />;
+  return (
+    <ManualShellWithNav slug={slug}>
+      <ManualRoteiro project={project} sections={sections} />
+    </ManualShellWithNav>
+  );
 }

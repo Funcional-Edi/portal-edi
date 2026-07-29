@@ -1,18 +1,18 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-interface ManualNavItem {
+export interface ManualNavItem {
   href: string;
   label: string;
   active?: boolean;
 }
 
-interface ManualNavGroup {
+export interface ManualNavGroup {
   title: string;
   items: ManualNavItem[];
 }
 
-interface ManualTocItem {
+export interface ManualTocItem {
   href: string;
   label: string;
 }
