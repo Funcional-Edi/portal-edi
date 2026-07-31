@@ -87,10 +87,10 @@ gantt
 | Etapa | Entrega | Status |
 |-------|---------|--------|
 | 3.1 | `/admin/projects` listar + criar slug | ✅ |
-| 3.2 | Connect gateway | ⏳ |
-| 3.3 | Sync schema | ⏳ |
-| 3.4 | Editor operações (form) | ⏳ |
-| 3.5 | Toggle `published` | ⏳ |
+| 3.2 | Connect gateway | ✅ |
+| 3.3 | Sync schema | ✅ |
+| 3.4 | Editor operações (form) | ✅ |
+| 3.5 | Toggle `published` | ✅ |
 
 ---
 

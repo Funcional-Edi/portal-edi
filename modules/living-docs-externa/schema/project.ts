@@ -55,6 +55,12 @@ export const connectGatewayInputSchema = z.object({
 
 export type ConnectGatewayInput = z.infer<typeof connectGatewayInputSchema>;
 
+export const publishProjectInputSchema = z.object({
+  published: z.boolean(),
+});
+
+export type PublishProjectInput = z.infer<typeof publishProjectInputSchema>;
+
 export interface ProjectSummary {
   slug: string;
   name: string;

@@ -126,6 +126,27 @@ export async function updateProjectGatewayConfig(
   return config;
 }
 
+/** Alterna `published` (e `manualStatus` correspondente) no `config.json` do projeto. */
+export async function updateProjectPublishStatus(
+  slug: string,
+  published: boolean
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    published,
+    manualStatus: published ? "published" : "draft",
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}
+
 export async function getManual(slug: string): Promise<IntegrationManual | null> {
   const project = await loadProjectFromStore(slug);
   return project?.manual ?? null;

@@ -5,6 +5,7 @@ import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
 import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
+import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 
 interface ProjectDetailPageProps {
@@ -33,8 +34,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs font-semibold uppercase text-slate-500">Status</dt>
-            <dd className="mt-1 text-sm text-slate-900">
-              {project.config.published ? "Publicado" : "Rascunho"}
+            <dd className="mt-1">
+              <PublishToggle slug={project.config.slug} published={project.config.published} />
             </dd>
           </div>
           <div>
