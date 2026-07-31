@@ -38,6 +38,14 @@ export const projectConfigSchema = z.object({
 
 export type ProjectConfig = z.infer<typeof projectConfigSchema>;
 
+export const createProjectInputSchema = z.object({
+  slug: slugSchema,
+  name: z.string().min(1).max(200),
+  description: z.string().max(2000).optional(),
+});
+
+export type CreateProjectInput = z.infer<typeof createProjectInputSchema>;
+
 export interface ProjectSummary {
   slug: string;
   name: string;
