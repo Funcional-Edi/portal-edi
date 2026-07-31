@@ -7,6 +7,7 @@ interface ManualShellWithNavProps {
   slug: string;
   kind?: string;
   name?: string;
+  playground?: boolean;
   children: ReactNode;
 }
 
@@ -14,9 +15,10 @@ export async function ManualShellWithNav({
   slug,
   kind,
   name,
+  playground,
   children,
 }: ManualShellWithNavProps) {
-  const nav = await buildManualNav(slug, { kind, name });
+  const nav = await buildManualNav(slug, { kind, name, playground });
 
   if (!nav) {
     return <ManualShell>{children}</ManualShell>;

@@ -39,3 +39,8 @@ export {
   type IntrospectionPayload,
   type ProjectSchemaSnapshot,
 } from "@/modules/living-docs-externa/schema/introspection";
+
+export {
+  playgroundRequestInputSchema,
+  type PlaygroundRequestInput,
+} from "@/modules/living-docs-externa/schema/playground";

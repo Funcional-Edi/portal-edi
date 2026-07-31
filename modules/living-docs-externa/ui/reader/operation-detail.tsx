@@ -64,6 +64,12 @@ export function OperationDetail({
           <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
             <code>{operation.exampleQuery}</code>
           </pre>
+          <Link
+            href={`/manual/${slug}/playground?query=${encodeURIComponent(operation.exampleQuery)}`}
+            className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+          >
+            Testar no playground
+          </Link>
         </section>
       ) : null}
 

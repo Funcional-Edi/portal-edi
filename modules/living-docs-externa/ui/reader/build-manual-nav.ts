@@ -9,6 +9,7 @@ import { getPublishedManual } from "@/modules/living-docs-externa/services/get-p
 interface BuildManualNavOptions {
   kind?: string;
   name?: string;
+  playground?: boolean;
 }
 
 export interface ManualNavData {
@@ -20,7 +21,7 @@ export async function buildManualNav(
   slug: string,
   options: BuildManualNavOptions = {},
 ): Promise<ManualNavData | null> {
-  const { kind, name } = options;
+  const { kind, name, playground } = options;
   const project = await getPublishedManual(slug);
   if (!project) return null;
 
@@ -31,7 +32,8 @@ export async function buildManualNav(
       title: "Navegação",
       items: [
         { href: "/manual", label: "Catálogo" },
-        { href: basePath, label: "Roteiro", active: !kind || !name },
+        { href: basePath, label: "Roteiro", active: !playground && (!kind || !name) },
+        { href: `${basePath}/playground`, label: "Playground", active: !!playground },
       ],
     },
     {
@@ -41,11 +43,15 @@ export async function buildManualNav(
         return {
           href,
           label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
-          active: href === `${basePath}/operations/${kind}/${name}`,
+          active: !playground && href === `${basePath}/operations/${kind}/${name}`,
         };
       }),
     },
   ];
+
+  if (playground) {
+    return { sidebarGroups, tocItems: [] };
+  }
 
   const kindResult = kind ? manualOperationKindSchema.safeParse(kind) : null;
 
