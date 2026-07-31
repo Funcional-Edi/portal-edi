@@ -1,9 +1,11 @@
 export {
   projectConfigSchema,
   slugSchema,
+  connectGatewayInputSchema,
   type Project,
   type ProjectConfig,
   type ProjectSummary,
+  type ConnectGatewayInput,
   toProjectSummary,
 } from "@/modules/living-docs-externa/schema/project";
 

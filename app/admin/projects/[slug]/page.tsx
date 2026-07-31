@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
+import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 
 interface ProjectDetailPageProps {
@@ -53,8 +54,19 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </dl>
 
         <p className="mt-6 text-sm text-slate-600">
-          Próximas etapas da Fase 3: conectar gateway, sync schema e editor de operações.
+          Próximas etapas da Fase 3: sync schema e editor de operações.
         </p>
+      </div>
+
+      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Conectar gateway</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Informe a URL GraphQL do gateway e as credenciais para validar a conexão. As
+          credenciais são cifradas e armazenadas apenas no servidor.
+        </p>
+        <div className="mt-5">
+          <ConnectGatewayForm slug={project.config.slug} currentGraphqlUrl={project.config.graphqlUrl} />
+        </div>
       </div>
     </AdminShell>
   );

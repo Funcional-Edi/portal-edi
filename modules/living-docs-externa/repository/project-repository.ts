@@ -104,3 +104,24 @@ export async function createProject(input: {
 
   return { config, manual };
 }
+
+/** Atualiza os dados de conexão do gateway no `config.json` do projeto. */
+export async function updateProjectGatewayConfig(
+  slug: string,
+  gateway: { graphqlUrl: string; gatewaySlug: string }
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    graphqlUrl: gateway.graphqlUrl,
+    gatewaySlug: gateway.gatewaySlug,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}

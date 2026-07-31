@@ -46,6 +46,15 @@ export const createProjectInputSchema = z.object({
 
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>;
 
+export const connectGatewayInputSchema = z.object({
+  graphqlUrl: z.string().url("URL do gateway inválida."),
+  login: z.string().min(1, "Login é obrigatório."),
+  password: z.string().min(1, "Senha é obrigatória."),
+  gatewaySlug: z.string().min(1).max(128).optional(),
+});
+
+export type ConnectGatewayInput = z.infer<typeof connectGatewayInputSchema>;
+
 export interface ProjectSummary {
   slug: string;
   name: string;

@@ -24,4 +24,9 @@ export function projectSchemaPath(slug: string): string {
   return `${CONTENT_PATHS.dataProjectsPrefix}/${slug}/schema.json`;
 }
 
+/** Credenciais do gateway cifradas (AES-256-GCM). Sempre gitignored. */
+export function projectCredentialsPath(slug: string): string {
+  return `${CONTENT_PATHS.dataProjectsPrefix}/${slug}/credentials.enc`;
+}
+
 export type ContentBackend = "local" | "github";
