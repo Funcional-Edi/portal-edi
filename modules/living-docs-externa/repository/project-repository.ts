@@ -125,3 +125,19 @@ export async function updateProjectGatewayConfig(
   await writeContentJson(projectConfigPath(slug), config);
   return config;
 }
+
+/** Atualiza apenas `updatedAt` no `config.json` de um projeto existente. */
+export async function updateProjectConfigUpdatedAt(slug: string): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}

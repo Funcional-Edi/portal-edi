@@ -26,3 +26,10 @@ export {
   titleFromMarkdown,
   type ManualSection,
 } from "@/modules/living-docs-externa/schema/section";
+
+export {
+  introspectionPayloadSchema,
+  projectSchemaSnapshotSchema,
+  type IntrospectionPayload,
+  type ProjectSchemaSnapshot,
+} from "@/modules/living-docs-externa/schema/introspection";

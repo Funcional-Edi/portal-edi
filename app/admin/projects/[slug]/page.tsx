@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
+import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 
 interface ProjectDetailPageProps {
@@ -66,6 +67,17 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </p>
         <div className="mt-5">
           <ConnectGatewayForm slug={project.config.slug} currentGraphqlUrl={project.config.graphqlUrl} />
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Sincronizar schema</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Busca o snapshot de introspection no gateway conectado e salva em{" "}
+          <code>data/projects/{project.config.slug}/schema.json</code>.
+        </p>
+        <div className="mt-5">
+          <SyncSchemaForm slug={project.config.slug} disabled={!project.config.graphqlUrl} />
         </div>
       </div>
     </AdminShell>
