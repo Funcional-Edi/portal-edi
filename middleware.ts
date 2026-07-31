@@ -13,6 +13,12 @@ export default auth((req) => {
   const session = req.auth;
   const role = session?.user?.role;
 
+  if (pathname === "/projects" || pathname.startsWith("/projects/")) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = pathname.replace(/^\/projects(?=\/|$)/, "/manual");
+    return NextResponse.redirect(redirectUrl, 308);
+  }
+
   const isAdminArea = pathname.startsWith("/admin");
   const isManualArea = pathname.startsWith("/manual");
 
@@ -30,5 +36,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/manual/:path*"],
+  matcher: ["/admin/:path*", "/manual/:path*", "/projects/:path*"],
 };

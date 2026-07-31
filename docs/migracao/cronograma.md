@@ -77,10 +77,20 @@ gantt
 | Etapa | Entrega | Status |
 |-------|---------|--------|
 | 2.1 | Render `sections/*.md` no roteiro | ✅ |
-| 2.2 | `ManualShell` completo (sidebar, TOC) | ⏳ |
-| 2.3 | Redirect `/projects/*` → `/manual/*` | ⏳ |
-| 2.4 | Adapter GitHub CMS | ⏳ |
-| 2.5 | Cache `unstable_cache` + tags | ⏳ |
+| 2.2 | `ManualShell` completo (sidebar, TOC) | ✅ |
+| 2.3 | Redirect `/projects/*` → `/manual/*` | ✅ |
+| 2.4 | Adapter GitHub CMS | ✅ |
+| 2.5 | Cache `unstable_cache` + tags | ✅ |
+
+### Fase 3 — progresso por etapas (estudo)
+
+| Etapa | Entrega | Status |
+|-------|---------|--------|
+| 3.1 | `/admin/projects` listar + criar slug | ✅ |
+| 3.2 | Connect gateway | ⏳ |
+| 3.3 | Sync schema | ⏳ |
+| 3.4 | Editor operações (form) | ⏳ |
+| 3.5 | Toggle `published` | ⏳ |
 
 ---
 

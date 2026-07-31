@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   test: {
     environment: "node",
+    setupFiles: ["./config/vitest.setup.ts"],
     include: ["core/**/*.test.ts", "modules/**/*.test.ts"],
     coverage: {
       provider: "v8",

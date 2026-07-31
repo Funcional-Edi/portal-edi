@@ -4,10 +4,10 @@ import {
   projectManualPath,
 } from "@/core/db/adapters/content-paths";
 import {
-  listLocalSubdirs,
-  readLocalJson,
-} from "@/core/db/adapters/local-content-store";
-import { getContentBackend } from "@/core/db/adapters";
+  listContentSubdirs,
+  readContentJson,
+  writeContentJson,
+} from "@/core/db/adapters";
 import {
   integrationManualSchema,
   type IntegrationManual,
@@ -17,6 +17,7 @@ import {
   type Project,
   type ProjectSummary,
   toProjectSummary,
+  type ProjectConfig,
 } from "@/modules/living-docs-externa/schema/project";
 
 function defaultManual(name: string): IntegrationManual {
@@ -27,14 +28,14 @@ function defaultManual(name: string): IntegrationManual {
   };
 }
 
-async function loadProjectFromLocal(slug: string): Promise<Project | null> {
-  const configRaw = await readLocalJson<unknown>(projectConfigPath(slug));
+async function loadProjectFromStore(slug: string): Promise<Project | null> {
+  const configRaw = await readContentJson<unknown>(projectConfigPath(slug));
   if (!configRaw) return null;
 
   const configResult = projectConfigSchema.safeParse(configRaw);
   if (!configResult.success) return null;
 
-  const manualRaw = await readLocalJson<unknown>(projectManualPath(slug));
+  const manualRaw = await readContentJson<unknown>(projectManualPath(slug));
   const manualResult = manualRaw
     ? integrationManualSchema.safeParse(manualRaw)
     : null;
@@ -48,17 +49,11 @@ async function loadProjectFromLocal(slug: string): Promise<Project | null> {
 }
 
 export async function listProjectSlugs(): Promise<string[]> {
-  if (getContentBackend() !== "local") {
-    throw new Error("GitHub content store ainda não implementado (Fase 2).");
-  }
-  return listLocalSubdirs(CONTENT_PATHS.projectsPrefix);
+  return listContentSubdirs(CONTENT_PATHS.projectsPrefix);
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
-  if (getContentBackend() !== "local") {
-    throw new Error("GitHub content store ainda não implementado (Fase 2).");
-  }
-  return loadProjectFromLocal(slug);
+  return loadProjectFromStore(slug);
 }
 
 export async function listProjectSummaries(): Promise<ProjectSummary[]> {
@@ -76,4 +71,36 @@ export async function listProjectSummaries(): Promise<ProjectSummary[]> {
 export async function listPublishedProjectSummaries(): Promise<ProjectSummary[]> {
   const all = await listProjectSummaries();
   return all.filter((p) => p.published);
+}
+
+export async function projectExists(slug: string): Promise<boolean> {
+  const config = await readContentJson(projectConfigPath(slug));
+  return config !== null;
+}
+
+export async function createProject(input: {
+  slug: string;
+  name: string;
+  description?: string;
+}): Promise<Project> {
+  if (await projectExists(input.slug)) {
+    throw new Error("PROJECT_ALREADY_EXISTS");
+  }
+
+  const now = new Date().toISOString();
+  const config: ProjectConfig = {
+    slug: input.slug,
+    name: input.name,
+    description: input.description,
+    published: false,
+    manualStatus: "draft",
+    createdAt: now,
+    updatedAt: now,
+  };
+  const manual = defaultManual(input.name);
+
+  await writeContentJson(projectConfigPath(input.slug), config);
+  await writeContentJson(projectManualPath(input.slug), manual);
+
+  return { config, manual };
 }

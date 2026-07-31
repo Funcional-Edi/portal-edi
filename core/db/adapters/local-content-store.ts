@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { getContentRoot } from "@/core/config/env";
@@ -37,6 +37,13 @@ export async function listLocalSubdirs(relativeDir: string): Promise<string[]> {
   } catch {
     return [];
   }
+}
+
+/** Grava JSON no filesystem local (cria pastas intermediárias se necessário). */
+export async function writeLocalJson(relativePath: string, data: unknown): Promise<void> {
+  const fullPath = resolvePath(relativePath);
+  await mkdir(path.dirname(fullPath), { recursive: true });
+  await writeFile(fullPath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
 
 /** Lista nomes de arquivos (não pastas) em um diretório relativo. */
