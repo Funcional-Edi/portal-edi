@@ -51,9 +51,22 @@ export const integrationManualSchema = z.object({
   operations: z.array(manualOperationSchema),
 });
 
+/** Entrada de criação: `order` é opcional (auto-atribuído se ausente). */
+export const createManualOperationInputSchema = manualOperationSchema.extend({
+  order: z.number().int().min(1).optional(),
+});
+
+/** Entrada de edição: `kind`/`name` identificam a operação e não são editáveis aqui. */
+export const updateManualOperationInputSchema = manualOperationSchema.omit({
+  kind: true,
+  name: true,
+});
+
 export type ManualOperationKind = z.infer<typeof manualOperationKindSchema>;
 export type ManualOperation = z.infer<typeof manualOperationSchema>;
 export type IntegrationManual = z.infer<typeof integrationManualSchema>;
+export type CreateManualOperationInput = z.infer<typeof createManualOperationInputSchema>;
+export type UpdateManualOperationInput = z.infer<typeof updateManualOperationInputSchema>;
 
 export function sortOperations(manual: IntegrationManual): ManualOperation[] {
   return [...manual.operations].sort((a, b) => a.order - b.order);

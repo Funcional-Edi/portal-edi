@@ -13,11 +13,15 @@ export {
   integrationManualSchema,
   manualOperationSchema,
   manualOperationKindSchema,
+  createManualOperationInputSchema,
+  updateManualOperationInputSchema,
   findOperation,
   sortOperations,
   type IntegrationManual,
   type ManualOperation,
   type ManualOperationKind,
+  type CreateManualOperationInput,
+  type UpdateManualOperationInput,
 } from "@/modules/living-docs-externa/schema/manual";
 
 export {

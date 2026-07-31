@@ -9,7 +9,7 @@ schema/       # Zod: ProjectConfig, IntegrationManual
 repository/   # I/O CMS (content/ + data/), inclui credentials-repository
 services/     # Regras: listagem publicada, get manual, connect-gateway
 ui/reader/    # Catálogo, roteiro, detalhe de operação
-ui/admin/     # CRUD projetos, conectar gateway (Fase 3.2)
+ui/admin/     # CRUD projetos, conectar gateway (3.2), sync schema (3.3), editor de operações (3.4)
 ```
 
 ## Rotas

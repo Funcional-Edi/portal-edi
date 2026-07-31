@@ -126,6 +126,23 @@ export async function updateProjectGatewayConfig(
   return config;
 }
 
+export async function getManual(slug: string): Promise<IntegrationManual | null> {
+  const project = await loadProjectFromStore(slug);
+  return project?.manual ?? null;
+}
+
+/**
+ * Sobrescreve `manual.json` do projeto. Só I/O — validação de schema e regras
+ * (duplicidade, existência da operação etc.) ficam em
+ * `services/manage-manual-operations.ts`.
+ */
+export async function writeManual(slug: string, manual: IntegrationManual): Promise<void> {
+  if (!(await projectExists(slug))) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+  await writeContentJson(projectManualPath(slug), manual);
+}
+
 /** Atualiza apenas `updatedAt` no `config.json` de um projeto existente. */
 export async function updateProjectConfigUpdatedAt(slug: string): Promise<ProjectConfig> {
   const project = await loadProjectFromStore(slug);
