@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "title": "Integracao IM - Inventario",
+  "productName": "Inventory Management",
+  "manualVersion": "1.3.0",
+  "versionHistory": [
+    {
+      "date": "2026-08-20",
+      "author": "Time EDI",
+      "details": "Ajuste de notas de negocio para janela de processamento.",
+      "version": "1.3.0"
+    },
+    {
+      "date": "2026-07-28",
+      "author": "Time EDI",
+      "details": "Migracao inicial para o Portal de Integracao.",
+      "version": "1.2.0"
+    }
+  ],
+  "referenceTables": [
+    {
+      "id": "operation-type",
+      "title": "operationType - modos de carga",
+      "columns": ["Valor", "Uso"],
+      "rows": [
+        ["INSERT", "Primeira carga do dia ou novos produtos"],
+        ["OVERLAP", "Sobrescreve a carga da mesma data"],
+        ["DELETE", "Remove produtos enviados da carga"]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "kind": "mutation",
+      "name": "createToken",
+      "order": 1,
+      "title": "1. Obter token do gateway",
+      "description": "Autentica no gateway antes de enviar inventario.",
+      "authRequired": false,
+      "businessNotes": [
+        "Token expira em 24h.",
+        "Nunca reutilizar token de producao em homolog."
+      ],
+      "exampleQuery": "mutation createToken {\n  createToken(\n    login: \"<login>\"\n    password: \"<senha>\"\n  ) {\n    token\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "saveInventories",
+      "order": 2,
+      "title": "2. Enviar carga de estoque",
+      "description": "Envia ate 500 itens por requisicao para o gateway.",
+      "prerequisites": ["createToken"],
+      "businessNotes": [
+        "Cargas acima de 500 itens devem ser quebradas em lotes.",
+        "Para indisponivel, enviar supply: 0."
+      ],
+      "relatedSections": ["visao-geral", "janela-processamento"],
+      "exampleQuery": "mutation saveInventories {\n  saveInventories(\n    industryCode: \"FAB\"\n    inventories: [\n      {\n        referenceDate: \"2026-08-20\"\n        customerCode: \"00000000000000\"\n        customerType: WHOLESALER\n        productCode: \"7891106001946\"\n        supply: 400\n        operationType: INSERT\n      }\n    ]\n  ) {\n    status\n    loadId\n    message\n  }\n}"
+    }
+  ]
+}

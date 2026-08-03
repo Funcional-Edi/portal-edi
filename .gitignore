@@ -11,6 +11,8 @@
 # testes e análise de arquitetura
 /coverage
 architecture.dot
+/test-results
+/playwright-report
 
 # ambiente (NUNCA commitar segredos)
 .env

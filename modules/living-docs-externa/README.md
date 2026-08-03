@@ -48,6 +48,17 @@ Regras de segurança:
 
 Layout compatível com `documentacao-funcional` (ADR-0009). Seed: `content/projects/demo/`.
 
+Conteudo real da Fase 5:
+
+- `content/projects/im/`
+- `content/projects/wholesaler/`
+
+Migracao automatizada (legado -> portal):
+
+```bash
+npm run migrate:legacy-content -- --legacy-root ../documentacao-funcional
+```
+
 Seções Markdown: `content/projects/{slug}/sections/*.md` (etapa 2.1).
 
 Credenciais do gateway (login/senha) ficam cifradas (AES-256-GCM, chave
