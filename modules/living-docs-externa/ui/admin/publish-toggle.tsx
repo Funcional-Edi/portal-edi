@@ -3,15 +3,26 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import type { ManualQualityReport } from "@/modules/living-docs-externa/services/manual-quality";
+
 interface PublishToggleProps {
   slug: string;
   published: boolean;
+  /**
+   * Quando informado, o botão de publicar já aparece desabilitado se o
+   * checklist reprovar — o servidor bloqueia de todo jeito (422), isto só
+   * evita o clique inútil.
+   */
+  qualityReport?: ManualQualityReport;
 }
 
-export function PublishToggle({ slug, published }: PublishToggleProps) {
+export function PublishToggle({ slug, published, qualityReport }: PublishToggleProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const blockedByQuality =
+    !published && qualityReport != null && !qualityReport.readyToPublish;
 
   async function handleToggle() {
     setSubmitting(true);
@@ -51,7 +62,7 @@ export function PublishToggle({ slug, published }: PublishToggleProps) {
         </span>
         <button
           type="button"
-          disabled={submitting}
+          disabled={submitting || blockedByQuality}
           onClick={handleToggle}
           className={
             published
@@ -62,6 +73,13 @@ export function PublishToggle({ slug, published }: PublishToggleProps) {
           {submitting ? "Atualizando…" : published ? "Despublicar" : "Publicar"}
         </button>
       </div>
+
+      {blockedByQuality ? (
+        <p className="text-xs text-red-800">
+          {qualityReport.failed} pendência{qualityReport.failed === 1 ? "" : "s"} no checklist de
+          qualidade impedem a publicação.
+        </p>
+      ) : null}
 
       {error ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">

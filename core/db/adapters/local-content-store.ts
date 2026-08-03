@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { getContentRoot } from "@/core/config/env";
@@ -44,6 +44,24 @@ export async function writeLocalJson(relativePath: string, data: unknown): Promi
   const fullPath = resolvePath(relativePath);
   await mkdir(path.dirname(fullPath), { recursive: true });
   await writeFile(fullPath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+}
+
+/** Grava texto puro no filesystem local (ex.: sections/*.md). */
+export async function writeLocalText(relativePath: string, content: string): Promise<void> {
+  const fullPath = resolvePath(relativePath);
+  await mkdir(path.dirname(fullPath), { recursive: true });
+  await writeFile(fullPath, content, "utf8");
+}
+
+/** Remove um arquivo. Retorna false se ele não existia. */
+export async function deleteLocalFile(relativePath: string): Promise<boolean> {
+  const fullPath = resolvePath(relativePath);
+  try {
+    await rm(fullPath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Lista nomes de arquivos (não pastas) em um diretório relativo. */

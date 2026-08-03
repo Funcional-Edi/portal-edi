@@ -32,6 +32,14 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
+  // Curadoria do portal legado virou o editor canônico (fase 6).
+  const curateMatch = pathname.match(/^\/admin\/projects\/([^/]+)\/curate(?:\/.*)?$/);
+  if (curateMatch) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = `/admin/projects/${curateMatch[1]}/edit`;
+    return NextResponse.redirect(redirectUrl, 308);
+  }
+
   return NextResponse.next();
 });
 

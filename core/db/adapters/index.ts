@@ -7,12 +7,14 @@ import {
   githubContentStore,
 } from "@/core/db/adapters/github-content-store";
 import {
+  deleteLocalFile,
   listLocalFiles,
   listLocalSubdirs,
   readLocalJson,
   readLocalText,
   localContentStore,
   writeLocalJson,
+  writeLocalText,
 } from "@/core/db/adapters/local-content-store";
 import type { DataStore } from "@/core/db";
 
@@ -59,6 +61,22 @@ export async function writeContentJson(relativePath: string, data: unknown): Pro
     throw new Error("Escrita no GitHub CMS ainda não implementada.");
   }
   return writeLocalJson(relativePath, data);
+}
+
+/** Porta única para gravar Markdown/texto (`sections/*.md`). */
+export async function writeContentText(relativePath: string, content: string): Promise<void> {
+  if (getContentBackend() === "github") {
+    throw new Error("Escrita no GitHub CMS ainda não implementada.");
+  }
+  return writeLocalText(relativePath, content);
+}
+
+/** Porta única para remover um arquivo de conteúdo. */
+export async function deleteContentFile(relativePath: string): Promise<boolean> {
+  if (getContentBackend() === "github") {
+    throw new Error("Escrita no GitHub CMS ainda não implementada.");
+  }
+  return deleteLocalFile(relativePath);
 }
 
 export function getContentStore(): DataStore {

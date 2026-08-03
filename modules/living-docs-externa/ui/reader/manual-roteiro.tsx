@@ -1,19 +1,48 @@
-import type { ManualSection, Project } from "@/modules/living-docs-externa/schema";
+import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
 import Link from "next/link";
+import type { ReactNode } from "react";
+
+/**
+ * Pontos de extensão do modo admin (etapa 6.1/6.2). Existem para que o editor
+ * e a visão do distribuidor compartilhem UM layout só: o admin injeta controles
+ * nos mesmos cards que o distribuidor vê, em vez de haver uma segunda tela.
+ */
+export interface ManualRoteiroEditorSlots {
+  /** Substitui o corpo Markdown da seção (editor inline). */
+  renderSectionBody?: (section: ManualSection) => ReactNode;
+  /** Controles no card da seção (editar, remover). */
+  renderSectionActions?: (section: ManualSection) => ReactNode;
+  /** Controles no card da operação (abrir slide-over, remover). */
+  renderOperationActions?: (operation: ManualOperation) => ReactNode;
+  /** Substitui o link de playground no cabeçalho. */
+  headerActions?: ReactNode;
+  /** Faixa acima do manual (status, checklist de qualidade). */
+  banner?: ReactNode;
+  /** Ações do bloco "Contexto" (nova seção). */
+  sectionsToolbar?: ReactNode;
+  /** Ações do bloco "Roteiro de integração" (nova operação). */
+  operationsToolbar?: ReactNode;
+}
 
 interface ManualRoteiroProps {
   project: Project;
   sections: ManualSection[];
+  /** Ausente = visão do distribuidor (somente leitura). */
+  editor?: ManualRoteiroEditorSlots;
 }
 
-export function ManualRoteiro({ project, sections }: ManualRoteiroProps) {
+export function ManualRoteiro({ project, sections, editor }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
+  const isEditing = editor != null;
+  const showContext = sections.length > 0 || isEditing;
 
   return (
     <article>
+      {editor?.banner ? <div className="mb-6">{editor.banner}</div> : null}
+
       <header className="mb-8 border-b border-slate-200 pb-6">
         <p className="text-sm font-medium text-brand-700">Manual de integração</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">{manual.title}</h1>
@@ -27,25 +56,44 @@ export function ManualRoteiro({ project, sections }: ManualRoteiroProps) {
           <p className="mt-2 text-xs text-slate-500">Versão {manual.manualVersion}</p>
         ) : null}
         <div className="mt-4">
-          <Link
-            href={`/manual/${config.slug}/playground`}
-            className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-          >
-            Abrir playground GraphQL
-          </Link>
+          {editor?.headerActions ?? (
+            <Link
+              href={`/manual/${config.slug}/playground`}
+              className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+            >
+              Abrir playground GraphQL
+            </Link>
+          )}
         </div>
       </header>
 
-      {sections.length > 0 ? (
+      {showContext ? (
         <section id="contexto" className="mb-10 space-y-8 scroll-mt-24">
-          <h2 className="text-lg font-semibold">Contexto</h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold">Contexto</h2>
+            {editor?.sectionsToolbar}
+          </div>
+
+          {sections.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-600">
+              Nenhuma seção de contexto ainda. O distribuidor abriria o manual direto no
+              roteiro.
+            </p>
+          ) : null}
+
           {sections.map((section) => (
             <div
               key={section.id}
               id={`section-${section.id}`}
               className="rounded-lg border border-slate-200 bg-white p-5"
             >
-              <MarkdownBody source={section.body} />
+              {editor?.renderSectionActions ? (
+                <div className="mb-3 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                  <span className="font-mono text-xs text-slate-500">{section.id}.md</span>
+                  {editor.renderSectionActions(section)}
+                </div>
+              ) : null}
+              {editor?.renderSectionBody?.(section) ?? <MarkdownBody source={section.body} />}
             </div>
           ))}
         </section>
@@ -92,28 +140,51 @@ export function ManualRoteiro({ project, sections }: ManualRoteiroProps) {
       ) : null}
 
       <section id="roteiro-integracao" className="scroll-mt-24">
-        <h2 className="mb-4 text-lg font-semibold">Roteiro de integração</h2>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold">Roteiro de integração</h2>
+          {editor?.operationsToolbar}
+        </div>
+
+        {operations.length === 0 && isEditing ? (
+          <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-600">
+            Nenhuma operação cadastrada neste manual ainda.
+          </p>
+        ) : null}
+
         <ol className="space-y-4">
-          {operations.map((op) => (
-            <li key={`${op.kind}-${op.name}`}>
-              <Link
-                href={`/manual/${config.slug}/operations/${op.kind}/${op.name}`}
-                className="block rounded-lg border border-slate-200 p-4 transition hover:border-brand-600"
-              >
-                <span className="text-xs font-medium uppercase text-brand-700">
-                  {op.kind}
-                </span>
-                <h3 className="mt-1 font-semibold">
-                  {op.title ?? `${op.kind} ${op.name}`}
-                </h3>
+          {operations.map((op) => {
+            const card = (
+              <>
+                <span className="text-xs font-medium uppercase text-brand-700">{op.kind}</span>
+                <h3 className="mt-1 font-semibold">{op.title ?? `${op.kind} ${op.name}`}</h3>
                 {op.description ? (
-                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">
-                    {op.description}
-                  </p>
+                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">{op.description}</p>
                 ) : null}
-              </Link>
-            </li>
-          ))}
+              </>
+            );
+
+            return (
+              <li key={`${op.kind}-${op.name}`}>
+                {isEditing ? (
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    {card}
+                    {editor?.renderOperationActions ? (
+                      <div className="mt-3 border-t border-slate-100 pt-3">
+                        {editor.renderOperationActions(op)}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <Link
+                    href={`/manual/${config.slug}/operations/${op.kind}/${op.name}`}
+                    className="block rounded-lg border border-slate-200 p-4 transition hover:border-brand-600"
+                  >
+                    {card}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ol>
       </section>
     </article>

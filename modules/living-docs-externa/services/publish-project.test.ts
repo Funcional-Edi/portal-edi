@@ -9,8 +9,32 @@ vi.mock("next/cache", () => ({
   revalidateTag: revalidateTagMock,
 }));
 
-import { createProject, getProject } from "@/modules/living-docs-externa/repository/project-repository";
+import { createProject, getProject, writeManual } from "@/modules/living-docs-externa/repository/project-repository";
+import { writeManualSection } from "@/modules/living-docs-externa/repository/section-repository";
 import { PublishProjectError, setProjectPublished } from "@/modules/living-docs-externa/services/publish-project";
+
+/** Deixa o projeto `demo` aprovado no checklist de qualidade (etapa 6.5). */
+async function makePublishable(): Promise<void> {
+  await writeManual("demo", {
+    version: 1,
+    title: "Integração Demo",
+    productName: "Demo Gateway",
+    operations: [
+      {
+        kind: "query",
+        name: "listItems",
+        order: 1,
+        description: "Lista os itens disponíveis no gateway.",
+        exampleQuery: "query listItems { listItems { id } }",
+      },
+    ],
+  });
+  await writeManualSection(
+    "demo",
+    "visao-geral",
+    "# Visão geral\n\nEste manual descreve a integração de demonstração usada nos testes automatizados do portal.\n"
+  );
+}
 
 describe("publishProject service", () => {
   let tempRoot: string;
@@ -32,6 +56,8 @@ describe("publishProject service", () => {
   });
 
   it("publica um projeto: seta published e manualStatus, invalida cache", async () => {
+    await makePublishable();
+
     const config = await setProjectPublished("demo", { published: true });
 
     expect(config.published).toBe(true);
@@ -45,6 +71,7 @@ describe("publishProject service", () => {
   });
 
   it("despublica um projeto: volta manualStatus para draft", async () => {
+    await makePublishable();
     await setProjectPublished("demo", { published: true });
     revalidateTagMock.mockClear();
 
@@ -53,6 +80,29 @@ describe("publishProject service", () => {
     expect(config.published).toBe(false);
     expect(config.manualStatus).toBe("draft");
     expect(revalidateTagMock).toHaveBeenCalledWith("living-docs:project:demo");
+  });
+
+  it("bloqueia publicação quando o checklist de qualidade reprova", async () => {
+    await expect(setProjectPublished("demo", { published: true })).rejects.toMatchObject({
+      code: "QUALITY_GATE",
+    });
+
+    const loaded = await getProject("demo");
+    expect(loaded?.config.published).toBe(false);
+    expect(revalidateTagMock).not.toHaveBeenCalled();
+  });
+
+  it("anexa o relatório de qualidade ao erro para o editor listar pendências", async () => {
+    const error = await setProjectPublished("demo", { published: true }).catch((e) => e);
+
+    expect(error).toBeInstanceOf(PublishProjectError);
+    expect((error as PublishProjectError).report?.readyToPublish).toBe(false);
+    expect((error as PublishProjectError).report?.failed).toBeGreaterThan(0);
+  });
+
+  it("despublicar nunca é bloqueado pelo checklist", async () => {
+    const config = await setProjectPublished("demo", { published: false });
+    expect(config.published).toBe(false);
   });
 
   it("rejeita entrada inválida sem persistir nem invalidar cache", async () => {

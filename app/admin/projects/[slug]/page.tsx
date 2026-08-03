@@ -7,6 +7,7 @@ import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-sche
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
 import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
+import { getManualQualityReport } from "@/modules/living-docs-externa/services/manual-quality";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -16,6 +17,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   const { slug } = await params;
   const project = await getProject(slug);
   if (!project) notFound();
+
+  const qualityReport = await getManualQualityReport(slug);
 
   return (
     <AdminShell>
@@ -28,6 +31,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </Link>
         <h1 className="mt-3 text-3xl font-bold tracking-tight">{project.config.name}</h1>
         <p className="mt-2 font-mono text-sm text-slate-500">{project.config.slug}</p>
+        <Link
+          href={`/admin/projects/${project.config.slug}/edit`}
+          className="mt-4 inline-flex items-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800"
+        >
+          Abrir editor do manual
+        </Link>
       </header>
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">
@@ -35,7 +44,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <div>
             <dt className="text-xs font-semibold uppercase text-slate-500">Status</dt>
             <dd className="mt-1">
-              <PublishToggle slug={project.config.slug} published={project.config.published} />
+              <PublishToggle
+                slug={project.config.slug}
+                published={project.config.published}
+                qualityReport={qualityReport ?? undefined}
+              />
             </dd>
           </div>
           <div>

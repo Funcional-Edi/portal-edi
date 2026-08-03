@@ -6,6 +6,9 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: "list",
+  /** O dev server compila rota por rota sob demanda: a primeira visita é lenta. */
+  timeout: 120 * 1000,
+  expect: { timeout: 20 * 1000 },
   use: {
     baseURL: "http://localhost:3002",
     trace: "on-first-retry",

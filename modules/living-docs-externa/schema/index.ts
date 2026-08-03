@@ -17,6 +17,7 @@ export {
   manualOperationKindSchema,
   createManualOperationInputSchema,
   updateManualOperationInputSchema,
+  updateManualMetadataInputSchema,
   findOperation,
   sortOperations,
   type IntegrationManual,
@@ -24,13 +25,18 @@ export {
   type ManualOperationKind,
   type CreateManualOperationInput,
   type UpdateManualOperationInput,
+  type UpdateManualMetadataInput,
 } from "@/modules/living-docs-externa/schema/manual";
 
 export {
   sectionIdSchema,
   manualSectionSchema,
+  createManualSectionInputSchema,
+  updateManualSectionInputSchema,
   titleFromMarkdown,
   type ManualSection,
+  type CreateManualSectionInput,
+  type UpdateManualSectionInput,
 } from "@/modules/living-docs-externa/schema/section";
 
 export {

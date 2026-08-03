@@ -21,9 +21,19 @@ interface ManualShellProps {
   children: ReactNode;
   sidebarGroups?: ManualNavGroup[];
   tocItems?: ManualTocItem[];
+  /** Rótulo do cabeçalho. O admin troca para identificar o modo edição. */
+  subtitle?: string;
+  /** Links à direita do cabeçalho. Padrão: catálogo do distribuidor. */
+  headerActions?: ReactNode;
 }
 
-export function ManualShell({ children, sidebarGroups = [], tocItems = [] }: ManualShellProps) {
+export function ManualShell({
+  children,
+  sidebarGroups = [],
+  tocItems = [],
+  subtitle = "Documentação viva",
+  headerActions,
+}: ManualShellProps) {
   const hasSidebar = sidebarGroups.some((group) => group.items.length > 0);
   const hasToc = tocItems.length > 0;
   const hasRailLayout = hasSidebar || hasToc;
@@ -36,14 +46,16 @@ export function ManualShell({ children, sidebarGroups = [], tocItems = [] }: Man
             <Link href="/" className="text-xs font-medium text-slate-500 hover:text-brand-700">
               Portal de Integração
             </Link>
-            <p className="text-sm font-semibold text-slate-900">Documentação viva</p>
+            <p className="text-sm font-semibold text-slate-900">{subtitle}</p>
           </div>
-          <Link
-            href="/manual"
-            className="text-sm font-medium text-brand-700 hover:underline"
-          >
-            Catálogo
-          </Link>
+          {headerActions ?? (
+            <Link
+              href="/manual"
+              className="text-sm font-medium text-brand-700 hover:underline"
+            >
+              Catálogo
+            </Link>
+          )}
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-10">

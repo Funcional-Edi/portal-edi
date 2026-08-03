@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
-import { PublishProjectError, setProjectPublished } from "@/modules/living-docs-externa/services/publish-project";
+import {
+  ManageMetadataError,
+  updateManualMetadata,
+} from "@/modules/living-docs-externa/services/manage-manual-metadata";
 
 async function requireAdmin() {
   const session = await auth();
@@ -11,17 +14,16 @@ async function requireAdmin() {
   return session;
 }
 
-const STATUS_BY_ERROR_CODE: Record<PublishProjectError["code"], number> = {
+const STATUS_BY_ERROR_CODE: Record<ManageMetadataError["code"], number> = {
   VALIDATION: 400,
   PROJECT_NOT_FOUND: 404,
-  /** Checklist de qualidade reprovado: requisição bem formada, estado inválido. */
-  QUALITY_GATE: 422,
 };
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }
 
+/** Atualiza o cabeçalho do manual (título, produto, versão). */
 export async function PATCH(request: Request, { params }: RouteParams) {
   const session = await requireAdmin();
   if (!session) {
@@ -38,17 +40,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   try {
-    const config = await setProjectPublished(slug, body);
+    const manual = await updateManualMetadata(slug, body);
     return NextResponse.json({
-      slug: config.slug,
-      published: config.published,
-      manualStatus: config.manualStatus,
-      updatedAt: config.updatedAt,
+      title: manual.title,
+      productName: manual.productName,
+      manualVersion: manual.manualVersion,
     });
   } catch (error) {
-    if (error instanceof PublishProjectError) {
+    if (error instanceof ManageMetadataError) {
       return NextResponse.json(
-        { error: error.message, report: error.report },
+        { error: error.message },
         { status: STATUS_BY_ERROR_CODE[error.code] }
       );
     }
