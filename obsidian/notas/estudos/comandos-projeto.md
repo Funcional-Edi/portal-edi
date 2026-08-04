@@ -4,11 +4,11 @@ Todos rodam na **raiz** do projeto: `C:\Projetos Cursor\Portal-Edi`
 
 ## Rodar o portal
 
-| Comando | Para que serve |
-| --- | --- |
-| `npm run dev` | Sobe o portal em modo desenvolvimento (recarrega ao salvar) → http://localhost:3002 |
-| `npm run build` | Gera a versão otimizada de produção (checa tipos e compila tudo) |
-| `npm run start` | Roda a versão de produção já buildada, na porta 3002 |
+| Comando         | Para que serve                                                                      |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `npm run dev`   | Sobe o portal em modo desenvolvimento (recarrega ao salvar) → http://localhost:3002 |
+| `npm run build` | Gera a versão otimizada de produção (checa tipos e compila tudo)                    |
+| `npm run start` | Roda a versão de produção já buildada, na porta 3002                                |
 
 Parar o servidor: `Ctrl + C` no terminal.
 
