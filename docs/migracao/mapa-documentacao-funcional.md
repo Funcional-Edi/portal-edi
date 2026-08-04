@@ -219,13 +219,18 @@ Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
 
 - [x] **Fase 0** — Mapa + ADR-0009 + cronograma
 - [x] **Fase 1** — Schemas, adapter local, catálogo + roteiro + operação
-- [ ] **Fase 2** — Seções Markdown, redirect legado, shell navegação completo
-- [ ] **Fase 3** — Admin CRUD projetos, connect, sync, publicar
-- [ ] **Fase 4** — Playground + proxy GraphQL + allowlist
-- [ ] **Fase 5** — Migrar conteúdo real (IM, wholesaler) + E2E Playwright
-- [ ] **Fase 6** — Editor WYSIWYG canônico
-- [ ] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`)
+- [x] **Fase 2** — Seções Markdown, redirect legado, shell navegação completo
+- [x] **Fase 3** — Admin CRUD projetos, connect, sync, publicar
+- [x] **Fase 4** — Playground + proxy GraphQL + allowlist
+- [x] **Fase 5** — Migrar conteúdo real (IM, wholesaler) + E2E Playwright
+- [x] **Fase 6** — Editor Markdown canônico (sem lib WYSIWYG — ver cronograma §6)
+- [ ] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`) — em andamento
 - [ ] **Fase 8** — Export, métricas, busca, guias transversais
+
+### Pendências fora das fases
+
+- [ ] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md)
+- [ ] Migrar `canal-autorizador` (depende da Fase 7)
 
 ---
 
@@ -235,3 +240,4 @@ Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
 - ADRs: `docs/arquitetura/adr/0001`, `0002`, `0003`, `0009`
 - Módulo: `modules/living-docs-externa/README.md`
 - Mapa geral: `docs/estrutura/mapa-projeto.md`
+- Cofre Obsidian (navegação + estudos): `obsidian/COMO-USAR.md`
