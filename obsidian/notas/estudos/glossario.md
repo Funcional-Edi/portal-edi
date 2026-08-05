@@ -28,6 +28,9 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Middleware** | Código que roda **antes** de toda requisição (`middleware.ts`) |
 | **SSR / SSG / ISR** | Render no servidor a cada request / na build / na build com revalidação |
 | **Slot / children** | Injetar conteúdo dentro de um componente (usado no editor da Fase 6) |
+| **AppShell / AppHeader** | Casca visual compartilhada em `core/ui` (marca, nav, ações). Ver ADR-0010 |
+| **Geist** | Fonte do portal (`geist` + CSS variables no `app/layout.tsx`) |
+| **lucide-react** | Biblioteca de ícones SVG usada na home, login e catálogo |
 
 ## TypeScript
 

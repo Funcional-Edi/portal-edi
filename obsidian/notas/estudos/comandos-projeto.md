@@ -12,6 +12,10 @@ Todos rodam na **raiz** do projeto: `C:\Projetos Cursor\Portal-Edi`
 
 Parar o servidor: `Ctrl + C` no terminal.
 
+> **Um `dev` por pasta.** Na mesma cópia do projeto só pode haver **um**
+> `npm run dev` (e não rode `npm run ci`/`build` com o dev aberto — disputa a
+> pasta `.next/`). Detalhe em [[fluxo-quando-quebra#npm run ci / build estranho]].
+
 ## Por que só um comando
 
 Em muitos projetos você sobe **backend** e **frontend** separados (dois terminais).
@@ -66,7 +70,7 @@ Para logar sem SSO em local: `DEV_AUTH_ENABLED=true`.
 
 | URL | O que é |
 | --- | --- |
-| http://localhost:3002 | Home — lista módulos ativos |
+| http://localhost:3002 | Home — módulos ativos em destaque + planejados |
 | http://localhost:3002/login | Login |
 | http://localhost:3002/manual | Catálogo de manuais (visão do distribuidor) |
 | http://localhost:3002/admin/projects | Admin — criar/editar manuais |

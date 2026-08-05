@@ -20,13 +20,6 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 - [[produtos/im/_index|im]]
 - [[produtos/wholesaler/_index|wholesaler]]
 
-## Estudos
-
-- [[00-PAINEL-ESTUDOS|Painel de estudos (comandos, fluxos, cronograma)]]
-- [[cronograma-estudos|Cronograma de estudos]]
-- [[glossario|Glossário]]
-- [[diario|Diário de aprendizado]]
-
 ## Suas anotações
 
 Crie notas em `notas/` — essa pasta não é sobrescrita pelo sync.

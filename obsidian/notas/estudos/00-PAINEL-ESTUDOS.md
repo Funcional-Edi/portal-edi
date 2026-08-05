@@ -30,6 +30,12 @@ Consulta rápida do dia a dia. Aprender **implementando** neste projeto.
 - [[fluxo-novo-modulo|Criar um módulo novo neste projeto]]
 - [[fluxo-quando-quebra|Quando algo quebra — como investigar]]
 
+## UI / casca do portal
+
+- Decisão: `docs/arquitetura/adr/0010-ui-shell-compartilhado.md` (via `obsidian/docs/…`)
+- Checklist e diagnóstico: `docs/migracao/decisoes-ui.md`
+- Código: `core/ui/` (`AppShell`, `Badge`, `SessionActions`)
+
 ## Estudo
 
 - [[cronograma-estudos|Cronograma de estudos]] — o que aprender em cada fase

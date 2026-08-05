@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { AppHeader, type AppNavItem } from "@/core/ui/app-shell";
+import { SessionActions } from "@/core/ui/session-actions";
+
 export interface ManualNavItem {
   href: string;
   label: string;
@@ -23,6 +26,8 @@ interface ManualShellProps {
   tocItems?: ManualTocItem[];
   /** Rótulo do cabeçalho. O admin troca para identificar o modo edição. */
   subtitle?: string;
+  /** Links principais no header (ex.: Catálogo). */
+  navItems?: AppNavItem[];
   /** Links à direita do cabeçalho. Padrão: catálogo do distribuidor. */
   headerActions?: ReactNode;
 }
@@ -32,32 +37,34 @@ export function ManualShell({
   sidebarGroups = [],
   tocItems = [],
   subtitle = "Documentação viva",
+  navItems = [],
   headerActions,
 }: ManualShellProps) {
   const hasSidebar = sidebarGroups.some((group) => group.items.length > 0);
   const hasToc = tocItems.length > 0;
   const hasRailLayout = hasSidebar || hasToc;
+  const showDefaultCatalogLink = headerActions == null && navItems.length === 0;
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div>
-            <Link href="/" className="text-xs font-medium text-slate-500 hover:text-brand-700">
-              Portal de Integração
-            </Link>
-            <p className="text-sm font-semibold text-slate-900">{subtitle}</p>
+      <AppHeader
+        subtitle={subtitle}
+        navItems={navItems}
+        actions={
+          <div className="flex items-center gap-4">
+            {headerActions}
+            {showDefaultCatalogLink ? (
+              <Link
+                href="/manual"
+                className="text-sm font-medium text-brand-700 hover:underline"
+              >
+                Catálogo
+              </Link>
+            ) : null}
+            <SessionActions />
           </div>
-          {headerActions ?? (
-            <Link
-              href="/manual"
-              className="text-sm font-medium text-brand-700 hover:underline"
-            >
-              Catálogo
-            </Link>
-          )}
-        </div>
-      </header>
+        }
+      />
       <main className="mx-auto max-w-7xl px-6 py-10">
         {hasRailLayout ? (
           <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_14rem]">

@@ -14,7 +14,7 @@ Um arquivo por dia em `diario/AAAA-MM-DD.md`, respondendo 4 perguntas:
 
 ## Entradas
 
-- [[2026-08-04|04/08/2026 — Integração Obsidian + painel de estudos]]
+- [[2026-08-04|04/08/2026 — Obsidian + painel de estudos + casca UI (`feat/ui-portal`)]]
 
 ## Template
 

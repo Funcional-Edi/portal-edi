@@ -58,6 +58,14 @@ Nunca "conserte" apagando a assertion.
 | Erro em `core/config` | Variável de ambiente faltando | Preencher `.env.local` (`AUTH_SECRET`) |
 | Comportamento antigo persistindo | Cache do Next | `Remove-Item -Recurse -Force .next` |
 
+## `npm run ci` / build estranho
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| `Invalid project directory ...\na` | Texto extra no comando (`npm run ci na fase-...`) | Rode só `npm run ci` — a branch é contexto, não argumento |
+| `EPERM: ... .next\trace` | `npm run build`/`ci` com `npm run dev` na **mesma** pasta | `Ctrl+C` no dev → rode o CI → suba o dev de novo |
+| Dois `npm run dev` na mesma pasta | Porta 3002 + pasta `.next/` disputadas | Só **um** processo Next por pasta do projeto |
+
 ## Erros de Next.js (App Router)
 
 | Mensagem | Causa | Correção |
