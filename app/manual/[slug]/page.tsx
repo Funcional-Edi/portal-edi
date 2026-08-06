@@ -11,13 +11,14 @@ interface ManualPageProps {
 
 export default async function ManualPage({ params }: ManualPageProps) {
   const { slug } = await params;
-  const project = await getPublishedManual(slug);
+  const [project, sections] = await Promise.all([
+    getPublishedManual(slug),
+    getPublishedManualSections(slug),
+  ]);
   if (!project) notFound();
 
-  const sections = await getPublishedManualSections(slug);
-
   return (
-    <ManualShellWithNav slug={slug}>
+    <ManualShellWithNav slug={slug} project={project} sections={sections}>
       <ManualRoteiro project={project} sections={sections} />
     </ManualShellWithNav>
   );

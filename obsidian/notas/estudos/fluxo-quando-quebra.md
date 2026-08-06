@@ -58,6 +58,14 @@ Nunca "conserte" apagando a assertion.
 | Erro em `core/config` | Variável de ambiente faltando | Preencher `.env.local` (`AUTH_SECRET`) |
 | Comportamento antigo persistindo | Cache do Next | `Remove-Item -Recurse -Force .next` |
 
+## Navegação lenta no `npm run dev`
+
+| Sintoma | Causa | O que fazer |
+| --- | --- | --- |
+| **Primeiro** clique numa rota demora 10–15 s | Next compila a rota na hora (só em dev) | Normal — clique de novo fica rápido; em prod use `npm run build` + `start` |
+| Tela “congelada” no clique | Sem `loading.tsx` | Skeleton em `app/manual/loading.tsx` (já no projeto) |
+| Mesma rota ainda lenta na 2ª vez | Leitura duplicada de CMS | Services com `React.cache()` + passar `project` pro shell |
+
 ## `npm run ci` / build estranho
 
 | Sintoma | Causa | Solução |

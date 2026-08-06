@@ -58,12 +58,11 @@ export async function getProject(slug: string): Promise<Project | null> {
 
 export async function listProjectSummaries(): Promise<ProjectSummary[]> {
   const slugs = await listProjectSlugs();
-  const summaries: ProjectSummary[] = [];
+  const projects = await Promise.all(slugs.map((slug) => getProject(slug)));
 
-  for (const slug of slugs) {
-    const project = await getProject(slug);
-    if (project) summaries.push(toProjectSummary(project.config));
-  }
+  const summaries = projects
+    .filter((project): project is Project => project !== null)
+    .map((project) => toProjectSummary(project.config));
 
   return summaries.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 }

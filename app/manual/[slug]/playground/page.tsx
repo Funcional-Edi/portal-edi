@@ -18,7 +18,7 @@ export default async function PlaygroundPage({ params, searchParams }: Playgroun
   if (!project) notFound();
 
   return (
-    <ManualShellWithNav slug={slug} playground>
+    <ManualShellWithNav slug={slug} playground project={project}>
       <article>
         <nav className="mb-6 text-sm text-slate-500">
           <Link href="/manual" className="hover:text-brand-700">
