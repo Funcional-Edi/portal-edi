@@ -191,16 +191,16 @@ travaria qualquer projeto novo em rascunho para sempre.
 
 ---
 
-## Fase 8 — Extras (2–13/out)
+## Fase 8 — Extras (2–13/out) ✅
 
-| Entrega | Detalhe |
-|---------|---------|
-| Export Postman/PDF | APIs export |
-| Métricas playground | in-memory ou banco |
-| Busca Ctrl+K | Fuse index |
-| Guias transversais | `manuais-internos` ou `/docs/guides` |
+| Entrega | Detalhe | Status |
+|---------|---------|--------|
+| Export Postman/Insomnia | APIs export + botões UI | ✅ |
+| Métricas playground | in-memory + `/admin/metrics` | ✅ |
+| Busca Ctrl+K | Fuse index global | ✅ |
+| Guias transversais | `manuais-internos` em `/interno` | ✅ |
 
-**Critério de done:** paridade funcional com portal antigo (exceto clientes legados).
+**Critério de done:** paridade funcional com portal antigo (exceto clientes legados). ✅
 
 ---
 

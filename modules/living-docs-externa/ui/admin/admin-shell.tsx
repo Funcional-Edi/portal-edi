@@ -5,15 +5,17 @@ import { SessionActions } from "@/core/ui/session-actions";
 
 interface AdminShellProps {
   children: ReactNode;
+  activeNavHref?: string;
 }
 
-export function AdminShell({ children }: AdminShellProps) {
+export function AdminShell({ children, activeNavHref = "/admin/projects" }: AdminShellProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <AppHeader
         subtitle="Admin — Documentação viva"
         navItems={[
-          { href: "/admin/projects", label: "Projetos", active: true },
+          { href: "/admin/projects", label: "Projetos", active: activeNavHref === "/admin/projects" },
+          { href: "/admin/metrics", label: "Métricas", active: activeNavHref === "/admin/metrics" },
           { href: "/manual", label: "Ver catálogo" },
         ]}
         actions={<SessionActions />}

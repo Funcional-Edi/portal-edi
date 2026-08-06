@@ -34,4 +34,13 @@ export function projectFlowPath(slug: string): string {
   return `${CONTENT_PATHS.projectsPrefix}/${slug}/flow.json`;
 }
 
+/** Guias transversais do time EDI (Fase 8 — `modules/manuais-internos`). */
+export const INTERN_CONTENT_PATHS = {
+  guidesPrefix: "content/interno/guides",
+} as const;
+
+export function internoGuidePath(slug: string): string {
+  return `${INTERN_CONTENT_PATHS.guidesPrefix}/${slug}.md`;
+}
+
 export type ContentBackend = "local" | "github";

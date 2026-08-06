@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/core/auth";
+import { recordPlaygroundExecution } from "@/core/metrics/playground-metrics-store";
 import { playgroundRequestInputSchema } from "@/modules/living-docs-externa/schema/playground";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import {
@@ -70,8 +71,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     );
   }
 
+  let allowlistResult;
   try {
-    validatePlaygroundQuery(project.manual, parsed.data.query);
+    allowlistResult = validatePlaygroundQuery(project.manual, parsed.data.query);
   } catch (error) {
     if (error instanceof PlaygroundAllowlistError) {
       return NextResponse.json(
@@ -84,6 +86,17 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   try {
     const result = await runPlaygroundQuery(slug, parsed.data.query, parsed.data.variables);
+
+    const hasGraphqlErrors = Boolean(result.errors?.length);
+    if (!hasGraphqlErrors && allowlistResult.operationNames[0]) {
+      recordPlaygroundExecution({
+        slug,
+        operationKind: allowlistResult.kind,
+        operationName: allowlistResult.operationNames[0],
+        success: true,
+      });
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof PlaygroundProxyError) {
