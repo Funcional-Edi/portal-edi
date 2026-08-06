@@ -30,7 +30,7 @@
 | Clientes legados (`clients.json`) | `/admin/clients` | **deprecado** | — |
 | Métricas / notificações | `/admin/metrics` | **fora do MVP** | 8+ |
 | Export PDF/Postman/Insomnia | APIs export | **fora do MVP** | 8+ |
-| Editor BPMN / fluxogramas | `integrationFlow` | módulo `fluxogramas` | 7+ |
+| Editor BPMN / fluxogramas | `integrationFlow` | módulo `fluxogramas` | 7 ✅ |
 | WYSIWYG unificado | `components/admin/wysiwyg` | Fase 6 | 6 |
 
 **Regra de ouro (mantida):** SSO abre o portal; Gateway alimenta os manuais; **nunca**
@@ -107,6 +107,8 @@ inverter URLs nem expor token master ao browser.
 | `/manual/[slug]/operations/[kind]/[name]` | idem | `ui/reader/operation-detail.tsx` | 1 ✅ |
 | `/manual/[slug]/playground` | idem | `ui/reader/playground-panel.tsx` | 4 |
 | `/projects/*` | redirect 308 → `/manual/*` | `middleware.ts` | 2 |
+| `/fluxogramas` | `/fluxogramas` | `ui/flow-catalog.tsx` | 7 ✅ |
+| `/fluxogramas/[slug]` | idem | `ui/flow-viewer.tsx` | 7 ✅ |
 
 ### 4.2 Admin (EDI)
 
@@ -116,6 +118,7 @@ inverter URLs nem expor token master ao browser.
 | `/admin/projects/new` | idem | 3 |
 | `/admin/projects/[slug]` | idem | 3 |
 | `/admin/projects/[slug]/edit` | idem (editor canônico) | 3–6 |
+| `/admin/projects/[slug]/flow` | idem | 7 ✅ |
 | `/admin/projects/[slug]/curate` | **removido** (redireciona p/ edit) | — |
 | `/admin/clients/*` | **não migrar** (SSO substitui) | — |
 | `/admin/docs/*` | Fase 8 ou `manuais-internos` | 8+ |
@@ -206,7 +209,7 @@ Schemas portados para `modules/living-docs-externa/schema/` (paridade com
 |----------------|------|------------|
 | `im` | Copiar para validar roteiro curto (2 ops) | Alta |
 | `wholesaler` | Copiar após IM validado (15 ops) | Média |
-| `canal-autorizador` | Copiar com fluxo BPMN (Fase 7) | Baixa |
+| `canal-autorizador` | Seed template BPMN em `content/projects/canal-autorizador/` | ✅ Fase 7 |
 | Projetos `e2e-*`, `teste*` | **Não migrar** | — |
 
 Seed local incluído: `content/projects/demo/` (desenvolvimento e testes).
@@ -224,13 +227,13 @@ Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
 - [x] **Fase 4** — Playground + proxy GraphQL + allowlist
 - [x] **Fase 5** — Migrar conteúdo real (IM, wholesaler) + E2E Playwright
 - [x] **Fase 6** — Editor Markdown canônico (sem lib WYSIWYG — ver cronograma §6)
-- [ ] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`) — em andamento
+- [x] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`) ✅
 - [ ] **Fase 8** — Export, métricas, busca, guias transversais
 
 ### Pendências fora das fases
 
 - [ ] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md)
-- [ ] Migrar `canal-autorizador` (depende da Fase 7)
+- [ ] Migrar `canal-autorizador` conteúdo real do legado (template local já existe)
 
 ---
 

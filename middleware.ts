@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
+
 import { auth } from "@/core/auth";
+import {
+  canAccessPath,
+  getForbiddenRedirectPath,
+  pathRequiresAuth,
+} from "@/core/auth/module-access";
+import { registerAllModules } from "@/modules/registry";
+
+const modules = registerAllModules();
 
 /**
- * RBAC de rotas (esqueleto). Regras:
- * - `/admin/**` exige papel admin.
- * - `/manual/**` exige login.
- * - rotas públicas (landing, /login, /api/auth, /api/health) passam.
- * Módulos futuros herdam este padrão via basePath do module-registry.
+ * RBAC genérico por módulo (basePath + access do registry).
+ * - `/` e `/login` são públicos (login inline na home).
+ * - `/login` redireciona para `/` (compat callbackUrl).
+ * - Rotas de módulo exigem sessão; client bloqueado em admin → /manual.
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -19,20 +27,23 @@ export default auth((req) => {
     return NextResponse.redirect(redirectUrl, 308);
   }
 
-  const isAdminArea = pathname.startsWith("/admin");
-  const isManualArea = pathname.startsWith("/manual");
+  if (pathname === "/login") {
+    const homeUrl = new URL("/", req.nextUrl);
+    const callbackUrl = req.nextUrl.searchParams.get("callbackUrl");
+    if (callbackUrl) homeUrl.searchParams.set("callbackUrl", callbackUrl);
+    return NextResponse.redirect(homeUrl);
+  }
 
-  if (!session && (isAdminArea || isManualArea)) {
-    const loginUrl = new URL("/login", req.nextUrl);
+  if (!session && pathRequiresAuth(pathname, modules)) {
+    const loginUrl = new URL("/", req.nextUrl);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAdminArea && role !== "admin") {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
+  if (session && !canAccessPath(role, pathname, modules)) {
+    return NextResponse.redirect(new URL(getForbiddenRedirectPath(role), req.nextUrl));
   }
 
-  // Curadoria do portal legado virou o editor canônico (fase 6).
   const curateMatch = pathname.match(/^\/admin\/projects\/([^/]+)\/curate(?:\/.*)?$/);
   if (curateMatch) {
     const redirectUrl = req.nextUrl.clone();
@@ -44,5 +55,15 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/manual/:path*", "/projects/:path*"],
+  matcher: [
+    "/",
+    "/login",
+    "/admin/:path*",
+    "/manual/:path*",
+    "/projects/:path*",
+    "/fluxogramas/:path*",
+    "/interno/:path*",
+    "/homologacao/:path*",
+    "/assistente/:path*",
+  ],
 };

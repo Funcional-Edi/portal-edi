@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "title": "Integração Canal Autorizador",
+  "productName": "Canal Autorizador",
+  "manualVersion": "1.0.0-template",
+  "operations": [
+    {
+      "kind": "mutation",
+      "name": "createToken",
+      "order": 1,
+      "title": "1. Autenticar",
+      "description": "Obter token no gateway."
+    },
+    {
+      "kind": "mutation",
+      "name": "authorizeOrder",
+      "order": 2,
+      "title": "2. Autorizar pedido",
+      "description": "Envia pedido para autorização."
+    },
+    {
+      "kind": "query",
+      "name": "orderStatus",
+      "order": 3,
+      "title": "3. Consultar status",
+      "description": "Consulta resultado da autorização."
+    }
+  ]
+}

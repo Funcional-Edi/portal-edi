@@ -17,7 +17,7 @@ export async function SessionActions() {
   if (!session?.user) {
     return (
       <Link
-        href="/login"
+        href="/"
         className="text-sm font-medium text-brand-700 hover:underline"
       >
         Entrar
@@ -31,7 +31,7 @@ export async function SessionActions() {
       <form
         action={async () => {
           "use server";
-          await signOut({ redirectTo: "/login" });
+          await signOut({ redirectTo: "/" });
         }}
       >
         <button

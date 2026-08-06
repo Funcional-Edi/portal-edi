@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "title": "Fluxo IM — inventário (demo)",
+  "description": "Sequência típica: autenticar no gateway e enviar carga de estoque.",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "Início da integração",
+      "position": { "x": 220, "y": 0 }
+    },
+    {
+      "id": "createToken",
+      "type": "operation",
+      "label": "Obter token",
+      "position": { "x": 200, "y": 100 },
+      "operationRef": { "kind": "mutation", "name": "createToken" }
+    },
+    {
+      "id": "saveInventories",
+      "type": "operation",
+      "label": "Enviar carga de estoque",
+      "position": { "x": 180, "y": 220 },
+      "operationRef": { "kind": "mutation", "name": "saveInventories" }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "label": "Fim",
+      "position": { "x": 240, "y": 340 }
+    }
+  ],
+  "edges": [
+    { "id": "e-start-token", "source": "start", "target": "createToken" },
+    { "id": "e-token-save", "source": "createToken", "target": "saveInventories" },
+    { "id": "e-save-end", "source": "saveInventories", "target": "end" }
+  ],
+  "updatedAt": "2026-08-06T15:00:00.000Z"
+}

@@ -34,7 +34,7 @@ gantt
   Fase 6 WYSIWYG               :done, f6, 2026-09-08, 10d
 
   section Extras
-  Fase 7 Fluxogramas           :active, f7, 2026-09-22, 8d
+  Fase 7 Fluxogramas           :done, f7, 2026-09-22, 8d
   Fase 8 Export e métricas     :f8, 2026-10-02, 8d
 ```
 
@@ -176,15 +176,18 @@ travaria qualquer projeto novo em rascunho para sempre.
 
 ---
 
-## Fase 7 — Fluxogramas (22/set – 1/out)
+## Fase 7 — Fluxogramas (22/set – 1/out) ✅
 
-| Entrega | Detalhe |
-|---------|---------|
-| Módulo `fluxogramas` | `integrationFlow` BPMN |
-| Canvas React Flow | port seletivo do legado |
-| Template canal-autorizador | seed |
+| Entrega | Detalhe | Status |
+|---------|---------|--------|
+| Módulo `fluxogramas` | `integrationFlow` BPMN, `status: active` | ✅ |
+| Schema + repository | `content/projects/{slug}/flow.json` | ✅ |
+| Canvas React Flow | viewer + editor admin | ✅ |
+| Export Mermaid | API + botão no editor | ✅ |
+| Template canal-autorizador | seed com decisão | ✅ |
+| Link roteiro → fluxograma | `/manual/[slug]` | ✅ |
 
-**Critério de done:** manual com fluxo editável e export Mermaid.
+**Critério de done:** manual com fluxo editável e export Mermaid. ✅
 
 ---
 

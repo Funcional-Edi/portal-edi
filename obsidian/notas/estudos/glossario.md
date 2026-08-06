@@ -89,6 +89,9 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Quality check** | Validação que **bloqueia** publish se o manual estiver incompleto |
 | **Distribuidor** | Cliente externo que lê o manual |
 | **CMS em arquivos** | Conteúdo em `content/` no Git, sem banco (ADR-0009) |
+| **IntegrationFlow** | Diagrama BPMN curado em `flow.json` — nós (`start`, `operation`, `decision`, `end`) + arestas |
+| **React Flow** | Biblioteca `@xyflow/react` para canvas de nós/arestas no browser |
+| **Mermaid** | Linguagem texto → diagrama; export do fluxo via `exportFlowToMermaid` |
 
 ## Segurança
 
@@ -99,6 +102,9 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **JWT** | Token assinado que carrega a sessão (8h, httpOnly aqui) |
 | **httpOnly** | Cookie que o JavaScript do browser **não** consegue ler |
 | **RBAC** | Controle de acesso por papel (`core/auth/roles`) |
+| **`module-access`** | Funções `canAccessModule` / `canAccessPath` — permitem rota conforme `access` do módulo |
+| **`UserRole`** | `admin` (EDI) ou `client` (distribuidor, default após SSO) |
+| **Porta única** | `/` = login (deslogado) ou hub (logado); `/login` redireciona para `/` |
 | **AES-256-GCM** | Cifra usada em `credentials.enc` |
 
 ↩ [[00-PAINEL-ESTUDOS|Painel de estudos]]

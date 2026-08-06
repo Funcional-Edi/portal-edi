@@ -5,6 +5,8 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { getPostLoginPath } from "./actions";
+
 type LoginMethod = "sso" | "dev";
 
 interface LoginFormProps {
@@ -13,20 +15,12 @@ interface LoginFormProps {
 }
 
 /**
- * Antes, os dois métodos de login (SSO e dev local) coexistiam no MESMO
- * formulário: o campo de senha decidia implicitamente qual `signIn()` seria
- * chamado (`onSubmit={password ? handleSsoLogin : handleDevLogin}`). Fora do
- * ambiente de dev isso confundia — o usuário não sabia por que às vezes o
- * botão pedia senha e às vezes não.
- *
- * Agora o método é EXPLÍCITO: uma aba por método, cada um com seu próprio
- * formulário. Quando só um método está configurado (ex.: só
- * `DEV_AUTH_ENABLED=true`, como nos testes E2E), a aba nem aparece — o
- * formulário daquele método é mostrado direto.
+ * Formulário de login compartilhado (home `/` e redirect legado `/login`).
+ * Método explícito: aba SSO vs dev local quando ambos configurados.
  */
 export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/manual";
+  const callbackUrl = searchParams.get("callbackUrl");
   const showTabs = ssoConfigured && devAuthEnabled;
 
   const [method, setMethod] = useState<LoginMethod>(ssoConfigured ? "sso" : "dev");
@@ -54,13 +48,20 @@ export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
     setLoading(true);
     setError(null);
 
+    const signInCallback = callbackUrl ?? "/";
+
     const result =
       method === "sso"
-        ? await signIn("sso", { email, password, redirect: false, callbackUrl })
-        : await signIn("dev", { email, redirect: false, callbackUrl });
+        ? await signIn("sso", {
+            email,
+            password,
+            redirect: false,
+            callbackUrl: signInCallback,
+          })
+        : await signIn("dev", { email, redirect: false, callbackUrl: signInCallback });
 
-    setLoading(false);
     if (result?.error) {
+      setLoading(false);
       setError(
         method === "sso"
           ? "Credenciais inválidas ou SSO indisponível."
@@ -68,7 +69,9 @@ export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
       );
       return;
     }
-    window.location.href = result?.url ?? callbackUrl;
+
+    const target = await getPostLoginPath(callbackUrl);
+    window.location.href = target;
   }
 
   return (

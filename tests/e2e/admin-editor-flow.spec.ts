@@ -25,7 +25,7 @@ const SECTION_BODY = [
 
 async function loginAsAdmin(page: Page) {
   await page.goto("/admin/projects");
-  await expect(page).toHaveURL(/\/login/);
+  await expect(page).toHaveURL(/callbackUrl=%2Fadmin%2Fprojects/);
 
   await page.getByLabel("E-mail").fill("admin@funcionalcorp.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();

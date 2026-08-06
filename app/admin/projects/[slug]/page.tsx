@@ -31,12 +31,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </Link>
         <h1 className="mt-3 text-3xl font-bold tracking-tight">{project.config.name}</h1>
         <p className="mt-2 font-mono text-sm text-slate-500">{project.config.slug}</p>
-        <Link
-          href={`/admin/projects/${project.config.slug}/edit`}
-          className="mt-4 inline-flex items-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800"
-        >
-          Abrir editor do manual
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={`/admin/projects/${project.config.slug}/edit`}
+            className="inline-flex items-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800"
+          >
+            Abrir editor do manual
+          </Link>
+          <Link
+            href={`/admin/projects/${project.config.slug}/flow`}
+            className="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Editor de fluxograma
+          </Link>
+        </div>
       </header>
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">

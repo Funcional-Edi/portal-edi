@@ -121,10 +121,66 @@ npm run ci
 - Dark mode intencional (só `color-scheme` no CSS)
 - Empty states e skeletons em admin
 - Microcopy e ilustrações de marca Fidelize
+- **Fase B:** permissões externas via `data/permissions.json` (hoje admins em código)
 
 ---
 
-## 7. Pegadinhas aprendidas nesta frente
+## 7. RBAC + UX de entrada (Fase A)
+
+> Data: 2026-08-06 · Branch: `feat/ui-portal`
+
+### Objetivo
+
+`/` vira **porta única** do portal: login inline quando deslogado; hub filtrado
+por papel quando logado. SSO igual para todos — diferença só no `role` após login.
+
+### Papéis
+
+| Papel | Quem | Vê na home | Rotas |
+|-------|------|------------|-------|
+| `client` | Distribuidor (default) | Módulos `access: "any"` | `/manual/**`, futuros `/fluxogramas/**` |
+| `admin` | Time EDI | Hub completo + planejados | Tudo + `/admin/**` |
+
+Resolução de papel: `core/auth/roles.ts` (`resolveRole`). Middleware e home
+usam `core/auth/module-access.ts` (`canAccessModule`, `canAccessPath`).
+
+### Fluxo
+
+```text
+Deslogado em /manual ou /admin
+  → middleware redireciona /?callbackUrl=<rota>
+  → login inline na home
+  → pós-login: admin → / (ou callback seguro); client → /manual
+
+/login (legado)
+  → redirect / preservando callbackUrl
+```
+
+### Arquivos
+
+| Arquivo | Papel |
+|---------|-------|
+| `core/auth/module-access.ts` | RBAC derivado do module-registry |
+| `core/auth/module-access.test.ts` | Testes unitários |
+| `middleware.ts` | Enforcement genérico por módulo |
+| `app/page.tsx` | Login inline + hub por role |
+| `app/login/page.tsx` | Redirect → `/` |
+| `app/login/login-form.tsx` | Redirect pós-login via server action |
+| `app/login/actions.ts` | `getPostLoginPath()` |
+
+### Validação manual
+
+| # | Cenário | Esperado |
+|---|---------|----------|
+| 1 | `/` deslogado | Formulário de login |
+| 2 | Client logado em `/` | Só card “Documentação Viva”; sem “Planejados” |
+| 3 | Client em `/admin/projects` | Redirect `/manual` |
+| 4 | Admin logado em `/` | Módulos ativos + planejados + link Admin |
+| 5 | `/login?callbackUrl=/manual/im` | Redirect `/` com callback; após login vai ao manual |
+
+---
+
+## 8. Pegadinhas aprendidas nesta frente
 
 | Situação | Lição |
 |----------|--------|

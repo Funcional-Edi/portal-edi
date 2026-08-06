@@ -29,4 +29,9 @@ export function projectCredentialsPath(slug: string): string {
   return `${CONTENT_PATHS.dataProjectsPrefix}/${slug}/credentials.enc`;
 }
 
+/** Fluxo de integração BPMN curado por projeto (Fase 7 — `modules/fluxogramas`). */
+export function projectFlowPath(slug: string): string {
+  return `${CONTENT_PATHS.projectsPrefix}/${slug}/flow.json`;
+}
+
 export type ContentBackend = "local" | "github";

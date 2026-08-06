@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
+    "@xyflow/react": "^12.11.2",
     "geist": "^1.7.2",
     "graphql": "^16.14.2",
     "lucide-react": "^1.28.0",

@@ -16,6 +16,8 @@ export interface ManualRoteiroEditorSlots {
   renderSectionActions?: (section: ManualSection) => ReactNode;
   /** Controles no card da operação (abrir slide-over, remover). */
   renderOperationActions?: (operation: ManualOperation) => ReactNode;
+  /** Link para fluxograma (modo admin). */
+  flowHref?: string;
   /** Substitui o link de playground no cabeçalho. */
   headerActions?: ReactNode;
   /** Faixa acima do manual (status, checklist de qualidade). */
@@ -31,9 +33,11 @@ interface ManualRoteiroProps {
   sections: ManualSection[];
   /** Ausente = visão do distribuidor (somente leitura). */
   editor?: ManualRoteiroEditorSlots;
+  /** Link para fluxograma quando `flow.json` existe. */
+  flowHref?: string;
 }
 
-export function ManualRoteiro({ project, sections, editor }: ManualRoteiroProps) {
+export function ManualRoteiro({ project, sections, editor, flowHref }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
   const isEditing = editor != null;
@@ -55,14 +59,24 @@ export function ManualRoteiro({ project, sections, editor }: ManualRoteiroProps)
         {manual.manualVersion ? (
           <p className="mt-2 text-xs text-slate-500">Versão {manual.manualVersion}</p>
         ) : null}
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           {editor?.headerActions ?? (
-            <Link
-              href={`/manual/${config.slug}/playground`}
-              className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-            >
-              Abrir playground GraphQL
-            </Link>
+            <>
+              <Link
+                href={`/manual/${config.slug}/playground`}
+                className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+              >
+                Abrir playground GraphQL
+              </Link>
+              {flowHref ?? editor?.flowHref ? (
+                <Link
+                  href={flowHref ?? editor!.flowHref!}
+                  className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Ver fluxograma
+                </Link>
+              ) : null}
+            </>
           )}
         </div>
       </header>

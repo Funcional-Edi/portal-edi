@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function loginAsDevUser(page: Page) {
   await page.goto("/manual");
-  await expect(page).toHaveURL(/\/login/);
+  await expect(page).toHaveURL(/callbackUrl=%2Fmanual/);
 
   await page.getByLabel("E-mail").fill("qa-distribuidor@fidelize.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
