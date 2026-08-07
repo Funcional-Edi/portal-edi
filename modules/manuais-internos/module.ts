@@ -9,9 +9,10 @@ export const manuaisInternosModule: PortalModule = {
   title: "Manuais Internos (EDI)",
   description:
     "Base viva de processos, regras de negócio e conhecimento do time EDI.",
-  status: "planned",
+  status: "active",
   basePath: "/interno",
   access: "admin",
   audience: "interno",
   requiresCapabilities: ["content"],
+  nav: [{ label: "Interno", href: "/interno", access: "admin" }],
 };

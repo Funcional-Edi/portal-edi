@@ -33,6 +33,8 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **`React.cache()`** | Dedupe de função async **na mesma request** (layout + page não relê disco 2x) |
 | **Geist** | Fonte do portal (`geist` + CSS variables no `app/layout.tsx`) |
 | **lucide-react** | Biblioteca de ícones SVG usada na home, login e catálogo |
+| **Fuse.js** | Busca fuzzy client-side/server-side; índice montado em `build-search-index.ts` |
+| **CommandPalette** | Modal de busca global (`Ctrl+K`) em `core/ui/command-palette.tsx` |
 
 ## TypeScript
 

@@ -6,6 +6,7 @@ import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/conne
 import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
 import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
+import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 import { getManualQualityReport } from "@/modules/living-docs-externa/services/manual-quality";
 
@@ -86,6 +87,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </p>
         <div className="mt-5">
           <ConnectGatewayForm slug={project.config.slug} currentGraphqlUrl={project.config.graphqlUrl} />
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Exportar coleções</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Gera arquivos Postman ou Insomnia a partir das operações curadas no manual.
+          Nenhuma credencial é incluída no export.
+        </p>
+        <div className="mt-5">
+          <ProjectExportActions
+            slug={project.config.slug}
+            graphqlUrl={project.config.graphqlUrl}
+          />
         </div>
       </div>
 
