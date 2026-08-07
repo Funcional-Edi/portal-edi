@@ -97,22 +97,18 @@ testada; `tests/e2e/manual-flow.spec.ts` de fluxo completo.
 - [ ] Rate limit de login (ADR-0007)
 - [ ] Criptografia de credencial (AES-256-GCM em `credentials.enc`)
 
-## Trilha 8 — Próxima fase do projeto (Fase 7 — Fluxogramas)
+## Trilha 8 — Fase 8 concluída (Export, busca, métricas, interno)
 
-Estudo que a próxima entrega vai exigir:
+- [x] Export Postman/Insomnia (`export-postman.ts`, APIs `/export/*`)
+- [x] Busca global Fuse.js + `Ctrl+K` (`core/search`, `CommandPalette`)
+- [x] Métricas playground in-memory (`core/metrics`, `/admin/metrics`)
+- [x] Módulo `manuais-internos` ativo em `/interno`
 
-- [ ] O que é BPMN e por que usar num manual de integração
-- [ ] React Flow — nós, arestas, estado
-- [ ] Mermaid — gerar diagrama a partir de texto
-- [ ] Gerar o diagrama **a partir do** `manual.json` em vez de desenhar à mão
+## Depois (pós-MVP)
 
-Entrega prática: `modules/fluxogramas` com `status: "active"`.
-
-## Depois (Fase 8)
-
-- [ ] Export para Postman/PDF
-- [ ] Busca client-side (Fuse.js) com atalho `Ctrl+K`
-- [ ] Métricas de uso
+- [ ] Export PDF
+- [ ] Referência GraphQL global (`/docs/api`)
+- [ ] Persistir métricas em banco (se ADR exigir)
 
 ## Como marcar progresso
 

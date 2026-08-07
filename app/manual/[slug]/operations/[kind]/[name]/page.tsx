@@ -27,6 +27,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
       slug={slug}
       manualTitle={project.manual.title}
       operation={operation}
+      graphqlUrl={project.config.graphqlUrl}
     />
   );
 }

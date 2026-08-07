@@ -1,16 +1,19 @@
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
+import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
 interface OperationDetailProps {
   slug: string;
   manualTitle: string;
   operation: ManualOperation;
+  graphqlUrl?: string;
 }
 
 export function OperationDetail({
   slug,
   manualTitle,
   operation,
+  graphqlUrl,
 }: OperationDetailProps) {
   return (
     <article>
@@ -32,6 +35,14 @@ export function OperationDetail({
           {operation.title ?? operation.name}
         </h1>
         <p className="mt-1 font-mono text-sm text-slate-500">{operation.name}</p>
+        <div className="mt-4">
+          <ExportDownloadButton
+            slug={slug}
+            format="postman"
+            label="Exportar manual (Postman)"
+            disabled={!graphqlUrl}
+          />
+        </div>
       </header>
 
       {operation.description ? (

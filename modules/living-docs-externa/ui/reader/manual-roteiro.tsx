@@ -1,6 +1,7 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
+import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -76,6 +77,10 @@ export function ManualRoteiro({ project, sections, editor, flowHref }: ManualRot
                   Ver fluxograma
                 </Link>
               ) : null}
+              <ProjectExportActions
+                slug={config.slug}
+                graphqlUrl={config.graphqlUrl}
+              />
             </>
           )}
         </div>
