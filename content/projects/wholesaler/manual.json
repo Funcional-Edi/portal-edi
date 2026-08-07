@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "title": "Integracao Wholesaler",
+  "productName": "Wholesaler Gateway",
+  "manualVersion": "2.1.0",
+  "operations": [
+    {
+      "kind": "mutation",
+      "name": "createToken",
+      "order": 1,
+      "title": "1. Obter token",
+      "description": "Token para autenticar chamadas do fluxo wholesaler.",
+      "authRequired": false,
+      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createOrder",
+      "order": 2,
+      "title": "2. Criar pedido",
+      "description": "Cria pedido no gateway com itens e dados do cliente.",
+      "prerequisites": ["createToken"],
+      "businessNotes": [
+        "Idempotencia por externalOrderId.",
+        "Itens com quantidade zero sao rejeitados."
+      ],
+      "relatedSections": ["regras-comerciais"],
+      "exampleQuery": "mutation createOrder {\n  createOrder(input: {\n    externalOrderId: \"PED-1001\",\n    customerCode: \"CLI-900\",\n    items: [{ sku: \"7891106001946\", quantity: 10 }]\n  }) {\n    status\n    orderId\n    message\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "orderStatus",
+      "order": 3,
+      "title": "3. Consultar status do pedido",
+      "description": "Consulta o status de processamento por orderId.",
+      "prerequisites": ["createOrder"],
+      "exampleQuery": "query orderStatus {\n  orderStatus(orderId: \"GW-123456\") {\n    status\n    updatedAt\n    message\n  }\n}"
+    }
+  ]
+}

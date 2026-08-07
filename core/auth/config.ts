@@ -64,7 +64,7 @@ const trustAuthHost =
 export const authConfig = {
   providers,
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
-  pages: { signIn: "/login" },
+  pages: { signIn: "/" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

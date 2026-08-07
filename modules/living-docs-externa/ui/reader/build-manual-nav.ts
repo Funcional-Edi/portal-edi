@@ -1,4 +1,9 @@
-import { manualOperationKindSchema, sortOperations } from "@/modules/living-docs-externa/schema";
+import {
+  manualOperationKindSchema,
+  sortOperations,
+  type ManualSection,
+  type Project,
+} from "@/modules/living-docs-externa/schema";
 import type {
   ManualNavGroup,
   ManualTocItem,
@@ -9,6 +14,11 @@ import { getPublishedManual } from "@/modules/living-docs-externa/services/get-p
 interface BuildManualNavOptions {
   kind?: string;
   name?: string;
+  playground?: boolean;
+  /** Quando a page já carregou o projeto, evita segunda leitura do CMS. */
+  project?: Project;
+  /** Quando a page já carregou seções (roteiro), evita reler `sections/*.md`. */
+  sections?: ManualSection[];
 }
 
 export interface ManualNavData {
@@ -20,8 +30,10 @@ export async function buildManualNav(
   slug: string,
   options: BuildManualNavOptions = {},
 ): Promise<ManualNavData | null> {
-  const { kind, name } = options;
-  const project = await getPublishedManual(slug);
+  const { kind, name, playground, project: projectInput, sections: sectionsInput } =
+    options;
+
+  const project = projectInput ?? (await getPublishedManual(slug));
   if (!project) return null;
 
   const basePath = `/manual/${slug}`;
@@ -31,7 +43,8 @@ export async function buildManualNav(
       title: "Navegação",
       items: [
         { href: "/manual", label: "Catálogo" },
-        { href: basePath, label: "Roteiro", active: !kind || !name },
+        { href: basePath, label: "Roteiro", active: !playground && (!kind || !name) },
+        { href: `${basePath}/playground`, label: "Playground", active: !!playground },
       ],
     },
     {
@@ -41,11 +54,15 @@ export async function buildManualNav(
         return {
           href,
           label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
-          active: href === `${basePath}/operations/${kind}/${name}`,
+          active: !playground && href === `${basePath}/operations/${kind}/${name}`,
         };
       }),
     },
   ];
+
+  if (playground) {
+    return { sidebarGroups, tocItems: [] };
+  }
 
   const kindResult = kind ? manualOperationKindSchema.safeParse(kind) : null;
 
@@ -60,7 +77,7 @@ export async function buildManualNav(
     return { sidebarGroups, tocItems };
   }
 
-  const sections = await getPublishedManualSections(slug);
+  const sections = sectionsInput ?? (await getPublishedManualSections(slug));
   const tocItems: ManualTocItem[] = [];
   if (sections.length > 0) tocItems.push({ href: "#contexto", label: "Contexto" });
   if (project.manual.referenceTables?.length)

@@ -19,22 +19,22 @@ gantt
   Fase 1 Leitor MVP            :done, f1, 2026-07-30, 6d
 
   section Leitor
-  Fase 2 Seções e shell        :active, f2, 2026-08-05, 5d
+  Fase 2 Seções e shell        :done, f2, 2026-08-05, 5d
 
   section Admin
-  Fase 3 Admin MVP             :f3, 2026-08-11, 10d
+  Fase 3 Admin MVP             :done, f3, 2026-08-11, 10d
 
   section Playground
-  Fase 4 Proxy GraphQL         :f4, 2026-08-25, 6d
+  Fase 4 Proxy GraphQL         :done, f4, 2026-08-25, 6d
 
   section Qualidade
-  Fase 5 Conteúdo real + E2E   :f5, 2026-09-01, 5d
+  Fase 5 Conteúdo real + E2E   :done, f5, 2026-09-01, 5d
 
   section Editor
-  Fase 6 WYSIWYG               :f6, 2026-09-08, 10d
+  Fase 6 WYSIWYG               :done, f6, 2026-09-08, 10d
 
   section Extras
-  Fase 7 Fluxogramas           :f7, 2026-09-22, 8d
+  Fase 7 Fluxogramas           :done, f7, 2026-09-22, 8d
   Fase 8 Export e métricas     :f8, 2026-10-02, 8d
 ```
 
@@ -87,10 +87,10 @@ gantt
 | Etapa | Entrega | Status |
 |-------|---------|--------|
 | 3.1 | `/admin/projects` listar + criar slug | ✅ |
-| 3.2 | Connect gateway | ⏳ |
-| 3.3 | Sync schema | ⏳ |
-| 3.4 | Editor operações (form) | ⏳ |
-| 3.5 | Toggle `published` | ⏳ |
+| 3.2 | Connect gateway | ✅ |
+| 3.3 | Sync schema | ✅ |
+| 3.4 | Editor operações (form) | ✅ |
+| 3.5 | Toggle `published` | ✅ |
 
 ---
 
@@ -150,28 +150,44 @@ gantt
 
 ---
 
-## Fase 6 — Editor WYSIWYG (8–19/set)
+## Fase 6 — Editor WYSIWYG (8–19/set) ✅
 
-| Entrega | Detalhe |
-|---------|---------|
-| Editor unificado | port de `wysiwyg/*` simplificado |
-| Inline edit seções | slide-overs operações |
-| Quality checklist | `manual-quality` service |
-| Deprecar rotas legacy | redirect `/curate` → `/edit` |
+| Etapa | Entrega | Detalhe | Status |
+|-------|---------|---------|--------|
+| 6.1 | Rota `/admin/projects/[slug]/edit` | `ManualShell` do leitor com nav admin | ✅ |
+| 6.2 | Editor unificado | `ui/admin/manual-editor.tsx` injeta slots no `ManualRoteiro` | ✅ |
+| 6.3 | Inline edit de seções | `ui/admin/section-editor.tsx` (toolbar + preview `MarkdownBody`) | ✅ |
+| 6.4 | Slide-over de operações | `ui/admin/slide-over.tsx` + `OperationForm` | ✅ |
+| 6.5 | Quality checklist | `services/manual-quality.ts` bloqueia publish (422) | ✅ |
+| 6.6 | APIs BFF de seções | `GET\|POST /sections`, `PUT\|DELETE /sections/[sectionId]` | ✅ |
+| 6.7 | Deprecar rotas legacy | redirect 308 `/curate` → `/edit` no middleware | ✅ |
+| 6.8 | Testes | Vitest (quality, seções, metadata) + E2E admin → distribuidor | ✅ |
 
-**Critério de done:** EDI edita manual na mesma tela que distribuidor vê.
+**Critério de done:** EDI edita manual na mesma tela que distribuidor vê. ✅
+
+**Decisão de escopo:** sem biblioteca WYSIWYG (TipTap/Slate). O editor é textarea
+Markdown com toolbar + preview lado a lado renderizado pelo **mesmo**
+`MarkdownBody` do leitor — o que o EDI vê no preview é literalmente o que o
+distribuidor recebe, sem um segundo pipeline de render para divergir.
+
+**Extra necessário:** `services/manage-manual-metadata.ts` + `PATCH /manual`.
+Sem editar o cabeçalho (título/produto/versão) na própria tela, o check `titulo`
+travaria qualquer projeto novo em rascunho para sempre.
 
 ---
 
-## Fase 7 — Fluxogramas (22/set – 1/out)
+## Fase 7 — Fluxogramas (22/set – 1/out) ✅
 
-| Entrega | Detalhe |
-|---------|---------|
-| Módulo `fluxogramas` | `integrationFlow` BPMN |
-| Canvas React Flow | port seletivo do legado |
-| Template canal-autorizador | seed |
+| Entrega | Detalhe | Status |
+|---------|---------|--------|
+| Módulo `fluxogramas` | `integrationFlow` BPMN, `status: active` | ✅ |
+| Schema + repository | `content/projects/{slug}/flow.json` | ✅ |
+| Canvas React Flow | viewer + editor admin | ✅ |
+| Export Mermaid | API + botão no editor | ✅ |
+| Template canal-autorizador | seed com decisão | ✅ |
+| Link roteiro → fluxograma | `/manual/[slug]` | ✅ |
 
-**Critério de done:** manual com fluxo editável e export Mermaid.
+**Critério de done:** manual com fluxo editável e export Mermaid. ✅
 
 ---
 

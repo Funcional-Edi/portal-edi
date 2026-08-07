@@ -1,0 +1,13 @@
+{
+  "slug": "wholesaler",
+  "name": "Wholesaler - Pedido e recebimento",
+  "description": "Manual de atacado para criacao, consulta e confirmacao de pedidos.",
+  "environment": "homolog",
+  "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+  "gatewaySlug": "gateway-homolog-fidelize",
+  "published": true,
+  "audience": "distribuidor",
+  "manualStatus": "published",
+  "createdAt": "2026-08-31T12:00:00.000Z",
+  "updatedAt": "2026-08-31T12:00:00.000Z"
+}

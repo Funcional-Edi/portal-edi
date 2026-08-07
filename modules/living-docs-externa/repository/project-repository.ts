@@ -58,12 +58,11 @@ export async function getProject(slug: string): Promise<Project | null> {
 
 export async function listProjectSummaries(): Promise<ProjectSummary[]> {
   const slugs = await listProjectSlugs();
-  const summaries: ProjectSummary[] = [];
+  const projects = await Promise.all(slugs.map((slug) => getProject(slug)));
 
-  for (const slug of slugs) {
-    const project = await getProject(slug);
-    if (project) summaries.push(toProjectSummary(project.config));
-  }
+  const summaries = projects
+    .filter((project): project is Project => project !== null)
+    .map((project) => toProjectSummary(project.config));
 
   return summaries.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 }
@@ -103,4 +102,79 @@ export async function createProject(input: {
   await writeContentJson(projectManualPath(input.slug), manual);
 
   return { config, manual };
+}
+
+/** Atualiza os dados de conexão do gateway no `config.json` do projeto. */
+export async function updateProjectGatewayConfig(
+  slug: string,
+  gateway: { graphqlUrl: string; gatewaySlug: string }
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    graphqlUrl: gateway.graphqlUrl,
+    gatewaySlug: gateway.gatewaySlug,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}
+
+/** Alterna `published` (e `manualStatus` correspondente) no `config.json` do projeto. */
+export async function updateProjectPublishStatus(
+  slug: string,
+  published: boolean
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    published,
+    manualStatus: published ? "published" : "draft",
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}
+
+export async function getManual(slug: string): Promise<IntegrationManual | null> {
+  const project = await loadProjectFromStore(slug);
+  return project?.manual ?? null;
+}
+
+/**
+ * Sobrescreve `manual.json` do projeto. Só I/O — validação de schema e regras
+ * (duplicidade, existência da operação etc.) ficam em
+ * `services/manage-manual-operations.ts`.
+ */
+export async function writeManual(slug: string, manual: IntegrationManual): Promise<void> {
+  if (!(await projectExists(slug))) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+  await writeContentJson(projectManualPath(slug), manual);
+}
+
+/** Atualiza apenas `updatedAt` no `config.json` de um projeto existente. */
+export async function updateProjectConfigUpdatedAt(slug: string): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
 }

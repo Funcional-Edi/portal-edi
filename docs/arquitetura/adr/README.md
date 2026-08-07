@@ -15,5 +15,6 @@ outra referencia a anterior como *Substituída por*).
 | [0007](./0007-rate-limit-login.md) | Rate limit no login SSO (proteção contra força bruta) | Aceita |
 | [0008](./0008-next-15-react-19.md) | Next.js 15 + React 19 antes da primeira feature | Aceita |
 | [0009](./0009-content-cms-adapter.md) | Persistência `content`: filesystem local + GitHub CMS | Aceita |
+| [0010](./0010-ui-shell-compartilhado.md) | Shell de UI compartilhado em `core/ui` | Aceita |
 
 > Template: [`_template.md`](./_template.md).

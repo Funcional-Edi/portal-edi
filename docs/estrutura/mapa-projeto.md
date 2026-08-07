@@ -24,7 +24,7 @@ Regra de dependência: **`app → modules → core`**. Validada por
 | Pasta | Papel | README |
 |-------|-------|--------|
 | `app/` | Camada de entrada Next.js: páginas, layout, middleware hook, rotas `/api/*` | — |
-| `core/` | Invariantes: auth, config, db, errors, ai, events, module-registry | [`core/README.md`](../../core/README.md) |
+| `core/` | Invariantes: auth, config, db, errors, ai, events, **ui** (casca), module-registry | [`core/README.md`](../../core/README.md) · [`core/ui/README.md`](../../core/ui/README.md) |
 | `modules/` | Contextos de negócio registrados em `modules/registry.ts` | [`modules/README.md`](../../modules/README.md) |
 | `types/` | Declarações TypeScript globais (não é código de runtime) | — |
 
@@ -45,8 +45,8 @@ Convenção interna de cada módulo: `module.ts`, `schema/`, `repository/`,
 
 | Pasta / arquivo | Conteúdo |
 |-----------------|----------|
-| `docs/arquitetura/adr/` | Decisões de arquitetura (ADRs 0001–0008) |
-| `docs/migracao/` | Guias de migração (placeholder) |
+| `docs/arquitetura/adr/` | Decisões de arquitetura (ADRs 0001–0010) |
+| `docs/migracao/` | Mapa, cronograma e decisões de UI da migração |
 | `docs/estrutura/mapa-projeto.md` | Este arquivo |
 
 ## Configuração (`config/`)

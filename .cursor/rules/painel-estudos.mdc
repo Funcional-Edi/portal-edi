@@ -1,0 +1,41 @@
+---
+description: Manter o painel de estudos do Obsidian atualizado conforme o projeto evolui
+alwaysApply: true
+---
+
+# Painel de estudos (Obsidian)
+
+O usuário está aprendendo programação na prática. O painel vive em
+`obsidian/notas/estudos/` e é **atualizado por você**, não pelo `obsidian:sync`.
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| `00-PAINEL-ESTUDOS.md` | Hub — top 6 comandos + links |
+| `comandos-*.md` | Fichas de comando (projeto, git, PowerShell, npm) |
+| `fluxo-*.md` | Passo a passo (feature, branches, projeto novo, módulo, debug) |
+| `cronograma-estudos.md` | Trilhas com checkboxes, ligadas às fases do projeto |
+| `glossario.md` | Termos no contexto deste projeto |
+| `diario/AAAA-MM-DD.md` | O que fiz / aprendi / travou / não entendi |
+
+## Quando atualizar (sem o usuário pedir)
+
+- **Comando novo** usado na sessão → adicione na ficha `comandos-*` correspondente
+- **Erro real + solução** → adicione em `fluxo-quando-quebra.md`
+- **Fase do projeto concluída** → marque em `cronograma-estudos.md` e ajuste a Trilha 8
+- **Termo novo** (biblioteca, padrão, sigla) → `glossario.md`
+- **Sessão com aprendizado relevante** → entrada em `diario/` e link em `diario.md`
+
+## Como escrever
+
+- Toda tabela de comando tem coluna **"para que serve"** em 1 frase
+- Exemplo sempre concreto **deste** projeto (caminhos e scripts reais)
+- Comandos de shell em PowerShell (`;` não `&&`; aspas em caminho com espaço)
+- Explique o **porquê**, não só o passo
+- Link com `[[nome-do-arquivo|texto]]` — nomes são únicos no cofre
+
+## Não fazer
+
+- Não editar `obsidian/produtos/**` nem `obsidian/docs/**` (gerados/atalhos) —
+  corrija a origem em `content/` ou `docs/`
+- Não duplicar conteúdo entre fichas: link em vez de repetir
+- Não inventar comando que não foi verificado no projeto

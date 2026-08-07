@@ -1,20 +1,14 @@
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
-import { LoginForm } from "./login-form";
-
-export default function LoginPage() {
-  return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
-      <header className="mb-8 text-center">
-        <p className="text-sm font-medium text-brand-700">Portal de Integração</p>
-        <h1 className="mt-1 text-2xl font-bold">Entrar</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Acesso aos manuais de integração (SSO ou login dev local).
-        </p>
-      </header>
-      <Suspense fallback={<p className="text-center text-sm text-slate-500">Carregando…</p>}>
-        <LoginForm />
-      </Suspense>
-    </main>
-  );
+/** Compatibilidade: `/login` redireciona para `/` preservando callbackUrl. */
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const params = await searchParams;
+  const homeUrl = params.callbackUrl
+    ? `/?callbackUrl=${encodeURIComponent(params.callbackUrl)}`
+    : "/";
+  redirect(homeUrl);
 }

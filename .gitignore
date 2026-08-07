@@ -11,6 +11,8 @@
 # testes e análise de arquitetura
 /coverage
 architecture.dot
+/test-results
+/playwright-report
 
 # ambiente (NUNCA commitar segredos)
 .env
@@ -27,3 +29,7 @@ architecture.dot
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# obsidian — atalhos locais (junction); conteúdo real está em docs/ e content/
+/obsidian/docs
+/obsidian/produtos/*/sections

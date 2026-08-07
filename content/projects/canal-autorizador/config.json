@@ -1,0 +1,10 @@
+{
+  "slug": "canal-autorizador",
+  "name": "Canal Autorizador (template BPMN)",
+  "description": "Template de fluxo com decisão — seed da Fase 7 para validar export Mermaid.",
+  "environment": "homolog",
+  "published": true,
+  "audience": "distribuidor",
+  "createdAt": "2026-08-06T15:00:00.000Z",
+  "updatedAt": "2026-08-06T15:00:00.000Z"
+}
