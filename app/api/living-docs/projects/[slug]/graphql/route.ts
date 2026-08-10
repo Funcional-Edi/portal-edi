@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "@/core/auth";
+import { auth, isAdminRole } from "@/core/auth";
 import { recordPlaygroundExecution } from "@/core/metrics/playground-metrics-store";
+import { validateMutationOrigin } from "@/core/security/request-origin";
 import { playgroundRequestInputSchema } from "@/modules/living-docs-externa/schema/playground";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import {
@@ -18,7 +19,7 @@ import {
  * para executar queries contra o gateway real de um projeto — o token
  * master do gateway nunca sai do servidor (ver `services/proxy-playground.ts`).
  *
- * Fluxo: sessão logada → projeto publicado → allowlist → proxy → JSON.
+ * Fluxo: sessão admin → projeto publicado → allowlist → proxy → JSON.
  */
 
 interface RouteParams {
@@ -45,8 +46,13 @@ const PROXY_STATUS_BY_ERROR_CODE: Record<PlaygroundProxyError["code"], number> =
 
 export async function POST(request: Request, { params }: RouteParams) {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.role || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const originError = validateMutationOrigin(request);
+  if (originError) {
+    return NextResponse.json({ error: originError }, { status: 403 });
   }
 
   const { slug } = await params;

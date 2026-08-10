@@ -35,6 +35,12 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **lucide-react** | Biblioteca de ícones SVG usada na home, login e catálogo |
 | **Fuse.js** | Busca fuzzy client-side/server-side; índice montado em `build-search-index.ts` |
 | **CommandPalette** | Modal de busca global (`Ctrl+K`) em `core/ui/command-palette.tsx` |
+| **`permissions.json`** | RBAC externo em `data/` — admins/clients sem editar código (Fase B/9) |
+| **Compliance** | Módulo admin `/compliance` — catálogo de controles de proteção de dados |
+| **RBAC** | *Role-Based Access Control* — papéis `admin` e `client` por e-mail |
+| **CSP** | *Content Security Policy* — header que restringe scripts/recursos carregados |
+| **CSRF** | Ataque que força ação autenticada de outro site; mitigado com Origin + SameSite |
+| **SSRF** | Servidor acessa URL interna maliciosa; bloqueado em `gateway-url.ts` |
 
 ## TypeScript
 
@@ -91,6 +97,7 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Quality check** | Validação que **bloqueia** publish se o manual estiver incompleto |
 | **Distribuidor** | Cliente externo que lê o manual |
 | **CMS em arquivos** | Conteúdo em `content/` no Git, sem banco (ADR-0009) |
+| **Seed-only** | Conteúdo de exemplo local para fluxo/tela, ainda sem paridade real com o legado |
 | **IntegrationFlow** | Diagrama BPMN curado em `flow.json` — nós (`start`, `operation`, `decision`, `end`) + arestas |
 | **React Flow** | Biblioteca `@xyflow/react` para canvas de nós/arestas no browser |
 | **Mermaid** | Linguagem texto → diagrama; export do fluxo via `exportFlowToMermaid` |

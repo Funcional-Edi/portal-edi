@@ -7,12 +7,12 @@ import {
 } from "@/core/auth/roles";
 
 describe("RBAC — resolução de papel", () => {
-  it("reconhece admin do time EDI pela lista de permissões", () => {
-    expect(resolveRole("admin@funcionalcorp.com.br")).toBe("admin");
+  it("reconhece admin pela lista de permissões padrão", () => {
+    expect(resolveRole("admin@empresa.com")).toBe("admin");
   });
 
   it("é insensível a maiúsculas no e-mail", () => {
-    expect(resolveRole("ADMIN@FuncionalCorp.com.BR")).toBe("admin");
+    expect(resolveRole("ADMIN@Empresa.com")).toBe("admin");
   });
 
   it("trata qualquer outro e-mail como client (papel padrão)", () => {

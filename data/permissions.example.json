@@ -1,0 +1,5 @@
+{
+  "admins": ["admin@empresa.com"],
+  "clients": ["@distribuidor.com"],
+  "defaultRole": "client"
+}

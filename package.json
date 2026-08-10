@@ -20,6 +20,8 @@
     "arch": "depcruise app core modules --config config/dependency-cruiser.cjs",
     "arch:graph": "depcruise app core modules --config config/dependency-cruiser.cjs --output-type dot > architecture.dot",
     "migrate:legacy-content": "tsx scripts/migrate-content-from-legacy.ts",
+    "content:validate-published": "tsx scripts/validate-published-projects.ts",
+    "smoke:homolog": "tsx scripts/smoke-homolog-checklist.ts",
     "obsidian:sync": "tsx scripts/sync-obsidian-vault.ts",
     "obsidian:watch": "tsx scripts/watch-obsidian-vault.ts",
     "ci": "npm run typecheck && npm run lint && npm run arch && npm run test && npm run build"
@@ -36,6 +38,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
+    "server-only": "^0.0.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {

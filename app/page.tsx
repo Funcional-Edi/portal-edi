@@ -6,6 +6,7 @@ import {
   ClipboardCheck,
   FileText,
   LayoutGrid,
+  ShieldCheck,
   Sparkles,
   Workflow,
   type LucideIcon,
@@ -34,6 +35,7 @@ const MODULE_ICONS: Record<string, LucideIcon> = {
   fluxogramas: Workflow,
   homologacao: ClipboardCheck,
   "assistente-ia": Sparkles,
+  compliance: ShieldCheck,
 };
 
 function LoginShell() {

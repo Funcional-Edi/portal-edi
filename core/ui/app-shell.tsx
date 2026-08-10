@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
@@ -45,7 +45,30 @@ export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) 
           </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
+          {navItems.length > 0 ? (
+            <details className="relative sm:hidden">
+              <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-sm text-slate-600">
+                <Menu className="h-4 w-4" aria-hidden="true" />
+                Menu
+              </summary>
+              <nav className="absolute right-0 top-10 z-20 min-w-44 rounded-md border border-slate-200 bg-white p-2 shadow-lg">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block rounded px-2 py-1.5 text-sm ${
+                      item.active
+                        ? "bg-brand-50 text-brand-700"
+                        : "text-slate-600 transition hover:bg-slate-50 hover:text-brand-700"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </details>
+          ) : null}
           {navItems.length > 0 ? (
             <nav className="hidden items-center gap-5 text-sm font-medium sm:flex">
               {navItems.map((item) => (

@@ -1,9 +1,10 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { DEFAULT_PERMISSIONS_CONFIG, resolveRole, type UserRole } from "@/core/auth/roles";
+import { getPermissionsConfig } from "@/core/auth/permissions-config";
+import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
+import { resolveRole, type UserRole } from "@/core/auth/roles";
 import { isSsoLoginConfigured, validateSsoCredentials } from "@/core/auth/sso";
-
 const isDevAuthEnabled =
   process.env.NODE_ENV === "development" && process.env.DEV_AUTH_ENABLED === "true";
 
@@ -28,7 +29,7 @@ if (isSsoLoginConfigured()) {
           id: user.id,
           email: user.email,
           name: user.name ?? user.email.split("@")[0],
-          role: resolveRole(user.email, DEFAULT_PERMISSIONS_CONFIG),
+          role: resolveRole(user.email, getPermissionsConfig()),
         };
       },
     })
@@ -45,14 +46,18 @@ if (isDevAuthEnabled) {
       async authorize(credentials) {
         const email = credentials?.email?.toString().trim().toLowerCase();
         if (!email || !email.includes("@")) return null;
+
+        const rateLimit = await checkLoginRateLimit(`dev:${email}`);
+        if (!rateLimit.allowed) return null;
+
+        await resetLoginRateLimit(`dev:${email}`);
         return {
           id: email,
           email,
           name: email.split("@")[0],
-          role: resolveRole(email, DEFAULT_PERMISSIONS_CONFIG),
+          role: resolveRole(email, getPermissionsConfig()),
         };
-      },
-    })
+      },    })
   );
 }
 
@@ -85,3 +90,4 @@ export const authConfig = {
   },
   trustHost: trustAuthHost,
 } satisfies NextAuthConfig;
+

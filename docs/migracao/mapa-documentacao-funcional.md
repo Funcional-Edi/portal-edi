@@ -29,7 +29,7 @@
 | Referência GraphQL global | `/docs/api` | **fora do MVP** | 8+ |
 | Clientes legados (`clients.json`) | `/admin/clients` | **deprecado** | — |
 | Métricas / notificações | `/admin/metrics` | **fora do MVP** | 8+ |
-| Export PDF/Postman/Insomnia | APIs export | **fora do MVP** | 8+ |
+| Export PDF/Postman/Insomnia | APIs export | `/export/postman`, `/export/insomnia`, `/export/pdf` | 8–10 ✅ |
 | Editor BPMN / fluxogramas | `integrationFlow` | módulo `fluxogramas` | 7 ✅ |
 | WYSIWYG unificado | `components/admin/wysiwyg` | Fase 6 | 6 |
 
@@ -147,7 +147,7 @@ Rotas finas em `app/api/` — lógica em `modules/living-docs-externa/services/`
 | `GET|PUT .../manual` | idem | `get-manual`, `update-manual` | 3 |
 | `POST .../graphql` | idem | `proxy-playground` | 4 |
 | `GET|PUT .../sections` | idem | `section-repository` | 3 |
-| `.../export/*` | Fase 8 | — | 8+ |
+| `.../export/*` | `GET /export/postman|insomnia|pdf` | `export-*` | 8–10 ✅ |
 | `GET /api/content` (guias) | Fora do MVP | — | — |
 | `POST /api/graphql` (global) | **não migrar** | — | — |
 
@@ -228,12 +228,14 @@ Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
 - [x] **Fase 5** — Migrar conteúdo real (IM, wholesaler) + E2E Playwright
 - [x] **Fase 6** — Editor Markdown canônico (sem lib WYSIWYG — ver cronograma §6)
 - [x] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`) ✅
-- [ ] **Fase 8** — Export, métricas, busca, guias transversais
+- [x] **Fase 8** — Export, métricas, busca, guias transversais ✅
+- [x] **Fase 9** — Consolidação homolog (RBAC por arquivo, smoke, deploy) ✅
+- [x] **Fase 10** — Polish pós-MVP sem banco (PDF, E2E allowlist, validações) ✅
 
 ### Pendências fora das fases
 
-- [ ] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md)
-- [ ] Migrar `canal-autorizador` conteúdo real do legado (template local já existe)
+- [x] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md) (automação + passos manuais)
+- [x] `canal-autorizador` marcado como **seed-only** até migração real do legado
 
 ---
 

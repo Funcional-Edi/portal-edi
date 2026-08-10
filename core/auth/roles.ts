@@ -10,11 +10,12 @@ export interface PermissionsConfig {
 }
 
 /**
- * Admins do time EDI. Ajuste conforme necessário; no futuro pode vir de
- * um recurso de dados (data/permissions.json ou banco).
+ * Defaults em código quando `data/permissions.json` não existe.
+ * Em homolog/prod, copie `data/permissions.example.json` → `data/permissions.json`.
+ * Nunca coloque e-mails reais aqui — só placeholders genéricos.
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: ["admin@funcionalcorp.com.br", "sfoliveira@funcionalcorp.com.br"],
+  admins: ["admin@empresa.com"],
   clients: [],
   defaultRole: "client",
 };

@@ -55,6 +55,12 @@ export function validateEnv(): string[] {
   if (env.isProduction && process.env.DEV_AUTH_ENABLED === "true") {
     problems.push("DEV_AUTH_ENABLED=true em produção — proibido (login dev bypassa SSO).");
   }
+  if (env.isProduction && !env.isSsoConfigured) {
+    problems.push("FUNCIONAL_SSO_GRAPHQL_URL ausente em produção.");
+  }
+  if (env.isProduction && !process.env.GATEWAY_URL_ALLOWED_HOSTS?.trim()) {
+    problems.push("GATEWAY_URL_ALLOWED_HOSTS ausente em produção (allowlist de gateways).");
+  }
   if (env.aiProvider !== "stub" && !process.env.AI_API_KEY) {
     problems.push(`AI_PROVIDER=${env.aiProvider} sem AI_API_KEY.`);
   }
