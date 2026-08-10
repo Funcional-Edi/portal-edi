@@ -20,6 +20,7 @@
     "arch": "depcruise app core modules --config config/dependency-cruiser.cjs",
     "arch:graph": "depcruise app core modules --config config/dependency-cruiser.cjs --output-type dot > architecture.dot",
     "migrate:legacy-content": "tsx scripts/migrate-content-from-legacy.ts",
+    "content:validate-published": "tsx scripts/validate-published-projects.ts",
     "smoke:homolog": "tsx scripts/smoke-homolog-checklist.ts",
     "obsidian:sync": "tsx scripts/sync-obsidian-vault.ts",
     "obsidian:watch": "tsx scripts/watch-obsidian-vault.ts",
