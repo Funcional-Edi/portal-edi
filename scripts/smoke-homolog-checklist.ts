@@ -98,7 +98,7 @@ const MANUAL_STEPS = [
   "1. Acesse `/` deslogado — formulário de login inline (não `/login`).",
   "2. Entre com usuário distribuidor SSO homolog.",
   "3. Confirme catálogo em `/manual` com IM — Inventário (homolog).",
-  "4. Abra `/manual/im` — seções + roteiro + export Postman visível.",
+  "4. Abra `/manual/im` — seções + roteiro + export Postman/Insomnia/PDF visível.",
   "5. Ctrl+K — busque createToken e navegue até a operação.",
   "6. Playground: execute query allowlisted; operação fora da lista → 403.",
   "7. Admin: `/admin/metrics` incrementa após execução no playground.",
