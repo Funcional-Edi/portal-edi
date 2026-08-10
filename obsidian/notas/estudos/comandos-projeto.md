@@ -42,6 +42,7 @@ Os dois são servidos pelo **mesmo** processo do `npm run dev`. É o padrão *BF
 | `npm run test:coverage` | Quanto do código está coberto por teste |
 | `npm run test:e2e` | Testes de ponta a ponta no navegador (Playwright) |
 | `npm run smoke:homolog` | Checks automatizados pré-deploy homolog (env, IM, módulos) |
+| `npm run content:validate-published` | Garante que projetos publicados em `content/projects/*` têm `graphqlUrl` e pelo menos 1 operação |
 
 Regra prática: **`npm run ci` verde antes de qualquer commit.**
 

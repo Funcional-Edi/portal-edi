@@ -37,6 +37,7 @@ gantt
   Fase 7 Fluxogramas           :done, f7, 2026-09-22, 8d
   Fase 8 Export e métricas     :done, f8, 2026-10-02, 8d
   Fase 9 Consolidação homolog  :done, f9, 2026-10-14, 5d
+  Fase 10 Polish pós-MVP       :active, f10, 2026-10-20, 5d
 ```
 
 ---
@@ -216,6 +217,21 @@ travaria qualquer projeto novo em rascunho para sempre.
 | Deploy homolog | Dockerfile + `/api/health` + README | ✅ |
 
 **Critério de done:** `npm run ci` verde; smoke automatizado OK; deploy documentado.
+
+---
+
+## Fase 10 — Polish pós-MVP (sem banco)
+
+| Entrega | Detalhe | Status |
+|---------|---------|--------|
+| Export PDF | API `/export/pdf` + botões leitor/admin | ✅ |
+| E2E smoke atualizado | login inline `/` + allowlist playground | ✅ |
+| Validação de conteúdo publicado | `npm run content:validate-published` | ✅ |
+| Paridade seed | `canal-autorizador` marcado como seed-only | ✅ |
+| Guardrail sem banco | nota `fase-10-stateless-sem-banco.md` | ✅ |
+
+**Critério de done:** `npm run ci` verde; export PDF funcional (`demo`/`im`);
+E2E Playwright com dev auth; nenhuma dependência de banco adicionada.
 
 ---
 

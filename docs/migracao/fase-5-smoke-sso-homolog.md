@@ -1,6 +1,6 @@
 # Fase 5 — Smoke SSO homolog
 
-Checklist para validar o fluxo distribuidor com SSO no ambiente homolog **após Fase 9** (porta única `/`, RBAC por arquivo, Ctrl+K, export Postman).
+Checklist para validar o fluxo distribuidor com SSO no ambiente homolog **após Fase 10** (porta única `/`, RBAC por arquivo, Ctrl+K, exports Postman/Insomnia/PDF).
 
 ## Pré-condições
 
@@ -10,14 +10,20 @@ Checklist para validar o fluxo distribuidor com SSO no ambiente homolog **após 
 - Projeto `im` publicado em `content/projects/im/config.json`.
 - Gateway homolog acessível (para playground — opcional no smoke inicial).
 
-## Automatizado (sem rede externa)
+## Automatizado (sem SSO real)
 
 ```bash
 npm run smoke:homolog
 curl -s http://localhost:3002/api/health
+npm run test:e2e -- tests/e2e/manual-flow.spec.ts
+npm run test:e2e -- tests/e2e/playground-allowlist.spec.ts
 ```
 
-Esperado: checks `env`, `content-im`, `module-living-docs` OK.
+Esperado:
+
+- checks `env`, `content-im`, `module-living-docs` OK;
+- fluxo catálogo → roteiro → operação passa com `DEV_AUTH_ENABLED=true`;
+- allowlist do playground valida operação permitida e bloqueia fora da lista com `403`.
 
 ## Passos manuais
 
@@ -25,10 +31,10 @@ Esperado: checks `env`, `content-im`, `module-living-docs` OK.
 2. Entre com usuário **distribuidor** SSO homolog.
 3. Confirme redirect para `/manual` (client) ou `/` (admin).
 4. Catálogo exibe **IM — Inventário (homolog)**.
-5. Abra `/manual/im` — seções + roteiro + botões **Exportar Postman**.
+5. Abra `/manual/im` — seções + roteiro + botões **Exportar Postman/Insomnia/PDF**.
 6. **Ctrl+K** → busque `createToken` → navegue até a operação.
 7. Abra `/manual/im/operations/mutation/createToken` — exemplo GraphQL visível.
-8. Playground: execute query allowlisted (`createToken`).
+8. Playground: execute query allowlisted (`createToken`) no ambiente homolog.
 9. Playground: operação **fora** da allowlist → resposta **403**.
 10. (Admin) Após execução no playground, `/admin/metrics` incrementa contador.
 
@@ -43,7 +49,8 @@ Esperado: checks `env`, `content-im`, `module-living-docs` OK.
 
 - Fluxo completo sem erro de autorização indevida.
 - Conteúdo IM com paridade funcional vs portal legado (exceto `/admin/clients`).
-- Export Postman baixa JSON **sem credenciais**.
+- Export Postman/Insomnia baixa JSON **sem credenciais**.
+- Export PDF baixa arquivo `.pdf` com resumo do manual.
 
 ## Referências
 

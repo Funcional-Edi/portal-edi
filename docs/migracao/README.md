@@ -11,8 +11,9 @@ Documentação da migração da **documentação viva** para o módulo
 | [`deploy-homolog.md`](./deploy-homolog.md) | Deploy homolog (Node/Docker, health, smoke) |
 | [`github-cms-staging.md`](./github-cms-staging.md) | CMS GitHub em staging (ADR-0009) |
 | [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md) | Checklist SSO pós-consolidação |
+| [`fase-10-stateless-sem-banco.md`](./fase-10-stateless-sem-banco.md) | Guardrail pós-MVP: continuar sem banco |
 
-**Estado:** Fases 0–8 entregues · **Fase 9** (consolidação homolog) em andamento.
+**Estado:** Fases 0–9 entregues · **Fase 10** (polish pós-MVP sem banco) em andamento.
 
 Decisões relacionadas:
 
