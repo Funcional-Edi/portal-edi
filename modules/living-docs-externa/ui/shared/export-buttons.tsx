@@ -2,7 +2,7 @@
 
 interface ExportDownloadButtonProps {
   slug: string;
-  format: "postman" | "insomnia";
+  format: "postman" | "insomnia" | "pdf";
   label?: string;
   disabled?: boolean;
   className?: string;
@@ -11,6 +11,7 @@ interface ExportDownloadButtonProps {
 const FORMAT_LABELS: Record<ExportDownloadButtonProps["format"], string> = {
   postman: "Exportar Postman",
   insomnia: "Exportar Insomnia",
+  pdf: "Exportar PDF",
 };
 
 /** Dispara download JSON da API BFF de export (sem credenciais no arquivo). */
@@ -70,6 +71,12 @@ export function ProjectExportActions({
         slug={slug}
         format="insomnia"
         disabled={disabled}
+        className={buttonClass}
+      />
+      <ExportDownloadButton
+        slug={slug}
+        format="pdf"
+        disabled={false}
         className={buttonClass}
       />
     </div>
