@@ -9,13 +9,14 @@ describe("registro de módulos do portal", () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toContain("living-docs-externa");
     expect(ids).toContain("homologacao");
+    expect(ids).toContain("compliance");
   });
 
   it("é idempotente — registrar duas vezes não duplica nem quebra", () => {
     registerAllModules();
     const segunda = registerAllModules();
 
-    expect(segunda).toHaveLength(5);
+    expect(segunda).toHaveLength(6);
   });
 
   it("sinaliza homologação como bloqueada por exigir banco transacional", () => {

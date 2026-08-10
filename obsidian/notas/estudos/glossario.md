@@ -36,6 +36,11 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Fuse.js** | Busca fuzzy client-side/server-side; índice montado em `build-search-index.ts` |
 | **CommandPalette** | Modal de busca global (`Ctrl+K`) em `core/ui/command-palette.tsx` |
 | **`permissions.json`** | RBAC externo em `data/` — admins/clients sem editar código (Fase B/9) |
+| **Compliance** | Módulo admin `/compliance` — catálogo de controles de proteção de dados |
+| **RBAC** | *Role-Based Access Control* — papéis `admin` e `client` por e-mail |
+| **CSP** | *Content Security Policy* — header que restringe scripts/recursos carregados |
+| **CSRF** | Ataque que força ação autenticada de outro site; mitigado com Origin + SameSite |
+| **SSRF** | Servidor acessa URL interna maliciosa; bloqueado em `gateway-url.ts` |
 
 ## TypeScript
 

@@ -33,6 +33,10 @@ Cada módulo em `modules/<contexto>/` com: `module.ts`, `schema/`, `repository/`
 - `DEV_AUTH_ENABLED=true` só em development — **nunca** em produção.
 - Rate limit login: 10 tentativas / 15 min.
 - `.env.local` nunca no Git; `AUTH_SECRET` obrigatório.
+- `GATEWAY_URL_ALLOWED_HOSTS` obrigatório em produção.
+- Playground GraphQL: **somente admin** (`isAdminRole`).
+- Módulo `/compliance` (admin): catálogo de controles — atualizar `modules/compliance/data/controls.ts`.
+- Regra Cursor: `.cursor/rules/seguranca-dados.mdc` — IA para e alerta ao detectar risco.
 
 ## IA
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
+import { validateMutationOrigin } from "@/core/security/request-origin";
 import { ConnectGatewayError, connectGateway } from "@/modules/living-docs-externa/services/connect-gateway";
 
 async function requireAdmin() {
@@ -27,6 +28,11 @@ export async function POST(request: Request, { params }: RouteParams) {
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const originError = validateMutationOrigin(request);
+  if (originError) {
+    return NextResponse.json({ error: originError }, { status: 403 });
   }
 
   const { slug } = await params;

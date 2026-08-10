@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
+import { auth, isAdminRole } from "@/core/auth";
 import { ManualShellWithNav } from "@/modules/living-docs-externa/ui/reader/manual-shell-with-nav";
 import { PlaygroundPanel } from "@/modules/living-docs-externa/ui/reader/playground-panel";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
@@ -12,6 +13,11 @@ interface PlaygroundPageProps {
 
 export default async function PlaygroundPage({ params, searchParams }: PlaygroundPageProps) {
   const { slug } = await params;
+  const session = await auth();
+  if (!session?.user?.role || !isAdminRole(session.user.role)) {
+    redirect(`/manual/${slug}`);
+  }
+
   const { query } = await searchParams;
 
   const project = await getPublishedManual(slug);

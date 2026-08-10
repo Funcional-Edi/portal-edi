@@ -4,6 +4,7 @@ import { auth } from "@/core/auth";
 import {
   canAccessPath,
   getForbiddenRedirectPath,
+  isPublicPath,
   pathRequiresAuth,
 } from "@/core/auth/module-access";
 import { registerAllModules } from "@/modules/registry";
@@ -13,13 +14,19 @@ const modules = registerAllModules();
 /**
  * RBAC genérico por módulo (basePath + access do registry).
  * - `/` e `/login` são públicos (login inline na home).
- * - `/login` redireciona para `/` (compat callbackUrl).
+ * - `/api/*` exige sessão, exceto `/api/auth` e `/api/health` (defesa em profundidade).
  * - Rotas de módulo exigem sessão; client bloqueado em admin → /manual.
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
   const role = session?.user?.role;
+
+  if (pathname.startsWith("/api/") && !isPublicPath(pathname)) {
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
 
   if (pathname === "/projects" || pathname.startsWith("/projects/")) {
     const redirectUrl = req.nextUrl.clone();
@@ -65,5 +72,7 @@ export const config = {
     "/interno/:path*",
     "/homologacao/:path*",
     "/assistente/:path*",
+    "/compliance/:path*",
+    "/api/:path*",
   ],
 };

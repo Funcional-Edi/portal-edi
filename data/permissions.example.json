@@ -1,8 +1,5 @@
 {
-  "admins": [
-    "admin@funcionalcorp.com.br",
-    "sfoliveira@funcionalcorp.com.br"
-  ],
-  "clients": [],
+  "admins": ["admin@empresa.com"],
+  "clients": ["@distribuidor.com"],
   "defaultRole": "client"
 }

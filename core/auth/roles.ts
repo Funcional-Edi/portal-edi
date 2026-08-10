@@ -12,9 +12,10 @@ export interface PermissionsConfig {
 /**
  * Defaults em código quando `data/permissions.json` não existe.
  * Em homolog/prod, copie `data/permissions.example.json` → `data/permissions.json`.
+ * Nunca coloque e-mails reais aqui — só placeholders genéricos.
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: ["admin@funcionalcorp.com.br", "sfoliveira@funcionalcorp.com.br"],
+  admins: ["admin@empresa.com"],
   clients: [],
   defaultRole: "client",
 };

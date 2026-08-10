@@ -1,0 +1,56 @@
+---
+description: Proteção de dados — a IA deve alertar e parar ao detectar riscos de segurança ou vazamento
+alwaysApply: true
+---
+
+# Segurança e proteção de dados (Portal-Edi)
+
+## Regra principal
+
+**Ao identificar qualquer risco de segurança, vazamento de dados ou violação de compliance, a IA deve:**
+
+1. **PARAR** — não implementar, commitar ou prosseguir com a ação arriscada.
+2. **ALERTAR** — explicar claramente o que está errado e qual o impacto (confidencialidade, integridade, LGPD).
+3. **ORIENTAR** — indicar a forma correta de fazer, com referência a arquivos/padrões do projeto.
+
+Nunca “resolver rápido” ignorando o risco. Nunca expor segredos “só para testar”.
+
+## O que é proibido (bloquear imediatamente)
+
+| Risco | Exemplo errado | Forma correta |
+|-------|----------------|---------------|
+| Segredo no client | `NEXT_PUBLIC_*` com token/chave | Variável só server-side via `core/config/env.ts` |
+| Segredo no Git | commitar `.env.local`, `credentials.enc`, `permissions.json` | Manter no `.gitignore`; usar `.env.example` |
+| Senha persistida | gravar senha SSO ou gateway em disco/log | SSO: só JWT; gateway: cifrar com `gateway-credentials.ts` |
+| Auth bypass | rota API sem `auth()` / playground aberto a `client` | Middleware + `isAdminRole` onde aplicável |
+| PII no código | e-mails reais em defaults commitados | Placeholders em `roles.ts`; reais em `permissions.json` |
+| Log sensível | `console.log(password, token, credentials)` | Nunca logar credenciais ou tokens |
+| DEV_AUTH em prod | `DEV_AUTH_ENABLED=true` fora de development | Só local; `validateEnv()` bloqueia em prod |
+| Gateway aberto | URL de gateway sem allowlist em prod | `GATEWAY_URL_ALLOWED_HOSTS` + `gateway-url.ts` |
+| Playground aberto | client executando mutations com credencial admin | Restrito a admin (`graphql/route.ts`) |
+
+## Ao implementar features novas
+
+- Rotas `app/api/**`: sempre `auth()`; mutações admin exigem `isAdminRole`.
+- Novas rotas `/api`: incluir no `matcher` do `middleware.ts`.
+- Mutações sensíveis: usar `validateMutationOrigin()` de `core/security/request-origin.ts`.
+- Novo controle de segurança: registrar em `modules/compliance/data/controls.ts` e revisar `/compliance`.
+
+## Referências rápidas
+
+- Catálogo de controles: `modules/compliance/data/controls.ts`
+- Painel: `/compliance` (admin)
+- Arquitetura auth: `.cursor/rules/arquitetura-portal-edi.mdc`
+- ADRs: `docs/arquitetura/adr/0003-sso-contrato.md`, `0007-rate-limit-login.md`
+
+## Formato do alerta (quando bloquear)
+
+```markdown
+## ⚠️ Risco de segurança detectado
+
+**Problema:** [o que está errado]
+**Impacto:** [confidencialidade / vazamento / bypass]
+**Ação correta:** [passo a passo ou arquivo de referência]
+
+Não vou prosseguir até corrigirmos isso.
+```
