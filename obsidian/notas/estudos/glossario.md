@@ -35,6 +35,7 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **lucide-react** | Biblioteca de ícones SVG usada na home, login e catálogo |
 | **Fuse.js** | Busca fuzzy client-side/server-side; índice montado em `build-search-index.ts` |
 | **CommandPalette** | Modal de busca global (`Ctrl+K`) em `core/ui/command-palette.tsx` |
+| **`permissions.json`** | RBAC externo em `data/` — admins/clients sem editar código (Fase B/9) |
 
 ## TypeScript
 

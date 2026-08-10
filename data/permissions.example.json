@@ -1,0 +1,8 @@
+{
+  "admins": [
+    "admin@funcionalcorp.com.br",
+    "sfoliveira@funcionalcorp.com.br"
+  ],
+  "clients": [],
+  "defaultRole": "client"
+}

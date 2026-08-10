@@ -41,6 +41,7 @@ Os dois são servidos pelo **mesmo** processo do `npm run dev`. É o padrão *BF
 | `npm run test:watch` | Testes rodando e re-executando ao salvar |
 | `npm run test:coverage` | Quanto do código está coberto por teste |
 | `npm run test:e2e` | Testes de ponta a ponta no navegador (Playwright) |
+| `npm run smoke:homolog` | Checks automatizados pré-deploy homolog (env, IM, módulos) |
 
 Regra prática: **`npm run ci` verde antes de qualquer commit.**
 
@@ -60,6 +61,7 @@ git clone https://github.com/Funcional-Edi/portal-edi.git
 cd portal-edi
 npm install
 Copy-Item .env.example .env.local
+Copy-Item data/permissions.example.json data/permissions.json
 npm run dev
 ```
 
@@ -70,11 +72,12 @@ Para logar sem SSO em local: `DEV_AUTH_ENABLED=true`.
 
 | URL | O que é |
 | --- | --- |
-| http://localhost:3002 | Home — módulos ativos em destaque + planejados |
-| http://localhost:3002/login | Login |
+| http://localhost:3002 | Home — login inline ou hub por papel |
 | http://localhost:3002/manual | Catálogo de manuais (visão do distribuidor) |
+| http://localhost:3002/interno | Guias internos EDI (admin) |
 | http://localhost:3002/admin/projects | Admin — criar/editar manuais |
-| http://localhost:3002/api/health | Healthcheck — mostra módulos e capacidades |
+| http://localhost:3002/admin/metrics | Métricas do playground |
+| http://localhost:3002/api/health | Healthcheck — módulos, CMS, RBAC |
 
 ## Terminais que costumo deixar abertos
 

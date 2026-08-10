@@ -21,6 +21,7 @@ architecture.dot
 
 # dados de operação / credenciais
 /data/**/credentials.enc
+/data/permissions.json
 
 # logs / SO
 *.log

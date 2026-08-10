@@ -32,11 +32,11 @@ Regra de dependência: **`app → modules → core`**. Validada por
 
 | ID | Público | Estado |
 |----|---------|--------|
-| `living-docs-externa` | Clientes | **ativo** (Fase 1: leitor `/manual`) |
-| `manuais-internos` | Time EDI | planejado |
-| `fluxogramas` | Ambos | planejado |
+| `living-docs-externa` | Clientes | **ativo** |
+| `manuais-internos` | Time EDI | **ativo** |
+| `fluxogramas` | Ambos | **ativo** |
 | `homologacao` | Time EDI | planejado (exige banco) |
-| `assistente-ia` | Time EDI | planejado (exige banco) |
+| `assistente-ia` | Time EDI | planejado (exige vector-search) |
 
 Convenção interna de cada módulo: `module.ts`, `schema/`, `repository/`,
 `services/`, `ui/` (opcional).

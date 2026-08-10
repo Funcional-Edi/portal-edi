@@ -35,7 +35,8 @@ gantt
 
   section Extras
   Fase 7 Fluxogramas           :done, f7, 2026-09-22, 8d
-  Fase 8 Export e métricas     :f8, 2026-10-02, 8d
+  Fase 8 Export e métricas     :done, f8, 2026-10-02, 8d
+  Fase 9 Consolidação homolog  :done, f9, 2026-10-14, 5d
 ```
 
 ---
@@ -201,6 +202,20 @@ travaria qualquer projeto novo em rascunho para sempre.
 | Guias transversais | `manuais-internos` em `/interno` | ✅ |
 
 **Critério de done:** paridade funcional com portal antigo (exceto clientes legados). ✅
+
+---
+
+## Fase 9 — Consolidação e go-live homolog
+
+| Entrega | Detalhe | Status |
+|---------|---------|--------|
+| Docs pós-Fase 8 | README, mapa, índices | ✅ |
+| RBAC `data/permissions.json` | Fase B — loader + example | ✅ |
+| Smoke homolog | script + checklist SSO atualizado | ✅ |
+| GitHub CMS staging | doc ADR-0009 | ✅ |
+| Deploy homolog | Dockerfile + `/api/health` + README | ✅ |
+
+**Critério de done:** `npm run ci` verde; smoke automatizado OK; deploy documentado.
 
 ---
 

@@ -104,7 +104,14 @@ testada; `tests/e2e/manual-flow.spec.ts` de fluxo completo.
 - [x] Métricas playground in-memory (`core/metrics`, `/admin/metrics`)
 - [x] Módulo `manuais-internos` ativo em `/interno`
 
-## Depois (pós-MVP)
+## Trilha 9 — Fase 9 concluída (Consolidação homolog)
+
+- [x] RBAC via `data/permissions.json` (`permissions-loader.ts`)
+- [x] Smoke homolog (`npm run smoke:homolog`)
+- [x] Deploy Docker + docs (`deploy-homolog.md`)
+- [x] Health enriquecido (`/api/health`)
+
+## Depois (Fase 10+)
 
 - [ ] Export PDF
 - [ ] Referência GraphQL global (`/docs/api`)

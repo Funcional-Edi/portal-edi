@@ -228,11 +228,11 @@ Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
 - [x] **Fase 5** — Migrar conteúdo real (IM, wholesaler) + E2E Playwright
 - [x] **Fase 6** — Editor Markdown canônico (sem lib WYSIWYG — ver cronograma §6)
 - [x] **Fase 7** — Fluxogramas BPMN (`modules/fluxogramas`) ✅
-- [ ] **Fase 8** — Export, métricas, busca, guias transversais
+- [x] **Fase 8** — Export, métricas, busca, guias transversais ✅
 
 ### Pendências fora das fases
 
-- [ ] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md)
+- [ ] Smoke SSO homolog — [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md) (checklist atualizado Fase 9)
 - [ ] Migrar `canal-autorizador` conteúdo real do legado (template local já existe)
 
 ---

@@ -44,6 +44,19 @@ npm run dev                    # http://localhost:3002
 
 - Login dev (local): habilite `DEV_AUTH_ENABLED=true` em `.env.local`.
 - Healthcheck / planta viva: `GET /api/health`.
+- Smoke homolog: `npm run smoke:homolog` (ver [`docs/migracao/deploy-homolog.md`](docs/migracao/deploy-homolog.md)).
+
+## Deploy homolog
+
+```bash
+cp .env.example .env.local          # preencher AUTH_SECRET, SSO, etc.
+cp data/permissions.example.json data/permissions.json
+npm run ci
+npm run start                       # ou docker build / docker run — ver deploy-homolog.md
+npm run smoke:homolog
+```
+
+Docker: [`Dockerfile`](Dockerfile) · Guia: [`docs/migracao/deploy-homolog.md`](docs/migracao/deploy-homolog.md).
 
 ## Qualidade
 

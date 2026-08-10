@@ -7,10 +7,12 @@ Documentação da migração da **documentação viva** para o módulo
 |-----------|----------|
 | [`mapa-documentacao-funcional.md`](./mapa-documentacao-funcional.md) | Mapa ponta a ponta: rotas, APIs, código, melhorias |
 | [`cronograma.md`](./cronograma.md) | Fases, datas, entregáveis e critérios de done |
-| [`decisoes-ui.md`](./decisoes-ui.md) | Redesign da casca (`feat/ui-portal`): diagnóstico, arquivos, checklist |
+| [`decisoes-ui.md`](./decisoes-ui.md) | Redesign da casca + RBAC (Fase A/B) |
+| [`deploy-homolog.md`](./deploy-homolog.md) | Deploy homolog (Node/Docker, health, smoke) |
+| [`github-cms-staging.md`](./github-cms-staging.md) | CMS GitHub em staging (ADR-0009) |
+| [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md) | Checklist SSO pós-consolidação |
 
-**Estado:** Fases 0–6 do leitor/admin/playground entregues na linha de produto ·
-UI compartilhada em andamento (`feat/ui-portal`).
+**Estado:** Fases 0–8 entregues · **Fase 9** (consolidação homolog) em andamento.
 
 Decisões relacionadas:
 

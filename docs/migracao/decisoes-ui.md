@@ -121,7 +121,7 @@ npm run ci
 - Dark mode intencional (só `color-scheme` no CSS)
 - Empty states e skeletons em admin
 - Microcopy e ilustrações de marca Fidelize
-- **Fase B:** permissões externas via `data/permissions.json` (hoje admins em código)
+- ~~**Fase B:** permissões externas via `data/permissions.json`~~ ✅ Fase 9
 
 ---
 
