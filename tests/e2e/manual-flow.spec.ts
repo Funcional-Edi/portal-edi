@@ -1,18 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function loginAsDevUser(page: Page) {
-  await page.goto("/manual");
-  await expect(page).toHaveURL(/callbackUrl=%2Fmanual/);
+  await page.goto("/");
 
   await page.getByLabel("E-mail").fill("qa-distribuidor@fidelize.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
 
-  await expect(page).toHaveURL("/manual");
+  await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }
 
 test("catalogo para roteiro para operacao (IM)", async ({ page }) => {
   await loginAsDevUser(page);
 
+  await page.goto("/manual");
+  await expect(page).toHaveURL("/manual");
   await expect(page.getByRole("heading", { name: "Manuais de integração" })).toBeVisible();
   await page.getByRole("link", { name: /IM - Inventario \(homolog\)/ }).click();
 
