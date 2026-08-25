@@ -17,8 +17,37 @@
           "name": "Query",
           "description": "Consultas do gateway IM",
           "fields": [
-            { "name": "health", "description": "Status do gateway" },
-            { "name": "inventoryLoad", "description": "Consulta carga por loadId" }
+            {
+              "name": "health",
+              "description": "Status do gateway",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+              }
+            },
+            {
+              "name": "inventoryLoad",
+              "description": "Consulta carga por loadId",
+              "args": [
+                {
+                  "name": "loadId",
+                  "description": "Identificador da carga",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "InventoryLoadResult",
+                "ofType": null
+              }
+            }
           ]
         },
         {
@@ -26,33 +55,100 @@
           "name": "Mutation",
           "description": "Mutations do gateway IM",
           "fields": [
-            { "name": "createToken", "description": "Autentica no gateway" },
-            { "name": "saveInventories", "description": "Envia carga de estoque" }
+            {
+              "name": "createToken",
+              "description": "Autentica no gateway",
+              "args": [
+                {
+                  "name": "login",
+                  "description": "Login do usuário",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+                  }
+                },
+                {
+                  "name": "password",
+                  "description": "Senha do usuário",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TokenPayload",
+                "ofType": null
+              }
+            },
+            {
+              "name": "saveInventories",
+              "description": "Envia carga de estoque",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+              }
+            }
           ]
         },
         {
           "kind": "OBJECT",
           "name": "TokenPayload",
-          "fields": [{ "name": "token" }]
+          "fields": [
+            {
+              "name": "token",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+              }
+            }
+          ]
         },
         {
           "kind": "OBJECT",
           "name": "InventoryLoadResult",
           "fields": [
-            { "name": "status" },
-            { "name": "loadId" },
-            { "name": "message" }
+            {
+              "name": "status",
+              "args": [],
+              "type": { "kind": "SCALAR", "name": "String", "ofType": null }
+            },
+            {
+              "name": "loadId",
+              "args": [],
+              "type": { "kind": "SCALAR", "name": "String", "ofType": null }
+            },
+            {
+              "name": "message",
+              "args": [],
+              "type": { "kind": "SCALAR", "name": "String", "ofType": null }
+            }
           ]
         },
         {
           "kind": "ENUM",
           "name": "CustomerType",
-          "fields": null
+          "enumValues": [
+            { "name": "PHARMACY", "description": "Farmácia" },
+            { "name": "DISTRIBUTOR", "description": "Distribuidor" }
+          ]
         },
         {
           "kind": "ENUM",
           "name": "OperationType",
-          "fields": null
+          "enumValues": [
+            { "name": "LOAD", "description": "Carga" },
+            { "name": "QUERY", "description": "Consulta" }
+          ]
         },
         {
           "kind": "SCALAR",

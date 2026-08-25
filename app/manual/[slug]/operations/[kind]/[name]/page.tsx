@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { auth, isAdminRole } from "@/core/auth";
 import {
   findOperation,
   manualOperationKindSchema,
@@ -20,6 +21,9 @@ export default async function OperationPage({ params }: OperationPageProps) {
   const kindResult = manualOperationKindSchema.safeParse(kind);
   if (!kindResult.success) notFound();
 
+  const session = await auth();
+  const canUsePlayground = Boolean(session?.user?.role && isAdminRole(session.user.role));
+
   const [project, hasSchema] = await Promise.all([
     getPublishedManual(slug),
     hasPublishedSchemaSnapshot(slug),
@@ -38,6 +42,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
       schemaFieldHref={
         hasSchema ? schemaFieldHref(slug, kindResult.data, name) : undefined
       }
+      canUsePlayground={canUsePlayground}
     />
   );
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { auth, isAdminRole } from "@/core/auth";
 import { ManualShellWithNav } from "@/modules/living-docs-externa/ui/reader/manual-shell-with-nav";
@@ -13,12 +13,9 @@ interface PlaygroundPageProps {
 
 export default async function PlaygroundPage({ params, searchParams }: PlaygroundPageProps) {
   const { slug } = await params;
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    redirect(`/manual/${slug}`);
-  }
-
   const { query } = await searchParams;
+  const session = await auth();
+  const canUsePlayground = Boolean(session?.user?.role && isAdminRole(session.user.role));
 
   const project = await getPublishedManual(slug);
   if (!project) notFound();
@@ -45,7 +42,24 @@ export default async function PlaygroundPage({ params, searchParams }: Playgroun
           </p>
         </header>
 
-        <PlaygroundPanel slug={slug} initialQuery={query} />
+        {canUsePlayground ? (
+          <PlaygroundPanel slug={slug} initialQuery={query} />
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-950">
+            <p className="font-medium">Acesso restrito a perfil admin</p>
+            <p className="mt-2">
+              O playground executa queries e mutations contra o gateway real usando credenciais
+              salvas no servidor. Por segurança, apenas usuários com perfil{" "}
+              <span className="font-medium">admin</span> podem usar esta ferramenta.
+            </p>
+            <Link
+              href={`/manual/${slug}`}
+              className="mt-4 inline-flex text-sm font-medium text-brand-700 hover:underline"
+            >
+              ← Voltar ao roteiro
+            </Link>
+          </div>
+        )}
       </article>
     </ManualShellWithNav>
   );

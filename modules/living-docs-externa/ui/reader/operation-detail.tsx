@@ -1,4 +1,5 @@
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
+import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
@@ -8,6 +9,8 @@ interface OperationDetailProps {
   operation: ManualOperation;
   graphqlUrl?: string;
   schemaFieldHref?: string;
+  /** Playground executa contra gateway real — só perfil admin. */
+  canUsePlayground?: boolean;
 }
 
 export function OperationDetail({
@@ -16,6 +19,7 @@ export function OperationDetail({
   operation,
   graphqlUrl,
   schemaFieldHref,
+  canUsePlayground = false,
 }: OperationDetailProps) {
   return (
     <article>
@@ -85,12 +89,20 @@ export function OperationDetail({
           <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
             <code>{operation.exampleQuery}</code>
           </pre>
-          <Link
-            href={`/manual/${slug}/playground?query=${encodeURIComponent(operation.exampleQuery)}`}
-            className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-          >
-            Testar no playground
-          </Link>
+          {canUsePlayground ? (
+            <Link
+              href={buildPlaygroundHref(slug, operation.exampleQuery)}
+              className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+            >
+              Testar no playground
+            </Link>
+          ) : (
+            <p className="mt-3 text-sm text-slate-600">
+              O playground executa contra o gateway real e está disponível apenas para perfil{" "}
+              <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao
+              time de integração.
+            </p>
+          )}
         </section>
       ) : null}
 

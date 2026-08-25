@@ -1,5 +1,6 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
+import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
 import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
@@ -38,6 +39,8 @@ interface ManualRoteiroProps {
   flowHref?: string;
   /** Link para referência GraphQL quando schema sincronizado. */
   schemaReferenceHref?: string;
+  /** Playground executa contra gateway real — só perfil admin. */
+  canUsePlayground?: boolean;
 }
 
 export function ManualRoteiro({
@@ -46,6 +49,7 @@ export function ManualRoteiro({
   editor,
   flowHref,
   schemaReferenceHref,
+  canUsePlayground = false,
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
@@ -71,12 +75,14 @@ export function ManualRoteiro({
         <div className="mt-4 flex flex-wrap gap-3">
           {editor?.headerActions ?? (
             <>
-              <Link
-                href={`/manual/${config.slug}/playground`}
-                className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-              >
-                Abrir playground GraphQL
-              </Link>
+              {canUsePlayground ? (
+                <Link
+                  href={buildPlaygroundHref(config.slug)}
+                  className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+                >
+                  Abrir playground GraphQL
+                </Link>
+              ) : null}
               {flowHref ?? editor?.flowHref ? (
                 <Link
                   href={flowHref ?? editor!.flowHref!}

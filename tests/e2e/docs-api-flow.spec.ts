@@ -31,6 +31,26 @@ test("catalogo docs/api para referencia de schema (IM)", async ({ page }) => {
   await expect(page.getByText("createToken")).toBeVisible();
 });
 
+test("drill-down de tipo na referencia GraphQL (IM)", async ({ page }) => {
+  await loginAsDevUser(page);
+
+  await page.goto("/docs/api/im");
+  await page.getByRole("link", { name: "Mutation", exact: true }).click();
+  await expect(page).toHaveURL("/docs/api/im/types/Mutation");
+  await expect(page.getByRole("heading", { name: "Mutation" })).toBeVisible();
+  await expect(page.getByText("createToken")).toBeVisible();
+  await expect(page.getByText("login", { exact: true })).toBeVisible();
+  await expect(page.getByText("password", { exact: true })).toBeVisible();
+
+  await page.getByRole("link", { name: "TokenPayload" }).click();
+  await expect(page).toHaveURL("/docs/api/im/types/TokenPayload");
+  await expect(page.getByRole("heading", { name: "TokenPayload" })).toBeVisible();
+  await expect(page.getByText("token", { exact: true })).toBeVisible();
+
+  await page.getByRole("link", { name: "← Voltar ao schema" }).click();
+  await expect(page).toHaveURL("/docs/api/im");
+});
+
 test("manual IM linka referencia GraphQL", async ({ page }) => {
   await loginAsDevUser(page);
 

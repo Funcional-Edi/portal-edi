@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { auth, isAdminRole } from "@/core/auth";
 import { ManualRoteiro } from "@/modules/living-docs-externa/ui/reader/manual-roteiro";
 import { ManualShellWithNav } from "@/modules/living-docs-externa/ui/reader/manual-shell-with-nav";
 import {
@@ -16,6 +17,9 @@ interface ManualPageProps {
 
 export default async function ManualPage({ params }: ManualPageProps) {
   const { slug } = await params;
+  const session = await auth();
+  const canUsePlayground = Boolean(session?.user?.role && isAdminRole(session.user.role));
+
   const [project, sections, hasFlow, hasSchema] = await Promise.all([
     getPublishedManual(slug),
     getPublishedManualSections(slug),
@@ -31,6 +35,7 @@ export default async function ManualPage({ params }: ManualPageProps) {
         sections={sections}
         flowHref={hasFlow ? `/fluxogramas/${slug}` : undefined}
         schemaReferenceHref={hasSchema ? schemaReferenceHref(slug) : undefined}
+        canUsePlayground={canUsePlayground}
       />
     </ManualShellWithNav>
   );
