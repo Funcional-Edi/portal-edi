@@ -32,10 +32,10 @@ Consulta rápida do dia a dia. Aprender **implementando** neste projeto.
 
 ## Painel do projeto (HTML, fora do Obsidian)
 
-Mapa geral + segurança + Kanban de prioridades + progresso das trilhas, tudo numa
-tela só: `docs/painel/index.html` — abra direto no navegador (duplo-clique).
-Kanban e checkboxes de estudo salvam no `localStorage` do navegador (não sincroniza
-via Git nem com este cofre).
+Mapa geral + segurança + Kanban de prioridades + progresso das trilhas + **aba Comandos**
+(todos os comandos para praticar no terminal), tudo numa tela só: `docs/painel/index.html` —
+abra direto no navegador (duplo-clique). Kanban e checkboxes de estudo salvam no
+`localStorage` do navegador (não sincroniza via Git nem com este cofre).
 
 ## UI / casca do portal
 

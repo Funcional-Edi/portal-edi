@@ -404,6 +404,98 @@
   .trilha li input { cursor: pointer; }
   .trilha .note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 
+  /* Comandos */
+  .cmd-filter {
+    width: 100%;
+    max-width: 420px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .cmd-section { margin-bottom: 28px; }
+  .cmd-section h3 {
+    font-size: 15px;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+  .cmd-section .cmd-intro {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  table.cmd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--panel);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 8px;
+  }
+  table.cmd-table th, table.cmd-table td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.cmd-table th {
+    background: var(--panel-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+  table.cmd-table tr:last-child td { border-bottom: none; }
+  table.cmd-table tr.cmd-hidden { display: none; }
+  table.cmd-table code.cmd {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  table.cmd-table td.when { color: var(--text-muted); font-size: 12.5px; }
+  .callout {
+    background: var(--amber-soft);
+    border: 1px solid #fcd34d;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .callout b { color: #92400e; }
+  .flow-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px 14px 36px;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+  }
+  .flow-box ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
+  .flow-box li code {
+    background: var(--panel-muted);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  pre.cmd-pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 8px 0 0;
+  }
+
   footer.note {
     text-align: center;
     color: var(--text-muted);
@@ -432,6 +524,7 @@
   <button class="tab" data-tab="mapa">Mapa de Pastas</button>
   <button class="tab" data-tab="seguranca">Segurança</button>
   <button class="tab" data-tab="kanban">Kanban</button>
+  <button class="tab" data-tab="comandos">Comandos</button>
   <button class="tab" data-tab="cronograma">Cronograma</button>
   <button class="tab" data-tab="estudos">Estudos</button>
 </nav>
@@ -601,6 +694,17 @@
     </div>
   </section>
 
+  <!-- ===================== COMANDOS ===================== -->
+  <section id="comandos" class="panel">
+    <div class="toolbar">
+      <div>
+        <input type="search" id="cmd-filter" class="cmd-filter" placeholder="Buscar comando… (ex: branch, npm run ci, stash)" />
+        <p class="hint" style="margin:6px 0 0">Copie e rode no terminal do Cursor para praticar. PowerShell — use <code>;</code> em vez de <code>&amp;&amp;</code>.</p>
+      </div>
+    </div>
+    <div id="comandos-wrap"></div>
+  </section>
+
   <!-- ===================== ESTUDOS ===================== -->
   <section id="estudos" class="panel">
     <div class="toolbar">
@@ -717,6 +821,7 @@ const DEFAULT_BOARD = [
     id: "done", title: "Feito", cards: [
       { id: "c6", title: "Referência GraphQL global (/docs/api)", desc: "MVP: catálogo + schema read-only por produto publicado.", prio: "alta" },
       { id: "c13", title: "UX /docs/api — links cruzados + catálogo pendentes", desc: "Manual ↔ referência, deep link por operação, wholesaler visível como pendente de sync.", prio: "alta" },
+      { id: "c17", title: "Painel — aba Comandos", desc: "Git, PowerShell, Cursor, npm, branches e higiene — para praticar no terminal.", prio: "alta" },
       { id: "c9", title: "Fase 10 — polish pós-MVP", desc: "Export PDF, E2E allowlist, validação de conteúdo publicado.", prio: "alta" },
       { id: "c10", title: "Hardening de segurança + /compliance", desc: "18 controles ativos, regra Cursor de proteção de dados.", prio: "alta" },
       { id: "c11", title: "RBAC via permissions.json", desc: "Fase 9 — controle de acesso configurável por arquivo.", prio: "media" },
@@ -1046,6 +1151,248 @@ document.getElementById("reset-estudos").addEventListener("click", () => {
 });
 
 renderTrilhas();
+
+/* ===================== Comandos ===================== */
+const COMMAND_SECTIONS = [
+  {
+    id: "mental",
+    title: "Antes de tudo — modelo mental do Git",
+    type: "callout",
+    html: `<b>4 lugares:</b> pasta editada → <code>git add</code> (staging) → <code>git commit</code> (histórico local) → <code>git push</code> (GitHub).<br>
+    Entender isso resolve a maior parte da confusão. Sempre rode <code>git status</code> antes de decidir o próximo passo.`,
+  },
+  {
+    id: "cursor",
+    title: "Cursor — dominar o editor",
+    intro: "Atalhos para não depender só do mouse. Terminal integrado = prática diária.",
+    rows: [
+      { cmd: "Ctrl + `", purpose: "Abre/fecha o terminal integrado", when: "Rodar npm, git, testes" },
+      { cmd: "Ctrl + Shift + `", purpose: "Novo terminal (aba)", when: "dev + obsidian:watch + git em paralelo" },
+      { cmd: "Ctrl + Shift + 5", purpose: "Divide o terminal em dois painéis", when: "Ver dev server e CI lado a lado" },
+      { cmd: "Ctrl + P", purpose: "Abrir arquivo por nome", when: "Ir rápido a um arquivo sem clicar pastas" },
+      { cmd: "Ctrl + Shift + P", purpose: "Paleta de comandos do editor", when: "Achar ação (format, rename, etc.)" },
+      { cmd: "Ctrl + L", purpose: "Limpa a tela do terminal", when: "Organizar visual antes de copiar output" },
+      { cmd: "Chat / Agent (painel)", purpose: "IA auxilia código, explica, implementa", when: "Dúvida ou tarefa maior — revise o diff antes de aceitar" },
+      { cmd: ".cursor/rules/", purpose: "Regras que a IA segue neste projeto", when: "Entender por que a IA para em risco de segurança" },
+    ],
+  },
+  {
+    id: "powershell",
+    title: "PowerShell — terminal deste projeto",
+    intro: "Tutoriais em bash usam && — aqui use ; . Caminho do projeto tem espaço: sempre aspas.",
+    rows: [
+      { cmd: 'cd "C:\\Projetos Cursor\\Portal-Edi"', purpose: "Ir para a raiz do projeto", when: "Todo terminal novo" },
+      { cmd: "comando1; comando2", purpose: "Encadear comandos", when: "Substitui && do bash" },
+      { cmd: "npm run ci; if ($?) { git push }", purpose: "Só faz push se CI passou", when: "Automatizar segurança no push" },
+      { cmd: "ls", purpose: "Lista arquivos da pasta", when: "Explorar estrutura" },
+      { cmd: "Copy-Item origem destino", purpose: "Copiar arquivo/pasta", when: "Ex.: .env.example → .env.local" },
+      { cmd: "Remove-Item -Recurse -Force .next", purpose: "Apaga cache do Next.js", when: "Erro EPERM ou build estranho" },
+      { cmd: "Get-NetTCPConnection -LocalPort 3002", purpose: "Quem usa a porta 3002", when: "EADDRINUSE ao subir dev" },
+      { cmd: "Stop-Process -Id <pid>", purpose: "Mata processo travado", when: "Dev server preso na porta" },
+      { cmd: "Ctrl + C", purpose: "Interrompe comando (para dev server)", when: "Antes de npm run ci/build" },
+    ],
+  },
+  {
+    id: "git-dia",
+    title: "Git — ciclo do dia a dia",
+    intro: "Sequência mínima antes de commitar. Regra: npm run ci verde.",
+    rows: [
+      { cmd: "git status", purpose: "O que mudou e em que estágio", when: "Sempre — primeiro comando" },
+      { cmd: "git diff", purpose: "Diff linha a linha (fora do staging)", when: "Revisar antes do add" },
+      { cmd: "git diff --staged", purpose: "O que vai entrar no commit", when: "Depois do git add" },
+      { cmd: "git add .", purpose: "Staging de tudo", when: "Commitar lote inteiro" },
+      { cmd: 'git add caminho/arquivo.ts', purpose: "Staging de um arquivo", when: "Commit parcial" },
+      { cmd: 'git commit -m "feat: descrição"', purpose: "Salva ponto no histórico local", when: "Após CI verde + diff ok" },
+      { cmd: "git push", purpose: "Envia commits ao GitHub", when: "Branch já tem upstream" },
+      { cmd: "git log --oneline -10", purpose: "Últimos 10 commits", when: "Ver histórico recente" },
+    ],
+    flow: {
+      title: "Fluxo completo (copie e adapte)",
+      steps: [
+        'cd "C:\\Projetos Cursor\\Portal-Edi"',
+        "npm run ci",
+        "git status",
+        "git add .",
+        'git commit -m "feat: sua mensagem"',
+        "git push",
+      ],
+    },
+  },
+  {
+    id: "branches-quando",
+    title: "Git — quando abrir branch nova?",
+    type: "callout",
+    html: `<b>Abra branch quando:</b> feature nova (<code>feat/...</code>), correção (<code>fix/...</code>), fase do cronograma (<code>feat/fase-N-...</code>), ou experimento que pode quebrar.<br>
+    <b>Fique na main quando:</b> só docs pequenas ou ajuste trivial acordado com o time (raro neste projeto).<br>
+    <b>Nunca</b> desenvolva feature grande direto na main — dificulta PR, CI e rollback.<br>
+    <b>Regra:</b> uma branch = uma tarefa/revisão. PR mergeado → apague a branch.`,
+  },
+  {
+    id: "branches-fluxo",
+    title: "Git — criar e usar branch",
+    intro: "Sempre parta da main atualizada. Só troque de branch com working tree limpa.",
+    rows: [
+      { cmd: "git switch main", purpose: "Vai para a main", when: "Início de tarefa ou pós-merge" },
+      { cmd: "git pull", purpose: "Atualiza main com o remoto", when: "Antes de criar branch nova" },
+      { cmd: "git switch -c feat/minha-tarefa", purpose: "Cria branch e entra nela", when: "Tarefa nova" },
+      { cmd: "git branch", purpose: "Lista branches locais (* = atual)", when: "Orientar onde está" },
+      { cmd: "git branch -a -vv", purpose: "Lista local + remoto com tracking", when: "Auditoria geral de branches" },
+      { cmd: "git push -u origin feat/minha-tarefa", purpose: "Publica branch (1ª vez)", when: "Abrir PR — -u liga upstream" },
+      { cmd: "git pull origin main", purpose: "Traz main para sua branch", when: "Sua branch ficou atrás da main" },
+    ],
+    flow: {
+      title: "Bug urgente enquanto trabalha em outra coisa",
+      steps: [
+        "git stash",
+        "git switch main; git pull",
+        "git switch -c fix/nome-do-bug",
+        "# ... corrige, npm run ci, commit, push, abre PR ...",
+        "git switch feat/sua-tarefa-anterior",
+        "git stash pop",
+      ],
+    },
+  },
+  {
+    id: "branches-higiene",
+    title: "Git — validar branches e limpar lixo",
+    intro: "Exemplo deste projeto: branches de PRs mergeadas (#3–#5) — candidatas a apagar após git pull na main.",
+    rows: [
+      { cmd: "git branch --merged main", purpose: "Branches locais já absorvidas pela main", when: "Achar lixo seguro para -d" },
+      { cmd: "git branch --no-merged main", purpose: "Branches com commits únicos", when: "Ver o que ainda não entrou na main" },
+      { cmd: "git log --oneline main..nome-branch", purpose: "Commits exclusivos da branch", when: "Confirmar se está vazia antes de apagar" },
+      { cmd: "git branch -d nome-branch", purpose: "Apaga branch local mergeada", when: "Após PR mergeado + git pull na main" },
+      { cmd: "git branch -D nome-branch", purpose: "Força apagar local", when: "Só se commit já está na main (ex.: ahead do remote)" },
+      { cmd: "git push origin --delete branch1 branch2", purpose: "Apaga branches no GitHub", when: "Limpeza remota — confirme com o time" },
+      { cmd: "git fetch --prune", purpose: "Remove refs remotas obsoletas", when: "Depois de apagar branch no GitHub" },
+      { cmd: "git stash list", purpose: "Ver trabalho guardado", when: "Antes de stash pop/drop" },
+    ],
+    flow: {
+      title: "Checklist de higiene (rode você mesmo)",
+      steps: [
+        "git switch main; git pull",
+        "git branch -a -vv",
+        "git branch --merged main",
+        "git log --oneline main..feat/nome",
+        "git branch -d feat/nome",
+        "# remoto: git push origin --delete feat/nome (só se todos concordarem)",
+      ],
+    },
+  },
+  {
+    id: "projeto",
+    title: "Portal EDI — npm e qualidade",
+    intro: "Raiz: C:\\Projetos Cursor\\Portal-Edi. Um npm run dev sobe UI + APIs juntas (Next.js BFF).",
+    rows: [
+      { cmd: "npm install", purpose: "Instala dependências", when: "Clone novo ou package.json mudou" },
+      { cmd: "npm run dev", purpose: "Dev server → localhost:3002", when: "Desenvolvimento diário" },
+      { cmd: "npm run ci", purpose: "Gate completo: types, lint, arch, test, build", when: "Antes de todo commit" },
+      { cmd: "npm run test", purpose: "Só testes unitários (Vitest)", when: "Iterar rápido num service" },
+      { cmd: "npm run test:e2e", purpose: "Testes no navegador (Playwright)", when: "Validar fluxo de tela" },
+      { cmd: "npm run arch", purpose: "Valida app → modules → core", when: "Após mudar imports entre camadas" },
+      { cmd: "npm run smoke:homolog", purpose: "Checklist automatizado homolog", when: "Pré-deploy" },
+      { cmd: "npm run obsidian:watch", purpose: "Sync Obsidian em tempo real", when: "Terminal 2, paralelo ao dev" },
+      { cmd: "npm run content:validate-published", purpose: "Valida projetos publicados", when: "Antes de release de conteúdo" },
+    ],
+  },
+  {
+    id: "npm-node",
+    title: "npm e Node — manutenção",
+    rows: [
+      { cmd: "node -v", purpose: "Versão do Node (exigido: 20.x)", when: "Setup ou erro estranho" },
+      { cmd: "npm ci", purpose: "Instala exato do lock (comando npm)", when: "Reproduzir CI localmente" },
+      { cmd: "npm run ci", purpose: "Script do projeto (types+lint+test+build)", when: "Não confundir com npm ci" },
+      { cmd: "npm outdated", purpose: "Dependências desatualizadas", when: "Manutenção periódica" },
+      { cmd: "Remove-Item -Recurse -Force node_modules; npm install", purpose: "Reset de dependências", when: "node_modules corrompido" },
+    ],
+  },
+  {
+    id: "github",
+    title: "GitHub — Pull Request (gh CLI)",
+    intro: "Repositório: github.com/Funcional-Edi/portal-edi",
+    rows: [
+      { cmd: 'gh pr create --title "..." --body "..."', purpose: "Abre PR da branch atual", when: "Após push da feature" },
+      { cmd: "gh pr status", purpose: "Status dos seus PRs", when: "Acompanhar revisão" },
+      { cmd: "gh pr checks", purpose: "Resultado do CI no GitHub", when: "PR falhou — ver qual check" },
+      { cmd: "git fetch", purpose: "Baixa novidades sem merge", when: "Ver o que mudou no remoto" },
+      { cmd: "git pull", purpose: "Fetch + merge na branch atual", when: "Atualizar antes de continuar" },
+    ],
+  },
+  {
+    id: "desfazer",
+    title: "Git — desfazer com cuidado",
+    footnote: "<b>Nunca</b> use <code>git reset --hard</code> sem certeza — apaga trabalho. <b>Nunca</b> commite <code>.env.local</code> ou <code>credentials.enc</code>.",
+    rows: [
+      { cmd: "git restore arquivo.ts", purpose: "Descarta edição não commitada", when: "Arquivo virou lixo" },
+      { cmd: "git restore --staged arquivo.ts", purpose: "Tira do staging, mantém edição", when: "Add errado" },
+      { cmd: "git stash", purpose: "Guarda alterações temporariamente", when: "Trocar branch com trabalho pela metade" },
+      { cmd: "git stash pop", purpose: "Recupera último stash", when: "Voltar à tarefa pausada" },
+      { cmd: "git reset --soft HEAD~1", purpose: "Desfaz commit, mantém código staged", when: "Commit prematuro, sem push" },
+    ],
+  },
+  {
+    id: "commits",
+    title: "Mensagens de commit (Conventional Commits)",
+    rows: [
+      { cmd: "feat:", purpose: "Funcionalidade nova", when: "Nova rota, módulo, feature" },
+      { cmd: "fix:", purpose: "Correção de bug", when: "Algo quebrado" },
+      { cmd: "docs:", purpose: "Só documentação", when: "README, painel, Obsidian" },
+      { cmd: "test:", purpose: "Só testes", when: "E2E ou unitário" },
+      { cmd: "chore:", purpose: "Config, deps, scripts", when: "Sem mudança de comportamento" },
+      { cmd: "refactor:", purpose: "Reorganiza sem mudar behavior", when: "Limpeza interna" },
+    ],
+  },
+];
+
+function cmdEscapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderComandos(filter = "") {
+  const wrap = document.getElementById("comandos-wrap");
+  const q = filter.trim().toLowerCase();
+  wrap.innerHTML = COMMAND_SECTIONS.map((section) => {
+    let body = "";
+    if (section.type === "callout") {
+      body += `<div class="callout">${section.html}</div>`;
+    }
+    if (section.intro) {
+      body += `<p class="cmd-intro">${section.intro}</p>`;
+    }
+    if (section.rows) {
+      const visibleRows = section.rows.filter((row) => {
+        if (!q) return true;
+        const hay = `${section.title} ${row.cmd} ${row.purpose} ${row.when || ""}`.toLowerCase();
+        return hay.includes(q);
+      });
+      if (q && visibleRows.length === 0 && !section.type) return "";
+      body += `<table class="cmd-table"><thead><tr><th>Comando</th><th>Para que serve</th><th>Quando usar</th></tr></thead><tbody>${section.rows.map((row) => {
+        const hay = `${section.title} ${row.cmd} ${row.purpose} ${row.when || ""}`.toLowerCase();
+        const hidden = q && !hay.includes(q) ? " cmd-hidden" : "";
+        return `<tr class="${hidden.trim()}">
+          <td><code class="cmd">${cmdEscapeHtml(row.cmd)}</code></td>
+          <td>${cmdEscapeHtml(row.purpose)}</td>
+          <td class="when">${cmdEscapeHtml(row.when || "—")}</td>
+        </tr>`;
+      }).join("")}</tbody></table>`;
+    }
+    if (section.flow) {
+      body += `<div class="flow-box"><p style="margin:0 0 8px;font-weight:600;font-size:13px">${section.flow.title}</p><ol>${section.flow.steps.map((s) => `<li><code>${cmdEscapeHtml(s)}</code></li>`).join("")}</ol></div>`;
+    }
+    if (section.footnote) {
+      body += `<div class="callout">${section.footnote}</div>`;
+    }
+    if (q && !body.replace(/cmd-hidden/g, "").match(/<tr|<div class="callout"/)) return "";
+    return `<div class="cmd-section"><h3>${section.title}</h3>${body}</div>`;
+  }).join("");
+}
+
+document.getElementById("cmd-filter").addEventListener("input", (e) => {
+  renderComandos(e.target.value);
+});
+
+renderComandos();
 </script>
 </body>
 </html>
