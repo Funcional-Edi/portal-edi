@@ -1,4 +1,10 @@
-export type SearchResultType = "manual" | "operation" | "section" | "guide";
+export type SearchResultType =
+  | "manual"
+  | "operation"
+  | "section"
+  | "guide"
+  | "schema-field"
+  | "schema-type";
 
 export interface SearchResult {
   type: SearchResultType;
@@ -17,4 +23,6 @@ export const SEARCH_RESULT_TYPE_LABELS: Record<SearchResultType, string> = {
   operation: "Operação",
   section: "Seção",
   guide: "Guia interno",
+  "schema-field": "Schema",
+  "schema-type": "Tipo GraphQL",
 };
