@@ -19,6 +19,7 @@ import {
   toProjectSummary,
   type ProjectConfig,
 } from "@/modules/living-docs-externa/schema/project";
+import type { ProductFamily } from "@/modules/living-docs-externa/schema/family";
 
 function defaultManual(name: string): IntegrationManual {
   return {
@@ -81,6 +82,7 @@ export async function createProject(input: {
   slug: string;
   name: string;
   description?: string;
+  family?: ProductFamily;
 }): Promise<Project> {
   if (await projectExists(input.slug)) {
     throw new Error("PROJECT_ALREADY_EXISTS");
@@ -91,6 +93,7 @@ export async function createProject(input: {
     slug: input.slug,
     name: input.name,
     description: input.description,
+    family: input.family,
     published: false,
     manualStatus: "draft",
     createdAt: now,
@@ -161,6 +164,26 @@ export async function writeManual(slug: string, manual: IntegrationManual): Prom
     throw new Error("PROJECT_NOT_FOUND");
   }
   await writeContentJson(projectManualPath(slug), manual);
+}
+
+/** Reclassifica a família de um projeto existente no `config.json`. */
+export async function updateProjectFamily(
+  slug: string,
+  family: ProductFamily
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    family,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
 }
 
 /** Atualiza apenas `updatedAt` no `config.json` de um projeto existente. */

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { IntegrationManual } from "@/modules/living-docs-externa/schema/manual";
+import { productFamilySchema, type ProductFamily } from "@/modules/living-docs-externa/schema/family";
 
 export const slugSchema = z
   .string()
@@ -26,6 +27,8 @@ export const projectConfigSchema = z.object({
   slug: slugSchema,
   name: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
+  /** Agrupamento visual no catálogo/admin (ex.: EDI Pharma, EDI Varejo). */
+  family: productFamilySchema.optional(),
   environment: projectEnvironmentSchema.optional(),
   graphqlUrl: z.string().url().optional(),
   gatewaySlug: z.string().min(1).max(128).optional(),
@@ -42,9 +45,16 @@ export const createProjectInputSchema = z.object({
   slug: slugSchema,
   name: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
+  family: productFamilySchema.optional(),
 });
 
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>;
+
+export const updateProjectFamilyInputSchema = z.object({
+  family: productFamilySchema,
+});
+
+export type UpdateProjectFamilyInput = z.infer<typeof updateProjectFamilyInputSchema>;
 
 export const connectGatewayInputSchema = z.object({
   graphqlUrl: z.string().url("URL do gateway inválida."),
@@ -65,6 +75,7 @@ export interface ProjectSummary {
   slug: string;
   name: string;
   description?: string;
+  family?: ProductFamily;
   environment?: z.infer<typeof projectEnvironmentSchema>;
   gatewaySlug?: string;
   published: boolean;
@@ -82,6 +93,7 @@ export function toProjectSummary(config: ProjectConfig): ProjectSummary {
     slug: config.slug,
     name: config.name,
     description: config.description,
+    family: config.family,
     environment: config.environment,
     gatewaySlug: config.gatewaySlug,
     published: config.published,

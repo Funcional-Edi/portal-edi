@@ -2,6 +2,7 @@
   "slug": "canal-autorizador",
   "name": "Canal Autorizador (seed-only)",
   "description": "Template local para validar fluxo BPMN; conteúdo real do legado ainda pendente.",
+  "family": "edi-pharma",
   "environment": "homolog",
   "published": false,
   "audience": "distribuidor",

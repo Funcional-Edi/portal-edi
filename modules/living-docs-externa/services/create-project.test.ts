@@ -66,4 +66,23 @@ describe("createProject service", () => {
       code: "VALIDATION",
     });
   });
+
+  it("cria projeto já classificado numa família", async () => {
+    const project = await createProject({
+      slug: "test-varejo",
+      name: "Test Varejo",
+      family: "edi-varejo",
+    });
+
+    expect(project.config.family).toBe("edi-varejo");
+
+    const loaded = await getProject("test-varejo");
+    expect(loaded?.config.family).toBe("edi-varejo");
+  });
+
+  it("rejeita família fora do enum conhecido", async () => {
+    await expect(
+      createProject({ slug: "test-invalido", name: "X", family: "edi-inexistente" })
+    ).rejects.toMatchObject({ code: "VALIDATION" });
+  });
 });

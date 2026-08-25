@@ -3,13 +3,23 @@ export {
   slugSchema,
   connectGatewayInputSchema,
   publishProjectInputSchema,
+  updateProjectFamilyInputSchema,
   type Project,
   type ProjectConfig,
   type ProjectSummary,
   type ConnectGatewayInput,
   type PublishProjectInput,
+  type UpdateProjectFamilyInput,
   toProjectSummary,
 } from "@/modules/living-docs-externa/schema/project";
+
+export {
+  productFamilySchema,
+  PRODUCT_FAMILY_METADATA,
+  PRODUCT_FAMILY_ORDER,
+  type ProductFamily,
+  type ProductFamilyMetadata,
+} from "@/modules/living-docs-externa/schema/family";
 
 export {
   integrationManualSchema,

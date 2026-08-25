@@ -2,6 +2,7 @@ import { ArrowRight, Braces, Clock, Database } from "lucide-react";
 import Link from "next/link";
 
 import { Badge, type BadgeTone } from "@/core/ui/badge";
+import { groupByFamily } from "@/modules/living-docs-externa/services/group-by-family";
 import type { SchemaCatalogEntry } from "@/modules/living-docs-externa/services/get-published-schema";
 
 interface SchemaCatalogProps {
@@ -119,9 +120,6 @@ function PendingCard({ entry }: { entry: SchemaCatalogEntry }) {
 }
 
 export function SchemaCatalog({ entries }: SchemaCatalogProps) {
-  const ready = entries.filter((entry) => entry.hasSchema);
-  const pending = entries.filter((entry) => !entry.hasSchema);
-
   if (entries.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
@@ -136,37 +134,57 @@ export function SchemaCatalog({ entries }: SchemaCatalogProps) {
     );
   }
 
-  return (
-    <div className="space-y-10">
-      {ready.length > 0 ? (
-        <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Schemas disponíveis
-          </h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {ready.map((entry) => (
-              <li key={entry.slug}>
-                <ReadyCard entry={entry} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+  const groups = groupByFamily(entries);
 
-      {pending.length > 0 ? (
-        <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Pendentes de sync
-          </h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {pending.map((entry) => (
-              <li key={entry.slug}>
-                <PendingCard entry={entry} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+  return (
+    <div className="space-y-12">
+      {groups.map((group) => {
+        const ready = group.items.filter((entry) => entry.hasSchema);
+        const pending = group.items.filter((entry) => !entry.hasSchema);
+
+        return (
+          <section key={group.family}>
+            <header className="mb-5 border-b border-slate-200 pb-3">
+              <h2 className="text-lg font-semibold text-slate-900">{group.label}</h2>
+              {group.description ? (
+                <p className="mt-1 text-sm text-slate-600">{group.description}</p>
+              ) : null}
+            </header>
+
+            <div className="space-y-8">
+              {ready.length > 0 ? (
+                <section>
+                  <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                    Schemas disponíveis
+                  </h3>
+                  <ul className="grid gap-4 sm:grid-cols-2">
+                    {ready.map((entry) => (
+                      <li key={entry.slug}>
+                        <ReadyCard entry={entry} />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {pending.length > 0 ? (
+                <section>
+                  <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                    Pendentes de sync
+                  </h3>
+                  <ul className="grid gap-4 sm:grid-cols-2">
+                    {pending.map((entry) => (
+                      <li key={entry.slug}>
+                        <PendingCard entry={entry} />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

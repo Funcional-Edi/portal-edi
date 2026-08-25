@@ -1,0 +1,12 @@
+{
+  "slug": "edi-canais",
+  "name": "EDI Canais (seed-only)",
+  "description": "Placeholder para os produtos de canais (credenciamento, benefício, PSP/PBM) hoje documentados em developer.funcionalmais.com. Conteúdo real e conexão de gateway ainda pendentes.",
+  "family": "edi-varejo",
+  "environment": "homolog",
+  "published": false,
+  "audience": "distribuidor",
+  "manualStatus": "draft",
+  "createdAt": "2026-08-25T00:00:00.000Z",
+  "updatedAt": "2026-08-25T00:00:00.000Z"
+}

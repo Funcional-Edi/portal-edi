@@ -101,6 +101,7 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **IntegrationFlow** | Diagrama BPMN curado em `flow.json` — nós (`start`, `operation`, `decision`, `end`) + arestas |
 | **React Flow** | Biblioteca `@xyflow/react` para canvas de nós/arestas no browser |
 | **Mermaid** | Linguagem texto → diagrama; export do fluxo via `exportFlowToMermaid` |
+| **Família de produto** | Agrupamento visual (EDI Pharma, EDI Varejo) no catálogo/admin — metadata em `config.json`, não muda rota nem credenciais |
 
 ## Segurança
 

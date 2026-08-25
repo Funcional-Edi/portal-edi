@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
+import { FamilySelect } from "@/modules/living-docs-externa/ui/admin/family-select";
 import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
 import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
@@ -58,6 +59,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 published={project.config.published}
                 qualityReport={qualityReport ?? undefined}
               />
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold uppercase text-slate-500">Família</dt>
+            <dd className="mt-1">
+              <FamilySelect slug={project.config.slug} family={project.config.family} />
             </dd>
           </div>
           <div>

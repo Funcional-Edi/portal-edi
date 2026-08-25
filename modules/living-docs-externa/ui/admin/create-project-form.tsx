@@ -3,11 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { PRODUCT_FAMILY_METADATA, PRODUCT_FAMILY_ORDER } from "@/modules/living-docs-externa/schema/family";
+import type { ProductFamily } from "@/modules/living-docs-externa/schema/family";
+
 export function CreateProjectForm() {
   const router = useRouter();
   const [slug, setSlug] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [family, setFamily] = useState<ProductFamily>(PRODUCT_FAMILY_ORDER[0]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,7 +24,7 @@ export function CreateProjectForm() {
       const response = await fetch("/api/living-docs/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, name, description: description || undefined }),
+        body: JSON.stringify({ slug, name, description: description || undefined, family }),
       });
 
       const payload = (await response.json()) as { error?: string; slug?: string };
@@ -89,6 +93,29 @@ export function CreateProjectForm() {
           onChange={(event) => setDescription(event.target.value)}
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
+      </div>
+
+      <div>
+        <label htmlFor="family" className="block text-sm font-medium text-slate-700">
+          Família
+        </label>
+        <select
+          id="family"
+          name="family"
+          required
+          value={family}
+          onChange={(event) => setFamily(event.target.value as ProductFamily)}
+          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        >
+          {PRODUCT_FAMILY_ORDER.map((option) => (
+            <option key={option} value={option}>
+              {PRODUCT_FAMILY_METADATA[option].name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-500">
+          Agrupamento no catálogo de manuais/referência GraphQL.
+        </p>
       </div>
 
       {error ? (
