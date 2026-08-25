@@ -116,7 +116,7 @@ testada; `tests/e2e/manual-flow.spec.ts` de fluxo completo.
 - [x] Export PDF
 - [x] Validar conteúdo publicado por script (`content:validate-published`)
 - [x] E2E allowlist do playground (permitido vs 403)
-- [ ] Referência GraphQL global (`/docs/api`)
+- [x] Referência GraphQL global (`/docs/api`)
 - [ ] Persistir métricas em banco (se ADR exigir)
 
 ## Como marcar progresso

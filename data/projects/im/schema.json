@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "syncedAt": "2026-08-31T12:00:00.000Z",
+  "source": {
+    "projectSlug": "im",
+    "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+    "gatewaySlug": "gateway-homolog-fidelize"
+  },
+  "introspection": {
+    "__schema": {
+      "queryType": { "name": "Query" },
+      "mutationType": { "name": "Mutation" },
+      "subscriptionType": null,
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "description": "Consultas do gateway IM",
+          "fields": [
+            { "name": "health", "description": "Status do gateway" },
+            { "name": "inventoryLoad", "description": "Consulta carga por loadId" }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Mutation",
+          "description": "Mutations do gateway IM",
+          "fields": [
+            { "name": "createToken", "description": "Autentica no gateway" },
+            { "name": "saveInventories", "description": "Envia carga de estoque" }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "TokenPayload",
+          "fields": [{ "name": "token" }]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "InventoryLoadResult",
+          "fields": [
+            { "name": "status" },
+            { "name": "loadId" },
+            { "name": "message" }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "CustomerType",
+          "fields": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "OperationType",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "String",
+          "fields": null
+        }
+      ]
+    }
+  },
+  "summary": {
+    "typeCount": 7,
+    "queryFieldCount": 2,
+    "mutationFieldCount": 2
+  }
+}

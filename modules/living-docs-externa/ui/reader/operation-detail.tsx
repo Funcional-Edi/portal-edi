@@ -7,6 +7,7 @@ interface OperationDetailProps {
   manualTitle: string;
   operation: ManualOperation;
   graphqlUrl?: string;
+  schemaFieldHref?: string;
 }
 
 export function OperationDetail({
@@ -14,6 +15,7 @@ export function OperationDetail({
   manualTitle,
   operation,
   graphqlUrl,
+  schemaFieldHref,
 }: OperationDetailProps) {
   return (
     <article>
@@ -35,13 +37,21 @@ export function OperationDetail({
           {operation.title ?? operation.name}
         </h1>
         <p className="mt-1 font-mono text-sm text-slate-500">{operation.name}</p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           <ExportDownloadButton
             slug={slug}
             format="postman"
             label="Exportar manual (Postman)"
             disabled={!graphqlUrl}
           />
+          {schemaFieldHref ? (
+            <Link
+              href={schemaFieldHref}
+              className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Ver na referência GraphQL
+            </Link>
+          ) : null}
         </div>
       </header>
 

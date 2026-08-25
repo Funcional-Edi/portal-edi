@@ -31,7 +31,14 @@ export async function ManualShellWithNav({
   }
 
   return (
-    <ManualShell sidebarGroups={nav.sidebarGroups} tocItems={nav.tocItems}>
+    <ManualShell
+      sidebarGroups={nav.sidebarGroups}
+      tocItems={nav.tocItems}
+      navItems={[
+        { href: "/manual", label: "Manuais", active: true },
+        { href: "/docs/api", label: "Referência API" },
+      ]}
+    >
       {children}
     </ManualShell>
   );

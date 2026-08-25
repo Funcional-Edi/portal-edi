@@ -29,6 +29,8 @@ docs/
 
 Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](docs/estrutura/mapa-projeto.md).
 
+**Painel do projeto** (mapa, segurança, Kanban de prioridades e trilhas de estudo, tudo em uma tela): [`docs/painel/index.html`](docs/painel/index.html) — abra direto no navegador.
+
 Migração da documentação viva: [`docs/migracao/mapa-documentacao-funcional.md`](docs/migracao/mapa-documentacao-funcional.md) · [`docs/migracao/cronograma.md`](docs/migracao/cronograma.md).
 
 Regra de dependência: `app → modules → core`. Módulos não se importam entre si —

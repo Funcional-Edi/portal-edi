@@ -17,10 +17,12 @@ import { manuaisInternosModule } from "@/modules/manuais-internos/module";
 import { fluxogramasModule } from "@/modules/fluxogramas/module";
 import { homologacaoModule } from "@/modules/homologacao/module";
 import { assistenteIaModule } from "@/modules/assistente-ia/module";
+import { graphqlReferenceModule } from "@/modules/graphql-reference/module";
 import { complianceModule } from "@/modules/compliance/module";
 
 const ALL_MODULES: PortalModule[] = [
   livingDocsExternaModule,
+  graphqlReferenceModule,
   manuaisInternosModule,
   fluxogramasModule,
   homologacaoModule,

@@ -67,6 +67,7 @@ export const config = {
     "/login",
     "/admin/:path*",
     "/manual/:path*",
+    "/docs/:path*",
     "/projects/:path*",
     "/fluxogramas/:path*",
     "/interno/:path*",

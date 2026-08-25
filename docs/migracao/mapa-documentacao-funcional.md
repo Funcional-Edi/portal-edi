@@ -26,7 +26,7 @@
 | Credenciais gateway criptografadas | `credentials.enc` | idem | 3 |
 | SSO distribuidor | provider `sso` | `core/auth` ✅ | — |
 | Rate limit login | `lib/auth/login-rate-limit` | `core/auth/rate-limit` ✅ | — |
-| Referência GraphQL global | `/docs/api` | **fora do MVP** | 8+ |
+| Referência GraphQL global | `/docs/api` | ✅ Fase 11 | 11 |
 | Clientes legados (`clients.json`) | `/admin/clients` | **deprecado** | — |
 | Métricas / notificações | `/admin/metrics` | **fora do MVP** | 8+ |
 | Export PDF/Postman/Insomnia | APIs export | `/export/postman`, `/export/insomnia`, `/export/pdf` | 8–10 ✅ |

@@ -5,6 +5,10 @@ import {
   manualOperationKindSchema,
 } from "@/modules/living-docs-externa/schema";
 import { OperationDetail } from "@/modules/living-docs-externa/ui/reader/operation-detail";
+import {
+  hasPublishedSchemaSnapshot,
+  schemaFieldHref,
+} from "@/modules/living-docs-externa/services/get-published-schema";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 
 interface OperationPageProps {
@@ -16,7 +20,10 @@ export default async function OperationPage({ params }: OperationPageProps) {
   const kindResult = manualOperationKindSchema.safeParse(kind);
   if (!kindResult.success) notFound();
 
-  const project = await getPublishedManual(slug);
+  const [project, hasSchema] = await Promise.all([
+    getPublishedManual(slug),
+    hasPublishedSchemaSnapshot(slug),
+  ]);
   if (!project) notFound();
 
   const operation = findOperation(project.manual, kindResult.data, name);
@@ -28,6 +35,9 @@ export default async function OperationPage({ params }: OperationPageProps) {
       manualTitle={project.manual.title}
       operation={operation}
       graphqlUrl={project.config.graphqlUrl}
+      schemaFieldHref={
+        hasSchema ? schemaFieldHref(slug, kindResult.data, name) : undefined
+      }
     />
   );
 }

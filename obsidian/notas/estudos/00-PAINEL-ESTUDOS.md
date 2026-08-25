@@ -30,6 +30,13 @@ Consulta rápida do dia a dia. Aprender **implementando** neste projeto.
 - [[fluxo-novo-modulo|Criar um módulo novo neste projeto]]
 - [[fluxo-quando-quebra|Quando algo quebra — como investigar]]
 
+## Painel do projeto (HTML, fora do Obsidian)
+
+Mapa geral + segurança + Kanban de prioridades + progresso das trilhas, tudo numa
+tela só: `docs/painel/index.html` — abra direto no navegador (duplo-clique).
+Kanban e checkboxes de estudo salvam no `localStorage` do navegador (não sincroniza
+via Git nem com este cofre).
+
 ## UI / casca do portal
 
 - Decisão: `docs/arquitetura/adr/0010-ui-shell-compartilhado.md` (via `obsidian/docs/…`)

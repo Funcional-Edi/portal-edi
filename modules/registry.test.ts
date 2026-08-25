@@ -8,6 +8,7 @@ describe("registro de módulos do portal", () => {
 
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toContain("living-docs-externa");
+    expect(ids).toContain("graphql-reference");
     expect(ids).toContain("homologacao");
     expect(ids).toContain("compliance");
   });
@@ -16,7 +17,7 @@ describe("registro de módulos do portal", () => {
     registerAllModules();
     const segunda = registerAllModules();
 
-    expect(segunda).toHaveLength(6);
+    expect(segunda).toHaveLength(7);
   });
 
   it("sinaliza homologação como bloqueada por exigir banco transacional", () => {

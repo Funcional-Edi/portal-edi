@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel do Projeto — Portal EDI</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-soft: #111827;
+    --panel: #ffffff;
+    --panel-muted: #f8fafc;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --green: #16a34a;
+    --green-soft: #dcfce7;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --purple: #7c3aed;
+    --purple-soft: #ede9fe;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    background: var(--panel-muted);
+    color: var(--text);
+  }
+
+  header.topbar {
+    background: var(--bg);
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  header.topbar h1 {
+    font-size: 20px;
+    margin: 0 0 4px 0;
+  }
+
+  header.topbar p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .stat-pill b { color: #fff; }
+  .stat-pill span { color: #94a3b8; }
+
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-soft);
+    padding: 0 32px;
+    overflow-x: auto;
+  }
+
+  nav.tabs button {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 12px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  nav.tabs button:hover { color: #e2e8f0; }
+
+  nav.tabs button.active {
+    color: #fff;
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px 64px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  h2.section-title {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2.section-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .grid.grid-2 { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+
+  .folder-card h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .folder-card .path {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 8px;
+    border-radius: 6px;
+    font-size: 12.5px;
+  }
+
+  .folder-card p { font-size: 13.5px; color: var(--text-muted); margin: 6px 0; }
+
+  .folder-card ul { margin: 8px 0 0; padding-left: 18px; font-size: 13px; }
+  .folder-card ul li { margin-bottom: 4px; }
+  .folder-card code {
+    background: var(--panel-muted);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .badge.ativo { background: var(--green-soft); color: var(--green); }
+  .badge.bloqueado { background: var(--red-soft); color: var(--red); }
+  .badge.planejado { background: var(--amber-soft); color: var(--amber); }
+  .badge.parcial { background: var(--amber-soft); color: var(--amber); }
+  .badge.pendente { background: var(--red-soft); color: var(--red); }
+
+  table.controls {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--panel);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  table.controls th, table.controls td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.controls th {
+    background: var(--panel-muted);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+  table.controls tr:last-child td { border-bottom: none; }
+  table.controls td.ref code {
+    background: var(--panel-muted);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11.5px;
+  }
+
+  .forbidden-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-top: 8px; }
+  .forbidden-table th, .forbidden-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  .forbidden-table th { background: #fef2f2; color: var(--red); font-size: 11.5px; text-transform: uppercase; }
+  .forbidden-table tr:last-child td { border-bottom: none; }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .toolbar .hint { font-size: 12.5px; color: var(--text-muted); }
+
+  button.btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button.btn:hover { background: #1d4ed8; }
+  button.btn.secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  button.btn.secondary:hover { background: var(--panel-muted); color: var(--text); }
+  button.btn.danger { background: var(--red); }
+  button.btn.danger:hover { background: #b91c1c; }
+
+  /* Kanban */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+  @media (max-width: 980px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .column {
+    background: #eef2f7;
+    border-radius: var(--radius);
+    padding: 10px;
+    min-height: 120px;
+  }
+
+  .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 6px 10px;
+  }
+
+  .column-header h4 {
+    margin: 0;
+    font-size: 13.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+
+  .column-count {
+    background: #fff;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .column.drag-over { outline: 2px dashed var(--accent); outline-offset: -4px; }
+
+  .cardlist { display: flex; flex-direction: column; gap: 8px; min-height: 30px; }
+
+  .kcard {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 10px 8px;
+    box-shadow: var(--shadow);
+    cursor: grab;
+    font-size: 13px;
+  }
+  .kcard.dragging { opacity: 0.4; }
+  .kcard .kcard-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .kcard h5 { margin: 0; font-size: 13.5px; line-height: 1.3; }
+  .kcard p { margin: 6px 0 4px; color: var(--text-muted); font-size: 12px; line-height: 1.4; }
+  .kcard .kcard-actions { display: flex; gap: 4px; }
+  .kcard .icon-btn {
+    background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 13px; padding: 2px;
+  }
+  .kcard .icon-btn:hover { color: var(--red); }
+
+  .prio {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .prio.alta { background: var(--red-soft); color: var(--red); }
+  .prio.media { background: var(--amber-soft); color: var(--amber); }
+  .prio.baixa { background: var(--green-soft); color: var(--green); }
+
+  .add-card-form {
+    margin-top: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .add-card-form.open { display: flex; }
+  .add-card-form input, .add-card-form textarea, .add-card-form select {
+    font-size: 12.5px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-family: inherit;
+  }
+  .add-card-form textarea { resize: vertical; min-height: 40px; }
+  .add-card-form .row { display: flex; gap: 6px; }
+  .add-card-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 12.5px;
+    cursor: pointer;
+    text-align: left;
+    padding: 6px;
+  }
+  .add-card-btn:hover { text-decoration: underline; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 24px; margin-top: 10px; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border);
+  }
+  .tl-item { position: relative; padding-bottom: 18px; }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--green);
+  }
+  .tl-item.pending::before { background: #fff; box-shadow: 0 0 0 2px var(--text-muted); }
+  .tl-item.active::before { background: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tl-item h4 { margin: 0 0 2px; font-size: 14px; }
+  .tl-item p { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+  .tl-item .tl-items { font-size: 12.5px; margin-top: 4px; color: var(--text); }
+
+  /* Estudos */
+  .trilha {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .trilha-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .trilha-head h4 { margin: 0; font-size: 14.5px; }
+  .progress-bar { background: var(--panel-muted); border-radius: 999px; height: 6px; overflow: hidden; margin-top: 6px; }
+  .progress-fill { background: var(--accent); height: 100%; border-radius: 999px; transition: width 0.2s; }
+  .trilha ul { list-style: none; margin: 0; padding: 0; }
+  .trilha li { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .trilha li.done { color: var(--text-muted); text-decoration: line-through; }
+  .trilha li input { cursor: pointer; }
+  .trilha .note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+  footer.note {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Painel do Projeto — Portal EDI</h1>
+    <p>Mapeamento, segurança, prioridades e estudo — atualizado localmente neste navegador.</p>
+  </div>
+  <div class="stats">
+    <div class="stat-pill"><b>Fases 0–10</b><span>concluídas</span></div>
+    <div class="stat-pill"><b>222</b><span>testes passando</span></div>
+    <div class="stat-pill"><b>18</b><span>controles de segurança ativos</span></div>
+    <div class="stat-pill"><b>6</b><span>módulos (4 ativos)</span></div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="visao">Visão Geral</button>
+  <button class="tab" data-tab="mapa">Mapa de Pastas</button>
+  <button class="tab" data-tab="seguranca">Segurança</button>
+  <button class="tab" data-tab="kanban">Kanban</button>
+  <button class="tab" data-tab="cronograma">Cronograma</button>
+  <button class="tab" data-tab="estudos">Estudos</button>
+</nav>
+
+<main>
+
+  <!-- ===================== VISÃO GERAL ===================== -->
+  <section id="visao" class="panel active">
+    <h2 class="section-title">O que é o Portal EDI</h2>
+    <div class="card">
+      <p>Portal modular do time <b>EDI / Tecnologia</b>: documentação viva (interna e externa), fluxogramas, homologação e automações com IA. Construído com <b>fundação primeiro</b> — esqueleto sólido (auth, segurança, arquitetura) antes de features.</p>
+      <p><b>Estado atual:</b> MVP da migração da documentação viva concluído (Fases 0–10). Portal roda <b>stateless</b> (sem banco de dados) por decisão explícita — ver aba Cronograma.</p>
+    </div>
+
+    <h2 class="section-title">Stack</h2>
+    <div class="grid">
+      <div class="card"><b>Next.js 15</b> (App Router)<br><span style="color:var(--text-muted);font-size:13px">UI + BFF num só processo — não existe "back" e "front" separados.</span></div>
+      <div class="card"><b>TypeScript + Zod</b><br><span style="color:var(--text-muted);font-size:13px">Tipagem estática + validação de dados na borda (schemas).</span></div>
+      <div class="card"><b>Auth.js v5</b><br><span style="color:var(--text-muted);font-size:13px">Login SSO (contrato do portal legado) + RBAC por papel.</span></div>
+      <div class="card"><b>Tailwind CSS</b><br><span style="color:var(--text-muted);font-size:13px">Estilização utilitária.</span></div>
+      <div class="card"><b>core/ai</b><br><span style="color:var(--text-muted);font-size:13px">IA com provedor plugável, guardrails e orçamento mensal.</span></div>
+      <div class="card"><b>Sem banco</b><br><span style="color:var(--text-muted);font-size:13px">Stateless-first (ADR-0002); conteúdo em arquivos.</span></div>
+    </div>
+
+    <h2 class="section-title">Regra de ouro da arquitetura</h2>
+    <div class="card">
+      <p style="font-family:monospace; font-size:16px; margin:0 0 8px;">app → modules → core</p>
+      <p style="margin:0">
+        <code>core/</code> é a fundação (auth, config, db, ai, events) e <b>não</b> conhece <code>modules/</code> nem <code>app/</code>.
+        Módulos são contextos isolados que <b>não se importam entre si</b> — só conversam via <code>core/events</code>.
+        Validado automaticamente por <code>npm run arch</code>; violação quebra o CI.
+      </p>
+    </div>
+
+    <h2 class="section-title">Comandos essenciais</h2>
+    <div class="grid grid-2">
+      <div class="card"><code>npm run dev</code> — sobe o portal em <code>http://localhost:3002</code></div>
+      <div class="card"><code>npm run ci</code> — typecheck → lint → arch → test → build (rodar antes de commitar)</div>
+      <div class="card"><code>npm run obsidian:watch</code> — sincroniza notas do Obsidian em tempo real</div>
+      <div class="card"><code>npm run smoke:homolog</code> — checklist automatizado de homologação</div>
+    </div>
+  </section>
+
+  <!-- ===================== MAPA DE PASTAS ===================== -->
+  <section id="mapa" class="panel">
+    <h2 class="section-title">Estrutura de alto nível</h2>
+    <div class="card">
+<pre style="margin:0; font-size:13px; line-height:1.6; overflow-x:auto">portal-integracao/
+├── app/          Next.js — páginas, layout, middleware, rotas /api/*
+├── core/         Fundação compartilhada (auth, db, ai, events, security, ui…)
+├── modules/      Contextos de negócio isolados entre si
+├── config/       Configs de ferramentas (dependency-cruiser, vitest)
+├── docs/         ADRs, migração, mapas de estrutura, este painel
+├── obsidian/     Cofre de notas + painel de estudos (sincronizado por script)
+├── types/        Augmentações globais de TypeScript (ex.: next-auth)
+└── [raiz]        package.json, next.config.mjs, middleware.ts, Dockerfile…</pre>
+    </div>
+
+    <h2 class="section-title">core/ — a fundação (sem regra de negócio)</h2>
+    <div class="grid">
+      <div class="card folder-card"><h3><span class="path">core/auth</span></h3><p>SSO, papéis (<code>roles.ts</code>), RBAC (<code>module-access.ts</code>), rate limit de login, sessão JWT.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/security</span></h3><p>Anti-SSRF em URLs de gateway, validação de Origin (CSRF), checagens de produção.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/db</span></h3><p>Gate de capacidades de dados — decide se um módulo pode ativar sem banco.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/ai</span></h3><p>Provedor de IA plugável, guardrails de segurança, orçamento mensal.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/events</span></h3><p>Única forma de comunicação entre módulos (pub/sub), evita acoplamento direto.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/config</span></h3><p>Leitura segura de variáveis de ambiente (<code>env.ts</code>) — nenhum módulo lê <code>process.env</code> direto.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/metrics</span></h3><p>Métricas in-memory do playground GraphQL (voláteis por processo).</p></div>
+      <div class="card folder-card"><h3><span class="path">core/search</span></h3><p>Índice Fuse.js para a busca global (<code>Ctrl+K</code>).</p></div>
+      <div class="card folder-card"><h3><span class="path">core/ui</span></h3><p>Casca compartilhada: <code>AppShell</code>, <code>Badge</code>, <code>SessionActions</code>.</p></div>
+      <div class="card folder-card"><h3><span class="path">core/errors</span></h3><p>Tratamento de erro padronizado entre camadas.</p></div>
+    </div>
+
+    <h2 class="section-title">modules/ — contextos de negócio</h2>
+    <div class="grid">
+      <div class="card folder-card">
+        <h3><span class="path">living-docs-externa</span> <span class="badge ativo">ativo</span></h3>
+        <p>Manual de integração para clientes: <code>/manual</code>, playground GraphQL, export Postman/Insomnia/PDF.</p>
+      </div>
+      <div class="card folder-card">
+        <h3><span class="path">manuais-internos</span> <span class="badge ativo">ativo</span></h3>
+        <p>Guias internos do time EDI em <code>/interno</code> (só admin).</p>
+      </div>
+      <div class="card folder-card">
+        <h3><span class="path">fluxogramas</span> <span class="badge ativo">ativo</span></h3>
+        <p>Fluxogramas BPMN em <code>/fluxogramas</code>, acessível a clientes e time.</p>
+      </div>
+      <div class="card folder-card">
+        <h3><span class="path">compliance</span> <span class="badge ativo">ativo</span></h3>
+        <p>Catálogo de controles de segurança em <code>/compliance</code> (só admin) — ver aba Segurança.</p>
+      </div>
+      <div class="card folder-card">
+        <h3><span class="path">homologacao</span> <span class="badge bloqueado">bloqueado</span></h3>
+        <p>Planejado — exige capacidades <code>transactional</code> + <code>audit-log</code> (banco). Aparece bloqueado em <code>/api/health</code> até haver ADR de banco.</p>
+      </div>
+      <div class="card folder-card">
+        <h3><span class="path">assistente-ia</span> <span class="badge bloqueado">bloqueado</span></h3>
+        <p>Planejado — exige capacidade <code>vector-search</code> (banco vetorial).</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <p style="margin:0">Cada módulo segue a convenção: <code>module.ts</code> (contrato), <code>schema/</code> (Zod), <code>repository/</code> (acesso a dado), <code>services/</code> (regra de negócio), <code>ui/</code> (opcional). Registro central em <code>modules/registry.ts</code>.</p>
+    </div>
+
+    <h2 class="section-title">Outras pastas importantes</h2>
+    <div class="grid">
+      <div class="card folder-card"><h3><span class="path">app/api/**</span></h3><p>Rotas server-side (BFF). Toda rota exige <code>auth()</code>; mutações admin exigem <code>isAdminRole</code>.</p></div>
+      <div class="card folder-card"><h3><span class="path">docs/arquitetura/adr/</span></h3><p>10 ADRs — decisões versionadas (stateless, SSO, arquitetura enforcada, rate limit, etc.).</p></div>
+      <div class="card folder-card"><h3><span class="path">docs/migracao/</span></h3><p>Mapa, cronograma e decisões de UI da migração da documentação viva.</p></div>
+      <div class="card folder-card"><h3><span class="path">obsidian/notas/estudos/</span></h3><p>Painel de estudos: comandos, fluxos, cronograma de trilhas, diário — atualizado pela IA a cada sessão.</p></div>
+      <div class="card folder-card"><h3><span class="path">data/</span></h3><p><code>permissions.json</code> e <code>credentials.enc</code> — <b>gitignored</b>, nunca versionados.</p></div>
+      <div class="card folder-card"><h3><span class="path">config/</span></h3><p><code>dependency-cruiser.cjs</code> (fronteiras de arquitetura) e <code>vitest.config.ts</code> (testes).</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== SEGURANÇA ===================== -->
+  <section id="seguranca" class="panel">
+    <h2 class="section-title">Regra principal (regra Cursor <code>seguranca-dados.mdc</code>)</h2>
+    <div class="card">
+      <p style="margin:0 0 8px">Ao identificar risco de segurança, vazamento de dados ou violação de compliance, a IA deve:</p>
+      <ol style="margin:0; padding-left:20px; font-size:13.5px">
+        <li><b>Parar</b> — não implementar, commitar ou prosseguir com a ação arriscada.</li>
+        <li><b>Alertar</b> — explicar o que está errado e o impacto.</li>
+        <li><b>Orientar</b> — indicar a forma correta, com referência ao arquivo/padrão do projeto.</li>
+      </ol>
+    </div>
+
+    <h2 class="section-title">O que é proibido</h2>
+    <table class="forbidden-table">
+      <thead><tr><th>Risco</th><th>Exemplo errado</th><th>Forma correta</th></tr></thead>
+      <tbody>
+        <tr><td>Segredo no client</td><td><code>NEXT_PUBLIC_*</code> com token/chave</td><td>Server-side via <code>core/config/env.ts</code></td></tr>
+        <tr><td>Segredo no Git</td><td>commitar <code>.env.local</code>, <code>credentials.enc</code></td><td><code>.gitignore</code> + <code>.env.example</code></td></tr>
+        <tr><td>Senha persistida</td><td>gravar senha SSO/gateway em disco</td><td>SSO: só JWT; gateway: <code>gateway-credentials.ts</code></td></tr>
+        <tr><td>Auth bypass</td><td>rota API sem <code>auth()</code></td><td>Middleware + <code>isAdminRole</code></td></tr>
+        <tr><td>PII no código</td><td>e-mails reais commitados</td><td>Placeholders em <code>roles.ts</code></td></tr>
+        <tr><td>Log sensível</td><td><code>console.log(password, token)</code></td><td>Nunca logar credenciais</td></tr>
+        <tr><td>DEV_AUTH em prod</td><td><code>DEV_AUTH_ENABLED=true</code> fora de dev</td><td><code>validateEnv()</code> bloqueia em prod</td></tr>
+        <tr><td>Gateway aberto</td><td>URL sem allowlist em prod</td><td><code>GATEWAY_URL_ALLOWED_HOSTS</code></td></tr>
+        <tr><td>Playground aberto</td><td>client executando mutation admin</td><td>Restrito a admin</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Catálogo de controles ativos (18)</h2>
+    <p class="hint" style="color:var(--text-muted); font-size:13px; margin-top:-6px">Fonte real do código: <code>modules/compliance/data/controls.ts</code> — visível também em <code>/compliance</code> (admin).</p>
+    <div id="controls-wrap"></div>
+  </section>
+
+  <!-- ===================== KANBAN ===================== -->
+  <section id="kanban" class="panel">
+    <div class="toolbar">
+      <span class="hint">Arraste os cartões entre colunas · clique em <b>+ Novo cartão</b> para adicionar · ✕ remove · tudo salva automaticamente neste navegador.</span>
+      <button class="btn secondary" id="reset-board">Restaurar padrão</button>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <!-- ===================== CRONOGRAMA ===================== -->
+  <section id="cronograma" class="panel">
+    <h2 class="section-title">Linha do tempo — Fases da migração</h2>
+    <div class="card">
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <h2 class="section-title">Decisão vigente</h2>
+    <div class="card">
+      <p style="margin:0"><b>Continuar sem banco</b> (ADR-0002, reafirmado na nota Fase 10+). Persistência de métricas, homologação transacional ou IA com busca vetorial só entram com uma <b>ADR nova</b> justificando o requisito.</p>
+    </div>
+  </section>
+
+  <!-- ===================== ESTUDOS ===================== -->
+  <section id="estudos" class="panel">
+    <div class="toolbar">
+      <span class="hint">Marque os itens conforme for dominando cada trilha — progresso salvo neste navegador.</span>
+      <button class="btn secondary" id="reset-estudos">Zerar progresso</button>
+    </div>
+    <div id="trilhas-wrap"></div>
+  </section>
+
+</main>
+
+<footer class="note">Painel local do Portal EDI · dados salvos em <code>localStorage</code> deste navegador · não sincroniza com o Git.</footer>
+
+<script>
+/* ===================== Tabs ===================== */
+document.querySelectorAll("nav.tabs button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav.tabs button").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll("main .panel").forEach((p) => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ===================== Segurança: controles ===================== */
+const CONTROLS = [
+  { title: "Segredos somente server-side", cat: "Confidencialidade", status: "ativo", desc: "Nenhuma NEXT_PUBLIC_* expõe chaves. Toda env passa por core/config/env.ts.", ref: "core/config/env.ts" },
+  { title: "Arquivos sensíveis fora do Git", cat: "Confidencialidade", status: "ativo", desc: ".env.local, credentials.enc e permissions.json no .gitignore.", ref: ".gitignore" },
+  { title: "Senha SSO nunca persistida", cat: "Confidencialidade", status: "ativo", desc: "Senha validada e descartada; só sessão JWT fica no cookie httpOnly.", ref: "core/auth/sso.ts" },
+  { title: "Credenciais do gateway cifradas (AES-256-GCM)", cat: "Confidencialidade", status: "ativo", desc: "Login/senha do gateway cifrados com chave derivada de AUTH_SECRET.", ref: "gateway-credentials.ts" },
+  { title: "Sessão JWT com expiração de 8h", cat: "Autenticação", status: "ativo", desc: "Cookie httpOnly com maxAge de 8h.", ref: "core/auth/config.ts" },
+  { title: "Rate limit no login SSO (10 / 15 min)", cat: "Autenticação", status: "ativo", desc: "Proteção contra força bruta por e-mail. Redis REST opcional.", ref: "core/auth/rate-limit.ts" },
+  { title: "Login dev restrito a development", cat: "Autenticação", status: "ativo", desc: "DEV_AUTH_ENABLED só com NODE_ENV=development.", ref: "validateEnv()" },
+  { title: "RBAC configurável (permissions.json)", cat: "Autorização", status: "ativo", desc: "Admins/clients definidos em data/permissions.json (gitignored).", ref: "permissions.example.json" },
+  { title: "RBAC no middleware (páginas + API)", cat: "Autorização", status: "ativo", desc: "/api/* exige sessão exceto /api/auth e /api/health.", ref: "middleware.ts" },
+  { title: "Playground GraphQL restrito a admin", cat: "Autorização", status: "ativo", desc: "Só admins executam mutations no gateway real.", ref: "graphql/route.ts" },
+  { title: "Allowlist de operações no playground", cat: "Integridade", status: "ativo", desc: "Só queries/mutations documentadas; introspection bloqueada.", ref: "playground-allowlist.ts" },
+  { title: "Anti-SSRF em URLs de gateway", cat: "Integridade", status: "ativo", desc: "Bloqueia localhost/IPs privados em produção.", ref: "core/security/gateway-url.ts" },
+  { title: "Headers HTTP de segurança", cat: "Operacional", status: "ativo", desc: "CSP, X-Frame-Options DENY, nosniff, Referrer-Policy.", ref: "next.config.mjs" },
+  { title: "Health endpoint mínimo público", cat: "Confidencialidade", status: "ativo", desc: "Sem sessão admin, /api/health retorna só status + timestamp.", ref: "app/api/health/route.ts" },
+  { title: "Validação de Origin em mutações sensíveis", cat: "Integridade", status: "ativo", desc: "Mitiga CSRF cross-site em connect e playground.", ref: "core/security/request-origin.ts" },
+  { title: "Proteção contra open redirect", cat: "Integridade", status: "ativo", desc: "callbackUrl pós-login só aceita paths internos.", ref: "module-access.ts" },
+  { title: "Guardrails de IA (redação de segredos)", cat: "Confidencialidade", status: "ativo", desc: "Entrada sanitizada; orçamento mensal configurável.", ref: "core/ai/guardrails.ts" },
+  { title: "Export respeita estado de publicação", cat: "Confidencialidade", status: "ativo", desc: "Clientes só exportam manuais publicados.", ref: "resolve-project-for-export.ts" },
+  { title: "Regra Cursor — alerta imediato de risco", cat: "Operacional", status: "ativo", desc: "IA para e alerta ao detectar risco de segurança.", ref: "seguranca-dados.mdc" },
+];
+
+function renderControls() {
+  const wrap = document.getElementById("controls-wrap");
+  const cats = [...new Set(CONTROLS.map((c) => c.cat))];
+  wrap.innerHTML = cats.map((cat) => {
+    const rows = CONTROLS.filter((c) => c.cat === cat).map((c) => `
+      <tr>
+        <td>${c.title}</td>
+        <td><span class="badge ${c.status}">${c.status}</span></td>
+        <td>${c.desc}</td>
+        <td class="ref"><code>${c.ref}</code></td>
+      </tr>`).join("");
+    return `
+      <h3 style="font-size:13.5px; margin:16px 0 6px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.03em">${cat}</h3>
+      <table class="controls">
+        <thead><tr><th>Controle</th><th>Status</th><th>O que faz</th><th>Referência</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }).join("");
+}
+renderControls();
+
+/* ===================== Cronograma / Timeline ===================== */
+const PHASES = [
+  { name: "Fase 0", desc: "Mapa + ADR-0009 + cronograma", status: "done" },
+  { name: "Fase 1", desc: "Schemas, adapter local, catálogo + roteiro + operação", status: "done" },
+  { name: "Fase 2", desc: "Seções Markdown, redirect legado, shell de navegação", status: "done" },
+  { name: "Fase 3", desc: "Admin CRUD projetos, connect, sync, publicar", status: "done" },
+  { name: "Fase 4", desc: "Playground + proxy GraphQL + allowlist", status: "done" },
+  { name: "Fase 5", desc: "Conteúdo real (IM, wholesaler) + E2E Playwright", status: "done" },
+  { name: "Fase 6", desc: "Editor Markdown canônico", status: "done" },
+  { name: "Fase 7", desc: "Fluxogramas BPMN (modules/fluxogramas)", status: "done" },
+  { name: "Fase 8", desc: "Export Postman/Insomnia, busca Ctrl+K, métricas, guias internos", status: "done" },
+  { name: "Fase 9", desc: "Consolidação homolog: RBAC por arquivo, smoke, deploy Docker", status: "done" },
+  { name: "Fase 10", desc: "Polish: export PDF, E2E allowlist, validação de conteúdo, hardening de segurança", status: "done" },
+  { name: "Fase 11+ (a definir)", desc: "Referência GraphQL global (/docs/api) · migração real do canal-autorizador · polish de UI", status: "pending" },
+];
+document.getElementById("timeline").innerHTML = PHASES.map((p) => `
+  <div class="tl-item ${p.status}">
+    <h4>${p.name}</h4>
+    <p>${p.desc}</p>
+  </div>`).join("");
+
+/* ===================== Kanban ===================== */
+const KANBAN_KEY = "portal-edi-kanban-v1";
+
+const DEFAULT_BOARD = [
+  {
+    id: "backlog", title: "Backlog", cards: [
+      { id: "c1", title: "Dark mode intencional", desc: "Hoje só existe color-scheme no CSS, sem toggle de fato.", prio: "baixa" },
+      { id: "c2", title: "Design system / Storybook", desc: "Formalizar componentes de core/ui.", prio: "baixa" },
+      { id: "c3", title: "Empty states e skeletons no admin", desc: "UX de carregamento/lista vazia nas telas admin.", prio: "media" },
+      { id: "c4", title: "Microcopy e identidade visual Fidelize", desc: "Revisar textos e ilustrações de marca.", prio: "baixa" },
+      { id: "c5", title: "Persistir métricas do playground em banco", desc: "Só entra com ADR nova (hoje é in-memory).", prio: "baixa" },
+    ]
+  },
+  {
+    id: "todo", title: "A Fazer", cards: [
+      { id: "c14", title: "UX /docs/api — detalhe de tipo", desc: "Página /docs/api/[slug]/types/[name] com campos e args.", prio: "media" },
+      { id: "c15", title: "UX /docs/api — schema no Ctrl+K", desc: "Indexar campos/tipos do snapshot na busca global.", prio: "media" },
+      { id: "c16", title: "UX /docs/api — filtro e mobile", desc: "Busca client-side nas tabelas + índice de seções no mobile.", prio: "baixa" },
+      { id: "c7", title: "Migrar conteúdo real do canal-autorizador", desc: "Hoje é seed-only (template BPMN); falta migrar do legado.", prio: "media" },
+      { id: "c8", title: "Smoke SSO homolog manual", desc: "Automação cobre checks locais; fluxo completo com SSO real ainda é manual.", prio: "media" },
+    ]
+  },
+  { id: "doing", title: "Em Progresso", cards: [] },
+  {
+    id: "done", title: "Feito", cards: [
+      { id: "c6", title: "Referência GraphQL global (/docs/api)", desc: "MVP: catálogo + schema read-only por produto publicado.", prio: "alta" },
+      { id: "c13", title: "UX /docs/api — links cruzados + catálogo pendentes", desc: "Manual ↔ referência, deep link por operação, wholesaler visível como pendente de sync.", prio: "alta" },
+      { id: "c9", title: "Fase 10 — polish pós-MVP", desc: "Export PDF, E2E allowlist, validação de conteúdo publicado.", prio: "alta" },
+      { id: "c10", title: "Hardening de segurança + /compliance", desc: "18 controles ativos, regra Cursor de proteção de dados.", prio: "alta" },
+      { id: "c11", title: "RBAC via permissions.json", desc: "Fase 9 — controle de acesso configurável por arquivo.", prio: "media" },
+      { id: "c12", title: "Deploy homolog + Docker", desc: "Dockerfile, health enriquecido, smoke automatizado.", prio: "media" },
+    ]
+  },
+];
+
+let board = loadBoard();
+
+function loadBoard() {
+  try {
+    const raw = localStorage.getItem(KANBAN_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore corrupt storage */ }
+  return JSON.parse(JSON.stringify(DEFAULT_BOARD));
+}
+
+function saveBoard() {
+  localStorage.setItem(KANBAN_KEY, JSON.stringify(board));
+}
+
+function uid() {
+  return "c" + Math.random().toString(36).slice(2, 9);
+}
+
+function renderBoard() {
+  const el = document.getElementById("board");
+  el.innerHTML = board.map((col) => `
+    <div class="column" data-col="${col.id}">
+      <div class="column-header">
+        <h4>${col.title}</h4>
+        <span class="column-count">${col.cards.length}</span>
+      </div>
+      <div class="cardlist" data-col="${col.id}">
+        ${col.cards.map((card) => renderCard(card, col.id)).join("")}
+      </div>
+      <button class="add-card-btn" data-open-form="${col.id}">+ Novo cartão</button>
+      <div class="add-card-form" data-form="${col.id}">
+        <input type="text" placeholder="Título" data-field="title" />
+        <textarea placeholder="Descrição (opcional)" data-field="desc"></textarea>
+        <div class="row">
+          <select data-field="prio" style="flex:1">
+            <option value="baixa">Prioridade baixa</option>
+            <option value="media" selected>Prioridade média</option>
+            <option value="alta">Prioridade alta</option>
+          </select>
+        </div>
+        <div class="row">
+          <button class="btn" data-save-card="${col.id}" style="flex:1">Adicionar</button>
+          <button class="btn secondary" data-cancel-card="${col.id}" style="flex:1">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  attachBoardEvents();
+}
+
+function renderCard(card, colId) {
+  return `
+    <div class="kcard" draggable="true" data-id="${card.id}" data-col="${colId}">
+      <div class="kcard-top">
+        <h5>${escapeHtml(card.title)}</h5>
+        <div class="kcard-actions">
+          <button class="icon-btn" data-del="${card.id}" title="Remover">✕</button>
+        </div>
+      </div>
+      ${card.desc ? `<p>${escapeHtml(card.desc)}</p>` : ""}
+      <span class="prio ${card.prio}">${card.prio === "alta" ? "Alta" : card.prio === "media" ? "Média" : "Baixa"}</span>
+    </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function attachBoardEvents() {
+  // drag start/end
+  document.querySelectorAll(".kcard").forEach((cardEl) => {
+    cardEl.addEventListener("dragstart", (e) => {
+      cardEl.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", JSON.stringify({ id: cardEl.dataset.id, from: cardEl.dataset.col }));
+    });
+    cardEl.addEventListener("dragend", () => cardEl.classList.remove("dragging"));
+  });
+
+  // drop zones
+  document.querySelectorAll(".column").forEach((colEl) => {
+    colEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      colEl.classList.add("drag-over");
+    });
+    colEl.addEventListener("dragleave", () => colEl.classList.remove("drag-over"));
+    colEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      colEl.classList.remove("drag-over");
+      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+      moveCard(data.id, data.from, colEl.dataset.col);
+    });
+  });
+
+  // delete
+  document.querySelectorAll("[data-del]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.del;
+      board.forEach((col) => { col.cards = col.cards.filter((c) => c.id !== id); });
+      saveBoard();
+      renderBoard();
+    });
+  });
+
+  // open/cancel add-card form
+  document.querySelectorAll("[data-open-form]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelector(`[data-form="${btn.dataset.openForm}"]`).classList.add("open");
+      btn.style.display = "none";
+    });
+  });
+  document.querySelectorAll("[data-cancel-card]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const colId = btn.dataset.cancelCard;
+      document.querySelector(`[data-form="${colId}"]`).classList.remove("open");
+      document.querySelector(`[data-open-form="${colId}"]`).style.display = "";
+    });
+  });
+
+  // save new card
+  document.querySelectorAll("[data-save-card]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const colId = btn.dataset.saveCard;
+      const form = document.querySelector(`[data-form="${colId}"]`);
+      const title = form.querySelector('[data-field="title"]').value.trim();
+      if (!title) return;
+      const desc = form.querySelector('[data-field="desc"]').value.trim();
+      const prio = form.querySelector('[data-field="prio"]').value;
+      const col = board.find((c) => c.id === colId);
+      col.cards.push({ id: uid(), title, desc, prio });
+      saveBoard();
+      renderBoard();
+    });
+  });
+}
+
+function moveCard(cardId, fromColId, toColId) {
+  const fromCol = board.find((c) => c.id === fromColId);
+  const toCol = board.find((c) => c.id === toColId);
+  const idx = fromCol.cards.findIndex((c) => c.id === cardId);
+  if (idx === -1) return;
+  const [card] = fromCol.cards.splice(idx, 1);
+  toCol.cards.push(card);
+  saveBoard();
+  renderBoard();
+}
+
+document.getElementById("reset-board").addEventListener("click", () => {
+  if (!confirm("Restaurar o Kanban para o estado padrão? Isso apaga suas alterações locais.")) return;
+  board = JSON.parse(JSON.stringify(DEFAULT_BOARD));
+  saveBoard();
+  renderBoard();
+});
+
+renderBoard();
+
+/* ===================== Estudos (trilhas) ===================== */
+const ESTUDOS_KEY = "portal-edi-estudos-v1";
+
+const TRILHAS = [
+  {
+    id: "t1", title: "Trilha 1 — Ferramentas do dia a dia",
+    items: [
+      { id: "t1i1", label: "Rodar o projeto (npm run dev, porta 3002)", done: true },
+      { id: "t1i2", label: "Diferença npm run dev / build / start", done: true },
+      { id: "t1i3", label: "PowerShell: ; no lugar de &&, aspas em caminho com espaço", done: true },
+      { id: "t1i4", label: "Ciclo Git completo: status → diff → add → commit → push", done: false },
+      { id: "t1i5", label: "Criar branch, trocar de branch, stash", done: false },
+      { id: "t1i6", label: "Abrir um Pull Request e ler o resultado do CI", done: false },
+      { id: "t1i7", label: "Resolver um conflito de merge de propósito", done: false },
+    ]
+  },
+  {
+    id: "t2", title: "Trilha 2 — TypeScript na prática",
+    items: [
+      { id: "t2i1", label: "type vs. interface — quando cada um", done: false },
+      { id: "t2i2", label: "unknown vs. any (por que any é proibido no lint)", done: false },
+      { id: "t2i3", label: "Tipos derivados: z.infer, Pick, Omit, Partial", done: false },
+      { id: "t2i4", label: "Narrowing: como o TS prova que algo não é undefined", done: false },
+      { id: "t2i5", label: "Ler um erro do tsc de baixo para cima", done: false },
+    ]
+  },
+  {
+    id: "t3", title: "Trilha 3 — Zod e validação de borda",
+    items: [
+      { id: "t3i1", label: "parse vs. safeParse", done: false },
+      { id: "t3i2", label: "Validar entrada de API antes de chegar no service", done: false },
+      { id: "t3i3", label: "z.enum, z.literal, .regex(), .optional(), .default()", done: false },
+      { id: "t3i4", label: "Derivar schema de entrada a partir do schema de domínio", done: false },
+    ]
+  },
+  {
+    id: "t4", title: "Trilha 4 — Next.js App Router",
+    items: [
+      { id: "t4i1", label: "Server Component vs. Client Component (\"use client\")", done: false },
+      { id: "t4i2", label: "layout.tsx vs. page.tsx", done: false },
+      { id: "t4i3", label: "Rota dinâmica [slug] e params", done: false },
+      { id: "t4i4", label: "route.ts — GET/POST/PUT/DELETE", done: false },
+      { id: "t4i5", label: "middleware.ts — o que roda antes de tudo", done: false },
+      { id: "t4i6", label: "Cache e revalidação por tag (unstable_cache)", done: false },
+    ]
+  },
+  {
+    id: "t5", title: "Trilha 5 — Arquitetura em camadas",
+    items: [
+      { id: "t5i1", label: "Por que app → modules → core e nunca ao contrário", done: false },
+      { id: "t5i2", label: "O que é bounded context", done: false },
+      { id: "t5i3", label: "Papel de cada camada: schema / repository / services / ui", done: false },
+      { id: "t5i4", label: "Comunicação entre módulos só por eventos", done: false },
+      { id: "t5i5", label: "Ler a saída do npm run arch e entender uma violação", done: false },
+    ]
+  },
+  {
+    id: "t6", title: "Trilha 6 — Testes",
+    items: [
+      { id: "t6i1", label: "Vitest: describe, it, expect", done: false },
+      { id: "t6i2", label: "Mock de dependência (vi.mock)", done: false },
+      { id: "t6i3", label: "Teste de unidade vs. integração vs. E2E", done: false },
+      { id: "t6i4", label: "Playwright: rodar e ler o relatório", done: false },
+      { id: "t6i5", label: "Escrever o teste antes da implementação", done: false },
+    ]
+  },
+  {
+    id: "t7", title: "Trilha 7 — Segurança aplicada",
+    items: [
+      { id: "t7i1", label: "Por que segredo nunca vai para o browser", done: false },
+      { id: "t7i2", label: "Server-side proxy (por que o playground não chama o gateway direto)", done: false },
+      { id: "t7i3", label: "SSRF — o que é e o que gateway-url.ts impede", done: false },
+      { id: "t7i4", label: "Rate limit de login (ADR-0007)", done: false },
+      { id: "t7i5", label: "Criptografia de credencial (AES-256-GCM)", done: false },
+    ]
+  },
+  {
+    id: "t8", title: "Trilha 8 — Fase 8 (Export, busca, métricas, interno)",
+    items: [
+      { id: "t8i1", label: "Export Postman/Insomnia", done: true },
+      { id: "t8i2", label: "Busca global Fuse.js + Ctrl+K", done: true },
+      { id: "t8i3", label: "Métricas playground in-memory", done: true },
+      { id: "t8i4", label: "Módulo manuais-internos em /interno", done: true },
+    ]
+  },
+  {
+    id: "t9", title: "Trilha 9 — Fase 9 (Consolidação homolog)",
+    items: [
+      { id: "t9i1", label: "RBAC via data/permissions.json", done: true },
+      { id: "t9i2", label: "Smoke homolog (npm run smoke:homolog)", done: true },
+      { id: "t9i3", label: "Deploy Docker + docs", done: true },
+      { id: "t9i4", label: "Health enriquecido (/api/health)", done: true },
+    ]
+  },
+  {
+    id: "t10", title: "Trilha 10 — Fase 10+ (Polish e além)",
+    items: [
+      { id: "t10i1", label: "Export PDF", done: true },
+      { id: "t10i2", label: "Validar conteúdo publicado por script", done: true },
+      { id: "t10i3", label: "E2E allowlist do playground", done: true },
+      { id: "t10i4", label: "Referência GraphQL global (/docs/api)", done: true },
+      { id: "t10i5", label: "Persistir métricas em banco (se ADR exigir)", done: false },
+    ]
+  },
+];
+
+function loadEstudos() {
+  try {
+    const raw = localStorage.getItem(ESTUDOS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  const state = {};
+  TRILHAS.forEach((t) => t.items.forEach((i) => { state[i.id] = i.done; }));
+  return state;
+}
+
+let estudosState = loadEstudos();
+
+function saveEstudos() {
+  localStorage.setItem(ESTUDOS_KEY, JSON.stringify(estudosState));
+}
+
+function renderTrilhas() {
+  const wrap = document.getElementById("trilhas-wrap");
+  wrap.innerHTML = TRILHAS.map((t) => {
+    const total = t.items.length;
+    const doneCount = t.items.filter((i) => estudosState[i.id]).length;
+    const pct = Math.round((doneCount / total) * 100);
+    return `
+      <div class="trilha">
+        <div class="trilha-head">
+          <h4>${t.title}</h4>
+          <span class="hint" style="color:var(--text-muted); font-size:12.5px">${doneCount}/${total}</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <ul style="margin-top:10px">
+          ${t.items.map((i) => `
+            <li class="${estudosState[i.id] ? "done" : ""}">
+              <input type="checkbox" data-item="${i.id}" ${estudosState[i.id] ? "checked" : ""} />
+              <span>${escapeHtml(i.label)}</span>
+            </li>`).join("")}
+        </ul>
+      </div>`;
+  }).join("");
+
+  wrap.querySelectorAll("[data-item]").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      estudosState[cb.dataset.item] = cb.checked;
+      saveEstudos();
+      renderTrilhas();
+    });
+  });
+}
+
+document.getElementById("reset-estudos").addEventListener("click", () => {
+  if (!confirm("Zerar todo o progresso de estudos?")) return;
+  estudosState = {};
+  TRILHAS.forEach((t) => t.items.forEach((i) => { estudosState[i.id] = false; }));
+  saveEstudos();
+  renderTrilhas();
+});
+
+renderTrilhas();
+</script>
+</body>
+</html>

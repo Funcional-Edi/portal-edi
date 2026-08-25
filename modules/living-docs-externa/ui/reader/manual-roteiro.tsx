@@ -36,9 +36,17 @@ interface ManualRoteiroProps {
   editor?: ManualRoteiroEditorSlots;
   /** Link para fluxograma quando `flow.json` existe. */
   flowHref?: string;
+  /** Link para referência GraphQL quando schema sincronizado. */
+  schemaReferenceHref?: string;
 }
 
-export function ManualRoteiro({ project, sections, editor, flowHref }: ManualRoteiroProps) {
+export function ManualRoteiro({
+  project,
+  sections,
+  editor,
+  flowHref,
+  schemaReferenceHref,
+}: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
   const isEditing = editor != null;
@@ -75,6 +83,14 @@ export function ManualRoteiro({ project, sections, editor, flowHref }: ManualRot
                   className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Ver fluxograma
+                </Link>
+              ) : null}
+              {schemaReferenceHref ? (
+                <Link
+                  href={schemaReferenceHref}
+                  className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Ver referência GraphQL
                 </Link>
               ) : null}
               <ProjectExportActions
