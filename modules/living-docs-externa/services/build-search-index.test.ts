@@ -7,21 +7,21 @@ const sampleIndex: SearchIndexEntry[] = [
   {
     type: "manual",
     title: "Integração IM — Inventário",
-    href: "/manual/demo",
+    href: "/docs/demo",
     snippet: "Manual de demonstração",
     keywords: "demo inventory",
   },
   {
     type: "operation",
     title: "1. Obter token",
-    href: "/manual/demo/operations/mutation/createToken",
+    href: "/docs/demo/operations/mutation/createToken",
     snippet: "Autentique no gateway",
     keywords: "mutation createToken demo",
   },
   {
     type: "section",
     title: "Visão geral",
-    href: "/manual/demo#section-visao-geral",
+    href: "/docs/demo#section-visao-geral",
     snippet: "Contexto do produto IM",
     keywords: "demo visao-geral",
   },
@@ -42,7 +42,7 @@ describe("searchIndex", () => {
   it("prioriza título de manual para busca por produto", () => {
     const results = searchIndex(sampleIndex, "Inventário");
     expect(results[0]?.type).toBe("manual");
-    expect(results[0]?.href).toBe("/manual/demo");
+    expect(results[0]?.href).toBe("/docs/demo");
   });
 });
 
@@ -53,7 +53,7 @@ describe("buildLivingDocsSearchIndex", () => {
     );
 
     const entries = await buildLivingDocsSearchIndex(false);
-    expect(entries.some((e) => e.type === "manual" && e.href === "/manual/demo")).toBe(
+    expect(entries.some((e) => e.type === "manual" && e.href === "/docs/demo")).toBe(
       true
     );
     expect(

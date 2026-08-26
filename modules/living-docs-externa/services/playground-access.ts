@@ -1,6 +1,2 @@
-/** Monta URL do playground com query opcional pré-preenchida. */
-export function buildPlaygroundHref(slug: string, query?: string): string {
-  const base = `/manual/${slug}/playground`;
-  if (!query?.trim()) return base;
-  return `${base}?query=${encodeURIComponent(query)}`;
-}
+/** @deprecated Use `docsPlaygroundHref` — mantido para compatibilidade com imports existentes. */
+export { docsPlaygroundHref as buildPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";

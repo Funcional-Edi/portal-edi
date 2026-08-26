@@ -16,7 +16,7 @@ export function AdminShell({ children, activeNavHref = "/admin/projects" }: Admi
         navItems={[
           { href: "/admin/projects", label: "Projetos", active: activeNavHref === "/admin/projects" },
           { href: "/admin/metrics", label: "Métricas", active: activeNavHref === "/admin/metrics" },
-          { href: "/manual", label: "Ver catálogo" },
+          { href: "/docs", label: "Ver catálogo" },
         ]}
         actions={<SessionActions />}
       />

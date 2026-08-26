@@ -1,6 +1,7 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
+import { docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
@@ -217,7 +218,7 @@ export function ManualRoteiro({
                   </div>
                 ) : (
                   <Link
-                    href={`/manual/${config.slug}/operations/${op.kind}/${op.name}`}
+                    href={docsOperationHref(config.slug, op.kind, op.name)}
                     className="block rounded-lg border border-slate-200 p-4 transition hover:border-brand-600"
                   >
                     {card}

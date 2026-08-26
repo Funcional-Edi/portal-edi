@@ -10,7 +10,7 @@ async function loginAsDevUser(page: Page) {
 test("Ctrl+K encontra tipo GraphQL do schema publicado", async ({ page }) => {
   await loginAsDevUser(page);
 
-  await page.goto("/manual/im");
+  await page.goto("/docs/im");
   await page.keyboard.press("Control+k");
   await expect(page.getByRole("dialog", { name: "Busca no portal" })).toBeVisible();
 

@@ -93,7 +93,7 @@ export default async function HomePage() {
   return (
     <AppShell
       subtitle={isAdmin ? "Time EDI / Tecnologia" : "Integração"}
-      navItems={uniqueNav.length > 0 ? uniqueNav : [{ href: "/manual", label: "Documentação Viva" }]}
+      navItems={uniqueNav.length > 0 ? uniqueNav : [{ href: "/docs", label: "Documentação" }]}
       actions={<SessionActions />}
     >
       <main className="mx-auto max-w-5xl px-6 py-16">

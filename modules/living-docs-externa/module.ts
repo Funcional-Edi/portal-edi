@@ -11,9 +11,9 @@ export const livingDocsExternaModule: PortalModule = {
   description:
     "Manuais de integração gerados do schema GraphQL e curados por produto, para parceiros.",
   status: "active",
-  basePath: "/manual",
+  basePath: "/docs",
   access: "any",
   audience: "externo",
   requiresCapabilities: ["content"],
-  nav: [{ label: "Manuais", href: "/manual", access: "any" }],
+  nav: [{ label: "Documentação", href: "/docs", access: "any" }],
 };

@@ -34,7 +34,7 @@ export function isPublicPath(pathname: string): boolean {
   );
 }
 
-/** Maior basePath que casa com pathname (ex.: /manual/im → módulo /manual). */
+/** Maior basePath que casa com pathname (ex.: /docs/im → módulo /docs). */
 export function findModuleForPath(
   pathname: string,
   modules: PortalModule[]
@@ -89,10 +89,10 @@ export function resolvePostLoginPath(
   ) {
     return callbackUrl;
   }
-  return role === "admin" ? "/" : "/manual";
+  return role === "admin" ? "/" : "/docs";
 }
 
 /** Onde mandar quem não tem permissão na rota pedida. */
 export function getForbiddenRedirectPath(role: UserRole | undefined): string {
-  return role === "admin" ? "/" : "/manual";
+  return role === "admin" ? "/" : "/docs";
 }

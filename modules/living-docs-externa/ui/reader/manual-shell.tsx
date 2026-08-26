@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { AppHeader, type AppNavItem } from "@/core/ui/app-shell";
 import { SessionActions } from "@/core/ui/session-actions";
+import { DOCS_HOME_HREF } from "@/modules/living-docs-externa/services/docs-routes";
 
 export interface ManualNavItem {
   href: string;
@@ -55,10 +56,10 @@ export function ManualShell({
             {headerActions}
             {showDefaultCatalogLink ? (
               <Link
-                href="/manual"
+                href={DOCS_HOME_HREF}
                 className="text-sm font-medium text-brand-700 hover:underline"
               >
-                Catálogo
+                Documentação
               </Link>
             ) : null}
             <SessionActions />

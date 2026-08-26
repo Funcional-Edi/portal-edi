@@ -3,9 +3,8 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 
 /**
- * Familias de produto (EDI Pharma / EDI Varejo): agrupamento visual no
- * catalogo/admin, sem alterar URLs. Os testes criam projetos descartaveis
- * (apagados no fim) para nao sujar `content/projects/im` etc.
+ * Familias de produto (EDI Pharma / EDI Varejo): entrada em /docs, depois
+ * catálogo por família. Os testes criam projetos descartaveis (apagados no fim).
  */
 const SLUG_VAREJO = "e2e-familia-varejo";
 const SLUG_RECLASSIFICA = "e2e-familia-reclassifica";
@@ -72,24 +71,26 @@ test.afterEach(async () => {
   await Promise.all(PROJECT_DIRS.map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-test("catalogo /manual agrupa produtos publicados por familia", async ({ page }) => {
+test("fluxo /docs escolhe familia e lista produtos publicados", async ({ page }) => {
   await loginAsAdmin(page);
   await createPublishableProject(page, SLUG_VAREJO, "Familia Varejo E2E", "EDI Varejo");
 
-  await page.goto("/manual");
-  await expect(page.getByRole("heading", { name: "EDI Pharma" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "EDI Varejo" })).toBeVisible();
+  await page.goto("/docs");
+  await expect(page.getByRole("heading", { name: "Documentação" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /EDI Pharma/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /EDI Varejo/ })).toBeVisible();
 
-  const pharmaSection = page.locator("section").filter({ hasText: "EDI Pharma" });
-  const varejoSection = page.locator("section").filter({ hasText: "EDI Varejo" });
+  await page.getByRole("link", { name: /EDI Varejo/ }).click();
+  await expect(page).toHaveURL("/docs/edi-varejo");
+  await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toBeVisible();
 
-  await expect(
-    varejoSection.getByRole("link", { name: /Familia Varejo E2E/ })
-  ).toBeVisible();
-  await expect(
-    pharmaSection.getByRole("link", { name: /Familia Varejo E2E/ })
-  ).toHaveCount(0);
-  await expect(pharmaSection.getByRole("link", { name: /IM - Inventario/ })).toBeVisible();
+  await page.getByRole("link", { name: "Todas as famílias" }).click();
+  await expect(page).toHaveURL("/docs");
+
+  await page.getByRole("link", { name: /EDI Pharma/ }).click();
+  await expect(page).toHaveURL("/docs/edi-pharma");
+  await expect(page.getByRole("link", { name: /IM - Inventario/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toHaveCount(0);
 });
 
 test("admin reclassifica a familia de um projeto existente", async ({ page }) => {
@@ -105,8 +106,6 @@ test("admin reclassifica a familia de um projeto existente", async ({ page }) =>
   const familySelect = page.getByLabel("Família do produto");
   await expect(familySelect).toHaveValue("edi-pharma");
 
-  // Aguarda a resposta do PATCH antes de recarregar — a UI atualiza o
-  // <select> otimisticamente, mas o reload aborta um fetch ainda em voo.
   const familyPatch = page.waitForResponse(
     (response) => response.url().includes("/family") && response.request().method() === "PATCH"
   );

@@ -1,5 +1,9 @@
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
 import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
+import {
+  DOCS_HOME_HREF,
+  docsGuideHref,
+} from "@/modules/living-docs-externa/services/docs-routes";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
@@ -24,11 +28,11 @@ export function OperationDetail({
   return (
     <article>
       <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/manual" className="hover:text-brand-700">
-          Manuais
+        <Link href={DOCS_HOME_HREF} className="hover:text-brand-700">
+          Documentação
         </Link>
         <span className="mx-2">/</span>
-        <Link href={`/manual/${slug}`} className="hover:text-brand-700">
+        <Link href={docsGuideHref(slug)} className="hover:text-brand-700">
           {manualTitle}
         </Link>
       </nav>
@@ -108,7 +112,7 @@ export function OperationDetail({
 
       <footer className="mt-8">
         <Link
-          href={`/manual/${slug}`}
+          href={docsGuideHref(slug)}
           className="text-sm font-medium text-brand-700 hover:underline"
         >
           ← Voltar ao roteiro

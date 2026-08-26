@@ -1,33 +1,22 @@
 import type { ReactNode } from "react";
 
-import { AppShell } from "@/core/ui/app-shell";
-import { SessionActions } from "@/core/ui/session-actions";
+import { DocsShell } from "@/modules/living-docs-externa/ui/reader/docs-shell";
+import { DOCS_API_HREF } from "@/modules/living-docs-externa/services/docs-routes";
 
 interface DocsApiShellProps {
   children: ReactNode;
   subtitle?: string;
-  activeHref?: "/docs/api" | `/docs/api/${string}`;
+  activeHref?: string;
 }
 
 export function DocsApiShell({
   children,
   subtitle = "Referência GraphQL",
-  activeHref = "/docs/api",
+  activeHref = DOCS_API_HREF,
 }: DocsApiShellProps) {
   return (
-    <AppShell
-      subtitle={subtitle}
-      navItems={[
-        {
-          href: "/docs/api",
-          label: "Referência API",
-          active: activeHref === "/docs/api",
-        },
-        { href: "/manual", label: "Manuais" },
-      ]}
-      actions={<SessionActions />}
-    >
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
-    </AppShell>
+    <DocsShell subtitle={subtitle} activeHref={activeHref}>
+      {children}
+    </DocsShell>
   );
 }

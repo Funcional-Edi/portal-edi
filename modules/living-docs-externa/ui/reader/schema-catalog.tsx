@@ -2,6 +2,7 @@ import { ArrowRight, Braces, Clock, Database } from "lucide-react";
 import Link from "next/link";
 
 import { Badge, type BadgeTone } from "@/core/ui/badge";
+import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { groupByFamily } from "@/modules/living-docs-externa/services/group-by-family";
 import type { SchemaCatalogEntry } from "@/modules/living-docs-externa/services/get-published-schema";
 
@@ -109,7 +110,7 @@ function PendingCard({ entry }: { entry: SchemaCatalogEntry }) {
       </p>
 
       <Link
-        href={`/manual/${entry.slug}`}
+        href={docsGuideHref(entry.slug)}
         className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
       >
         Abrir manual curado

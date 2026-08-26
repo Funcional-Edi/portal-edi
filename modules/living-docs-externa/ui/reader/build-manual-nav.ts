@@ -1,9 +1,14 @@
+import type { ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import {
   manualOperationKindSchema,
   sortOperations,
-  type ManualSection,
-  type Project,
 } from "@/modules/living-docs-externa/schema";
+import {
+  DOCS_HOME_HREF,
+  docsGuideHref,
+  docsOperationHref,
+  docsPlaygroundHref,
+} from "@/modules/living-docs-externa/services/docs-routes";
 import type {
   ManualNavGroup,
   ManualTocItem,
@@ -36,21 +41,21 @@ export async function buildManualNav(
   const project = projectInput ?? (await getPublishedManual(slug));
   if (!project) return null;
 
-  const basePath = `/manual/${slug}`;
+  const basePath = docsGuideHref(slug);
   const operations = sortOperations(project.manual);
   const sidebarGroups: ManualNavGroup[] = [
     {
       title: "Navegação",
       items: [
-        { href: "/manual", label: "Catálogo" },
+        { href: DOCS_HOME_HREF, label: "Documentação" },
         { href: basePath, label: "Roteiro", active: !playground && (!kind || !name) },
-        { href: `${basePath}/playground`, label: "Playground", active: !!playground },
+        { href: docsPlaygroundHref(slug), label: "Playground", active: !!playground },
       ],
     },
     {
       title: "Operações",
       items: operations.map((op) => {
-        const href = `${basePath}/operations/${op.kind}/${op.name}`;
+        const href = docsOperationHref(slug, op.kind, op.name);
         return {
           href,
           label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,

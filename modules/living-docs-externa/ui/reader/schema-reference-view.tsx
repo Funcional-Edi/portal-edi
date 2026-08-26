@@ -4,6 +4,7 @@ import { Badge } from "@/core/ui/badge";
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
 import type { PublishedSchemaReference } from "@/modules/living-docs-externa/services/get-published-schema";
 import { schemaTypeHref } from "@/modules/living-docs-externa/services/get-published-schema";
+import { docsGuideHref, docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { SchemaFieldRef } from "@/modules/living-docs-externa/services/schema-reference";
 import { schemaFieldAnchor } from "@/modules/living-docs-externa/services/schema-reference";
 
@@ -25,7 +26,7 @@ function manualLinkForField(
 ): string | null {
   const match = operations.find((op) => op.kind === kind && op.name === name);
   if (!match) return null;
-  return `/manual/${slug}/operations/${kind}/${name}`;
+  return docsOperationHref(slug, kind, name);
 }
 
 function FieldTable({
@@ -127,7 +128,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
         </p>
         <div className="mt-4">
           <Link
-            href={`/manual/${project.config.slug}`}
+            href={docsGuideHref(project.config.slug)}
             className="text-sm font-medium text-brand-700 hover:underline"
           >
             Abrir manual curado →
