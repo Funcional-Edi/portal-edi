@@ -513,7 +513,7 @@
   </div>
   <div class="stats">
     <div class="stat-pill"><b>Fases 0–10</b><span>concluídas</span></div>
-    <div class="stat-pill"><b>256</b><span>testes passando</span></div>
+    <div class="stat-pill"><b>275</b><span>testes passando</span></div>
     <div class="stat-pill"><b>18</b><span>controles de segurança ativos</span></div>
     <div class="stat-pill"><b>6</b><span>módulos (4 ativos)</span></div>
   </div>
@@ -786,7 +786,7 @@ const PHASES = [
   { name: "Fase 8", desc: "Export Postman/Insomnia, busca Ctrl+K, métricas, guias internos", status: "done" },
   { name: "Fase 9", desc: "Consolidação homolog: RBAC por arquivo, smoke, deploy Docker", status: "done" },
   { name: "Fase 10", desc: "Polish: export PDF, E2E allowlist, validação de conteúdo, hardening de segurança", status: "done" },
-  { name: "Fase 11+ (a definir)", desc: "Famílias de produto (EDI Pharma/Varejo) — concluído · migração real do canal-autorizador e EDI Canais · polish de UI", status: "pending" },
+  { name: "Fase 11+ (a definir)", desc: "Famílias de produto (EDI Pharma/Varejo) e suporte REST (PSP) — concluídos · falta curar conteúdo detalhado (EDI Canais + PSP) e migrar o canal-autorizador · polish de UI", status: "pending" },
 ];
 document.getElementById("timeline").innerHTML = PHASES.map((p) => `
   <div class="tl-item ${p.status}">
@@ -811,13 +811,15 @@ const DEFAULT_BOARD = [
     id: "todo", title: "A Fazer", cards: [
       { id: "c16", title: "UX /docs/api — filtro e mobile", desc: "Busca client-side nas tabelas + índice de seções no mobile.", prio: "baixa" },
       { id: "c7", title: "Migrar conteúdo real do canal-autorizador", desc: "Hoje é seed-only (template BPMN); falta migrar do legado. Já classificado como família EDI Pharma.", prio: "media" },
-      { id: "c18", title: "Migrar documentação EDI Canais para EDI Varejo", desc: "Curar produtos (credenciado, benefício, PSP/PBM) a partir de developer.funcionalmais.com e conectar gateway real via admin. Seed edi-canais já existe em família EDI Varejo.", prio: "media" },
+      { id: "c21", title: "Curar conteúdo detalhado EDI Canais (5 páginas legadas)", desc: "Gateway de Credenciado, Beneficiários, Busca de Preço, Benefício Farmácia: falta o texto/print de cada página legada para curar descrição e regras de negócio das operações GraphQL. Depende de conectar o gateway real (stores-uat.funcionalmais.com/graphql) via admin e sincronizar o schema.", prio: "media" },
+      { id: "c22", title: "Curar endpoints reais do PSP (REST)", desc: "Projeto psp criado (protocol rest, família EDI Varejo) com intro real migrada de /docs/psp; falta a lista de endpoints (método, path, exemplos) e a URL real da API para conectar via admin (Conectar API).", prio: "media" },
       { id: "c8", title: "Smoke SSO homolog manual", desc: "Automação cobre checks locais; fluxo completo com SSO real ainda é manual.", prio: "media" },
     ]
   },
   { id: "doing", title: "Em Progresso", cards: [] },
   {
     id: "done", title: "Feito", cards: [
+      { id: "c20", title: "Suporte a operações REST no portal (PSP)", desc: "manual.ts (kind rest + method/path/exampleBody) e project.ts (protocol + apiBaseUrl); checklist de qualidade, exports (Postman/Insomnia/PDF), leitura (Endpoint em vez de playground) e admin (Conectar API, seletor de Protocolo) todos sensíveis a protocolo. edi-canais (GraphQL) e psp (REST) reestruturados em família EDI Varejo, com introdução real migrada de developer.funcionalmais.com.", prio: "alta" },
       { id: "c19", title: "Famílias de produto (EDI Pharma/Varejo) no catálogo", desc: "Campo family opcional no projeto, admin classifica/reclassifica, catálogos /manual e /docs/api agrupados por família. URLs não mudaram.", prio: "alta" },
       { id: "c15", title: "UX /docs/api — schema no Ctrl+K", desc: "Campos/tipos do snapshot indexados na busca global (Ctrl+K).", prio: "media" },
       { id: "c14", title: "UX /docs/api — detalhe de tipo", desc: "Página /docs/api/[slug]/types/[name] com campos, args e tipos de retorno.", prio: "media" },

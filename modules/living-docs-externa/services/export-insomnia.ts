@@ -26,13 +26,19 @@ function graphqlBodyText(query: string): string {
   return JSON.stringify({ query });
 }
 
+function joinUrl(base: string, path: string): string {
+  return `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 /** Gera export Insomnia v4 a partir do manual curado (sem credenciais). */
 export function buildInsomniaExport(
   config: ProjectConfig,
   manual: IntegrationManual
 ): InsomniaExportV4 {
-  if (!config.graphqlUrl) {
-    throw new Error("GRAPHQL_URL_REQUIRED");
+  const isRest = config.protocol === "rest";
+  const baseUrl = isRest ? config.apiBaseUrl : config.graphqlUrl;
+  if (!baseUrl) {
+    throw new Error(isRest ? "API_BASE_URL_REQUIRED" : "GRAPHQL_URL_REQUIRED");
   }
 
   const now = Date.now();
@@ -51,24 +57,42 @@ export function buildInsomniaExport(
 
   for (const op of sortOperations(manual)) {
     const requestId = `req_${config.slug}_${op.kind}_${op.name}`;
-    const query = op.exampleQuery?.trim() || defaultExampleQuery(op.kind, op.name);
+    const isRestOp = isRest || op.kind === "rest";
 
-    resources.push({
-      _type: "request",
-      _id: requestId,
-      parentId: workspaceId,
-      modified: now,
-      created: now,
-      name: op.title ?? op.name,
-      description: op.description ?? "",
-      url: config.graphqlUrl,
-      method: "POST",
-      body: {
-        mimeType: "application/graphql",
-        text: graphqlBodyText(query),
-      },
-      headers: [{ name: "Content-Type", value: "application/json" }],
-    });
+    resources.push(
+      isRestOp
+        ? {
+            _type: "request",
+            _id: requestId,
+            parentId: workspaceId,
+            modified: now,
+            created: now,
+            name: op.title ?? op.name,
+            description: op.description ?? "",
+            url: joinUrl(config.apiBaseUrl ?? baseUrl, op.path ?? "/"),
+            method: op.method ?? "GET",
+            body: op.exampleBody?.trim()
+              ? { mimeType: "application/json", text: op.exampleBody }
+              : {},
+            headers: [{ name: "Content-Type", value: "application/json" }],
+          }
+        : {
+            _type: "request",
+            _id: requestId,
+            parentId: workspaceId,
+            modified: now,
+            created: now,
+            name: op.title ?? op.name,
+            description: op.description ?? "",
+            url: config.graphqlUrl ?? baseUrl,
+            method: "POST",
+            body: {
+              mimeType: "application/graphql",
+              text: graphqlBodyText(op.exampleQuery?.trim() || defaultExampleQuery(op.kind, op.name)),
+            },
+            headers: [{ name: "Content-Type", value: "application/json" }],
+          }
+    );
   }
 
   return {

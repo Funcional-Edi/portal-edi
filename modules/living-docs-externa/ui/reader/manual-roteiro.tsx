@@ -56,6 +56,8 @@ export function ManualRoteiro({
   const operations = sortOperations(manual);
   const isEditing = editor != null;
   const showContext = sections.length > 0 || isEditing;
+  const isGraphql = config.protocol !== "rest";
+  const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
 
   return (
     <article>
@@ -76,7 +78,7 @@ export function ManualRoteiro({
         <div className="mt-4 flex flex-wrap gap-3">
           {editor?.headerActions ?? (
             <>
-              {canUsePlayground ? (
+              {isGraphql && canUsePlayground ? (
                 <Link
                   href={buildPlaygroundHref(config.slug)}
                   className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
@@ -100,10 +102,7 @@ export function ManualRoteiro({
                   Ver referência GraphQL
                 </Link>
               ) : null}
-              <ProjectExportActions
-                slug={config.slug}
-                graphqlUrl={config.graphqlUrl}
-              />
+              <ProjectExportActions slug={config.slug} gatewayConnected={gatewayConnected} />
             </>
           )}
         </div>
@@ -197,7 +196,9 @@ export function ManualRoteiro({
           {operations.map((op) => {
             const card = (
               <>
-                <span className="text-xs font-medium uppercase text-brand-700">{op.kind}</span>
+                <span className="text-xs font-medium uppercase text-brand-700">
+                  {op.kind === "rest" ? op.method ?? "rest" : op.kind}
+                </span>
                 <h3 className="mt-1 font-semibold">{op.title ?? `${op.kind} ${op.name}`}</h3>
                 {op.description ? (
                   <p className="mt-2 text-sm text-slate-600 line-clamp-2">{op.description}</p>

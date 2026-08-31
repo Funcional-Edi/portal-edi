@@ -44,11 +44,18 @@ function buildPdfLines(config: ProjectConfig, manual: IntegrationManual): string
   const lines: string[] = [];
   const operations = sortOperations(manual);
 
+  const isRest = config.protocol === "rest";
+
   lines.push(`Manual de Integracao - ${manual.title}`);
   lines.push(`Projeto: ${config.name} (${config.slug})`);
+  lines.push(`Protocolo: ${isRest ? "REST" : "GraphQL"}`);
   lines.push(`Ambiente: ${config.environment ?? "nao informado"}`);
   lines.push(`Publicado: ${config.published ? "sim" : "nao"}`);
-  lines.push(`URL GraphQL: ${config.graphqlUrl ?? "nao configurada"}`);
+  lines.push(
+    isRest
+      ? `URL base da API: ${config.apiBaseUrl ?? "nao configurada"}`
+      : `URL GraphQL: ${config.graphqlUrl ?? "nao configurada"}`
+  );
   lines.push("");
 
   if (config.description) {
@@ -61,15 +68,24 @@ function buildPdfLines(config: ProjectConfig, manual: IntegrationManual): string
   lines.push("");
 
   for (const operation of operations) {
+    const kindLabel = operation.kind === "rest" ? operation.method ?? "REST" : operation.kind;
     lines.push(
       ...wrapLine(
-        `${operation.order}. [${operation.kind}] ${operation.title ?? operation.name} (${operation.name})`
+        `${operation.order}. [${kindLabel}] ${operation.title ?? operation.name} (${operation.name})`
       )
     );
     if (operation.description) {
       lines.push(...wrapLine(`Descricao: ${operation.description}`));
     }
-    if (operation.exampleQuery) {
+    if (operation.kind === "rest") {
+      if (operation.path) {
+        lines.push(...wrapLine(`Endpoint: ${operation.method ?? ""} ${operation.path}`));
+      }
+      if (operation.exampleBody) {
+        const preview = normalizeInline(operation.exampleBody).slice(0, 180);
+        lines.push(...wrapLine(`Corpo: ${preview}${preview.length === 180 ? "..." : ""}`));
+      }
+    } else if (operation.exampleQuery) {
       const preview = normalizeInline(operation.exampleQuery).slice(0, 180);
       lines.push(...wrapLine(`Exemplo: ${preview}${preview.length === 180 ? "..." : ""}`));
     }

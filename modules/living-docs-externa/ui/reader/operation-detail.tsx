@@ -11,9 +11,10 @@ interface OperationDetailProps {
   slug: string;
   manualTitle: string;
   operation: ManualOperation;
-  graphqlUrl?: string;
+  /** `true` quando o projeto tem gateway GraphQL ou API REST conectada. */
+  gatewayConnected?: boolean;
   schemaFieldHref?: string;
-  /** Playground executa contra gateway real — só perfil admin. */
+  /** Playground executa contra gateway real — só perfil admin, e só faz sentido em GraphQL. */
   canUsePlayground?: boolean;
 }
 
@@ -21,10 +22,12 @@ export function OperationDetail({
   slug,
   manualTitle,
   operation,
-  graphqlUrl,
+  gatewayConnected = false,
   schemaFieldHref,
   canUsePlayground = false,
 }: OperationDetailProps) {
+  const isRest = operation.kind === "rest";
+
   return (
     <article>
       <nav className="mb-6 text-sm text-slate-500">
@@ -39,7 +42,7 @@ export function OperationDetail({
 
       <header className="mb-8 border-b border-slate-200 pb-6">
         <span className="text-xs font-medium uppercase text-brand-700">
-          {operation.kind}
+          {isRest ? operation.method ?? "rest" : operation.kind}
         </span>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">
           {operation.title ?? operation.name}
@@ -50,7 +53,7 @@ export function OperationDetail({
             slug={slug}
             format="postman"
             label="Exportar manual (Postman)"
-            disabled={!graphqlUrl}
+            disabled={!gatewayConnected}
           />
           {schemaFieldHref ? (
             <Link
@@ -85,7 +88,31 @@ export function OperationDetail({
         </section>
       ) : null}
 
-      {operation.exampleQuery ? (
+      {isRest ? (
+        <section id="endpoint-rest" className="mb-6 scroll-mt-24">
+          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Endpoint</h2>
+          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
+            <code>
+              {operation.method} {operation.path}
+            </code>
+          </pre>
+          {operation.exampleBody ? (
+            <>
+              <h3 className="mt-4 mb-2 text-sm font-semibold uppercase text-slate-500">
+                Corpo de exemplo
+              </h3>
+              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
+                <code>{operation.exampleBody}</code>
+              </pre>
+            </>
+          ) : null}
+          <p className="mt-3 text-sm text-slate-600">
+            Esta API é <span className="font-medium">REST</span> — não há playground no portal.
+            Use um cliente HTTP (Insomnia, Postman, curl) enviando o token JWT no header{" "}
+            <code>Authorization: Bearer &lt;token&gt;</code>.
+          </p>
+        </section>
+      ) : operation.exampleQuery ? (
         <section id="exemplo-graphql" className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Exemplo GraphQL

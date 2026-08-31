@@ -61,8 +61,16 @@ describe("createProject service", () => {
     });
   });
 
-  it("rejeita slug inválido", async () => {
-    await expect(createProject({ slug: "INVALID", name: "X" })).rejects.toMatchObject({
+  it("normaliza slug com maiúsculas, espaços e underscore", async () => {
+    const project = await createProject({ slug: "EDI_Canais Teste", name: "X" });
+    expect(project.config.slug).toBe("edi-canais-teste");
+  });
+
+  it("rejeita slug inválido após normalização", async () => {
+    await expect(createProject({ slug: "!!!", name: "X" })).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
+    await expect(createProject({ slug: "a", name: "X" })).rejects.toMatchObject({
       code: "VALIDATION",
     });
   });

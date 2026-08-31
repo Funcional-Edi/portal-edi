@@ -102,6 +102,7 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **React Flow** | Biblioteca `@xyflow/react` para canvas de nós/arestas no browser |
 | **Mermaid** | Linguagem texto → diagrama; export do fluxo via `exportFlowToMermaid` |
 | **Família de produto** | Agrupamento visual (EDI Pharma, EDI Varejo) no catálogo/admin — metadata em `config.json`, não muda rota nem credenciais |
+| **Protocolo REST vs GraphQL no portal** | `config.protocol` (`"graphql"` \| `"rest"`) define como um projeto é lido: GraphQL usa `graphqlUrl`, playground e `exampleQuery`; REST usa `apiBaseUrl`, sem playground, e cada operação (`kind: "rest"`) tem `method`/`path`/`exampleBody` em vez de query. Toda a cadeia (schema, quality gate, exports, UI, admin) faz esse branch — ver `modules/living-docs-externa/schema/manual.ts` e `project.ts` |
 
 ## Segurança
 

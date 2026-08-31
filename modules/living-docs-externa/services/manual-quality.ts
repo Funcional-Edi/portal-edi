@@ -82,8 +82,10 @@ export function evaluateManualQuality({
     (operation) => !operation.description?.trim()
   );
 
-  const operationsWithoutExample = manual.operations.filter(
-    (operation) => !operation.exampleQuery?.trim()
+  const operationsWithoutExample = manual.operations.filter((operation) =>
+    operation.kind === "rest"
+      ? !(operation.method && operation.path?.trim())
+      : !operation.exampleQuery?.trim()
   );
 
   const orders = manual.operations.map((operation) => operation.order);
@@ -142,7 +144,7 @@ export function evaluateManualQuality({
     ),
     check(
       "operacoes-exemplo",
-      "Todas as operações têm exemplo GraphQL",
+      "Todas as operações têm exemplo (GraphQL ou endpoint REST)",
       operationsWithoutExample.length === 0,
       "warn",
       `Sem exemplo: ${operationsWithoutExample.map(operationKey).join(", ")}.`
@@ -163,10 +165,14 @@ export function evaluateManualQuality({
     ),
     check(
       "gateway",
-      "Gateway GraphQL conectado",
-      Boolean(config.graphqlUrl?.trim()),
+      config.protocol === "rest" ? "API REST conectada" : "Gateway GraphQL conectado",
+      config.protocol === "rest"
+        ? Boolean(config.apiBaseUrl?.trim())
+        : Boolean(config.graphqlUrl?.trim()),
       "warn",
-      "Sem `graphqlUrl` o playground fica indisponível para o distribuidor."
+      config.protocol === "rest"
+        ? "Sem `apiBaseUrl` a exportação (Postman/Insomnia) fica incompleta para o distribuidor."
+        : "Sem `graphqlUrl` o playground fica indisponível para o distribuidor."
     ),
   ];
 

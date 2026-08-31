@@ -1,12 +1,13 @@
 {
   "slug": "edi-canais",
-  "name": "EDI Canais (seed-only)",
-  "description": "Placeholder para os produtos de canais (credenciamento, benefício, PSP/PBM) hoje documentados em developer.funcionalmais.com. Conteúdo real e conexão de gateway ainda pendentes.",
+  "name": "EDI Canais",
+  "description": "Integrações de canais de varejo (Gateway de Credenciado, Beneficiários, Busca de Preço e Benefício Farmácia) via um único gateway GraphQL. Migrado de developer.funcionalmais.com.",
   "family": "edi-varejo",
+  "protocol": "graphql",
   "environment": "homolog",
   "published": false,
   "audience": "distribuidor",
   "manualStatus": "draft",
   "createdAt": "2026-08-25T00:00:00.000Z",
-  "updatedAt": "2026-08-25T00:00:00.000Z"
+  "updatedAt": "2026-08-31T00:00:00.000Z"
 }

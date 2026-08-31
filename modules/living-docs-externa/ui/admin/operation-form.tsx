@@ -5,6 +5,9 @@ import { useState } from "react";
 
 import type { ManualOperation, ManualOperationKind } from "@/modules/living-docs-externa/schema";
 
+const REST_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
+type RestMethod = (typeof REST_METHODS)[number];
+
 interface OperationFormProps {
   slug: string;
   mode: "create" | "edit";
@@ -35,6 +38,9 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
   const [title, setTitle] = useState(operation?.title ?? "");
   const [description, setDescription] = useState(operation?.description ?? "");
   const [exampleQuery, setExampleQuery] = useState(operation?.exampleQuery ?? "");
+  const [method, setMethod] = useState<RestMethod>(operation?.method ?? "GET");
+  const [path, setPath] = useState(operation?.path ?? "");
+  const [exampleBody, setExampleBody] = useState(operation?.exampleBody ?? "");
   const [authRequired, setAuthRequired] = useState(operation?.authRequired ?? false);
   const [prerequisites, setPrerequisites] = useState((operation?.prerequisites ?? []).join("\n"));
   const [businessNotes, setBusinessNotes] = useState((operation?.businessNotes ?? []).join("\n"));
@@ -53,12 +59,20 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
       order: order.trim() ? Number(order) : undefined,
       title: title.trim() || undefined,
       description: description.trim() || undefined,
-      exampleQuery: exampleQuery.trim() || undefined,
       authRequired,
       prerequisites: linesToList(prerequisites),
       businessNotes: linesToList(businessNotes),
       relatedSections: csvToList(relatedSections),
     };
+
+    const effectiveKind = mode === "create" ? kind : operation?.kind;
+    if (effectiveKind === "rest") {
+      payload.method = method;
+      payload.path = path.trim();
+      payload.exampleBody = exampleBody.trim() || undefined;
+    } else {
+      payload.exampleQuery = exampleQuery.trim() || undefined;
+    }
 
     const url =
       mode === "create"
@@ -93,6 +107,9 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
     }
   }
 
+  const effectiveKind = mode === "create" ? kind : operation?.kind;
+  const isRest = effectiveKind === "rest";
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -116,11 +133,12 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
           >
             <option value="query">query</option>
             <option value="mutation">mutation</option>
+            <option value="rest">rest</option>
           </select>
         </div>
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-            Nome (campo GraphQL)
+            {kind === "rest" ? "Nome (identificador único)" : "Nome (campo GraphQL)"}
           </label>
           <input
             id="name"
@@ -173,18 +191,67 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
         />
       </div>
 
-      <div>
-        <label htmlFor="exampleQuery" className="block text-sm font-medium text-slate-700">
-          Exemplo GraphQL
-        </label>
-        <textarea
-          id="exampleQuery"
-          rows={5}
-          value={exampleQuery}
-          onChange={(event) => setExampleQuery(event.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
-        />
-      </div>
+      {isRest ? (
+        <>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label htmlFor="method" className="block text-sm font-medium text-slate-700">
+                Método
+              </label>
+              <select
+                id="method"
+                value={method}
+                onChange={(event) => setMethod(event.target.value as RestMethod)}
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              >
+                {REST_METHODS.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="path" className="block text-sm font-medium text-slate-700">
+                Caminho (path)
+              </label>
+              <input
+                id="path"
+                required
+                value={path}
+                onChange={(event) => setPath(event.target.value)}
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+                placeholder="ex.: /wsAutorizacao/service.asmx/Autoriza"
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="exampleBody" className="block text-sm font-medium text-slate-700">
+              Corpo de exemplo (opcional)
+            </label>
+            <textarea
+              id="exampleBody"
+              rows={5}
+              value={exampleBody}
+              onChange={(event) => setExampleBody(event.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+            />
+          </div>
+        </>
+      ) : (
+        <div>
+          <label htmlFor="exampleQuery" className="block text-sm font-medium text-slate-700">
+            Exemplo GraphQL
+          </label>
+          <textarea
+            id="exampleQuery"
+            rows={5}
+            value={exampleQuery}
+            onChange={(event) => setExampleQuery(event.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+          />
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>

@@ -16,8 +16,8 @@ import { Kind, parse, type FieldNode, type OperationDefinitionNode } from "graph
 import {
   findOperation,
   type IntegrationManual,
-  type ManualOperationKind,
 } from "@/modules/living-docs-externa/schema/manual";
+import type { PlaygroundOperationKind } from "@/core/metrics/playground-metrics-store";
 
 export type PlaygroundAllowlistErrorCode =
   | "INVALID_QUERY"
@@ -37,7 +37,7 @@ export class PlaygroundAllowlistError extends Error {
 }
 
 export interface PlaygroundAllowlistResult {
-  kind: ManualOperationKind;
+  kind: PlaygroundOperationKind;
   operationNames: string[];
 }
 
@@ -90,7 +90,7 @@ export function validatePlaygroundQuery(
     );
   }
 
-  const kind: ManualOperationKind = operation.operation === "mutation" ? "mutation" : "query";
+  const kind: PlaygroundOperationKind = operation.operation === "mutation" ? "mutation" : "query";
   const names = rootFieldNames(operation);
 
   if (names.length === 0) {

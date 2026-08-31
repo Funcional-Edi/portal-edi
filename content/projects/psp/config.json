@@ -1,0 +1,13 @@
+{
+  "slug": "psp",
+  "name": "EDI Varejo — PSP",
+  "description": "Acompanhamento de pacientes (PSP) via API REST. Migrado de developer.funcionalmais.com/docs/psp.",
+  "family": "edi-varejo",
+  "protocol": "rest",
+  "environment": "homolog",
+  "published": false,
+  "audience": "distribuidor",
+  "manualStatus": "draft",
+  "createdAt": "2026-08-31T00:00:00.000Z",
+  "updatedAt": "2026-08-31T00:00:00.000Z"
+}

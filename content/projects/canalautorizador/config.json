@@ -1,0 +1,10 @@
+{
+  "slug": "canalautorizador",
+  "name": "CA",
+  "family": "edi-pharma",
+  "protocol": "graphql",
+  "published": false,
+  "manualStatus": "draft",
+  "createdAt": "2026-08-31T19:02:38.487Z",
+  "updatedAt": "2026-08-31T19:02:38.487Z"
+}

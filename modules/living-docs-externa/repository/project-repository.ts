@@ -18,6 +18,7 @@ import {
   type ProjectSummary,
   toProjectSummary,
   type ProjectConfig,
+  type ProjectProtocol,
 } from "@/modules/living-docs-externa/schema/project";
 import type { ProductFamily } from "@/modules/living-docs-externa/schema/family";
 
@@ -83,6 +84,7 @@ export async function createProject(input: {
   name: string;
   description?: string;
   family?: ProductFamily;
+  protocol?: ProjectProtocol;
 }): Promise<Project> {
   if (await projectExists(input.slug)) {
     throw new Error("PROJECT_ALREADY_EXISTS");
@@ -94,6 +96,7 @@ export async function createProject(input: {
     name: input.name,
     description: input.description,
     family: input.family,
+    protocol: input.protocol ?? "graphql",
     published: false,
     manualStatus: "draft",
     createdAt: now,
@@ -121,6 +124,26 @@ export async function updateProjectGatewayConfig(
     ...project.config,
     graphqlUrl: gateway.graphqlUrl,
     gatewaySlug: gateway.gatewaySlug,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}
+
+/** Atualiza a URL base da API REST no `config.json` do projeto (equivalente a `updateProjectGatewayConfig` para REST). */
+export async function updateProjectApiConfig(
+  slug: string,
+  api: { apiBaseUrl: string }
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    apiBaseUrl: api.apiBaseUrl,
     updatedAt: new Date().toISOString(),
   };
 

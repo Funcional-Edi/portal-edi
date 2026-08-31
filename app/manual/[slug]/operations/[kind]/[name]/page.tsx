@@ -33,14 +33,21 @@ export default async function OperationPage({ params }: OperationPageProps) {
   const operation = findOperation(project.manual, kindResult.data, name);
   if (!operation) notFound();
 
+  const gatewayConnected = Boolean(
+    project.config.protocol === "rest" ? project.config.apiBaseUrl : project.config.graphqlUrl
+  );
+  const kindForSchema = kindResult.data;
+
   return (
     <OperationDetail
       slug={slug}
       manualTitle={project.manual.title}
       operation={operation}
-      graphqlUrl={project.config.graphqlUrl}
+      gatewayConnected={gatewayConnected}
       schemaFieldHref={
-        hasSchema ? schemaFieldHref(slug, kindResult.data, name) : undefined
+        hasSchema && kindForSchema !== "rest"
+          ? schemaFieldHref(slug, kindForSchema, name)
+          : undefined
       }
       canUsePlayground={canUsePlayground}
     />

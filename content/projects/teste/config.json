@@ -1,0 +1,12 @@
+{
+  "slug": "teste",
+  "name": "TESTE",
+  "family": "edi-pharma",
+  "protocol": "graphql",
+  "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+  "gatewaySlug": "teste",
+  "published": false,
+  "manualStatus": "draft",
+  "createdAt": "2026-08-31T19:03:21.000Z",
+  "updatedAt": "2026-08-31T19:07:27.852Z"
+}

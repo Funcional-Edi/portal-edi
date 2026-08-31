@@ -54,6 +54,12 @@ export async function GET(_request: Request, { params }: RouteParams) {
         { status: 409 }
       );
     }
+    if (error instanceof Error && error.message === "API_BASE_URL_REQUIRED") {
+      return NextResponse.json(
+        { error: "Projeto ainda não possui URL base da API configurada." },
+        { status: 409 }
+      );
+    }
     throw error;
   }
 }

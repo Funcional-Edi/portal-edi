@@ -46,17 +46,18 @@ export function ExportDownloadButton({
 
 interface ProjectExportActionsProps {
   slug: string;
-  graphqlUrl?: string;
+  /** `true` quando o projeto tem gateway GraphQL ou API REST conectada. */
+  gatewayConnected: boolean;
   compact?: boolean;
 }
 
-/** Botões Postman + Insomnia; desabilitados sem gateway conectado. */
+/** Botões Postman + Insomnia; desabilitados sem gateway/API conectada. */
 export function ProjectExportActions({
   slug,
-  graphqlUrl,
+  gatewayConnected,
   compact = false,
 }: ProjectExportActionsProps) {
-  const disabled = !graphqlUrl;
+  const disabled = !gatewayConnected;
   const buttonClass = compact ? "text-xs px-2 py-1" : "";
 
   return (
