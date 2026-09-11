@@ -1,25 +1,12 @@
 import { ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 
-import { Badge, type BadgeTone } from "@/core/ui/badge";
+import { Badge, environmentBadgeTone } from "@/core/ui/badge";
 import type { ProjectSummary } from "@/modules/living-docs-externa/schema";
 import { groupByFamily } from "@/modules/living-docs-externa/services/group-by-family";
 
 interface ManualCatalogProps {
   manuals: ProjectSummary[];
-}
-
-function environmentTone(
-  environment: ProjectSummary["environment"]
-): BadgeTone {
-  switch (environment) {
-    case "production":
-      return "success";
-    case "homolog":
-      return "warning";
-    default:
-      return "neutral";
-  }
 }
 
 function formatUpdatedAt(iso: string): string {
@@ -72,7 +59,7 @@ export function ManualCatalog({ manuals }: ManualCatalogProps) {
                       <BookOpen className="h-5 w-5" aria-hidden="true" />
                     </span>
                     {manual.environment ? (
-                      <Badge tone={environmentTone(manual.environment)}>
+                      <Badge tone={environmentBadgeTone(manual.environment)}>
                         {manual.environment}
                       </Badge>
                     ) : null}

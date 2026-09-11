@@ -102,7 +102,25 @@ export function ManualShell({
               </aside>
             ) : null}
 
-            <div className="min-w-0">{children}</div>
+            <div className="min-w-0">
+              {hasToc ? (
+                <nav
+                  aria-label="Navegação rápida"
+                  className="mb-6 flex gap-2 overflow-x-auto pb-1 xl:hidden"
+                >
+                  {tocItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              ) : null}
+              {children}
+            </div>
 
             {hasToc ? (
               <aside className="hidden xl:block">

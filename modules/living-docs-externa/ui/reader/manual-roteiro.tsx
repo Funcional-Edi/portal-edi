@@ -4,8 +4,27 @@ import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/play
 import { docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
+import { Badge, environmentBadgeTone } from "@/core/ui/badge";
+import { ArrowRight, PencilLine, Search, Send } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+
+function formatUpdatedAt(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/** Ícone por tipo de operação — ajuda a escanear o roteiro visualmente. */
+function OperationKindIcon({ kind }: { kind: ManualOperation["kind"] }) {
+  if (kind === "query") return <Search className="h-4 w-4" aria-hidden="true" />;
+  if (kind === "rest") return <Send className="h-4 w-4" aria-hidden="true" />;
+  return <PencilLine className="h-4 w-4" aria-hidden="true" />;
+}
 
 /**
  * Pontos de extensão do modo admin (etapa 6.1/6.2). Existem para que o editor
@@ -75,6 +94,26 @@ export function ManualRoteiro({
         {manual.manualVersion ? (
           <p className="mt-2 text-xs text-slate-500">Versão {manual.manualVersion}</p>
         ) : null}
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {config.environment ? (
+            <Badge tone={environmentBadgeTone(config.environment)}>{config.environment}</Badge>
+          ) : null}
+          <Badge tone="brand">{isGraphql ? "GraphQL" : "REST"}</Badge>
+          <Badge tone="neutral">
+            {operations.length} {operations.length === 1 ? "operação" : "operações"}
+          </Badge>
+          {manual.referenceTables && manual.referenceTables.length > 0 ? (
+            <Badge tone="neutral">
+              {manual.referenceTables.length}{" "}
+              {manual.referenceTables.length === 1 ? "tabela de referência" : "tabelas de referência"}
+            </Badge>
+          ) : null}
+          <span className="text-xs text-slate-500">
+            Atualizado {formatUpdatedAt(config.updatedAt)}
+          </span>
+        </div>
+
         <div className="mt-4 flex flex-wrap gap-3">
           {editor?.headerActions ?? (
             <>
@@ -143,11 +182,26 @@ export function ManualRoteiro({
       {manual.referenceTables && manual.referenceTables.length > 0 ? (
         <section id="tabelas-referencia" className="mb-10 scroll-mt-24">
           <h2 className="mb-4 text-lg font-semibold">Tabelas de referência</h2>
-          <div className="space-y-6">
-            {manual.referenceTables.map((table) => (
-              <div key={table.id}>
-                <h3 className="mb-2 font-medium">{table.title}</h3>
-                <div className="overflow-x-auto rounded-lg border border-slate-200">
+          <div className="space-y-3">
+            {manual.referenceTables.map((table, index) => (
+              <details
+                key={table.id}
+                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
+                open={index === 0}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3">
+                  <span className="font-medium text-slate-800">{table.title}</span>
+                  <span className="flex items-center gap-2">
+                    <Badge tone="neutral">
+                      {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
+                    </Badge>
+                    <ArrowRight
+                      className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-90"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </summary>
+                <div className="overflow-x-auto border-t border-slate-100">
                   <table className="min-w-full text-sm">
                     <thead className="bg-slate-50">
                       <tr>
@@ -174,7 +228,7 @@ export function ManualRoteiro({
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </details>
             ))}
           </div>
         </section>
@@ -192,17 +246,25 @@ export function ManualRoteiro({
           </p>
         ) : null}
 
-        <ol className="space-y-4">
-          {operations.map((op) => {
+        <ol className="space-y-3">
+          {operations.map((op, index) => {
             const card = (
               <>
-                <span className="text-xs font-medium uppercase text-brand-700">
-                  {op.kind === "rest" ? op.method ?? "rest" : op.kind}
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
+                  {index + 1}
                 </span>
-                <h3 className="mt-1 font-semibold">{op.title ?? `${op.kind} ${op.name}`}</h3>
-                {op.description ? (
-                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">{op.description}</p>
-                ) : null}
+                <div className="min-w-0 flex-1">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase text-brand-700">
+                    <OperationKindIcon kind={op.kind} />
+                    {op.kind === "rest" ? op.method ?? "rest" : op.kind}
+                  </span>
+                  <h3 className="mt-1 font-semibold text-slate-900">
+                    {op.title ?? `${op.kind} ${op.name}`}
+                  </h3>
+                  {op.description ? (
+                    <p className="mt-1.5 text-sm text-slate-600 line-clamp-2">{op.description}</p>
+                  ) : null}
+                </div>
               </>
             );
 
@@ -210,7 +272,7 @@ export function ManualRoteiro({
               <li key={`${op.kind}-${op.name}`}>
                 {isEditing ? (
                   <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    {card}
+                    <div className="flex gap-3">{card}</div>
                     {editor?.renderOperationActions ? (
                       <div className="mt-3 border-t border-slate-100 pt-3">
                         {editor.renderOperationActions(op)}
@@ -220,9 +282,13 @@ export function ManualRoteiro({
                 ) : (
                   <Link
                     href={docsOperationHref(config.slug, op.kind, op.name)}
-                    className="block rounded-lg border border-slate-200 p-4 transition hover:border-brand-600"
+                    className="group flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:shadow-md"
                   >
                     {card}
+                    <ArrowRight
+                      className="mt-2 h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-brand-600"
+                      aria-hidden="true"
+                    />
                   </Link>
                 )}
               </li>

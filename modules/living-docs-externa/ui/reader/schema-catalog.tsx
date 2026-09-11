@@ -1,26 +1,13 @@
 import { ArrowRight, Braces, Clock, Database } from "lucide-react";
 import Link from "next/link";
 
-import { Badge, type BadgeTone } from "@/core/ui/badge";
+import { Badge, environmentBadgeTone } from "@/core/ui/badge";
 import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { groupByFamily } from "@/modules/living-docs-externa/services/group-by-family";
 import type { SchemaCatalogEntry } from "@/modules/living-docs-externa/services/get-published-schema";
 
 interface SchemaCatalogProps {
   entries: SchemaCatalogEntry[];
-}
-
-function environmentTone(
-  environment: SchemaCatalogEntry["environment"]
-): BadgeTone {
-  switch (environment) {
-    case "production":
-      return "success";
-    case "homolog":
-      return "warning";
-    default:
-      return "neutral";
-  }
 }
 
 function formatSyncedAt(iso?: string): string {
@@ -47,7 +34,7 @@ function ReadyCard({ entry }: { entry: SchemaCatalogEntry }) {
           <Database className="h-5 w-5" aria-hidden="true" />
         </span>
         {entry.environment ? (
-          <Badge tone={environmentTone(entry.environment)}>{entry.environment}</Badge>
+          <Badge tone={environmentBadgeTone(entry.environment)}>{entry.environment}</Badge>
         ) : null}
       </div>
 
@@ -93,7 +80,7 @@ function PendingCard({ entry }: { entry: SchemaCatalogEntry }) {
           <Clock className="h-5 w-5" aria-hidden="true" />
         </span>
         {entry.environment ? (
-          <Badge tone={environmentTone(entry.environment)}>{entry.environment}</Badge>
+          <Badge tone={environmentBadgeTone(entry.environment)}>{entry.environment}</Badge>
         ) : null}
       </div>
 
