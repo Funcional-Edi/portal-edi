@@ -5,7 +5,7 @@ import { integrationManualSchema } from "@/modules/living-docs-externa/schema/ma
 import { projectConfigSchema } from "@/modules/living-docs-externa/schema/project";
 
 const PROJECTS_ROOT = path.join(process.cwd(), "content", "projects");
-const SEED_ONLY_PROJECTS = new Set(["canal-autorizador", "edi-canais", "psp"]);
+const SEED_ONLY_PROJECTS = new Set(["edi-canais", "psp"]);
 
 async function readJson(filePath: string): Promise<unknown> {
   const raw = await readFile(filePath, "utf8");

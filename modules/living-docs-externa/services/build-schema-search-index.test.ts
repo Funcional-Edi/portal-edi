@@ -85,11 +85,15 @@ describe("buildSchemaSearchIndex", () => {
     ]);
 
     const results = searchIndex([...manualEntries, ...schemaEntries], "TokenPayload");
-    expect(results.some((r) => r.type === "schema-type" && r.title === "TokenPayload")).toBe(
-      true
+    const tokenPayloadResults = results.filter(
+      (r) => r.type === "schema-type" && r.title === "TokenPayload"
     );
-    expect(results.find((r) => r.type === "schema-type")?.href).toMatch(
-      /\/docs\/api\/im\/types\/TokenPayload/
-    );
+    // `TokenPayload` é um nome de tipo comum a mais de um gateway publicado
+    // (ex.: im, canal-autorizador) — a asserção não deve depender de qual
+    // produto aparece primeiro, só de o link apontar para um schema válido.
+    expect(tokenPayloadResults.length).toBeGreaterThan(0);
+    expect(
+      tokenPayloadResults.every((r) => /\/docs\/api\/[a-z0-9-]+\/types\/TokenPayload/.test(r.href))
+    ).toBe(true);
   });
 });

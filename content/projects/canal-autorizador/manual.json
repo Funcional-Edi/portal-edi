@@ -1,29 +1,409 @@
 {
   "version": 1,
-  "title": "Integração Canal Autorizador",
+  "title": "Integração Canal Autorizador — Transfer Order",
   "productName": "Canal Autorizador",
-  "manualVersion": "1.0.0-template",
+  "manualVersion": "1.7.0",
+  "versionHistory": [
+    {
+      "date": "2018-04-24",
+      "author": "Equipe EDI",
+      "details": "Especificação inicial do layout.",
+      "version": "1.0"
+    },
+    {
+      "date": "2019-11-11",
+      "author": "Wanderson Macedo",
+      "details": "Adicionado o campo product_reason_detail na query groupedOrder.",
+      "version": "1.1"
+    },
+    {
+      "date": "2020-02-19",
+      "author": "Renato Filizzola",
+      "details": "Adicionado novo motivo à tabela de motivos retornados no campo product_reason (groupedOrder): DUPLICATE_ORDER_ON_INDUSTRY_OL_PORTAL.",
+      "version": "1.2"
+    },
+    {
+      "date": "2020-03-09",
+      "author": "Renato Filizzola",
+      "details": "Adicionado o campo invoice_item_id na mutation createGroupedInvoice.",
+      "version": "1.3"
+    },
+    {
+      "date": "2020-04-10",
+      "author": "Raphael Costa",
+      "details": "Retirada a obrigatoriedade da requisição createGroupedResponse. O distribuidor pode enviar direto o createGroupedInvoice; para o produto não atendido, enviar 0 em invoice_quantity.",
+      "version": "1.4"
+    },
+    {
+      "date": "2020-11-03",
+      "author": "Eden Meireles",
+      "details": "Adicionada a query groupedOrders, para consultar pedidos do Canal Autorizador por client_identification, wholesaler_branch_code, status e date.",
+      "version": "1.5"
+    },
+    {
+      "date": "2025-03-20",
+      "author": "Fabio Cardoso",
+      "details": "Adicionada a mutation de envio da devolução (createGroupedInvoiceDevolution) e as queries de consulta (groupedInvoiceDevolution e groupedInvoiceDevolutions).",
+      "version": "1.6"
+    },
+    {
+      "date": "2026-04-29",
+      "author": "Equipe EDI",
+      "details": "Adicionados novos motivos à tabela de motivos retornados no campo product_reason (groupedOrder): RETROACTIVE_ORDER_NOT_AVAILABLE_FOR_WHOLESALER_BRANCH, ORIGIN_NOT_ALLOWED_FOR_ORDER_DATE_RETROACTIVE, DATE_RANGE_NOT_DEFINED, ORDER_DATE_OUT_OF_RANGE, COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_CLIENT, COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_WHOLESALER, COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_PRODUCT, WHOLESALER_BRANCH_NOT_FOUND_ON_INDUSTRY_OL_PORTAL, DISTRIBUTOR_NOT_ASSOCIATED_WITH_THE_CUSTOMER, ORDER_REJECTED_DUE_TO_ONE_OR_MORE_DISCOUNTS_OUTSIDE_COMMERCIAL_POLICY, PRODUCT_DISCOUNT_NOT_CONFIGURED_IN_POLICY, ERROR_ON_CREATE_ORDER, ORDERED_QUANTITY_BELOW_REQUIRED, ORDERED_QUANTITY_ABOVE_MAXIMUM.",
+      "version": "1.7"
+    }
+  ],
+  "referenceTables": [
+    {
+      "id": "industry-codes",
+      "title": "Códigos de identificação das indústrias",
+      "columns": ["Indústria / Projeto", "Código"],
+      "rows": [
+        ["Homologação", "FAB"],
+        ["Abbott", "ABT"],
+        ["Abbott ANI", "ABI"],
+        ["Apsen", "APS"],
+        ["AstraZeneca", "AZN"],
+        ["AstraZeneca Institucional", "AZI"],
+        ["Bayer", "BAY"],
+        ["Bausch", "BSH"],
+        ["Biogen", "BGN"],
+        ["Celgene", "CGN"],
+        ["Esanofi", "ESA"],
+        ["Haleon", "HLN"],
+        ["Knight", "KNG"],
+        ["MSD", "MSD"],
+        ["Nestlé", "NTE"],
+        ["Organon", "ORG"],
+        ["Pfizer", "PFZ"],
+        ["Produtos sem OL", "PSO"],
+        ["Reckitt", "RCK"],
+        ["Roche", "RCH"],
+        ["Sankyo", "SKO"],
+        ["Saúde Petrobras", "DLV (homologação e produção)"],
+        ["Sanofi", "SAN"],
+        ["Servier", "SVR"],
+        ["Viatris", "UPJ"]
+      ]
+    },
+    {
+      "id": "order-status",
+      "title": "Status do pedido (campo status, em groupedOrder / groupedOrders / groupedStatusChanges)",
+      "columns": ["Status", "Tradução"],
+      "rows": [
+        ["AWAITING_PROCESSING", "Aguardando processamento"],
+        ["PROCESSING", "Processando"],
+        ["PROCESSED", "Pedido processado e totalmente rejeitado (negado) pela indústria"],
+        ["AWAITING_ORDER_RESPONSE", "Aguardando o retorno do pedido"],
+        ["AWAITING_ORDER_INVOICE", "Aguardando a nota do pedido"],
+        ["INVOICE_RECEIVED", "Nota recebida"],
+        ["AWAITING_CANCELLATION_PROCESSING", "Aguardando processamento do cancelamento"],
+        ["PROCESSING_CANCELLATION", "Cancelamento sendo processado"],
+        ["AWAITING_INVOICE_REVERSAL_PROCESSING", "Aguardando processamento da nota reversal"],
+        ["PROCESSING_INVOICE_REVERSAL", "Nota reversal sendo processada"],
+        ["CANCELLED", "Pedido cancelado"],
+        ["REJECTED", "Pedido rejeitado"],
+        ["AWAITING_INVOICE_DEVOLUTION_PROCESSING", "Aguardando processamento da devolução"],
+        ["PROCESSING_INVOICE_DEVOLUTION", "Nota de devolução sendo processada"],
+        ["RETURNED", "Devolvido"],
+        ["PARTIALLY_RETURNED", "Parcialmente devolvido"]
+      ]
+    },
+    {
+      "id": "product-reason-query",
+      "title": "Motivo do produto na consulta (campo product_reason, retornado por groupedOrder)",
+      "columns": ["Product Reason", "Tradução", "Ação do distribuidor"],
+      "rows": [
+        ["AWAITING_PROCESSING", "Aguardando processamento", "Consultar o pedido novamente"],
+        ["ORDER_CREATED_ON_INDUSTRY_OL_PORTAL", "Pedido criado no portal da indústria", "Seguir com o pedido"],
+        ["NO_RESPONSE_FROM_INDUSTRY_OL_PORTAL", "Sem resposta no portal da indústria", "Enviar o pedido novamente, pois o portal estava fora do ar"],
+        ["PRODUCT_DOES_NOT_BELONG_TO_OL_FIDELIZE", "Produto não existe na OL Funcional", "Desconsiderar este item, pois não pertence à Funcional"],
+        ["PRODUCT_DOES_NOT_BELONG_TO_SELECTED_INDUSTRY", "Produto não existe na indústria selecionada", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["PRODUCT_NOT_RELEASED_ON_COMMERCIAL_CONDITION", "Produto não existe na condição comercial", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_ORDER_CONDITIONS", "Política comercial não disponível para a condição", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["COMMERCIAL_POLICIES_NOT_FOUND_FOR_PRODUCT_ON_INDUSTRY_OL_PORTAL", "Nenhuma política comercial encontrada para o produto", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["WHOLESALER_DISCOUNT_REQUIRED", "Desconto requerido", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["WHOLESALER_DISCOUNT_OUT_OF_RANGE", "Desconto fora de alcance", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["PRODUCT_DISABLED_ON_INDUSTRY_OL_PORTAL", "Produto desabilitado no portal da indústria", "Desconsiderar este item, pois o produto está desabilitado"],
+        ["CLIENT_NOT_FOUND_ON_INDUSTRY_OL_PORTAL", "Cliente não encontrado no portal da indústria", "Entrar em contato com o KAM para cadastro"],
+        ["WHOLESALER_BRANCH_NOT_AVAILABLE_FOR_ORDER_CONDITIONS", "Nenhuma condição comercial liberada para a filial do distribuidor", "Entrar em contato com o KAM para cadastro"],
+        ["WHOLESALER_BRANCH_NOT_ALLOWED_TO_INDUSTRY", "Filial não existe na indústria", "Entrar em contato com o KAM para cadastro"],
+        ["PRODUCTS_NOT_AVAILABLES", "Produto não disponível", "Desconsiderar este item, pois não pertence à Funcional"],
+        ["ERROR_ADDING_PRODUCT_TO_ORDER", "Erro ao adicionar produto no pedido", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["ERROR_SENDING_ORDER", "Erro ao enviar pedido", "Verificar com a Funcional se pode enviar novamente o pedido"],
+        ["DISCOUNT_OUT_OF_PERMITED_RANGE", "Desconto fora do permitido", "Verificar com o KAM o motivo de não ter sido criado"],
+        ["DUPLICATE_ORDER_ON_INDUSTRY_OL_PORTAL", "Pedido duplicado", "Verificar com a Funcional qual o tempo de espera para enviar pedido duplicado"],
+        ["RETROACTIVE_ORDER_NOT_AVAILABLE_FOR_WHOLESALER_BRANCH", "Pedido retroativo não disponível para a filial do distribuidor", "Verificar com a Funcional se o envio de pedidos retroativos está liberado para a filial"],
+        ["ORIGIN_NOT_ALLOWED_FOR_ORDER_DATE_RETROACTIVE", "Origem não permitida para data de pedido retroativa", "Verificar com a Funcional se o envio de pedidos retroativos está liberado"],
+        ["DATE_RANGE_NOT_DEFINED", "Intervalo de datas não definido", "Verificar junto à Funcional a data para envio de pedidos retroativos"],
+        ["ORDER_DATE_OUT_OF_RANGE", "Data do pedido fora do intervalo", "Verificar junto à Funcional a data para envio de pedidos retroativos"],
+        ["COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_CLIENT", "Políticas comerciais não disponíveis para o cliente", "Verificar com o KAM a tabela correta"],
+        ["COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_WHOLESALER", "Políticas comerciais não disponíveis para o distribuidor", "Verificar com o KAM a tabela correta"],
+        ["COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_PRODUCT", "Políticas comerciais não disponíveis para o produto", "Verificar com o KAM quais produtos estão liberados na tabela"],
+        ["WHOLESALER_BRANCH_NOT_FOUND_ON_INDUSTRY_OL_PORTAL", "Filial do distribuidor não encontrada no portal da indústria", "Verificar junto à Funcional a liberação da filial"],
+        ["DISTRIBUTOR_NOT_ASSOCIATED_WITH_THE_CUSTOMER", "Distribuidor não associado ao cliente", "Verificar junto à Funcional a liberação do cliente para o distribuidor"],
+        ["ORDER_REJECTED_DUE_TO_ONE_OR_MORE_DISCOUNTS_OUTSIDE_COMMERCIAL_POLICY", "Pedido rejeitado devido a um ou mais descontos fora da política comercial", "Verificar com o KAM os descontos corretos"],
+        ["PRODUCT_DISCOUNT_NOT_CONFIGURED_IN_POLICY", "Desconto do produto não configurado na política", "Verificar junto à Funcional se há desconto configurado"],
+        ["ERROR_ON_CREATE_ORDER", "Erro ao criar o pedido", "Verificar junto à Funcional o motivo do pedido não ter sido criado"],
+        ["ORDERED_QUANTITY_BELOW_REQUIRED", "Quantidade encomendada abaixo do necessário", "Verificar junto à Funcional a quantidade mínima da tabela"],
+        ["ORDERED_QUANTITY_ABOVE_MAXIMUM", "Quantidade encomendada acima do máximo", "Verificar junto à Funcional a quantidade máxima da tabela"]
+      ]
+    },
+    {
+      "id": "order-motive-response",
+      "title": "Motivo do pedido no retorno do distribuidor (campo order_motive, em createGroupedResponse)",
+      "columns": ["Código", "Motivo"],
+      "rows": [
+        ["BELOW_THE_MINIMUM", "Abaixo do mínimo"],
+        ["PARTIALLY_BILLED_ORDER", "Pedido pago parcialmente"],
+        ["ORDER_SUCCESSFULLY_ACCEPTED", "Pedido aceito com sucesso"],
+        ["STOCK_SHORTAGE", "Falta de estoque"],
+        ["CREDIT_SHORTAGE", "Critério de crédito"],
+        ["CLIENT_NOT_REGISTERED", "Cliente não registrado"],
+        ["TIME_EXCEEDED", "Tempo excedido"],
+        ["CLIENT_AND_OR_PRODUCT_NOT_REGISTERED_ON_NEGOTIATION", "Cliente e/ou produto não registrado na negociação"],
+        ["DUPLICATE_ORDER", "Pedido duplicado"],
+        ["LICENSE_DATE_EXPIRED", "Data de licença expirada"],
+        ["REGISTRATION_PROBLEMS", "Problemas de registro"],
+        ["CLIENT_BLOCKED", "Cliente bloqueado"],
+        ["INVALID_PAYMENT_CONDITION", "Condição de pagamento inválida"],
+        ["LOGISTICAL_OPERATION_NOT_ALLOWED", "Funcionamento logístico não permitido"],
+        ["CLIENT_NOT_REGISTERED_ON_PROMOTION", "Cliente não registrado na negociação"],
+        ["INVALID_LAYOUT", "Layout inválido"],
+        ["ORDER_BILLED_WITH_DIFFERENT_CONDITION", "Pedido faturado em condições diferentes"]
+      ]
+    },
+    {
+      "id": "product-reason-response",
+      "title": "Motivo do produto no retorno do distribuidor (campo product_reason, em createGroupedResponse)",
+      "columns": ["Product Reason", "Tradução"],
+      "rows": [
+        ["PRODUCT_SUCCESSFULLY_ACCEPTED", "Produto aceito com sucesso"],
+        ["PRODUCT_NOT_REGISTERED", "Produto não registrado"],
+        ["PARTIALLY_ACCEPTED_PRODUCT", "Produto parcialmente aceito"],
+        ["UNBILLED_PRODUCT", "Produto não faturado"],
+        ["STOCK_SHORTAGE", "Falta de estoque"],
+        ["PRODUCT_BLOCKED", "Produto bloqueado"],
+        ["DISCONTINUED_PRODUCT", "Produto descontinuado"],
+        ["INVALID_ORDERED_AMOUNT", "Quantidade inválida"],
+        ["CLIENT_AND_OR_PRODUCT_NOT_REGISTERED_ON_NEGOTIATION", "Cliente ou produto não registrado na negociação"],
+        ["PRODUCT_BLOCKED_BY_BRIEF_EXPIRATION_DATE", "Produto bloqueado por data de expiração"],
+        ["PRODUCT_BLOCKED_FOR_THIS_OPERATION", "Produto bloqueado para esta operação"],
+        ["PRODUCT_BLOCKED_CLINICAL", "Produto clínico bloqueado"],
+        ["PRODUCT_BLOCKED_BY_PRICE_DIVERGENCE", "Produto bloqueado por divergência de preço"],
+        ["PRODUCT_BLOCKED_BY_LOGISTICS", "Produto bloqueado por logística"],
+        ["PRODUCT_NOT_REGISTERED_ON_PROMOTION", "Produto não registrado na promoção"]
+      ]
+    },
+    {
+      "id": "product-code-reason",
+      "title": "Código de motivo do produto (campo code_reason, em createGroupedInvoiceDevolution)",
+      "columns": ["Código", "Motivo"],
+      "rows": [
+        ["000", "Produto aceito com sucesso"],
+        ["001", "Produto não cadastrado"],
+        ["003", "Produto parcialmente aceito"],
+        ["004", "Produto não faturado"],
+        ["201", "Falta no estoque"],
+        ["202", "Produto bloqueado"],
+        ["205", "Produto descontinuado"],
+        ["206", "Quantidade pedida inválida"],
+        ["304", "Cliente e/ou produto não cadastrado na negociação"],
+        ["504", "Produto bloqueado por validade curta"],
+        ["601", "Produto bloqueado para esta operação"],
+        ["602", "Produto bloqueado (hospitalar)"],
+        ["603", "Produto bloqueado por divergência de preço"],
+        ["604", "Produto bloqueado pela logística"],
+        ["704", "Produto não cadastrado na promoção"]
+      ]
+    },
+    {
+      "id": "validation-headers",
+      "title": "Parâmetros de validação (General Header)",
+      "columns": ["Parâmetro", "Tipo", "Descrição"],
+      "rows": [
+        ["statusCode", "Integer", "0 = requisição válida; diferente de 0 = código de erro de validação, descrito em statusMessage"],
+        ["statusMessage", "String", "Descrição referente ao código de retorno"]
+      ]
+    },
+    {
+      "id": "rate-limit",
+      "title": "Limite de requisições — Rate limit (Response Header)",
+      "columns": ["Parâmetro", "Descrição"],
+      "rows": [
+        ["X-RateLimit-Limit", "Limite de requisições por minuto (atualmente 3000 requisições/min)"],
+        ["X-RateLimit-Remaining", "Número de requisições restantes no momento"],
+        ["Retry-After", "Tempo em segundos para o envio da próxima requisição"]
+      ]
+    }
+  ],
   "operations": [
     {
       "kind": "mutation",
       "name": "createToken",
       "order": 1,
-      "title": "1. Autenticar",
-      "description": "Obter token no gateway."
+      "title": "1. Autenticar (obter token)",
+      "description": "Autentica no gateway do Canal Autorizador e retorna o token JWT que deve ser enviado no header Authorization das demais requisições.",
+      "authRequired": false,
+      "businessNotes": [
+        "O token é válido por 24 horas e deve ser gerado apenas uma vez nesse período.",
+        "Login e senha são solicitados ao responsável pela homologação na Funcional — nunca compartilhe essas credenciais.",
+        "Nunca reutilize token de produção em homologação, nem exponha o token a terceiros."
+      ],
+      "relatedSections": ["seguranca-e-ferramentas"],
+      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}"
     },
     {
       "kind": "mutation",
-      "name": "authorizeOrder",
+      "name": "createGroupedOrder",
       "order": 2,
-      "title": "2. Autorizar pedido",
-      "description": "Envia pedido para autorização."
+      "title": "2. Criar pré-pedido (Transfer Order)",
+      "description": "Cria um pré-pedido na Funcional com os produtos e a condição comercial do pedido faturado pelo distribuidor.",
+      "prerequisites": ["createToken"],
+      "businessNotes": [
+        "O pedido é criado no portal da indústria após a validação das questões comerciais (ex.: desconto do produto).",
+        "Se o pedido tiver mais de um produto, a Funcional pode rejeitá-lo parcialmente — criando o pedido só com os produtos aceitos e rejeitando os demais por questões comerciais da indústria.",
+        "O percentual de desconto deve ser enviado de acordo com o combinado com a indústria.",
+        "industry_abbreviation só é obrigatório a depender da indústria (hoje apenas AstraZeneca, sigla AZN, exige o envio)."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation createGroupedOrder {\n  createGroupedOrder(\n    client_identification: \"00000000000000\"\n    wholesaler: \"00000000000000\"\n    client_code: \"1234\"\n    commercial_condition: \"\"\n    products: [\n      { ean: \"7891058003203\", ordered_quantity: 1, wholesaler_discount: 50 }\n      { ean: \"7891058003241\", ordered_quantity: 2, wholesaler_discount: 40 }\n    ]\n  ) {\n    id\n    grouped_order_code\n    client_identification\n    wholesaler\n    client_code\n    commercial_condition\n    status\n    total_products\n  }\n}"
     },
     {
       "kind": "query",
-      "name": "orderStatus",
+      "name": "groupedOrder",
       "order": 3,
-      "title": "3. Consultar status",
-      "description": "Consulta resultado da autorização."
+      "title": "3. Consultar um pedido",
+      "description": "Consulta, pelo id do pedido na Funcional, todos os dados do pedido: produtos, retorno, notas, cancelamentos e devoluções.",
+      "prerequisites": ["createGroupedOrder"],
+      "businessNotes": [
+        "Use esta query para acompanhar todos os pedidos enviados pelo Canal Autorizador — é o principal método de acompanhamento do fluxo.",
+        "O campo importation_outcome retorna null quando ainda não há resposta processada, e \"importado com sucesso\" quando já foi processado.",
+        "Quando o pedido estiver com status PROCESSED, ele foi totalmente negado — não envie nenhuma requisição para este pedido; valide com o KAM/comercial da Funcional e, após o ajuste, envie um novo pedido (novo id)."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "query groupedOrder {\n  groupedOrder(id: 230408) {\n    id\n    grouped_order_code\n    client_identification\n    wholesaler\n    client_code\n    commercial_condition\n    status\n    created_at\n    total_products\n    products {\n      ean\n      ordered_quantity\n      wholesaler_discount\n      order_discount\n      unit_net_price\n      industry_order_code\n      product_reason\n      industry_abbreviation\n      time_without_response\n    }\n    responses {\n      status\n      processed_at\n      order_motive\n      total_value\n      discount_value\n      products {\n        ean\n        response_quantity\n        percent_discount\n        unit_discount_price\n        wholesaler_reason\n        unit_net_price\n        product_status\n        product_reason\n        monitored\n        importation_outcome\n      }\n    }\n    invoices {\n      processed_at\n      status\n      issue_date\n      number\n      danfe\n      value\n      discount_value\n      products_total_value\n      products {\n        product_status\n        ean\n        invoice_quantity\n        percent_discount\n        reimbursement_value\n        importation_outcome\n        invoice_item_id\n        batches {\n          quantity\n          identification\n          due_date\n        }\n      }\n    }\n    grouped_devolutions {\n      invoice_number_devolution\n      invoice_devolution_created_at\n      cfop\n      danfe\n      status\n      products {\n        batch\n        code_reason\n        ean\n        id\n        importation_outcome\n        quantity\n        status\n      }\n    }\n    cancellations {\n      status\n      products {\n        ean\n        status\n        importation_outcome\n        product_status\n      }\n    }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createGroupedResponse",
+      "order": 4,
+      "title": "4. Enviar retorno do pedido (opcional)",
+      "description": "Envia o retorno (aceite, rejeição ou aceite parcial) do pedido à Funcional, produto a produto.",
+      "prerequisites": ["createGroupedOrder"],
+      "businessNotes": [
+        "O envio do retorno não é obrigatório — o distribuidor pode enviar direto o createGroupedInvoice.",
+        "Há uma alteração no fluxo de envio das requisições ao usar o retorno: alinhe com o responsável pela homologação na Funcional antes de habilitar.",
+        "Se o pedido já homologou o envio do retorno e você quer parar de enviá-lo (ou vice-versa), é necessário um realinhamento com a Funcional.",
+        "Para o produto que não for atendido, envie 0 no campo response_quantity."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation createGroupedResponse {\n  createGroupedResponse(\n    id: 587\n    date_time_processing: \"2025-05-06 10:00:00\"\n    order_motive: ORDER_SUCCESSFULLY_ACCEPTED\n    products: [\n      {\n        ean: \"5000456011624\"\n        response_quantity: 10\n        percent_discount: 1\n        unit_discount_price: 0.40\n        unit_net_price: 40.00\n        product_reason: PRODUCT_SUCCESSFULLY_ACCEPTED\n        monitored: true\n        wholesaler_reason: \"PRODUCT_SUCCESSFULLY_ACCEPTED\"\n      }\n      {\n        ean: \"7891000460214\"\n        response_quantity: 10\n        percent_discount: 1\n        unit_discount_price: 0.20\n        unit_net_price: 30.00\n        product_reason: PRODUCT_SUCCESSFULLY_ACCEPTED\n        monitored: true\n        wholesaler_reason: \"PRODUCT_SUCCESSFULLY_ACCEPTED\"\n      }\n    ]\n    total_value: 39.20\n    discount_value: 0.80\n  ) {\n    grouped_order_code\n    client_identification\n    wholesaler\n    client_code\n    commercial_condition\n    status\n    total_products\n    products {\n      ean\n      ordered_quantity\n      wholesaler_discount\n      order_discount\n      unit_net_price\n      industry_order_code\n      product_reason\n      industry_abbreviation\n    }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createGroupedInvoice",
+      "order": 5,
+      "title": "5. Enviar a nota fiscal do pedido",
+      "description": "Envia os dados da nota fiscal (DANFE, valores, impostos e produtos faturados) do pedido à Funcional.",
+      "prerequisites": ["createGroupedOrder"],
+      "businessNotes": [
+        "Pode ser enviada direto para um pedido sem retorno (createGroupedResponse). Se um produto não for faturado, envie 0 no campo invoice_quantity — nesse caso não há envio de cancelamento para ele.",
+        "Se o pedido for faturado com mais de uma nota, o envio do retorno (createGroupedResponse) se torna obrigatório.",
+        "O campo invoice_item_id é obrigatório quando a mesma DANFE é usada em mais de um pedido na Funcional. O valor pode repetir entre DANFEs diferentes, mas não pode repetir dentro da mesma DANFE. Se não for enviado nesse cenário, a nota não será processada."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation createGroupedInvoice {\n  createGroupedInvoice(\n    id: 587\n    invoice_issue_date: \"2025-05-06\"\n    date_time_processing: \"2025-05-06 07:36:57\"\n    invoice_number: 351523\n    invoice_value: 3039\n    invoice_discount_value: 0\n    products_total_value: 3039\n    danfe: \"35152306123456000100550010000001234567890000\"\n    invoice_products: [\n      {\n        ean: \"5000456011624\"\n        invoice_quantity: 10\n        unit_net_price: 2.640\n        unit_discount_price: 0\n        percent_discount: 0\n        product_total_value: 2.640\n      }\n      {\n        ean: \"7891000460214\"\n        invoice_quantity: 10\n        unit_net_price: 2.640\n        unit_discount_price: 0\n        percent_discount: 0\n        product_total_value: 2.640\n      }\n    ]\n  ) {\n    id\n    client_identification\n    wholesaler\n    client_code\n    commercial_condition\n    status\n    total_products\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createGroupedCancellation",
+      "order": 6,
+      "title": "6. Cancelar o pedido (parcial ou total)",
+      "description": "Envia o cancelamento do pedido à Funcional, informando o id do pedido e cada produto a cancelar.",
+      "prerequisites": ["createGroupedResponse"],
+      "businessNotes": [
+        "A requisição deve conter apenas os produtos que devem ser cancelados — o cancelamento pode ser parcial ou total. Produtos que não serão cancelados não devem constar na requisição.",
+        "O cancelamento só pode ser enviado depois do envio do retorno e antes do faturamento (antes do envio da nota fiscal)."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation createGroupedCancellation {\n  createGroupedCancellation(\n    id: 587\n    products: [\n      { ean: \"5000456011624\" }\n      { ean: \"7891000460214\" }\n    ]\n  ) {\n    id\n    status\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "groupedInvoices",
+      "order": 7,
+      "title": "7. Consultar o ressarcimento",
+      "description": "Consulta os dados de ressarcimento das notas fiscais enviadas, incluindo boletos bancários e taxas de imposto.",
+      "prerequisites": ["createGroupedInvoice"],
+      "exampleQuery": "query {\n  groupedInvoices(\n    grouped_order_id: 587\n    invoice_number: 351523\n    wholesaler_branch_code: \"00000000000000\"\n  ) {\n    processed_at\n    issue_date\n    number\n    base_calculation_icms_tax_substitution\n    base_calculation_icms\n    danfe\n    value\n    discount_value\n    icms_value_transferred\n    products_total_value\n    status\n    icms_total_value_withheld\n    icms_total_value\n    volume_quantity\n    products {\n      ean\n      reimbursement_value\n    }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createGroupedInvoiceReversal",
+      "order": 8,
+      "title": "8. Substituir a nota fiscal enviada",
+      "description": "Substitui os dados de uma nota já enviada por uma nova nota, informando o número da nota a remover e os dados completos da nova nota.",
+      "prerequisites": ["createGroupedInvoice"],
+      "businessNotes": [
+        "Informe o número da nota que deseja substituir em removed_invoices e, em new_invoices, todos os dados da nota nova (não apenas o que mudou)."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation createGroupedInvoiceReversal {\n  createGroupedInvoiceReversal(\n    grouped_order_id: 587\n    removed_invoices: [351523]\n    new_invoices: [\n      {\n        date_time_processing: \"2025-05-06 10:00:00\"\n        invoice_issue_date: \"2025-05-06\"\n        invoice_number: 351524\n        danfe: \"BFG102141515\"\n        invoice_value: 175.00\n        invoice_discount_value: 0.00\n        products_total_value: 175.00\n        invoice_products: [\n          { ean: \"5000456011624\", invoice_quantity: 1, percent_discount: 0.00 }\n          { ean: \"7891000460214\", invoice_quantity: 2, percent_discount: 0.00 }\n        ]\n      }\n    ]\n  ) {\n    id\n    grouped_order_code\n    client_identification\n    commercial_condition\n    client_code\n    status\n    total_products\n    products {\n      ean\n      ordered_quantity\n    }\n    invoices {\n      processed_at\n      number\n      danfe\n      value\n      status\n      products {\n        ean\n        invoice_quantity\n      }\n    }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "groupedOrders",
+      "order": 9,
+      "title": "9. Consultar pedidos por filtro",
+      "description": "Consulta pedidos do Canal Autorizador paginados, filtrando por status, filial, condição comercial, cliente e data.",
+      "prerequisites": ["createGroupedOrder"],
+      "businessNotes": [
+        "O parâmetro limit não deve passar de 200 registros por página."
+      ],
+      "exampleQuery": "query {\n  groupedOrders(page: 1, limit: 10, filter: { status: AWAITING_ORDER_RESPONSE }) {\n    total\n    per_page\n    current_page\n    from\n    to\n    last_page\n    has_more_pages\n    data {\n      id\n      status\n      products {\n        ean\n        ordered_quantity\n      }\n      responses {\n        products {\n          ean\n          importation_outcome\n          product_status\n          product_reason\n          response_quantity\n        }\n      }\n      invoices {\n        products {\n          ean\n          invoice_quantity\n          status\n          importation_outcome\n        }\n      }\n      grouped_devolutions {\n        invoice_number_devolution\n        invoice_devolution_created_at\n        cfop\n        danfe\n        status\n        products {\n          batch\n          code_reason\n          ean\n          id\n          importation_outcome\n          quantity\n          status\n        }\n      }\n    }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "groupedStatusChanges",
+      "order": 10,
+      "title": "10. Consultar pedidos com status atualizado (stream)",
+      "description": "Retorna os pedidos cujo status foi atualizado desde a última leitura, em vez de o distribuidor precisar consultá-los um a um.",
+      "prerequisites": ["createGroupedOrder"],
+      "businessNotes": [
+        "Os registros recuperados nesta query são removidos da fila!",
+        "Se não conseguir processar os registros por erro de rede ou qualquer outro problema, consulte os pedidos individualmente pela query groupedOrder."
+      ],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "query groupedStatusChanges {\n  groupedStatusChanges(limit: 50) {\n    id\n    status\n    client_identification\n    wholesaler\n    total_products\n    products {\n      ean\n      ordered_quantity\n    }\n    responses {\n      status\n      processed_at\n      products {\n        ean\n        response_quantity\n        importation_outcome\n      }\n    }\n    invoices {\n      processed_at\n      status\n      products {\n        ean\n        invoice_quantity\n        importation_outcome\n      }\n    }\n    cancellations {\n      products {\n        ean\n        importation_outcome\n      }\n    }\n    invoices_reversals {\n      products {\n        ean\n        importation_outcome\n      }\n    }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createGroupedInvoiceDevolution",
+      "order": 11,
+      "title": "11. Enviar a devolução da nota",
+      "description": "Registra a devolução de produtos de uma nota já enviada, informando o produto devolvido, o lote e os dados da nova nota de devolução.",
+      "prerequisites": ["createGroupedInvoice"],
+      "relatedSections": ["fluxo-do-pedido"],
+      "exampleQuery": "mutation {\n  createGroupedInvoiceDevolution(\n    input: {\n      grouped_order_id: 123456\n      invoice_number: 321654\n      invoice_number_devolution: \"07042025001\"\n      invoice_devolution_created_at: \"2025-04-07\"\n      danfe: \"TESTE\"\n      cfop: \"TESTE\"\n      products: [\n        { ean: \"0000000000004\", quantity: 3, batch: \"f\", code_reason: \"201\" }\n      ]\n    }\n  ) {\n    invoice_number_devolution\n    invoice_number\n    grouped_order_id\n    invoice_devolution_created_at\n    cfop\n    danfe\n    status\n    products {\n      id\n      ean\n      batch\n      quantity\n      code_reason\n      status\n      importation_outcome\n    }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "groupedInvoiceDevolution",
+      "order": 12,
+      "title": "12. Consultar uma devolução específica",
+      "description": "Consulta os dados de uma devolução de nota específica, pelo id do pedido devolvido ou pelo número da nota de devolução.",
+      "prerequisites": ["createGroupedInvoiceDevolution"],
+      "exampleQuery": "query {\n  groupedInvoiceDevolution(grouped_order_id: 233316) {\n    invoice_devolution_created_at\n    cfop\n    danfe\n    grouped_order_id\n    status\n    id\n    invoice_number\n    invoice_number_devolution\n    products {\n      id\n      ean\n      batch\n      quantity\n      code_reason\n      status\n      importation_outcome\n    }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "groupedInvoiceDevolutions",
+      "order": 13,
+      "title": "13. Consultar devoluções (paginado)",
+      "description": "Consulta várias devoluções de nota, paginadas e com filtros por CFOP, DANFE, pedido, data e número da nota.",
+      "prerequisites": ["createGroupedInvoiceDevolution"],
+      "exampleQuery": "query {\n  groupedInvoiceDevolutions(page: 8, limit: 8, filter: {}) {\n    data {\n      grouped_order_id\n      invoice_number\n      invoice_number_devolution\n      invoice_devolution_created_at\n      cfop\n      danfe\n      status\n      products {\n        batch\n        code_reason\n        ean\n        id\n        importation_outcome\n        quantity\n        status\n      }\n    }\n    total\n    per_page\n    current_page\n    from\n    to\n    last_page\n    has_more_pages\n  }\n}"
     }
   ]
 }

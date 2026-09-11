@@ -1,12 +1,15 @@
 {
   "slug": "canal-autorizador",
-  "name": "Canal Autorizador (seed-only)",
-  "description": "Template local para validar fluxo BPMN; conteúdo real do legado ainda pendente.",
+  "name": "Canal Autorizador",
+  "description": "Transfer Order: informa às indústrias (OLs) os pedidos faturados pelos distribuidores via GraphQL. Substitui o processo manual do PDF por documentação viva conectada ao gateway.",
   "family": "edi-pharma",
   "environment": "homolog",
-  "published": false,
+  "protocol": "graphql",
+  "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+  "gatewaySlug": "gateway-homolog-fidelize",
+  "published": true,
   "audience": "distribuidor",
-  "manualStatus": "draft",
+  "manualStatus": "published",
   "createdAt": "2026-08-06T15:00:00.000Z",
-  "updatedAt": "2026-08-10T14:30:00.000Z"
+  "updatedAt": "2026-09-11T18:17:00.000Z"
 }
