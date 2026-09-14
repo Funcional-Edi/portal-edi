@@ -20,7 +20,8 @@ export class CreateProjectError extends Error {
 export async function createProject(input: unknown): Promise<Project> {
   const parsed = createProjectInputSchema.safeParse(input);
   if (!parsed.success) {
-    throw new CreateProjectError("VALIDATION", parsed.error.message);
+    const message = parsed.error.issues[0]?.message ?? "Dados inválidos.";
+    throw new CreateProjectError("VALIDATION", message);
   }
 
   try {

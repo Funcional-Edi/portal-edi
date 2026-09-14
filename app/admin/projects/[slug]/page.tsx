@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
+import { ConnectApiForm } from "@/modules/living-docs-externa/ui/admin/connect-api-form";
+import { FamilySelect } from "@/modules/living-docs-externa/ui/admin/family-select";
 import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
 import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
@@ -20,6 +22,10 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   if (!project) notFound();
 
   const qualityReport = await getManualQualityReport(slug);
+  const isGraphql = project.config.protocol !== "rest";
+  const gatewayConnected = Boolean(
+    isGraphql ? project.config.graphqlUrl : project.config.apiBaseUrl
+  );
 
   return (
     <AdminShell>
@@ -61,8 +67,18 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </dd>
           </div>
           <div>
+            <dt className="text-xs font-semibold uppercase text-slate-500">Família</dt>
+            <dd className="mt-1">
+              <FamilySelect slug={project.config.slug} family={project.config.family} />
+            </dd>
+          </div>
+          <div>
             <dt className="text-xs font-semibold uppercase text-slate-500">Operações</dt>
             <dd className="mt-1 text-sm text-slate-900">{project.manual.operations.length}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold uppercase text-slate-500">Protocolo</dt>
+            <dd className="mt-1 text-sm text-slate-900 uppercase">{project.config.protocol}</dd>
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase text-slate-500">Gateway</dt>
@@ -71,22 +87,34 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase text-slate-500">GraphQL URL</dt>
+            <dt className="text-xs font-semibold uppercase text-slate-500">
+              {isGraphql ? "GraphQL URL" : "URL base da API"}
+            </dt>
             <dd className="mt-1 text-sm text-slate-900">
-              {project.config.graphqlUrl ?? "—"}
+              {(isGraphql ? project.config.graphqlUrl : project.config.apiBaseUrl) ?? "—"}
             </dd>
           </div>
         </dl>
       </div>
 
       <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Conectar gateway</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          {isGraphql ? "Conectar gateway" : "Conectar API"}
+        </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Informe a URL GraphQL do gateway e as credenciais para validar a conexão. As
-          credenciais são cifradas e armazenadas apenas no servidor.
+          {isGraphql
+            ? "Informe a URL GraphQL do gateway e as credenciais para validar a conexão. As credenciais são cifradas e armazenadas apenas no servidor."
+            : "Informe a URL base da API REST e as credenciais. As credenciais são cifradas e armazenadas apenas no servidor."}
         </p>
         <div className="mt-5">
-          <ConnectGatewayForm slug={project.config.slug} currentGraphqlUrl={project.config.graphqlUrl} />
+          {isGraphql ? (
+            <ConnectGatewayForm
+              slug={project.config.slug}
+              currentGraphqlUrl={project.config.graphqlUrl}
+            />
+          ) : (
+            <ConnectApiForm slug={project.config.slug} currentApiBaseUrl={project.config.apiBaseUrl} />
+          )}
         </div>
       </div>
 
@@ -97,23 +125,30 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           Nenhuma credencial é incluída no export.
         </p>
         <div className="mt-5">
-          <ProjectExportActions
-            slug={project.config.slug}
-            graphqlUrl={project.config.graphqlUrl}
-          />
+          <ProjectExportActions slug={project.config.slug} gatewayConnected={gatewayConnected} />
         </div>
       </div>
 
-      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Sincronizar schema</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Busca o snapshot de introspection no gateway conectado e salva em{" "}
-          <code>data/projects/{project.config.slug}/schema.json</code>.
-        </p>
-        <div className="mt-5">
-          <SyncSchemaForm slug={project.config.slug} disabled={!project.config.graphqlUrl} />
+      {isGraphql ? (
+        <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-slate-900">Sincronizar schema</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Busca o snapshot de introspection no gateway conectado e salva em{" "}
+            <code>data/projects/{project.config.slug}/schema.json</code>.
+          </p>
+          <div className="mt-5">
+            <SyncSchemaForm slug={project.config.slug} disabled={!project.config.graphqlUrl} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-slate-900">Sincronizar schema</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Não se aplica a projetos REST — não há introspection. As operações deste manual
+            são cadastradas manualmente em <strong>Operações do manual</strong>, abaixo.
+          </p>
+        </div>
+      )}
 
       <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Operações do manual</h2>

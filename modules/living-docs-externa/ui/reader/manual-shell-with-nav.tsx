@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { buildManualNav } from "@/modules/living-docs-externa/ui/reader/build-manual-nav";
 import { ManualShell } from "@/modules/living-docs-externa/ui/reader/manual-shell";
+import { DOCS_NAV_ITEMS } from "@/modules/living-docs-externa/services/docs-routes";
 
 interface ManualShellWithNavProps {
   slug: string;
@@ -34,10 +35,10 @@ export async function ManualShellWithNav({
     <ManualShell
       sidebarGroups={nav.sidebarGroups}
       tocItems={nav.tocItems}
-      navItems={[
-        { href: "/manual", label: "Manuais", active: true },
-        { href: "/docs/api", label: "Referência API" },
-      ]}
+      navItems={DOCS_NAV_ITEMS.map((item) => ({
+        ...item,
+        active: item.href === DOCS_NAV_ITEMS[0].href,
+      }))}
     >
       {children}
     </ManualShell>

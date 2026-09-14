@@ -74,9 +74,9 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.email = user.email ?? token.email;
-        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email);
+        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email, getPermissionsConfig());
       } else if (token.email && !token.role) {
-        token.role = resolveRole(token.email as string);
+        token.role = resolveRole(token.email as string, getPermissionsConfig());
       }
       return token;
     },

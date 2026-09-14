@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { AppHeader, type AppNavItem } from "@/core/ui/app-shell";
 import { SessionActions } from "@/core/ui/session-actions";
+import { DOCS_HOME_HREF } from "@/modules/living-docs-externa/services/docs-routes";
 
 export interface ManualNavItem {
   href: string;
@@ -55,10 +56,10 @@ export function ManualShell({
             {headerActions}
             {showDefaultCatalogLink ? (
               <Link
-                href="/manual"
+                href={DOCS_HOME_HREF}
                 className="text-sm font-medium text-brand-700 hover:underline"
               >
-                Catálogo
+                Documentação
               </Link>
             ) : null}
             <SessionActions />
@@ -101,7 +102,25 @@ export function ManualShell({
               </aside>
             ) : null}
 
-            <div className="min-w-0">{children}</div>
+            <div className="min-w-0">
+              {hasToc ? (
+                <nav
+                  aria-label="Navegação rápida"
+                  className="mb-6 flex gap-2 overflow-x-auto pb-1 xl:hidden"
+                >
+                  {tocItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              ) : null}
+              {children}
+            </div>
 
             {hasToc ? (
               <aside className="hidden xl:block">

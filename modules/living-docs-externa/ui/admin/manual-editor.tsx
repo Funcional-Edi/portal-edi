@@ -18,6 +18,10 @@ import { QualityChecklist } from "@/modules/living-docs-externa/ui/admin/quality
 import { SectionEditor } from "@/modules/living-docs-externa/ui/admin/section-editor";
 import { SlideOver } from "@/modules/living-docs-externa/ui/admin/slide-over";
 import { ManualRoteiro } from "@/modules/living-docs-externa/ui/reader/manual-roteiro";
+import {
+  docsGuideHref,
+  docsOperationHref,
+} from "@/modules/living-docs-externa/services/docs-routes";
 
 interface ManualEditorProps {
   project: Project;
@@ -156,7 +160,7 @@ export function ManualEditor({ project, sections, report }: ManualEditorProps) {
               </Link>
               {project.config.published ? (
                 <Link
-                  href={`/manual/${slug}`}
+                  href={docsGuideHref(slug)}
                   className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-100"
                 >
                   Ver como distribuidor
@@ -225,7 +229,7 @@ export function ManualEditor({ project, sections, report }: ManualEditorProps) {
                 Editar operação
               </button>
               <Link
-                href={`/manual/${slug}/operations/${operation.kind}/${operation.name}`}
+                href={docsOperationHref(slug, operation.kind, operation.name)}
                 className="font-medium text-slate-600 hover:underline"
               >
                 Ver página

@@ -6,6 +6,8 @@ export const LIVING_DOCS_CACHE_KEYS = {
   getPublishedManualSections: "get-published-manual-sections",
   listPublishedSchemaCatalog: "list-published-schema-catalog",
   getPublishedSchemaReference: "get-published-schema-reference",
+  getPublishedSchemaTypeDetail: "get-published-schema-type-detail",
+  getPublishedOperationSchemaDetail: "get-published-operation-schema-detail",
   hasPublishedSchemaSnapshot: "has-published-schema-snapshot",
 } as const;
 

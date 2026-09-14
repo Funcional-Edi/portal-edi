@@ -16,7 +16,7 @@ const manualModule: PortalModule = {
   title: "Manual",
   description: "Doc externa",
   status: "active",
-  basePath: "/manual",
+  basePath: "/docs",
   access: "any",
   audience: "externo",
 };
@@ -57,7 +57,7 @@ describe("canAccessModule", () => {
 
 describe("findModuleForPath", () => {
   it("resolve o módulo pelo prefixo mais específico", () => {
-    expect(findModuleForPath("/manual/im", TEST_MODULES)?.id).toBe("living-docs-externa");
+    expect(findModuleForPath("/docs/im", TEST_MODULES)?.id).toBe("living-docs-externa");
     expect(findModuleForPath("/interno/docs", TEST_MODULES)?.id).toBe("manuais-internos");
   });
 
@@ -74,8 +74,8 @@ describe("canAccessPath", () => {
   });
 
   it("client acessa manual mas não admin nem módulos internos", () => {
-    expect(canAccessPath("client", "/manual", TEST_MODULES)).toBe(true);
-    expect(canAccessPath("client", "/manual/im", TEST_MODULES)).toBe(true);
+    expect(canAccessPath("client", "/docs", TEST_MODULES)).toBe(true);
+    expect(canAccessPath("client", "/docs/im", TEST_MODULES)).toBe(true);
     expect(canAccessPath("client", "/admin/projects", TEST_MODULES)).toBe(false);
     expect(canAccessPath("client", "/interno", TEST_MODULES)).toBe(false);
   });
@@ -83,11 +83,11 @@ describe("canAccessPath", () => {
   it("admin acessa tudo registrado", () => {
     expect(canAccessPath("admin", "/admin/projects", TEST_MODULES)).toBe(true);
     expect(canAccessPath("admin", "/interno", TEST_MODULES)).toBe(true);
-    expect(canAccessPath("admin", "/manual", TEST_MODULES)).toBe(true);
+    expect(canAccessPath("admin", "/docs", TEST_MODULES)).toBe(true);
   });
 
   it("módulo protegido exige login", () => {
-    expect(canAccessPath(undefined, "/manual", TEST_MODULES)).toBe(false);
+    expect(canAccessPath(undefined, "/docs", TEST_MODULES)).toBe(false);
   });
 });
 
@@ -95,7 +95,7 @@ describe("pathRequiresAuth", () => {
   it("distingue público de protegido", () => {
     expect(isPublicPath("/")).toBe(true);
     expect(pathRequiresAuth("/", TEST_MODULES)).toBe(false);
-    expect(pathRequiresAuth("/manual", TEST_MODULES)).toBe(true);
+    expect(pathRequiresAuth("/docs", TEST_MODULES)).toBe(true);
     expect(pathRequiresAuth("/admin/projects", TEST_MODULES)).toBe(true);
   });
 });
@@ -105,22 +105,22 @@ describe("resolvePostLoginPath", () => {
     expect(resolvePostLoginPath("admin", null, TEST_MODULES)).toBe("/");
   });
 
-  it("client vai para /manual por padrão", () => {
-    expect(resolvePostLoginPath("client", null, TEST_MODULES)).toBe("/manual");
+  it("client vai para /docs por padrão", () => {
+    expect(resolvePostLoginPath("client", null, TEST_MODULES)).toBe("/docs");
   });
 
   it("respeita callbackUrl seguro quando permitido", () => {
-    expect(resolvePostLoginPath("client", "/manual/im", TEST_MODULES)).toBe("/manual/im");
+    expect(resolvePostLoginPath("client", "/docs/im", TEST_MODULES)).toBe("/docs/im");
   });
 
   it("ignora callbackUrl proibido para o papel", () => {
-    expect(resolvePostLoginPath("client", "/admin/projects", TEST_MODULES)).toBe("/manual");
+    expect(resolvePostLoginPath("client", "/admin/projects", TEST_MODULES)).toBe("/docs");
   });
 });
 
 describe("isSafeCallbackUrl", () => {
   it("aceita path relativo interno", () => {
-    expect(isSafeCallbackUrl("/manual")).toBe(true);
+    expect(isSafeCallbackUrl("/docs")).toBe(true);
   });
 
   it("rejeita open redirect", () => {

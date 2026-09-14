@@ -2,6 +2,7 @@
   "slug": "demo",
   "name": "Demo — Inventário (IM)",
   "description": "Manual de demonstração com 2 operações (paridade simplificada com IM v1.0.0).",
+  "family": "edi-pharma",
   "environment": "homolog",
   "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
   "gatewaySlug": "gateway-homolog-fidelize",

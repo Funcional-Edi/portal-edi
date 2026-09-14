@@ -2,6 +2,7 @@
   "slug": "im",
   "name": "IM - Inventario (homolog)",
   "description": "Manual de integracao de inventario para distribuidores (ambiente homolog).",
+  "family": "edi-pharma",
   "environment": "homolog",
   "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
   "gatewaySlug": "gateway-homolog-fidelize",

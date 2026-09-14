@@ -1,55 +1,84 @@
 {
   "version": 1,
   "title": "Fluxo Canal Autorizador",
-  "description": "Autorização com ramificação quando o pedido exige revisão manual.",
+  "description": "Ciclo de vida do Transfer Order: autenticação, pré-pedido, retorno opcional, cancelamento, nota fiscal e ajustes pós-faturamento (substituição ou devolução).",
   "nodes": [
-    {
-      "id": "start",
-      "type": "start",
-      "label": "Pedido recebido",
-      "position": { "x": 240, "y": 0 }
-    },
+    { "id": "start", "type": "start", "label": "Pedido recebido", "position": { "x": 260, "y": 0 } },
     {
       "id": "createToken",
       "type": "operation",
       "label": "Autenticar",
-      "position": { "x": 220, "y": 90 },
+      "position": { "x": 260, "y": 80 },
       "operationRef": { "kind": "mutation", "name": "createToken" }
     },
     {
-      "id": "authorizeOrder",
+      "id": "createGroupedOrder",
       "type": "operation",
-      "label": "Autorizar pedido",
-      "position": { "x": 200, "y": 190 },
-      "operationRef": { "kind": "mutation", "name": "authorizeOrder" }
+      "label": "Criar pré-pedido",
+      "position": { "x": 260, "y": 160 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedOrder" }
     },
+    { "id": "decisionAccepted", "type": "decision", "label": "Pedido aceito pela indústria?", "position": { "x": 260, "y": 250 } },
+    { "id": "endRejected", "type": "end", "label": "Rejeitado (status PROCESSED)", "position": { "x": 480, "y": 250 } },
+    { "id": "decisionResponse", "type": "decision", "label": "Enviar retorno do pedido?", "position": { "x": 260, "y": 340 } },
     {
-      "id": "needsReview",
-      "type": "decision",
-      "label": "Revisão manual?",
-      "position": { "x": 220, "y": 290 }
-    },
-    {
-      "id": "orderStatus",
+      "id": "createGroupedResponse",
       "type": "operation",
-      "label": "Consultar status",
-      "position": { "x": 80, "y": 400 },
-      "operationRef": { "kind": "query", "name": "orderStatus" }
+      "label": "Enviar retorno",
+      "position": { "x": 80, "y": 430 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedResponse" }
+    },
+    { "id": "decisionCancel", "type": "decision", "label": "Cancelar pedido antes do faturamento?", "position": { "x": 80, "y": 520 } },
+    {
+      "id": "createGroupedCancellation",
+      "type": "operation",
+      "label": "Cancelar pedido",
+      "position": { "x": 0, "y": 610 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedCancellation" }
+    },
+    { "id": "endCancelled", "type": "end", "label": "Pedido cancelado", "position": { "x": 0, "y": 700 } },
+    {
+      "id": "createGroupedInvoice",
+      "type": "operation",
+      "label": "Enviar nota fiscal",
+      "position": { "x": 260, "y": 520 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedInvoice" }
+    },
+    { "id": "decisionPostInvoice", "type": "decision", "label": "Ajuste após o faturamento?", "position": { "x": 260, "y": 610 } },
+    {
+      "id": "createGroupedInvoiceReversal",
+      "type": "operation",
+      "label": "Substituir nota",
+      "position": { "x": 80, "y": 700 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedInvoiceReversal" }
     },
     {
-      "id": "end",
-      "type": "end",
-      "label": "Concluído",
-      "position": { "x": 360, "y": 400 }
-    }
+      "id": "createGroupedInvoiceDevolution",
+      "type": "operation",
+      "label": "Devolver produto",
+      "position": { "x": 440, "y": 700 },
+      "operationRef": { "kind": "mutation", "name": "createGroupedInvoiceDevolution" }
+    },
+    { "id": "end", "type": "end", "label": "Concluído", "position": { "x": 260, "y": 790 } }
   ],
   "edges": [
     { "id": "e1", "source": "start", "target": "createToken" },
-    { "id": "e2", "source": "createToken", "target": "authorizeOrder" },
-    { "id": "e3", "source": "authorizeOrder", "target": "needsReview" },
-    { "id": "e4", "source": "needsReview", "target": "orderStatus", "label": "Sim" },
-    { "id": "e5", "source": "needsReview", "target": "end", "label": "Não" },
-    { "id": "e6", "source": "orderStatus", "target": "end" }
+    { "id": "e2", "source": "createToken", "target": "createGroupedOrder" },
+    { "id": "e3", "source": "createGroupedOrder", "target": "decisionAccepted" },
+    { "id": "e4", "source": "decisionAccepted", "target": "endRejected", "label": "Rejeitado (PROCESSED)" },
+    { "id": "e5", "source": "decisionAccepted", "target": "decisionResponse", "label": "Aceito (total ou parcial)" },
+    { "id": "e6", "source": "decisionResponse", "target": "createGroupedResponse", "label": "Sim" },
+    { "id": "e7", "source": "decisionResponse", "target": "createGroupedInvoice", "label": "Não" },
+    { "id": "e8", "source": "createGroupedResponse", "target": "decisionCancel" },
+    { "id": "e9", "source": "decisionCancel", "target": "createGroupedCancellation", "label": "Sim" },
+    { "id": "e10", "source": "createGroupedCancellation", "target": "endCancelled" },
+    { "id": "e11", "source": "decisionCancel", "target": "createGroupedInvoice", "label": "Não" },
+    { "id": "e12", "source": "createGroupedInvoice", "target": "decisionPostInvoice" },
+    { "id": "e13", "source": "decisionPostInvoice", "target": "createGroupedInvoiceReversal", "label": "Substituir nota" },
+    { "id": "e14", "source": "decisionPostInvoice", "target": "createGroupedInvoiceDevolution", "label": "Devolver produto" },
+    { "id": "e15", "source": "decisionPostInvoice", "target": "end", "label": "Nenhum ajuste" },
+    { "id": "e16", "source": "createGroupedInvoiceReversal", "target": "end" },
+    { "id": "e17", "source": "createGroupedInvoiceDevolution", "target": "end" }
   ],
-  "updatedAt": "2026-08-06T15:00:00.000Z"
+  "updatedAt": "2026-09-11T18:17:00.000Z"
 }

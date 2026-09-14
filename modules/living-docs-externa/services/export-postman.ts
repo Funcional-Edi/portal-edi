@@ -14,18 +14,16 @@ export interface PostmanCollectionV21 {
   variable?: Array<{ key: string; value: string }>;
 }
 
+type PostmanBody =
+  | { mode: "graphql"; graphql: { query: string; variables: string } }
+  | { mode: "raw"; raw: string; options?: { raw: { language: "json" } } };
+
 interface PostmanRequestItem {
   name: string;
   request: {
-    method: "POST";
+    method: string;
     header: Array<{ key: string; value: string }>;
-    body: {
-      mode: "graphql";
-      graphql: {
-        query: string;
-        variables: string;
-      };
-    };
+    body?: PostmanBody;
     url: string;
     description?: string;
   };
@@ -35,16 +33,18 @@ function defaultExampleQuery(kind: string, name: string): string {
   return `${kind} ${name} {\n  ${name}\n}`;
 }
 
-function buildRequestItem(
-  manual: IntegrationManual,
+function joinUrl(base: string, path: string): string {
+  return `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function buildGraphqlRequestItem(
   op: ReturnType<typeof sortOperations>[number],
   graphqlUrl: string
 ): PostmanRequestItem {
   const query = op.exampleQuery?.trim() || defaultExampleQuery(op.kind, op.name);
-  const label = op.title ?? op.name;
 
   return {
-    name: label,
+    name: op.title ?? op.name,
     request: {
       method: "POST",
       header: [{ key: "Content-Type", value: "application/json" }],
@@ -58,18 +58,40 @@ function buildRequestItem(
   };
 }
 
+function buildRestRequestItem(
+  op: ReturnType<typeof sortOperations>[number],
+  apiBaseUrl: string
+): PostmanRequestItem {
+  return {
+    name: op.title ?? op.name,
+    request: {
+      method: op.method ?? "GET",
+      header: [{ key: "Content-Type", value: "application/json" }],
+      body: op.exampleBody?.trim()
+        ? { mode: "raw", raw: op.exampleBody, options: { raw: { language: "json" } } }
+        : undefined,
+      url: joinUrl(apiBaseUrl, op.path ?? "/"),
+      description: op.description,
+    },
+  };
+}
+
 /** Gera collection Postman v2.1 a partir do manual curado (sem credenciais). */
 export function buildPostmanCollection(
   config: ProjectConfig,
   manual: IntegrationManual
 ): PostmanCollectionV21 {
-  if (!config.graphqlUrl) {
-    throw new Error("GRAPHQL_URL_REQUIRED");
+  const isRest = config.protocol === "rest";
+  const baseUrl = isRest ? config.apiBaseUrl : config.graphqlUrl;
+  if (!baseUrl) {
+    throw new Error(isRest ? "API_BASE_URL_REQUIRED" : "GRAPHQL_URL_REQUIRED");
   }
 
   const operations = sortOperations(manual);
   const items = operations.map((op) =>
-    buildRequestItem(manual, op, config.graphqlUrl!)
+    isRest || op.kind === "rest"
+      ? buildRestRequestItem(op, config.apiBaseUrl ?? baseUrl)
+      : buildGraphqlRequestItem(op, config.graphqlUrl ?? baseUrl)
   );
 
   return {
@@ -79,7 +101,7 @@ export function buildPostmanCollection(
       schema: POSTMAN_SCHEMA,
     },
     item: items,
-    variable: [{ key: "graphqlUrl", value: config.graphqlUrl }],
+    variable: [{ key: isRest ? "apiBaseUrl" : "graphqlUrl", value: baseUrl }],
   };
 }
 

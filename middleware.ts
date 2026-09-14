@@ -15,12 +15,18 @@ const modules = registerAllModules();
  * RBAC genérico por módulo (basePath + access do registry).
  * - `/` e `/login` são públicos (login inline na home).
  * - `/api/*` exige sessão, exceto `/api/auth` e `/api/health` (defesa em profundidade).
- * - Rotas de módulo exigem sessão; client bloqueado em admin → /manual.
+ * - Rotas de módulo exigem sessão; client bloqueado em admin → /docs.
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
   const role = session?.user?.role;
+
+  if (pathname === "/manual" || pathname.startsWith("/manual/")) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = pathname.replace(/^\/manual(?=\/|$)/, "/docs");
+    return NextResponse.redirect(redirectUrl, 308);
+  }
 
   if (pathname.startsWith("/api/") && !isPublicPath(pathname)) {
     if (!session) {
@@ -30,7 +36,7 @@ export default auth((req) => {
 
   if (pathname === "/projects" || pathname.startsWith("/projects/")) {
     const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = pathname.replace(/^\/projects(?=\/|$)/, "/manual");
+    redirectUrl.pathname = pathname.replace(/^\/projects(?=\/|$)/, "/docs");
     return NextResponse.redirect(redirectUrl, 308);
   }
 

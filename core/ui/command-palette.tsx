@@ -135,7 +135,7 @@ export function CommandPalette() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={onInputKeyDown}
-            placeholder="Buscar manuais, operações, seções…"
+            placeholder="Buscar manuais, operações, schema GraphQL…"
             className="w-full text-sm text-slate-900 outline-none placeholder:text-slate-400"
             aria-label="Termo de busca"
           />

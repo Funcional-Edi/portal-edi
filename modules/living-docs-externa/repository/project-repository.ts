@@ -18,7 +18,9 @@ import {
   type ProjectSummary,
   toProjectSummary,
   type ProjectConfig,
+  type ProjectProtocol,
 } from "@/modules/living-docs-externa/schema/project";
+import type { ProductFamily } from "@/modules/living-docs-externa/schema/family";
 
 function defaultManual(name: string): IntegrationManual {
   return {
@@ -81,6 +83,8 @@ export async function createProject(input: {
   slug: string;
   name: string;
   description?: string;
+  family?: ProductFamily;
+  protocol?: ProjectProtocol;
 }): Promise<Project> {
   if (await projectExists(input.slug)) {
     throw new Error("PROJECT_ALREADY_EXISTS");
@@ -91,6 +95,8 @@ export async function createProject(input: {
     slug: input.slug,
     name: input.name,
     description: input.description,
+    family: input.family,
+    protocol: input.protocol ?? "graphql",
     published: false,
     manualStatus: "draft",
     createdAt: now,
@@ -118,6 +124,26 @@ export async function updateProjectGatewayConfig(
     ...project.config,
     graphqlUrl: gateway.graphqlUrl,
     gatewaySlug: gateway.gatewaySlug,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
+}
+
+/** Atualiza a URL base da API REST no `config.json` do projeto (equivalente a `updateProjectGatewayConfig` para REST). */
+export async function updateProjectApiConfig(
+  slug: string,
+  api: { apiBaseUrl: string }
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    apiBaseUrl: api.apiBaseUrl,
     updatedAt: new Date().toISOString(),
   };
 
@@ -161,6 +187,26 @@ export async function writeManual(slug: string, manual: IntegrationManual): Prom
     throw new Error("PROJECT_NOT_FOUND");
   }
   await writeContentJson(projectManualPath(slug), manual);
+}
+
+/** Reclassifica a família de um projeto existente no `config.json`. */
+export async function updateProjectFamily(
+  slug: string,
+  family: ProductFamily
+): Promise<ProjectConfig> {
+  const project = await loadProjectFromStore(slug);
+  if (!project) {
+    throw new Error("PROJECT_NOT_FOUND");
+  }
+
+  const config: ProjectConfig = {
+    ...project.config,
+    family,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeContentJson(projectConfigPath(slug), config);
+  return config;
 }
 
 /** Atualiza apenas `updatedAt` no `config.json` de um projeto existente. */

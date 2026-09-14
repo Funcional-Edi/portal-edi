@@ -2,19 +2,34 @@ export {
   projectConfigSchema,
   slugSchema,
   connectGatewayInputSchema,
+  connectApiInputSchema,
   publishProjectInputSchema,
+  updateProjectFamilyInputSchema,
+  projectProtocolSchema,
   type Project,
   type ProjectConfig,
   type ProjectSummary,
+  type ProjectProtocol,
   type ConnectGatewayInput,
+  type ConnectApiInput,
   type PublishProjectInput,
+  type UpdateProjectFamilyInput,
   toProjectSummary,
 } from "@/modules/living-docs-externa/schema/project";
+
+export {
+  productFamilySchema,
+  PRODUCT_FAMILY_METADATA,
+  PRODUCT_FAMILY_ORDER,
+  type ProductFamily,
+  type ProductFamilyMetadata,
+} from "@/modules/living-docs-externa/schema/family";
 
 export {
   integrationManualSchema,
   manualOperationSchema,
   manualOperationKindSchema,
+  restMethodSchema,
   createManualOperationInputSchema,
   updateManualOperationInputSchema,
   updateManualMetadataInputSchema,

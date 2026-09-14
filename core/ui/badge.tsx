@@ -29,3 +29,20 @@ export function Badge({ tone = "neutral", children }: BadgeProps) {
     </span>
   );
 }
+
+/**
+ * Tom semântico para o ambiente do projeto (homolog/production/sandbox).
+ * Antes duplicado em `family-catalog.tsx`, `manual-catalog.tsx` e
+ * `schema-catalog.tsx` — centralizado aqui para as três telas (e novas)
+ * ficarem sempre consistentes.
+ */
+export function environmentBadgeTone(environment?: string): BadgeTone {
+  switch (environment) {
+    case "production":
+      return "success";
+    case "homolog":
+      return "warning";
+    default:
+      return "neutral";
+  }
+}

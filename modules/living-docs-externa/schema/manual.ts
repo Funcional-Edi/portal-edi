@@ -1,14 +1,23 @@
 import { z } from "zod";
 
-export const manualOperationKindSchema = z.enum(["query", "mutation"]);
+export const manualOperationKindSchema = z.enum(["query", "mutation", "rest"]);
 
-export const manualOperationSchema = z.object({
+export const restMethodSchema = z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]);
+
+/** Forma "crua" (sem o refine cross-field) — usada para `.extend`/`.omit` em inputs derivados. */
+export const manualOperationShapeSchema = z.object({
   kind: manualOperationKindSchema,
   name: z.string().min(1),
   order: z.number().int().min(1),
   title: z.string().optional(),
   description: z.string().optional(),
   exampleQuery: z.string().optional(),
+  /** Só para `kind: "rest"` — método HTTP do endpoint. */
+  method: restMethodSchema.optional(),
+  /** Só para `kind: "rest"` — caminho do endpoint (ex.: `/wsAutorizacao/service.asmx/Autoriza`). */
+  path: z.string().optional(),
+  /** Só para `kind: "rest"` — corpo de exemplo da requisição (JSON/texto). */
+  exampleBody: z.string().optional(),
   prerequisites: z.array(z.string()).optional(),
   businessNotes: z.array(z.string()).optional(),
   authRequired: z.boolean().optional(),
@@ -22,6 +31,29 @@ export const manualOperationSchema = z.object({
     )
     .optional(),
 });
+
+function requireRestFields(
+  operation: { kind: string; method?: string; path?: string },
+  ctx: z.RefinementCtx
+): void {
+  if (operation.kind !== "rest") return;
+  if (!operation.method) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Operação REST precisa de `method`.",
+      path: ["method"],
+    });
+  }
+  if (!operation.path?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Operação REST precisa de `path`.",
+      path: ["path"],
+    });
+  }
+}
+
+export const manualOperationSchema = manualOperationShapeSchema.superRefine(requireRestFields);
 
 export const integrationManualSchema = z.object({
   version: z.literal(1),
@@ -52,12 +84,18 @@ export const integrationManualSchema = z.object({
 });
 
 /** Entrada de criação: `order` é opcional (auto-atribuído se ausente). */
-export const createManualOperationInputSchema = manualOperationSchema.extend({
-  order: z.number().int().min(1).optional(),
-});
+export const createManualOperationInputSchema = manualOperationShapeSchema
+  .extend({
+    order: z.number().int().min(1).optional(),
+  })
+  .superRefine(requireRestFields);
 
-/** Entrada de edição: `kind`/`name` identificam a operação e não são editáveis aqui. */
-export const updateManualOperationInputSchema = manualOperationSchema.omit({
+/**
+ * Entrada de edição: `kind`/`name` identificam a operação e não são editáveis aqui.
+ * O `kind` (e portanto a exigência de `method`/`path` para REST) não muda depois de
+ * criada — não repetimos o refine aqui.
+ */
+export const updateManualOperationInputSchema = manualOperationShapeSchema.omit({
   kind: true,
   name: true,
 });

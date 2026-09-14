@@ -11,8 +11,12 @@ import {
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { listPublishedManuals } from "@/modules/living-docs-externa/services/list-published-manuals";
 import {
+  buildOperationSchemaDetail,
   buildSchemaReferenceView,
+  buildSchemaTypeDetailView,
+  type OperationSchemaDetail,
   type SchemaReferenceView,
+  type SchemaTypeDetailView,
 } from "@/modules/living-docs-externa/services/schema-reference";
 import type { ProjectSchemaSnapshot } from "@/modules/living-docs-externa/schema/introspection";
 
@@ -20,6 +24,12 @@ export interface PublishedSchemaReference {
   project: Project;
   snapshot: ProjectSchemaSnapshot;
   reference: SchemaReferenceView;
+}
+
+export interface PublishedSchemaTypeDetail {
+  project: Project;
+  snapshot: ProjectSchemaSnapshot;
+  typeDetail: SchemaTypeDetailView;
 }
 
 export interface SchemaCatalogEntry extends ProjectSummary {
@@ -89,6 +99,76 @@ async function loadPublishedSchemaCatalogCached(): Promise<SchemaCatalogEntry[]>
 export const getPublishedSchemaReference = cache(loadPublishedSchemaReferenceCached);
 export const listPublishedSchemaCatalog = cache(loadPublishedSchemaCatalogCached);
 
+async function loadPublishedSchemaTypeDetail(
+  slug: string,
+  typeName: string
+): Promise<PublishedSchemaTypeDetail | null> {
+  const data = await loadPublishedSchemaReference(slug);
+  if (!data) return null;
+
+  const typeDetail = buildSchemaTypeDetailView(data.snapshot, typeName);
+  if (!typeDetail) return null;
+
+  return {
+    project: data.project,
+    snapshot: data.snapshot,
+    typeDetail,
+  };
+}
+
+async function loadPublishedSchemaTypeDetailCached(
+  slug: string,
+  typeName: string
+): Promise<PublishedSchemaTypeDetail | null> {
+  const backend = getContentBackend();
+  const getCached = unstable_cache(
+    async () => loadPublishedSchemaTypeDetail(slug, typeName),
+    [LIVING_DOCS_CACHE_KEYS.getPublishedSchemaTypeDetail, backend, slug, typeName],
+    { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
+  );
+  return getCached();
+}
+
+export const getPublishedSchemaTypeDetail = cache(loadPublishedSchemaTypeDetailCached);
+
+async function loadPublishedOperationSchemaDetail(
+  slug: string,
+  kind: "query" | "mutation",
+  operationName: string
+): Promise<OperationSchemaDetail | null> {
+  const project = await getPublishedManual(slug);
+  if (!project) return null;
+
+  const snapshot = await readProjectSchemaSnapshot(slug);
+  if (!snapshot) return null;
+
+  return buildOperationSchemaDetail(snapshot, kind, operationName);
+}
+
+async function loadPublishedOperationSchemaDetailCached(
+  slug: string,
+  kind: "query" | "mutation",
+  operationName: string
+): Promise<OperationSchemaDetail | null> {
+  const backend = getContentBackend();
+  const getCached = unstable_cache(
+    async () => loadPublishedOperationSchemaDetail(slug, kind, operationName),
+    [
+      LIVING_DOCS_CACHE_KEYS.getPublishedOperationSchemaDetail,
+      backend,
+      slug,
+      kind,
+      operationName,
+    ],
+    { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
+  );
+  return getCached();
+}
+
+export const getPublishedOperationSchemaDetail = cache(
+  loadPublishedOperationSchemaDetailCached
+);
+
 /** Indica se o produto publicado tem snapshot de schema (para links cruzados no manual). */
 async function loadHasPublishedSchemaSnapshot(slug: string): Promise<boolean> {
   const project = await getPublishedManual(slug);
@@ -119,4 +199,8 @@ export function schemaFieldHref(
   name: string
 ): string {
   return `/docs/api/${slug}#${kind}-${name}`;
+}
+
+export function schemaTypeHref(slug: string, typeName: string): string {
+  return `/docs/api/${slug}/types/${encodeURIComponent(typeName)}`;
 }

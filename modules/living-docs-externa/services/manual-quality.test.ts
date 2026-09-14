@@ -26,6 +26,7 @@ import {
 const baseConfig: ProjectConfig = {
   slug: "demo",
   name: "Demo",
+  protocol: "graphql",
   graphqlUrl: "https://gateway.example.com/graphql",
   published: false,
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -191,6 +192,61 @@ describe("evaluateManualQuality", () => {
     expect(statusOf(report, "gateway")).toBe("warn");
     expect(report.warnings).toBe(3);
     expect(report.readyToPublish).toBe(true);
+  });
+
+  it("avalia operações REST pelo par method/path em vez de exampleQuery", () => {
+    const restConfig: ProjectConfig = {
+      ...baseConfig,
+      protocol: "rest",
+      graphqlUrl: undefined,
+      apiBaseUrl: "https://api.exemplo.com.br",
+    };
+
+    const semEndpoint = evaluateManualQuality({
+      config: restConfig,
+      manual: {
+        ...baseManual,
+        operations: [{ kind: "rest", name: "autoriza", order: 1, description: "Autoriza." }],
+      },
+      sections: [goodSection],
+    });
+    expect(statusOf(semEndpoint, "operacoes-exemplo")).toBe("warn");
+
+    const comEndpoint = evaluateManualQuality({
+      config: restConfig,
+      manual: {
+        ...baseManual,
+        operations: [
+          {
+            kind: "rest",
+            name: "autoriza",
+            order: 1,
+            description: "Autoriza.",
+            method: "POST",
+            path: "/autoriza",
+          },
+        ],
+      },
+      sections: [goodSection],
+    });
+    expect(statusOf(comEndpoint, "operacoes-exemplo")).toBe("pass");
+    expect(statusOf(comEndpoint, "gateway")).toBe("pass");
+  });
+
+  it("check de gateway olha apiBaseUrl (não graphqlUrl) quando protocol é rest", () => {
+    const restSemApi: ProjectConfig = {
+      ...baseConfig,
+      protocol: "rest",
+      graphqlUrl: "https://gateway.example.com/graphql",
+      apiBaseUrl: undefined,
+    };
+
+    const report = evaluateManualQuality({
+      config: restSemApi,
+      manual: baseManual,
+      sections: [goodSection],
+    });
+    expect(statusOf(report, "gateway")).toBe("warn");
   });
 });
 

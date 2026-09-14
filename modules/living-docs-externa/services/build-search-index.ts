@@ -5,6 +5,10 @@ import {
 } from "@/modules/living-docs-externa/repository/project-repository";
 import { listManualSections } from "@/modules/living-docs-externa/repository/section-repository";
 import type { SearchIndexEntry } from "@/core/search/types";
+import {
+  docsGuideHref,
+  docsOperationHref,
+} from "@/modules/living-docs-externa/services/docs-routes";
 
 function excerpt(text: string, max = 120): string {
   const normalized = text.replace(/\s+/g, " ").trim();
@@ -32,7 +36,7 @@ export async function buildLivingDocsSearchIndex(
     entries.push({
       type: "manual",
       title: manual.title,
-      href: `/manual/${config.slug}`,
+      href: docsGuideHref(config.slug),
       snippet: config.description,
       keywords: `${config.slug} ${config.name} ${manual.productName ?? ""}`,
     });
@@ -42,7 +46,7 @@ export async function buildLivingDocsSearchIndex(
       entries.push({
         type: "section",
         title: section.title,
-        href: `/manual/${config.slug}#section-${section.id}`,
+        href: `${docsGuideHref(config.slug)}#section-${section.id}`,
         snippet: excerpt(section.body),
         keywords: `${config.slug} ${section.id}`,
       });
@@ -52,7 +56,7 @@ export async function buildLivingDocsSearchIndex(
       entries.push({
         type: "operation",
         title: op.title ?? op.name,
-        href: `/manual/${config.slug}/operations/${op.kind}/${op.name}`,
+        href: docsOperationHref(config.slug, op.kind, op.name),
         snippet: op.description,
         keywords: `${op.kind} ${op.name} ${config.slug}`,
       });

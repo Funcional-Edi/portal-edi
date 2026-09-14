@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Badge } from "@/core/ui/badge";
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
 import type { PublishedSchemaReference } from "@/modules/living-docs-externa/services/get-published-schema";
+import { schemaTypeHref } from "@/modules/living-docs-externa/services/get-published-schema";
+import { docsGuideHref, docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { SchemaFieldRef } from "@/modules/living-docs-externa/services/schema-reference";
 import { schemaFieldAnchor } from "@/modules/living-docs-externa/services/schema-reference";
 
@@ -24,7 +26,7 @@ function manualLinkForField(
 ): string | null {
   const match = operations.find((op) => op.kind === kind && op.name === name);
   if (!match) return null;
-  return `/manual/${slug}/operations/${kind}/${name}`;
+  return docsOperationHref(slug, kind, name);
 }
 
 function FieldTable({
@@ -126,7 +128,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
         </p>
         <div className="mt-4">
           <Link
-            href={`/manual/${project.config.slug}`}
+            href={docsGuideHref(project.config.slug)}
             className="text-sm font-medium text-brand-700 hover:underline"
           >
             Abrir manual curado →
@@ -198,7 +200,17 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
                 <tbody>
                   {reference.types.map((type) => (
                     <tr key={type.name} className="border-t border-slate-100">
-                      <td className="px-4 py-3 font-mono text-slate-800">{type.name}</td>
+                      <td className="px-4 py-3">
+                        <Link
+                          href={schemaTypeHref(project.config.slug, type.name)}
+                          className="font-mono text-brand-700 hover:underline"
+                        >
+                          {type.name}
+                        </Link>
+                        {type.description ? (
+                          <p className="mt-1 text-slate-600">{type.description}</p>
+                        ) : null}
+                      </td>
                       <td className="px-4 py-3 text-slate-600">{type.kind}</td>
                       <td className="px-4 py-3 text-slate-600">{type.fieldCount}</td>
                     </tr>

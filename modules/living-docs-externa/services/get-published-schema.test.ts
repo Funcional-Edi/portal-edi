@@ -22,6 +22,7 @@ vi.mock("@/core/db/adapters", async (importOriginal) => {
 import { writeProjectSchemaSnapshot } from "@/modules/living-docs-externa/repository/schema-repository";
 import {
   getPublishedSchemaReference,
+  getPublishedSchemaTypeDetail,
   hasPublishedSchemaSnapshot,
   listPublishedSchemaCatalog,
 } from "@/modules/living-docs-externa/services/get-published-schema";
@@ -104,5 +105,21 @@ describe("get-published-schema services", () => {
 
     const result = await getPublishedSchemaReference("draft-only");
     expect(result).toBeNull();
+  });
+
+  it("retorna detalhe de tipo publicado com campos e args", async () => {
+    const result = await getPublishedSchemaTypeDetail("im", "Mutation");
+    expect(result).not.toBeNull();
+    expect(result?.typeDetail.name).toBe("Mutation");
+    expect(result?.typeDetail.fields?.some((f) => f.name === "createToken")).toBe(true);
+    const createToken = result?.typeDetail.fields?.find((f) => f.name === "createToken");
+    expect(createToken?.args.map((a) => a.name)).toEqual(["login", "password"]);
+    expect(createToken?.returnType.namedType).toBe("TokenPayload");
+  });
+
+  it("retorna null para tipo inexistente ou produto sem schema", async () => {
+    expect(await getPublishedSchemaTypeDetail("im", "TipoInexistente")).toBeNull();
+    expect(await getPublishedSchemaTypeDetail("wholesaler", "Query")).toBeNull();
+    expect(await getPublishedSchemaTypeDetail("nao-existe", "Query")).toBeNull();
   });
 });

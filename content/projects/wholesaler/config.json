@@ -2,6 +2,7 @@
   "slug": "wholesaler",
   "name": "Wholesaler - Pedido e recebimento",
   "description": "Manual de atacado para criacao, consulta e confirmacao de pedidos.",
+  "family": "edi-pharma",
   "environment": "homolog",
   "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
   "gatewaySlug": "gateway-homolog-fidelize",

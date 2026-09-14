@@ -1,0 +1,4449 @@
+{
+  "version": 1,
+  "syncedAt": "2026-09-11T18:17:00.000Z",
+  "source": {
+    "projectSlug": "canal-autorizador",
+    "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+    "gatewaySlug": "gateway-homolog-fidelize"
+  },
+  "introspection": {
+    "__schema": {
+      "queryType": {
+        "name": "Query"
+      },
+      "mutationType": {
+        "name": "Mutation"
+      },
+      "subscriptionType": null,
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "description": "Consultas do Canal Autorizador (Transfer Order).",
+          "fields": [
+            {
+              "name": "groupedOrder",
+              "description": "Consulta um pedido criado na API da Funcional pelo id.",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Código do pedido na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "groupedOrders",
+              "description": "Consulta pedidos paginados, com filtro por status, filial, condição comercial, cliente e data.",
+              "args": [
+                {
+                  "name": "page",
+                  "description": "Página",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "limit",
+                  "description": "Número máximo de registros por página — não deve passar de 200",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "filter",
+                  "description": "Filtro de busca",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GroupedOrderFilterType",
+                    "ofType": null
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrdersPage",
+                "ofType": null
+              }
+            },
+            {
+              "name": "groupedStatusChanges",
+              "description": "Retorna um stream de pedidos com status atualizado (fila). Os registros recuperados são removidos da fila — em caso de erro de rede, consultar os pedidos individualmente via groupedOrder.",
+              "args": [
+                {
+                  "name": "limit",
+                  "description": "Número máximo de registros a serem recuperados",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                }
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedOrder",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "groupedInvoices",
+              "description": "Consulta o ressarcimento (notas) na Funcional.",
+              "args": [
+                {
+                  "name": "grouped_order_id",
+                  "description": "Código do pedido na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "invoice_number",
+                  "description": "Número da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "wholesaler_branch_code",
+                  "description": "CNPJ do distribuidor",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoice",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "groupedInvoiceDevolution",
+              "description": "Consulta uma devolução específica.",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Id do pedido devolvido",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "invoice_number_devolution",
+                  "description": "Número da nota devolvida",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedInvoiceDevolution",
+                "ofType": null
+              }
+            },
+            {
+              "name": "groupedInvoiceDevolutions",
+              "description": "Consulta várias devoluções, paginado e com filtros.",
+              "args": [
+                {
+                  "name": "page",
+                  "description": "Página inicial do resultado",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "limit",
+                  "description": "Quantidade máxima de dados",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "filter",
+                  "description": "Filtro de busca",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GroupedInvoiceDevolutionFilterType",
+                    "ofType": null
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedInvoiceDevolutionsPage",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Mutation",
+          "description": "Mutations do Canal Autorizador (Transfer Order).",
+          "fields": [
+            {
+              "name": "createToken",
+              "description": "Autentica no gateway e retorna o token JWT (válido por 24h).",
+              "args": [
+                {
+                  "name": "login",
+                  "description": "Login informado pelo responsável pela homologação na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "password",
+                  "description": "Senha informada pelo responsável pela homologação na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TokenPayload",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedOrder",
+              "description": "Cria um pré-pedido (Transfer Order) na Funcional.",
+              "args": [
+                {
+                  "name": "client_identification",
+                  "description": "CNPJ do cliente PDV",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "wholesaler",
+                  "description": "CNPJ da filial do distribuidor",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "client_code",
+                  "description": "Código interno do PDV",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "commercial_condition",
+                  "description": "Código da condição comercial (informado pela indústria e cadastrado na Funcional)",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "order_type",
+                  "description": "Tipo de venda",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "GroupedOrderTypeEnum",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "products",
+                  "description": "Produtos do pedido",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "ProductInput",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedResponse",
+              "description": "Envia o retorno do pedido à Funcional. Não é obrigatório, mas altera o fluxo (é necessário alinhar com o responsável pela homologação).",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Código do pedido",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "date_time_processing",
+                  "description": "Data e hora de processamento do retorno (formato YYYY-MM-DD HH:MM:SS)",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "order_motive",
+                  "description": "Motivo do pedido",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "OrderMotive",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "products",
+                  "description": "Dados dos produtos no retorno",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "ProductResponseInput",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "total_value",
+                  "description": "Valor total",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "discount_value",
+                  "description": "Valor total do desconto",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedInvoice",
+              "description": "Envia a nota fiscal do pedido à Funcional. Pode ser enviada direto para um pedido sem retorno; se o produto não for faturado, enviar 0 em invoice_quantity.",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Código do pedido",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "date_time_processing",
+                  "description": "Data e hora de processamento da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Datetime",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_issue_date",
+                  "description": "Data de emissão da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Date",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_number",
+                  "description": "Número da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "base_calculation_icms_tax_substitution",
+                  "description": "Base de cálculo do ICMS por substituição tributária",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Float",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "base_calculation_icms",
+                  "description": "Base de cálculo do ICMS",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Float",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "danfe",
+                  "description": "Chave DANFE",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_value",
+                  "description": "Valor da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_discount_value",
+                  "description": "Valor de desconto da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "icms_value_transferred",
+                  "description": "Valor de repasse do ICMS",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Float",
+                    "ofType": null
+                  }
+                },
+                {
+                  "name": "products_total_value",
+                  "description": "Valor total dos produtos",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_products",
+                  "description": "Dados de entrada dos produtos na nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "GroupedInvoiceProductInputType",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_tax_rates",
+                  "description": "Entrada das taxas de impostos da nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "INPUT_OBJECT",
+                        "name": "InvoiceTaxRateInputType",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "invoice_bank_tickets",
+                  "description": "Dados de entrada do boleto bancário",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "INPUT_OBJECT",
+                        "name": "InvoiceBankTicketInputType",
+                        "ofType": null
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedCancellation",
+              "description": "Envia o cancelamento (parcial ou total) do pedido à Funcional. Só pode ser enviado depois do retorno e antes do faturamento.",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Código do pedido na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "products",
+                  "description": "Produtos a serem cancelados",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "CancellationProductInput",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedInvoiceReversal",
+              "description": "Substitui os dados de uma nota enviada anteriormente por uma nova nota.",
+              "args": [
+                {
+                  "name": "grouped_order_id",
+                  "description": "Código do pedido na Funcional",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "removed_invoices",
+                  "description": "Número da nota a remover",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "new_invoices",
+                  "description": "Dados da nova nota",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "GroupedInvoiceInputType",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedOrder",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createGroupedInvoiceDevolution",
+              "description": "Realiza a devolução de uma nota já enviada, informando o produto devolvido e os dados da nova nota.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Dados da devolução",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "CreateGroupedInvoiceDevolutionInput",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedInvoiceDevolution",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "TokenPayload",
+          "description": "Token de autenticação do gateway.",
+          "fields": [
+            {
+              "name": "token",
+              "description": "Token JWT válido por 24 horas",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedOrder",
+          "description": "Pedido agrupado (Transfer Order) do Canal Autorizador — pré-pedido criado, com retorno, nota, cancelamento e devolução associados.",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Código do pedido na Funcional",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "grouped_order_code",
+              "description": "Código do pedido na Funcional",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "client_identification",
+              "description": "CNPJ do cliente",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler",
+              "description": "CNPJ do distribuidor",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "client_code",
+              "description": "Código do pedido no cliente",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "commercial_condition",
+              "description": "Código da condição comercial",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "GroupedOrderStatusEnum",
+                "ofType": null
+              }
+            },
+            {
+              "name": "created_at",
+              "description": "Criado em",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total_products",
+              "description": "Total de produtos",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total_value",
+              "description": "Valor total",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "order_type",
+              "description": "Tipo de pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "origin",
+              "description": "Origem do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "time_without_response",
+              "description": "Tempo do pedido sem resposta",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler_branch",
+              "description": "Filial do distribuidor",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "WholesalerBranch",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos do pedido",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedOrderProduct",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "responses",
+              "description": "Retornos do pedido (createGroupedResponse)",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedResponse",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoices",
+              "description": "Notas fiscais do pedido",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoice",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "grouped_devolutions",
+              "description": "Devoluções de nota do pedido",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceDevolution",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "cancellations",
+              "description": "Cancelamentos do pedido",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedCancellation",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoices_reversals",
+              "description": "Substituições de nota (reversal) do pedido",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceReversal",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedOrderProduct",
+          "description": "Produto do pedido agrupado.",
+          "fields": [
+            {
+              "name": "chain_name",
+              "description": "Nome da rede",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "id",
+              "description": "Código do pedido na Funcional",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "industry_abbreviation",
+              "description": "Sigla da indústria",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "industry_order_code",
+              "description": "Código do pedido na indústria",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "order_discount",
+              "description": "Valor unitário do desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ordered_quantity",
+              "description": "Quantidade pedida",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "product_reason",
+              "description": "Motivo do produto",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "OrderProductReason",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_reason_detail",
+              "description": "Motivo detalhado",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "time_without_response",
+              "description": "Tempo do pedido sem resposta",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total_value",
+              "description": "Valor total",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_net_price",
+              "description": "Valor líquido unitário",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler_discount",
+              "description": "Desconto do distribuidor",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedResponse",
+          "description": "Retorno do pedido enviado pelo distribuidor.",
+          "fields": [
+            {
+              "name": "discount_value",
+              "description": "Valor total do desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "order_motive",
+              "description": "Motivo do pedido",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "OrderMotive",
+                "ofType": null
+              }
+            },
+            {
+              "name": "processed_at",
+              "description": "Quando foi processado",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos do retorno",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedResponseProduct",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total_value",
+              "description": "Valor total",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedResponseProduct",
+          "description": "Produto no retorno do pedido.",
+          "fields": [
+            {
+              "name": "ean",
+              "description": "Código do EAN",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "importation_outcome",
+              "description": "Resultado da importação",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "monitored",
+              "description": "Produto monitorado (true ou false)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_discount",
+              "description": "Percentual de desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_reason",
+              "description": "Motivo do produto",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "OrderProductMotive",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_status",
+              "description": "Status do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "response_quantity",
+              "description": "Quantidade prevista",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_discount_price",
+              "description": "Valor unitário do desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_net_price",
+              "description": "Valor líquido unitário",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler_reason",
+              "description": "Motivo do distribuidor",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoice",
+          "description": "Nota fiscal do pedido.",
+          "fields": [
+            {
+              "name": "processed_at",
+              "description": "Quando foi processado",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status de processamento",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "issue_date",
+              "description": "Data de emissão da nota",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "number",
+              "description": "Número da nota",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "danfe",
+              "description": "Chave DANFE",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "value",
+              "description": "Valor da nota",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "discount_value",
+              "description": "Valor do desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products_total_value",
+              "description": "Valor total dos produtos",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms_tax_substitution",
+              "description": "Base de cálculo do ICMS por substituição tributária",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_value_transferred",
+              "description": "Valor de repasse do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_total_value",
+              "description": "Valor total do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_total_value_withheld",
+              "description": "Valor total do ICMS retido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "volume_quantity",
+              "description": "Quantidade de volume",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos da nota (dados de entrada dos produtos)",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceProductType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "bank_tickets",
+              "description": "Boletos bancários da nota",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceBankTicketType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "tax_rates",
+              "description": "Taxas de imposto da nota",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceTaxRate",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceProductType",
+          "description": "Produto faturado na nota.",
+          "fields": [
+            {
+              "name": "product_status",
+              "description": "Status da importação do produto no portal",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_item_id",
+              "description": "Id do EAN na nota",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_quantity",
+              "description": "Quantidade faturada",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_discount",
+              "description": "Percentual de desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "reimbursement_value",
+              "description": "Valor de reembolso",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "importation_outcome",
+              "description": "Resultado da importação no portal da indústria (null = ainda sem resposta; \"importado com sucesso\" = resposta processada)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms_tax_substitution",
+              "description": "Base de cálculo do ICMS por substituição tributária",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "cfop",
+              "description": "CFOP",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "dcb",
+              "description": "DCB",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_transferred_value",
+              "description": "Valor do ICMS repassado",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_value",
+              "description": "Valor do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_financial_discount",
+              "description": "Percentual de desconto financeiro",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_icms_aliquot",
+              "description": "Percentual de ICMS (alíquota)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_icms_tax_rate",
+              "description": "Percentual de taxa de imposto de ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_ipi_aliquot",
+              "description": "Percentual de IPI (alíquota)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_ipi_tax_rate",
+              "description": "Percentual da taxa de imposto de IPI",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_unit_financial_discount",
+              "description": "Valor unitário do desconto financeiro",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "positive_list_identifier",
+              "description": "Identificador da lista positiva (P=Positiva / N=Negativa / O=Neutro)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_classification",
+              "description": "Classificação do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_deadline",
+              "description": "Prazo do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_total_value",
+              "description": "Valor total do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_total_value_charges",
+              "description": "Valor total do produto + encargos",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "st_value",
+              "description": "Valor do repasse (substituição tributária)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tax_status_code",
+              "description": "Código do status fiscal",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tax_substitution_flag",
+              "description": "Flag de substituição tributária (S=Substituição / N=Normal / I=Isento)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "transfer_value",
+              "description": "Valor do repasse",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "type",
+              "description": "Tipo de produto (M=Monitorado / L=Liberado)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_discount_price",
+              "description": "Valor unitário do desconto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_net_price",
+              "description": "Valor líquido unitário",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "batches",
+              "description": "Lotes do produto na nota",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceProductBatchType",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceProductBatchType",
+          "description": "Lote de um produto faturado.",
+          "fields": [
+            {
+              "name": "quantity",
+              "description": "Quantidade",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "identification",
+              "description": "Identificação do lote",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "due_date",
+              "description": "Data de vencimento",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceBankTicketType",
+          "description": "Boleto bancário associado à nota.",
+          "fields": [
+            {
+              "name": "antecipated_discount",
+              "description": "Desconto antecipado",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "bank_agency",
+              "description": "Agência bancária",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "bank_code",
+              "description": "Código do banco",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "current_account_number",
+              "description": "Número da conta atual",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "due_date",
+              "description": "Data de vencimento",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "financial_discount_total_value",
+              "description": "Valor total do desconto financeiro",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "issue_date",
+              "description": "Data de emissão",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "number",
+              "description": "Número",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "penalty",
+              "description": "Percentual de multa",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_financial_discount",
+              "description": "Percentual de desconto financeiro",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_interest_per_day",
+              "description": "Percentual de juros por dia",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "plot_value",
+              "description": "Valor da parcela",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "value",
+              "description": "Valor",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceTaxRate",
+          "description": "Taxa de imposto faturada agrupada.",
+          "fields": [
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_total_value",
+              "description": "Valor total do ICMS",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_aliquot_icms",
+              "description": "Percentual de ICMS (alíquota)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedCancellation",
+          "description": "Dados do cancelamento do pedido.",
+          "fields": [
+            {
+              "name": "status",
+              "description": "Status de processamento da requisição",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos a serem cancelados",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CancellationProductType",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CancellationProductType",
+          "description": "Produto cancelado.",
+          "fields": [
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "importation_outcome",
+              "description": "Resultado da importação",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_status",
+              "description": "Status da importação do produto no portal",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do cancelamento",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceReversal",
+          "description": "Dados do estorno (substituição de nota) enviado no pedido.",
+          "fields": [
+            {
+              "name": "products",
+              "description": "Produtos do estorno",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceReversalProductType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceReversalProductType",
+          "description": "Produto de uma nota substituída (reversal).",
+          "fields": [
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "importation_outcome",
+              "description": "Resultado da importação do estorno",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceDevolution",
+          "description": "Devolução de uma nota fiscal enviada.",
+          "fields": [
+            {
+              "name": "cfop",
+              "description": "CFOP",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "danfe",
+              "description": "Chave DANFE",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "grouped_order_id",
+              "description": "ID do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "id",
+              "description": "Id da nota de devolução",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_devolution_created_at",
+              "description": "Data da devolução",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_number",
+              "description": "Número da nota devolvida",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_number_devolution",
+              "description": "Número da nota de devolução",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos devolvidos",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceDevolutionProduct",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceDevolutionProduct",
+          "description": "Produto de uma devolução de nota.",
+          "fields": [
+            {
+              "name": "batch",
+              "description": "Lote da nota",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "code_reason",
+              "description": "Razão da devolução do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "grouped_invoice_devolution",
+              "description": "Devolução de nota",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedInvoiceDevolution",
+                "ofType": null
+              }
+            },
+            {
+              "name": "grouped_invoice_product",
+              "description": "Produto da nota devolvido",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GroupedInvoiceProductType",
+                "ofType": null
+              }
+            },
+            {
+              "name": "id",
+              "description": "ID",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "importation_outcome",
+              "description": "Resultado da importação",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "quantity",
+              "description": "Quantidade",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do produto",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WholesalerBranch",
+          "description": "Filial do distribuidor.",
+          "fields": [
+            {
+              "name": "name",
+              "description": "Descrição do nome do distribuidor",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedOrdersPage",
+          "description": "Página de resultados de groupedOrders.",
+          "fields": [
+            {
+              "name": "current_page",
+              "description": "Página atual",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "data",
+              "description": "Pedidos da página atual",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedOrder",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "from",
+              "description": "Número do primeiro item devolvido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "has_more_pages",
+              "description": "Determina se o cursor tem mais páginas após a página atual",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "name": "last_page",
+              "description": "A última página (número de páginas)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "per_page",
+              "description": "Quantidade de pedidos por página",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "to",
+              "description": "Número do último item devolvido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total",
+              "description": "Total de pedidos trazidos pela query",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GroupedInvoiceDevolutionsPage",
+          "description": "Página de resultados de groupedInvoiceDevolutions.",
+          "fields": [
+            {
+              "name": "current_page",
+              "description": "Página atual",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "data",
+              "description": "Devoluções da página atual",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "GroupedInvoiceDevolution",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "from",
+              "description": "Número do primeiro item devolvido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "has_more_pages",
+              "description": "Determina se há mais páginas após a atual",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "name": "last_page",
+              "description": "A última página",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "per_page",
+              "description": "Quantidade por página",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "to",
+              "description": "Número do último item devolvido",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "total",
+              "description": "Total de devoluções trazidas pela query",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ProductInput",
+          "description": "Dados de entrada do produto no pré-pedido (createGroupedOrder).",
+          "inputFields": [
+            {
+              "name": "ean",
+              "description": "Código do EAN",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "industry_abbreviation",
+              "description": "Sigla da indústria (obrigatório a depender da indústria — atualmente apenas AstraZeneca, sigla AZN)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ordered_quantity",
+              "description": "Quantidade pedida do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "wholesaler_discount",
+              "description": "Percentual do desconto do produto (obrigatório a depender da indústria)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ProductResponseInput",
+          "description": "Dados do produto no retorno do pedido (createGroupedResponse).",
+          "inputFields": [
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "monitored",
+              "description": "Produto monitorado (true ou false)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_discount",
+              "description": "Percentual do desconto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_reason",
+              "description": "Motivo do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "OrderProductMotive",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "response_quantity",
+              "description": "Quantidade atendida",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "unit_discount_price",
+              "description": "Valor unitário do desconto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_net_price",
+              "description": "Valor líquido unitário",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler_reason",
+              "description": "Motivo do distribuidor",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "InvoiceBatchType",
+          "description": "Lote de faturamento de um produto da nota.",
+          "inputFields": [
+            {
+              "name": "due_date",
+              "description": "Data de vencimento",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "identification",
+              "description": "Identificação do lote",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "quantity",
+              "description": "Quantidade",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "InvoiceTaxRateInputType",
+          "description": "Taxa de imposto da nota fiscal.",
+          "inputFields": [
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "icms_total_value",
+              "description": "Valor total do ICMS retido",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_aliquot_icms",
+              "description": "Percentual de ICMS (alíquota)",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "InvoiceBankTicketInputType",
+          "description": "Dados de entrada do boleto bancário da nota.",
+          "inputFields": [
+            {
+              "name": "antecipated_discount",
+              "description": "Desconto antecipado",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "bank_agency",
+              "description": "Agência bancária",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "bank_code",
+              "description": "Código do banco",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "current_account_number",
+              "description": "Número da conta atual",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "due_date",
+              "description": "Data de vencimento",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Date",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "financial_discount_total_value",
+              "description": "Valor total do desconto financeiro",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "issue_date",
+              "description": "Data de emissão",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            {
+              "name": "number",
+              "description": "Número do boleto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "penalty",
+              "description": "Percentual de multa",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_financial_discount",
+              "description": "Percentual de desconto financeiro",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_interest_per_day",
+              "description": "Percentual de juros por dia",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "plot_value",
+              "description": "Valor da parcela",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "value",
+              "description": "Valor",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GroupedInvoiceProductInputType",
+          "description": "Dados de entrada de um produto faturado na nota (createGroupedInvoice).",
+          "inputFields": [
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms_tax_substitution",
+              "description": "Base de cálculo do ICMS por substituição tributária",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "cfop",
+              "description": "CFOP",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "dcb",
+              "description": "DCB",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "icms_transferred_value",
+              "description": "Valor do ICMS repassado",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_value",
+              "description": "Valor do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_item_id",
+              "description": "Id do EAN na nota (obrigatório quando a mesma DANFE é usada em mais de um pedido)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_quantity",
+              "description": "Quantidade faturada",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "percent_discount",
+              "description": "Percentual de desconto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "percent_financial_discount",
+              "description": "Percentual de desconto financeiro",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_icms_aliquot",
+              "description": "Percentual de ICMS (alíquota)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_ipi_aliquot",
+              "description": "Percentual de IPI (alíquota)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "percent_unit_financial_discount",
+              "description": "Valor unitário do desconto financeiro",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "positive_list_identifier",
+              "description": "Identificador da lista positiva (P=Positiva / N=Negativa / O=Neutro)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_classification",
+              "description": "Classificação do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_deadline",
+              "description": "Prazo do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_total_value",
+              "description": "Valor total do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "product_total_value_charges",
+              "description": "Valor total do produto + encargos",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "st_value",
+              "description": "Valor do repasse (substituição tributária)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tax_status_code",
+              "description": "Código do status fiscal",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tax_substitution_flag",
+              "description": "Flag de substituição tributária (S=Substituição / N=Normal / I=Isento)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "transfer_value",
+              "description": "Valor do repasse",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "type",
+              "description": "Tipo de produto (M=Monitorado / L=Liberado)",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_discount_price",
+              "description": "Valor unitário do desconto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "unit_net_price",
+              "description": "Valor líquido unitário",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_batches",
+              "description": "Lotes de faturamento do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "InvoiceBatchType",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CancellationProductInput",
+          "description": "Produto a cancelar (createGroupedCancellation) — parcial ou total.",
+          "inputFields": [
+            {
+              "name": "ean",
+              "description": "EAN do produto cancelado",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GroupedInvoiceInputType",
+          "description": "Nova nota fiscal para substituir a nota removida (createGroupedInvoiceReversal).",
+          "inputFields": [
+            {
+              "name": "base_calculation_icms",
+              "description": "Base de cálculo do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "base_calculation_icms_tax_substitution",
+              "description": "Base de cálculo do ICMS por substituição tributária",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "danfe",
+              "description": "Chave DANFE",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "date_time_processing",
+              "description": "Data e hora de processamento (formato YYYY-MM-DD HH:MM:SS)",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Datetime",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "icms_total_value",
+              "description": "Valor total do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_total_value_withheld",
+              "description": "Valor total do ICMS retido",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "icms_value_transferred",
+              "description": "Valor de repasse do ICMS",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_bank_tickets",
+              "description": "Dados de entrada do boleto bancário",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "InvoiceBankTicketInputType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoice_batches",
+              "description": "Lotes de faturamento",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "InvoiceBatchType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoice_discount_value",
+              "description": "Valor do desconto da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_issue_date",
+              "description": "Data de emissão da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Date",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_number",
+              "description": "Número da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_products",
+              "description": "Dados de entrada dos produtos na nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "GroupedInvoiceProductInputType",
+                      "ofType": null
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoice_tax_rates",
+              "description": "Taxas de impostos da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "InvoiceTaxRateInputType",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            {
+              "name": "invoice_value",
+              "description": "Valor da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "products_total_value",
+              "description": "Valor total dos produtos",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "volume_quantity",
+              "description": "Quantidade de volume",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GroupedOrderFilterType",
+          "description": "Filtros de busca de pedidos (groupedOrders).",
+          "inputFields": [
+            {
+              "name": "begin_date",
+              "description": "Data de início",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            {
+              "name": "client_identification",
+              "description": "CNPJ ou CPF do cliente",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "commercial_condition",
+              "description": "Condição comercial",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "end_date",
+              "description": "Data final",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            {
+              "name": "status",
+              "description": "Status do pedido",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "GroupedOrderStatusEnum",
+                "ofType": null
+              }
+            },
+            {
+              "name": "wholesaler_branch_code",
+              "description": "Filial do distribuidor",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GroupedInvoiceProductDevolutionInputType",
+          "description": "Produto a devolver (createGroupedInvoiceDevolution).",
+          "inputFields": [
+            {
+              "name": "batch",
+              "description": "Lote da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "code_reason",
+              "description": "Código do motivo da devolução do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "ean",
+              "description": "EAN do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "quantity",
+              "description": "Quantidade da devolução",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CreateGroupedInvoiceDevolutionInput",
+          "description": "Dados de entrada da devolução da nota (createGroupedInvoiceDevolution).",
+          "inputFields": [
+            {
+              "name": "cfop",
+              "description": "CFOP",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "danfe",
+              "description": "Chave DANFE",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "grouped_order_id",
+              "description": "Código do pedido na Funcional",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_devolution_created_at",
+              "description": "Data da devolução",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Date",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_number",
+              "description": "Número da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "invoice_number_devolution",
+              "description": "Número da nota de devolução",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "products",
+              "description": "Produtos a devolver",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "GroupedInvoiceProductDevolutionInputType",
+                      "ofType": null
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "GroupedInvoiceDevolutionFilterType",
+          "description": "Filtros de busca de devoluções (groupedInvoiceDevolutions).",
+          "inputFields": [
+            {
+              "name": "cfop",
+              "description": "CFOP",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "danfe",
+              "description": "Chave DANFE",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "grouped_order_id",
+              "description": "ID do pedido",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_devolution_created_at",
+              "description": "Data da devolução",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_number",
+              "description": "Número da nota",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "name": "invoice_number_devolution",
+              "description": "Número da nota de devolução",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "GroupedOrderStatusEnum",
+          "description": "Status do pedido agrupado (Canal Autorizador).",
+          "enumValues": [
+            {
+              "name": "AWAITING_PROCESSING",
+              "description": "Aguardando processamento"
+            },
+            {
+              "name": "PROCESSING",
+              "description": "Processando"
+            },
+            {
+              "name": "PROCESSED",
+              "description": "Pedido processado e totalmente rejeitado (negado) pela indústria"
+            },
+            {
+              "name": "AWAITING_ORDER_RESPONSE",
+              "description": "Aguardando o retorno do pedido (createGroupedResponse)"
+            },
+            {
+              "name": "AWAITING_ORDER_INVOICE",
+              "description": "Aguardando a nota do pedido (createGroupedInvoice)"
+            },
+            {
+              "name": "INVOICE_RECEIVED",
+              "description": "Nota recebida"
+            },
+            {
+              "name": "AWAITING_CANCELLATION_PROCESSING",
+              "description": "Aguardando processamento do cancelamento"
+            },
+            {
+              "name": "PROCESSING_CANCELLATION",
+              "description": "Cancelamento sendo processado"
+            },
+            {
+              "name": "AWAITING_INVOICE_REVERSAL_PROCESSING",
+              "description": "Aguardando processamento da nota reversal"
+            },
+            {
+              "name": "PROCESSING_INVOICE_REVERSAL",
+              "description": "Nota reversal sendo processada"
+            },
+            {
+              "name": "CANCELLED",
+              "description": "Pedido cancelado"
+            },
+            {
+              "name": "REJECTED",
+              "description": "Pedido rejeitado"
+            },
+            {
+              "name": "AWAITING_INVOICE_DEVOLUTION_PROCESSING",
+              "description": "Aguardando processamento da devolução"
+            },
+            {
+              "name": "PROCESSING_INVOICE_DEVOLUTION",
+              "description": "Nota de devolução sendo processada"
+            },
+            {
+              "name": "RETURNED",
+              "description": "Devolvido"
+            },
+            {
+              "name": "PARTIALLY_RETURNED",
+              "description": "Parcialmente devolvido"
+            }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "GroupedOrderTypeEnum",
+          "description": "Tipo de venda do pedido agrupado.",
+          "enumValues": [
+            {
+              "name": "CONSIGNMENT",
+              "description": "Consignação"
+            },
+            {
+              "name": "BONUS",
+              "description": "Bonificação"
+            },
+            {
+              "name": "TRIANGULAR_SALE",
+              "description": "Venda triangular"
+            }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "OrderProductReason",
+          "description": "Motivo do produto retornado pela Funcional na consulta do pedido (campo product_reason em groupedOrder/groupedOrders/groupedStatusChanges).",
+          "enumValues": [
+            {
+              "name": "AWAITING_PROCESSING",
+              "description": "Aguardando processamento — consultar o pedido novamente"
+            },
+            {
+              "name": "ORDER_CREATED_ON_INDUSTRY_OL_PORTAL",
+              "description": "Pedido criado no portal da indústria — seguir com o pedido"
+            },
+            {
+              "name": "NO_RESPONSE_FROM_INDUSTRY_OL_PORTAL",
+              "description": "Sem resposta no portal da indústria — enviar o pedido novamente, pois o portal estava fora do ar"
+            },
+            {
+              "name": "PRODUCT_DOES_NOT_BELONG_TO_OL_FIDELIZE",
+              "description": "Produto não existe na OL Funcional — desconsiderar este item"
+            },
+            {
+              "name": "PRODUCT_DOES_NOT_BELONG_TO_SELECTED_INDUSTRY",
+              "description": "Produto não existe na indústria selecionada — verificar com o KAM"
+            },
+            {
+              "name": "PRODUCT_NOT_RELEASED_ON_COMMERCIAL_CONDITION",
+              "description": "Produto não existe na condição comercial — verificar com o KAM"
+            },
+            {
+              "name": "COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_ORDER_CONDITIONS",
+              "description": "Política comercial não disponível para a condição — verificar com o KAM"
+            },
+            {
+              "name": "COMMERCIAL_POLICIES_NOT_FOUND_FOR_PRODUCT_ON_INDUSTRY_OL_PORTAL",
+              "description": "Nenhuma política comercial encontrada para o produto — verificar com o KAM"
+            },
+            {
+              "name": "WHOLESALER_DISCOUNT_REQUIRED",
+              "description": "Desconto requerido — verificar com o KAM"
+            },
+            {
+              "name": "WHOLESALER_DISCOUNT_OUT_OF_RANGE",
+              "description": "Desconto fora de alcance — verificar com o KAM"
+            },
+            {
+              "name": "PRODUCT_DISABLED_ON_INDUSTRY_OL_PORTAL",
+              "description": "Produto desabilitado no portal da indústria — desconsiderar este item"
+            },
+            {
+              "name": "CLIENT_NOT_FOUND_ON_INDUSTRY_OL_PORTAL",
+              "description": "Cliente não encontrado no portal da indústria — contatar o KAM para cadastro"
+            },
+            {
+              "name": "WHOLESALER_BRANCH_NOT_AVAILABLE_FOR_ORDER_CONDITIONS",
+              "description": "Nenhuma condição comercial liberada para a filial do distribuidor — contatar o KAM"
+            },
+            {
+              "name": "WHOLESALER_BRANCH_NOT_ALLOWED_TO_INDUSTRY",
+              "description": "Filial não existe na indústria — contatar o KAM para cadastro"
+            },
+            {
+              "name": "PRODUCTS_NOT_AVAILABLES",
+              "description": "Produto não disponível — desconsiderar este item, pois não pertence à Funcional"
+            },
+            {
+              "name": "ERROR_ADDING_PRODUCT_TO_ORDER",
+              "description": "Erro ao adicionar produto no pedido — verificar com o KAM"
+            },
+            {
+              "name": "ERROR_SENDING_ORDER",
+              "description": "Erro ao enviar pedido — verificar com a Funcional se pode reenviar"
+            },
+            {
+              "name": "DISCOUNT_OUT_OF_PERMITED_RANGE",
+              "description": "Desconto fora do permitido — verificar com o KAM"
+            },
+            {
+              "name": "DUPLICATE_ORDER_ON_INDUSTRY_OL_PORTAL",
+              "description": "Pedido duplicado — verificar com a Funcional o tempo de espera para reenvio"
+            },
+            {
+              "name": "RETROACTIVE_ORDER_NOT_AVAILABLE_FOR_WHOLESALER_BRANCH",
+              "description": "Pedido retroativo não disponível para a filial do distribuidor — verificar liberação com a Funcional"
+            },
+            {
+              "name": "ORIGIN_NOT_ALLOWED_FOR_ORDER_DATE_RETROACTIVE",
+              "description": "Origem não permitida para data de pedido retroativa — verificar liberação com a Funcional"
+            },
+            {
+              "name": "DATE_RANGE_NOT_DEFINED",
+              "description": "Intervalo de datas não definido — verificar com a Funcional a data para envio de pedidos retroativos"
+            },
+            {
+              "name": "ORDER_DATE_OUT_OF_RANGE",
+              "description": "Data do pedido fora do intervalo — verificar com a Funcional a data para envio de pedidos retroativos"
+            },
+            {
+              "name": "COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_CLIENT",
+              "description": "Políticas comerciais não disponíveis para o cliente — verificar a tabela correta com o KAM"
+            },
+            {
+              "name": "COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_WHOLESALER",
+              "description": "Políticas comerciais não disponíveis para o distribuidor — verificar a tabela correta com o KAM"
+            },
+            {
+              "name": "COMMERCIAL_POLICIES_NOT_AVAILABLE_FOR_PRODUCT",
+              "description": "Políticas comerciais não disponíveis para o produto — verificar produtos liberados na tabela com o KAM"
+            },
+            {
+              "name": "WHOLESALER_BRANCH_NOT_FOUND_ON_INDUSTRY_OL_PORTAL",
+              "description": "Filial do distribuidor não encontrada no portal da indústria — verificar liberação com a Funcional"
+            },
+            {
+              "name": "DISTRIBUTOR_NOT_ASSOCIATED_WITH_THE_CUSTOMER",
+              "description": "Distribuidor não associado ao cliente — verificar liberação do cliente com a Funcional"
+            },
+            {
+              "name": "ORDER_REJECTED_DUE_TO_ONE_OR_MORE_DISCOUNTS_OUTSIDE_COMMERCIAL_POLICY",
+              "description": "Pedido rejeitado por um ou mais descontos fora da política comercial — verificar descontos com o KAM"
+            },
+            {
+              "name": "PRODUCT_DISCOUNT_NOT_CONFIGURED_IN_POLICY",
+              "description": "Desconto do produto não configurado na política — verificar com a Funcional"
+            },
+            {
+              "name": "ERROR_ON_CREATE_ORDER",
+              "description": "Erro ao criar o pedido — verificar com a Funcional o motivo"
+            },
+            {
+              "name": "ORDERED_QUANTITY_BELOW_REQUIRED",
+              "description": "Quantidade encomendada abaixo do necessário — verificar quantidade mínima da tabela com a Funcional"
+            },
+            {
+              "name": "ORDERED_QUANTITY_ABOVE_MAXIMUM",
+              "description": "Quantidade encomendada acima do máximo — verificar quantidade máxima da tabela com a Funcional"
+            }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "OrderMotive",
+          "description": "Motivo do pedido enviado pelo distribuidor no retorno (campo order_motive em createGroupedResponse).",
+          "enumValues": [
+            {
+              "name": "BELOW_THE_MINIMUM",
+              "description": "Abaixo do mínimo"
+            },
+            {
+              "name": "PARTIALLY_BILLED_ORDER",
+              "description": "Pedido pago parcialmente"
+            },
+            {
+              "name": "ORDER_SUCCESSFULLY_ACCEPTED",
+              "description": "Pedido aceito com sucesso"
+            },
+            {
+              "name": "STOCK_SHORTAGE",
+              "description": "Falta de estoque"
+            },
+            {
+              "name": "CREDIT_SHORTAGE",
+              "description": "Critério de crédito"
+            },
+            {
+              "name": "CLIENT_NOT_REGISTERED",
+              "description": "Cliente não registrado"
+            },
+            {
+              "name": "TIME_EXCEEDED",
+              "description": "Tempo excedido"
+            },
+            {
+              "name": "CLIENT_AND_OR_PRODUCT_NOT_REGISTERED_ON_NEGOTIATION",
+              "description": "Cliente e/ou produto não registrado na negociação"
+            },
+            {
+              "name": "DUPLICATE_ORDER",
+              "description": "Pedido duplicado"
+            },
+            {
+              "name": "LICENSE_DATE_EXPIRED",
+              "description": "Data de licença expirada"
+            },
+            {
+              "name": "REGISTRATION_PROBLEMS",
+              "description": "Problemas de registro"
+            },
+            {
+              "name": "CLIENT_BLOCKED",
+              "description": "Cliente bloqueado"
+            },
+            {
+              "name": "INVALID_PAYMENT_CONDITION",
+              "description": "Condição de pagamento inválida"
+            },
+            {
+              "name": "LOGISTICAL_OPERATION_NOT_ALLOWED",
+              "description": "Funcionamento logístico não permitido"
+            },
+            {
+              "name": "CLIENT_NOT_REGISTERED_ON_PROMOTION",
+              "description": "Cliente não registrado na negociação"
+            },
+            {
+              "name": "INVALID_LAYOUT",
+              "description": "Layout inválido"
+            },
+            {
+              "name": "ORDER_BILLED_WITH_DIFFERENT_CONDITION",
+              "description": "Pedido faturado em condições diferentes"
+            }
+          ]
+        },
+        {
+          "kind": "ENUM",
+          "name": "OrderProductMotive",
+          "description": "Motivo do produto enviado pelo distribuidor no retorno (campo product_reason em createGroupedResponse).",
+          "enumValues": [
+            {
+              "name": "PRODUCT_SUCCESSFULLY_ACCEPTED",
+              "description": "Produto aceito com sucesso"
+            },
+            {
+              "name": "PRODUCT_NOT_REGISTERED",
+              "description": "Produto não registrado"
+            },
+            {
+              "name": "PARTIALLY_ACCEPTED_PRODUCT",
+              "description": "Produto parcialmente aceito"
+            },
+            {
+              "name": "UNBILLED_PRODUCT",
+              "description": "Produto não faturado"
+            },
+            {
+              "name": "STOCK_SHORTAGE",
+              "description": "Falta de estoque"
+            },
+            {
+              "name": "PRODUCT_BLOCKED",
+              "description": "Produto bloqueado"
+            },
+            {
+              "name": "DISCONTINUED_PRODUCT",
+              "description": "Produto descontinuado"
+            },
+            {
+              "name": "INVALID_ORDERED_AMOUNT",
+              "description": "Quantidade inválida"
+            },
+            {
+              "name": "CLIENT_AND_OR_PRODUCT_NOT_REGISTERED_ON_NEGOTIATION",
+              "description": "Cliente ou produto não registrado na negociação"
+            },
+            {
+              "name": "PRODUCT_BLOCKED_BY_BRIEF_EXPIRATION_DATE",
+              "description": "Produto bloqueado por data de expiração"
+            },
+            {
+              "name": "PRODUCT_BLOCKED_FOR_THIS_OPERATION",
+              "description": "Produto bloqueado para esta operação"
+            },
+            {
+              "name": "PRODUCT_BLOCKED_CLINICAL",
+              "description": "Produto clínico bloqueado"
+            },
+            {
+              "name": "PRODUCT_BLOCKED_BY_PRICE_DIVERGENCE",
+              "description": "Produto bloqueado por divergência de preço"
+            },
+            {
+              "name": "PRODUCT_BLOCKED_BY_LOGISTICS",
+              "description": "Produto bloqueado por logística"
+            },
+            {
+              "name": "PRODUCT_NOT_REGISTERED_ON_PROMOTION",
+              "description": "Produto não registrado na promoção"
+            }
+          ]
+        },
+        {
+          "kind": "SCALAR",
+          "name": "String",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Int",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Float",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Boolean",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "ID",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Date",
+          "description": "Data no formato YYYY-MM-DD.",
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Datetime",
+          "description": "Data e hora no formato YYYY-MM-DD HH:MM:SS.",
+          "fields": null
+        }
+      ]
+    }
+  },
+  "summary": {
+    "typeCount": 45,
+    "queryFieldCount": 6,
+    "mutationFieldCount": 7
+  }
+}

@@ -90,7 +90,7 @@ test("admin monta o manual no editor unificado e distribuidor ve o resultado", a
   await expect(page.getByRole("button", { name: "Despublicar" })).toBeVisible();
 
   // Visão do distribuidor: mesmo layout, sem controles de edição.
-  await page.goto(`/manual/${SLUG}`);
+  await page.goto(`/docs/${SLUG}`);
   await expect(page.getByRole("heading", { name: MANUAL_TITLE })).toBeVisible();
   await expect(page.getByText(SECTION_MARKER)).toBeVisible();
   await expect(

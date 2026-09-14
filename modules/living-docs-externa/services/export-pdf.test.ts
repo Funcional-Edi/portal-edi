@@ -9,6 +9,7 @@ const baseConfig: ProjectConfig = {
   name: "Demo API",
   description: "Projeto de demonstração para validar export PDF.",
   environment: "homolog",
+  protocol: "graphql",
   graphqlUrl: "https://gateway-homologa.fidelize.com.br/graphql",
   published: true,
   audience: "distribuidor",

@@ -7,8 +7,15 @@ async function loginAsDevUser(page: Page) {
   await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }
 
+async function loginAsDevAdmin(page: Page) {
+  await page.goto("/");
+  await page.getByLabel("E-mail").fill("admin@empresa.com");
+  await page.getByRole("button", { name: "Entrar (dev)" }).click();
+  await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
+}
+
 test("playground aceita query allowlisted e bloqueia fora da lista", async ({ page }) => {
-  await loginAsDevUser(page);
+  await loginAsDevAdmin(page);
 
   const allowlisted = await page.evaluate(async () => {
     const response = await fetch("/api/living-docs/projects/demo/graphql", {
@@ -36,4 +43,23 @@ test("playground aceita query allowlisted e bloqueia fora da lista", async ({ pa
 
   expect(blocked.status).toBe(403);
   expect(blocked.error).toContain("allowlist");
+});
+
+test("distribuidor recebe forbidden na API do playground", async ({ page }) => {
+  await loginAsDevUser(page);
+
+  const response = await page.evaluate(async () => {
+    const res = await fetch("/api/living-docs/projects/demo/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: 'mutation { createToken(login: "demo", password: "demo") { token } }',
+      }),
+    });
+    const body = (await res.json()) as { error?: string };
+    return { status: res.status, error: body.error ?? "" };
+  });
+
+  expect(response.status).toBe(403);
+  expect(response.error).toBe("Forbidden");
 });

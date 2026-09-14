@@ -20,6 +20,7 @@ Um arquivo por dia em `diario/AAAA-MM-DD.md`, respondendo 4 perguntas:
 - [[2026-08-10|10/08/2026 — Fase 10 polish (PDF + E2E allowlist + validação de conteúdo)]]
 - [[2026-08-24|24/08/2026 — Retomada: análise geral + CI verde]]
 - [[2026-08-25|25/08/2026 — /docs/api referência GraphQL global]]
+- [[2026-08-31|31/08/2026 — Suporte REST (PSP) + reestruturação EDI Canais/PSP]]
 
 ## Template
 
