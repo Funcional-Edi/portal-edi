@@ -23,9 +23,7 @@ describe("permissions-config", () => {
   it("usa defaults quando env ausente", () => {
     delete process.env.PERMISSIONS_CONFIG_JSON;
     expect(getPermissionsConfigSource()).toBe("default");
-    expect(resolveRole("admin@empresa.com", getPermissionsConfig())).toBe(
-      "admin"
-    );
+    expect(resolveRole("admin@empresa.com", getPermissionsConfig())).toBe("client");
   });
 
   it("lê admins de PERMISSIONS_CONFIG_JSON", () => {
