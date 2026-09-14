@@ -68,6 +68,33 @@ export interface SchemaTypeDetailView {
   interfaces?: string[];
 }
 
+/** Linha de tabela estilo PDF (Campo / Tipo / Obrigatório / Descrição). */
+export interface SchemaFieldRow {
+  name: string;
+  type: SchemaTypeNameRef;
+  required: boolean;
+  description?: string;
+  defaultValue?: string;
+}
+
+/** Tipo de entrada aninhado referenciado por um argumento (ex.: ProductInput). */
+export interface SchemaInputTypeSection {
+  typeName: string;
+  description?: string;
+  fields: SchemaFieldRow[];
+}
+
+/** Campos de requisição/resposta de uma operação GraphQL, extraídos do snapshot. */
+export interface OperationSchemaDetail {
+  operationName: string;
+  kind: "query" | "mutation";
+  description?: string;
+  requestArgs: SchemaFieldRow[];
+  requestInputTypes: SchemaInputTypeSection[];
+  responseTypeName: string | null;
+  responseFields: SchemaFieldRow[];
+}
+
 type IntrospectionTypeRef = {
   kind: string;
   name?: string | null;
@@ -153,6 +180,13 @@ export function resolveNamedType(
     return resolveNamedType(typeRef.ofType);
   }
   return typeRef.name ?? null;
+}
+
+/** Indica se o tipo GraphQL é obrigatório (envolvido por NON_NULL). */
+export function isRequiredGraphQLType(
+  typeRef: IntrospectionTypeRef | null | undefined
+): boolean {
+  return typeRef?.kind === "NON_NULL";
 }
 
 /** Formata referência de tipo GraphQL para exibição. */
@@ -283,6 +317,116 @@ export function buildSchemaTypeDetailView(
   if (interfaces.length) detail.interfaces = interfaces;
 
   return detail;
+}
+
+function mapArgsToSchemaFieldRows(
+  args: IntrospectionArg[] | null | undefined
+): SchemaFieldRow[] {
+  if (!args?.length) return [];
+  return args
+    .map((arg) => ({
+      name: arg.name,
+      type: toTypeNameRef(arg.type),
+      required: isRequiredGraphQLType(arg.type),
+      description: arg.description ?? undefined,
+      defaultValue: arg.defaultValue ?? undefined,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function mapInputFieldsToSchemaFieldRows(
+  fields: IntrospectionInputField[] | null | undefined
+): SchemaFieldRow[] {
+  if (!fields?.length) return [];
+  return fields
+    .map((field) => ({
+      name: field.name,
+      type: toTypeNameRef(field.type),
+      required: isRequiredGraphQLType(field.type),
+      description: field.description ?? undefined,
+      defaultValue: field.defaultValue ?? undefined,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function mapObjectFieldsToSchemaFieldRows(
+  fields: IntrospectionField[] | null | undefined
+): SchemaFieldRow[] {
+  if (!fields?.length) return [];
+  return fields
+    .map((field) => ({
+      name: field.name,
+      type: toTypeNameRef(field.type),
+      required: isRequiredGraphQLType(field.type),
+      description: field.description ?? undefined,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function collectReferencedInputTypes(
+  types: IntrospectionType[],
+  args: IntrospectionArg[] | null | undefined
+): SchemaInputTypeSection[] {
+  if (!args?.length) return [];
+
+  const seen = new Set<string>();
+  const sections: SchemaInputTypeSection[] = [];
+
+  for (const arg of args) {
+    const named = resolveNamedType(arg.type);
+    if (!named || seen.has(named)) continue;
+
+    const type = findTypeByName(types, named);
+    if (type?.kind !== "INPUT_OBJECT" || !type.inputFields?.length) continue;
+
+    seen.add(named);
+    sections.push({
+      typeName: named,
+      description: type.description ?? undefined,
+      fields: mapInputFieldsToSchemaFieldRows(type.inputFields),
+    });
+  }
+
+  return sections.sort((a, b) => a.typeName.localeCompare(b.typeName));
+}
+
+/**
+ * Extrai campos de requisição (args + tipos INPUT_OBJECT) e resposta (tipo retornado)
+ * de uma operação GraphQL — equivalente às tabelas Request/Response Class do PDF.
+ */
+export function buildOperationSchemaDetail(
+  snapshot: ProjectSchemaSnapshot,
+  kind: "query" | "mutation",
+  operationName: string
+): OperationSchemaDetail | null {
+  const schema = snapshot.introspection.__schema;
+  const types = (schema.types ?? []) as IntrospectionType[];
+  const rootTypeName = kind === "query" ? schema.queryType?.name : schema.mutationType?.name;
+  const rootType = findRootType(types, rootTypeName);
+  if (!rootType?.fields?.length) return null;
+
+  const operationField = rootType.fields.find((field) => field.name === operationName);
+  if (!operationField) return null;
+
+  const responseTypeName = resolveNamedType(operationField.type);
+  let responseFields: SchemaFieldRow[] = [];
+
+  if (responseTypeName) {
+    const responseType = findTypeByName(types, responseTypeName);
+    if (responseType?.kind === "OBJECT" && responseType.fields?.length) {
+      responseFields = mapObjectFieldsToSchemaFieldRows(responseType.fields);
+    }
+  }
+
+  return {
+    operationName,
+    kind,
+    description: operationField.description ?? undefined,
+    requestArgs: mapArgsToSchemaFieldRows(operationField.args),
+    requestInputTypes: collectReferencedInputTypes(types, operationField.args),
+    responseTypeName,
+    responseFields,
+  };
 }
 
 /** Transforma snapshot de introspection em visão navegável (queries, mutations, tipos). */

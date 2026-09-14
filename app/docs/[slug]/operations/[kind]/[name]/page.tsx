@@ -7,6 +7,7 @@ import {
 } from "@/modules/living-docs-externa/schema";
 import { OperationDetail } from "@/modules/living-docs-externa/ui/reader/operation-detail";
 import {
+  getPublishedOperationSchemaDetail,
   hasPublishedSchemaSnapshot,
   schemaFieldHref,
 } from "@/modules/living-docs-externa/services/get-published-schema";
@@ -37,6 +38,10 @@ export default async function OperationPage({ params }: OperationPageProps) {
     project.config.protocol === "rest" ? project.config.apiBaseUrl : project.config.graphqlUrl
   );
   const kindForSchema = kindResult.data;
+  const schemaDetail =
+    hasSchema && kindForSchema !== "rest"
+      ? await getPublishedOperationSchemaDetail(slug, kindForSchema, name)
+      : null;
 
   return (
     <OperationDetail
@@ -49,6 +54,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
           ? schemaFieldHref(slug, kindForSchema, name)
           : undefined
       }
+      schemaDetail={schemaDetail}
       canUsePlayground={canUsePlayground}
     />
   );

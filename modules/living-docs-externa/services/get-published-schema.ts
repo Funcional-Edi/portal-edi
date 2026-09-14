@@ -11,8 +11,10 @@ import {
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { listPublishedManuals } from "@/modules/living-docs-externa/services/list-published-manuals";
 import {
+  buildOperationSchemaDetail,
   buildSchemaReferenceView,
   buildSchemaTypeDetailView,
+  type OperationSchemaDetail,
   type SchemaReferenceView,
   type SchemaTypeDetailView,
 } from "@/modules/living-docs-externa/services/schema-reference";
@@ -128,6 +130,44 @@ async function loadPublishedSchemaTypeDetailCached(
 }
 
 export const getPublishedSchemaTypeDetail = cache(loadPublishedSchemaTypeDetailCached);
+
+async function loadPublishedOperationSchemaDetail(
+  slug: string,
+  kind: "query" | "mutation",
+  operationName: string
+): Promise<OperationSchemaDetail | null> {
+  const project = await getPublishedManual(slug);
+  if (!project) return null;
+
+  const snapshot = await readProjectSchemaSnapshot(slug);
+  if (!snapshot) return null;
+
+  return buildOperationSchemaDetail(snapshot, kind, operationName);
+}
+
+async function loadPublishedOperationSchemaDetailCached(
+  slug: string,
+  kind: "query" | "mutation",
+  operationName: string
+): Promise<OperationSchemaDetail | null> {
+  const backend = getContentBackend();
+  const getCached = unstable_cache(
+    async () => loadPublishedOperationSchemaDetail(slug, kind, operationName),
+    [
+      LIVING_DOCS_CACHE_KEYS.getPublishedOperationSchemaDetail,
+      backend,
+      slug,
+      kind,
+      operationName,
+    ],
+    { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
+  );
+  return getCached();
+}
+
+export const getPublishedOperationSchemaDetail = cache(
+  loadPublishedOperationSchemaDetailCached
+);
 
 /** Indica se o produto publicado tem snapshot de schema (para links cruzados no manual). */
 async function loadHasPublishedSchemaSnapshot(slug: string): Promise<boolean> {

@@ -15,6 +15,7 @@ import type {
 } from "@/modules/living-docs-externa/ui/reader/manual-shell";
 import { getPublishedManualSections } from "@/modules/living-docs-externa/services/get-published-manual-sections";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
+import { getPublishedOperationSchemaDetail } from "@/modules/living-docs-externa/services/get-published-schema";
 
 interface BuildManualNavOptions {
   kind?: string;
@@ -77,6 +78,20 @@ export async function buildManualNav(
     if (operation?.description) tocItems.push({ href: "#descricao", label: "Descrição" });
     if (operation?.businessNotes?.length)
       tocItems.push({ href: "#regras-negocio", label: "Regras de negócio" });
+
+    const schemaDetail =
+      kindResult.data === "rest"
+        ? null
+        : await getPublishedOperationSchemaDetail(slug, kindResult.data, name);
+    if (schemaDetail) {
+      if (schemaDetail.requestArgs.length > 0 || schemaDetail.requestInputTypes.length > 0) {
+        tocItems.push({ href: "#campos-requisicao", label: "Campos da requisição" });
+      }
+      if (schemaDetail.responseFields.length > 0) {
+        tocItems.push({ href: "#campos-resposta", label: "Campos da resposta" });
+      }
+    }
+
     if (operation?.exampleQuery)
       tocItems.push({ href: "#exemplo-graphql", label: "Exemplo GraphQL" });
     return { sidebarGroups, tocItems };

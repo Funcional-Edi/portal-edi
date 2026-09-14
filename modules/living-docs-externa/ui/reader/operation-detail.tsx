@@ -4,6 +4,8 @@ import {
   DOCS_HOME_HREF,
   docsGuideHref,
 } from "@/modules/living-docs-externa/services/docs-routes";
+import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
+import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
@@ -14,6 +16,8 @@ interface OperationDetailProps {
   /** `true` quando o projeto tem gateway GraphQL ou API REST conectada. */
   gatewayConnected?: boolean;
   schemaFieldHref?: string;
+  /** Campos de requisição/resposta extraídos do schema GraphQL (equivalente ao PDF). */
+  schemaDetail?: OperationSchemaDetail | null;
   /** Playground executa contra gateway real — só perfil admin, e só faz sentido em GraphQL. */
   canUsePlayground?: boolean;
 }
@@ -24,6 +28,7 @@ export function OperationDetail({
   operation,
   gatewayConnected = false,
   schemaFieldHref,
+  schemaDetail,
   canUsePlayground = false,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
@@ -86,6 +91,10 @@ export function OperationDetail({
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {!isRest && schemaDetail ? (
+        <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} />
       ) : null}
 
       {isRest ? (
