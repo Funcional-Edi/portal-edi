@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "syncedAt": "2026-09-14T14:45:00.000Z",
+  "source": {
+    "projectSlug": "wholesaler",
+    "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+    "gatewaySlug": "gateway-homolog-fidelize"
+  },
+  "introspection": {
+    "__schema": {
+      "queryType": { "name": "Query" },
+      "mutationType": { "name": "Mutation" },
+      "subscriptionType": null,
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "description": "Consultas do gateway Wholesaler.",
+          "fields": [
+            {
+              "name": "orderStatus",
+              "description": "Consulta o status de processamento de um pedido pelo orderId retornado na criação.",
+              "args": [
+                {
+                  "name": "orderId",
+                  "description": "Identificador do pedido no gateway (ex.: GW-123456)",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "OrderStatusResult",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Mutation",
+          "description": "Mutations do gateway Wholesaler.",
+          "fields": [
+            {
+              "name": "createToken",
+              "description": "Autentica no gateway e retorna o token JWT para as demais operações.",
+              "args": [
+                {
+                  "name": "login",
+                  "description": "Login informado pelo responsável pela homologação",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                },
+                {
+                  "name": "password",
+                  "description": "Senha informada pelo responsável pela homologação",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TokenPayload",
+                "ofType": null
+              }
+            },
+            {
+              "name": "createOrder",
+              "description": "Cria pedido no gateway com itens e dados do cliente.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Dados do pedido a ser criado",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "CreateOrderInput",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateOrderResult",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "TokenPayload",
+          "description": "Token de autenticação do gateway.",
+          "fields": [
+            {
+              "name": "token",
+              "description": "Token JWT para uso no header Authorization: Bearer",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreateOrderResult",
+          "description": "Retorno da criação de pedido.",
+          "fields": [
+            {
+              "name": "status",
+              "description": "Status do processamento (ex.: ACCEPTED, REJECTED)",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "orderId",
+              "description": "Identificador do pedido no gateway",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "message",
+              "description": "Mensagem complementar de retorno",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "OrderStatusResult",
+          "description": "Status atual de um pedido existente.",
+          "fields": [
+            {
+              "name": "status",
+              "description": "Status de processamento do pedido",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "updatedAt",
+              "description": "Data/hora da última atualização do status",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "name": "message",
+              "description": "Mensagem complementar",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CreateOrderInput",
+          "description": "Dados de entrada para criação de pedido (createOrder).",
+          "inputFields": [
+            {
+              "name": "externalOrderId",
+              "description": "Identificador externo do pedido (idempotência)",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "customerCode",
+              "description": "Código do cliente no ERP/distribuidor",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "items",
+              "description": "Itens do pedido",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "OrderItemInput",
+                      "ofType": null
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "OrderItemInput",
+          "description": "Item de pedido (SKU + quantidade).",
+          "inputFields": [
+            {
+              "name": "sku",
+              "description": "Código SKU/EAN do produto",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "quantity",
+              "description": "Quantidade solicitada (zero é rejeitado)",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "SCALAR",
+          "name": "String",
+          "description": null,
+          "fields": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Int",
+          "description": null,
+          "fields": null
+        }
+      ]
+    }
+  },
+  "summary": {
+    "typeCount": 9,
+    "queryFieldCount": 1,
+    "mutationFieldCount": 2
+  }
+}
