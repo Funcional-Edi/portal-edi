@@ -3,8 +3,9 @@
 export type UserRole = "admin" | "client";
 
 export interface PermissionsConfig {
+  /** E-mail exato ou domínio (`@empresa.com`). */
   admins: string[];
-  /** Regras de client: e-mail exato ou domínio (começa com "@"). */
+  /** E-mail exato ou domínio (`@distribuidor.com`). */
   clients: string[];
   defaultRole: UserRole;
 }
@@ -13,20 +14,24 @@ export interface PermissionsConfig {
  * Defaults em código quando `data/permissions.json` não existe.
  * Em homolog/prod, copie `data/permissions.example.json` → `data/permissions.json`.
  * Nunca coloque e-mails reais aqui — só placeholders genéricos.
+ *
+ * Regras: e-mail exato (`admin@empresa.com`) ou domínio (`@empresa.com`).
+ * Domínio = auto-identificação: qualquer e-mail daquele sufixo casa a regra.
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: ["admin@empresa.com"],
-  clients: [],
+  admins: ["admin@funcionalcorp.com.br"],
+  clients: ["@distribuidor.com"],
   defaultRole: "client",
 };
 
-function matchesAdminRule(email: string, rule: string): boolean {
-  return email.toLowerCase() === rule.toLowerCase();
-}
-
-function matchesClientRule(email: string, rule: string): boolean {
-  if (rule.startsWith("@")) return email.toLowerCase().endsWith(rule.toLowerCase());
-  return email.toLowerCase() === rule.toLowerCase();
+/** E-mail exato ou domínio começando com `@` (ex.: `@empresa.com`). */
+export function matchesEmailRule(email: string, rule: string): boolean {
+  const normalizedEmail = email.toLowerCase();
+  const normalizedRule = rule.toLowerCase();
+  if (normalizedRule.startsWith("@")) {
+    return normalizedEmail.endsWith(normalizedRule);
+  }
+  return normalizedEmail === normalizedRule;
 }
 
 export function resolveRole(
@@ -35,8 +40,8 @@ export function resolveRole(
 ): UserRole {
   if (!email) return config.defaultRole;
   const normalized = email.toLowerCase();
-  if (config.admins.some((r) => matchesAdminRule(normalized, r))) return "admin";
-  if (config.clients.some((r) => matchesClientRule(normalized, r))) return "client";
+  if (config.admins.some((r) => matchesEmailRule(normalized, r))) return "admin";
+  if (config.clients.some((r) => matchesEmailRule(normalized, r))) return "client";
   return config.defaultRole;
 }
 

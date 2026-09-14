@@ -3,18 +3,34 @@ name: CI
 on:
   push:
     branches: [main]
+
   pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   qualidade:
+    name: Qualidade e build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+
+      - name: Instalar dependências
+        run: npm ci
 
       - name: Tipos
         run: npm run typecheck
@@ -25,10 +41,15 @@ jobs:
       - name: Fronteiras de arquitetura
         run: npm run arch
 
-      - name: Testes
+      - name: Validar conteúdo publicado
+        run: npm run content:validate-published
+
+      - name: Testes unitários
         run: npm run test
 
-      - name: Build
+      - name: Build de produção
         run: npm run build
         env:
-          AUTH_SECRET: ci-not-a-real-secret
+          AUTH_SECRET: ci-build-secret-not-used-in-production
+          AUTH_TRUST_HOST: "true"
+          NEXT_TELEMETRY_DISABLED: "1"
