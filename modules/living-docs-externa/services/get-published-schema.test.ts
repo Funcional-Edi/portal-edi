@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -27,6 +27,50 @@ import {
   listPublishedSchemaCatalog,
 } from "@/modules/living-docs-externa/services/get-published-schema";
 
+const publishedWithoutSchemaSlug = "published-without-schema";
+
+async function createPublishedProjectWithoutSchema(root: string): Promise<void> {
+  const projectRoot = path.join(root, "content", "projects", publishedWithoutSchemaSlug);
+
+  await mkdir(projectRoot, { recursive: true });
+  await writeFile(
+    path.join(projectRoot, "config.json"),
+    `${JSON.stringify(
+      {
+        slug: publishedWithoutSchemaSlug,
+        name: "Published Without Schema",
+        description: "Published GraphQL project without a schema snapshot.",
+        family: "edi-pharma",
+        protocol: "graphql",
+        environment: "homolog",
+        graphqlUrl: "https://gateway.example/graphql",
+        gatewaySlug: "gateway-without-schema",
+        published: true,
+        audience: "distribuidor",
+        manualStatus: "published",
+        createdAt: "2026-08-31T12:00:00.000Z",
+        updatedAt: "2026-08-31T12:00:00.000Z",
+      },
+      null,
+      2
+    )}\n`
+  );
+  await writeFile(
+    path.join(projectRoot, "manual.json"),
+    `${JSON.stringify(
+      {
+        version: 1,
+        title: "Published Without Schema",
+        productName: "Published Without Schema",
+        manualVersion: "1.0.0",
+        operations: [],
+      },
+      null,
+      2
+    )}\n`
+  );
+}
+
 describe("get-published-schema services", () => {
   let tempRoot: string;
   const originalContentRoot = process.env.CONTENT_ROOT;
@@ -43,6 +87,7 @@ describe("get-published-schema services", () => {
     await cp(path.join(process.cwd(), "data"), path.join(tempRoot, "data"), {
       recursive: true,
     });
+    await createPublishedProjectWithoutSchema(tempRoot);
   });
 
   afterEach(async () => {
@@ -56,16 +101,20 @@ describe("get-published-schema services", () => {
     const im = catalog.find((entry) => entry.slug === "im");
     const demo = catalog.find((entry) => entry.slug === "demo");
     const wholesaler = catalog.find((entry) => entry.slug === "wholesaler");
+    const withoutSchema = catalog.find((entry) => entry.slug === publishedWithoutSchemaSlug);
 
     expect(im?.hasSchema).toBe(true);
     expect(im?.queryFieldCount).toBe(2);
     expect(demo?.hasSchema).toBe(true);
-    expect(wholesaler?.hasSchema).toBe(false);
+    expect(wholesaler?.hasSchema).toBe(true);
+    expect(wholesaler?.typeCount).toBeGreaterThan(0);
+    expect(withoutSchema?.hasSchema).toBe(false);
   });
 
   it("hasPublishedSchemaSnapshot retorna true/false conforme snapshot", async () => {
     expect(await hasPublishedSchemaSnapshot("im")).toBe(true);
-    expect(await hasPublishedSchemaSnapshot("wholesaler")).toBe(false);
+    expect(await hasPublishedSchemaSnapshot("wholesaler")).toBe(true);
+    expect(await hasPublishedSchemaSnapshot(publishedWithoutSchemaSlug)).toBe(false);
   });
 
   it("retorna referência publicada com snapshot e visão derivada", async () => {
@@ -75,8 +124,18 @@ describe("get-published-schema services", () => {
     expect(result?.reference.mutations.map((m) => m.name)).toContain("createToken");
   });
 
-  it("retorna null para projeto publicado sem snapshot de schema", async () => {
+  it("retorna referencia publicada para wholesaler com snapshot", async () => {
     const result = await getPublishedSchemaReference("wholesaler");
+
+    expect(result).not.toBeNull();
+    expect(result?.project.config.slug).toBe("wholesaler");
+    expect(result?.snapshot).toBeDefined();
+    expect(result?.snapshot.source.projectSlug).toBe("wholesaler");
+    expect(result?.reference).toBeDefined();
+  });
+
+  it("retorna null para projeto publicado sem snapshot de schema", async () => {
+    const result = await getPublishedSchemaReference(publishedWithoutSchemaSlug);
     expect(result).toBeNull();
   });
 
@@ -119,7 +178,7 @@ describe("get-published-schema services", () => {
 
   it("retorna null para tipo inexistente ou produto sem schema", async () => {
     expect(await getPublishedSchemaTypeDetail("im", "TipoInexistente")).toBeNull();
-    expect(await getPublishedSchemaTypeDetail("wholesaler", "Query")).toBeNull();
+    expect(await getPublishedSchemaTypeDetail(publishedWithoutSchemaSlug, "Query")).toBeNull();
     expect(await getPublishedSchemaTypeDetail("nao-existe", "Query")).toBeNull();
   });
 });

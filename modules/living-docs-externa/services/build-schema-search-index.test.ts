@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -22,6 +22,50 @@ vi.mock("@/core/db/adapters", async (importOriginal) => {
   };
 });
 
+const publishedWithoutSchemaSlug = "published-without-schema";
+
+async function createPublishedProjectWithoutSchema(root: string): Promise<void> {
+  const projectRoot = path.join(root, "content", "projects", publishedWithoutSchemaSlug);
+
+  await mkdir(projectRoot, { recursive: true });
+  await writeFile(
+    path.join(projectRoot, "config.json"),
+    `${JSON.stringify(
+      {
+        slug: publishedWithoutSchemaSlug,
+        name: "Published Without Schema",
+        description: "Published GraphQL project without a schema snapshot.",
+        family: "edi-pharma",
+        protocol: "graphql",
+        environment: "homolog",
+        graphqlUrl: "https://gateway.example/graphql",
+        gatewaySlug: "gateway-without-schema",
+        published: true,
+        audience: "distribuidor",
+        manualStatus: "published",
+        createdAt: "2026-08-31T12:00:00.000Z",
+        updatedAt: "2026-08-31T12:00:00.000Z",
+      },
+      null,
+      2
+    )}\n`
+  );
+  await writeFile(
+    path.join(projectRoot, "manual.json"),
+    `${JSON.stringify(
+      {
+        version: 1,
+        title: "Published Without Schema",
+        productName: "Published Without Schema",
+        manualVersion: "1.0.0",
+        operations: [],
+      },
+      null,
+      2
+    )}\n`
+  );
+}
+
 describe("buildSchemaSearchIndex", () => {
   let tempRoot: string;
   const originalContentRoot = process.env.CONTENT_ROOT;
@@ -38,6 +82,7 @@ describe("buildSchemaSearchIndex", () => {
     await cp(path.join(process.cwd(), "data"), path.join(tempRoot, "data"), {
       recursive: true,
     });
+    await createPublishedProjectWithoutSchema(tempRoot);
   });
 
   afterEach(async () => {
@@ -62,13 +107,22 @@ describe("buildSchemaSearchIndex", () => {
     expect(entries.every((e) => e.href.startsWith("/docs/api/"))).toBe(true);
   });
 
-  it("nao indexa produto publicado sem snapshot (wholesaler)", async () => {
+  it("indexa produto publicado com snapshot", async () => {
     const { buildSchemaSearchIndex } = await import(
       "@/modules/living-docs-externa/services/build-schema-search-index"
     );
 
     const entries = await buildSchemaSearchIndex();
-    expect(entries.some((e) => e.keywords.includes("wholesaler"))).toBe(false);
+    expect(entries.some((entry) => entry.keywords.includes("wholesaler"))).toBe(true);
+  });
+
+  it("nao indexa produto publicado sem snapshot", async () => {
+    const { buildSchemaSearchIndex } = await import(
+      "@/modules/living-docs-externa/services/build-schema-search-index"
+    );
+
+    const entries = await buildSchemaSearchIndex();
+    expect(entries.some((entry) => entry.keywords.includes(publishedWithoutSchemaSlug))).toBe(false);
   });
 
   it("integra com searchIndex por nome de tipo GraphQL", async () => {
