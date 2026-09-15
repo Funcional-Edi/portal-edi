@@ -47,6 +47,7 @@ Convenção interna de cada módulo: `module.ts`, `schema/`, `repository/`,
 |-----------------|----------|
 | `docs/arquitetura/adr/` | Decisões de arquitetura (ADRs 0001–0010) |
 | `docs/migracao/` | Mapa, cronograma e decisões de UI da migração |
+| `docs/operacao/` | Guias operacionais de release e rotina de validacao |
 | `docs/estrutura/mapa-projeto.md` | Este arquivo |
 
 ## Configuração (`config/`)

@@ -25,6 +25,7 @@ config/                 # configs de ferramentas (dependency-cruiser, vitest)
 docs/
   arquitetura/adr/      # decisões versionadas (ADRs)
   estrutura/            # mapa do projeto (mapa-projeto.md)
+  operacao/             # guias operacionais (release, validacoes)
 ```
 
 Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](docs/estrutura/mapa-projeto.md).
@@ -72,12 +73,38 @@ npm run ci          # typecheck → lint → arch → test → build
 | `npm run lint` | Padrão de código |
 | `npm run arch` | **Regra de dependência não foi violada** (`app → modules → core`, módulos isolados, sem ciclos) |
 | `npm run test` | Comportamento da fundação (vitest) |
+| `npm run content:validate-published` | Valida projetos publicados e consistencia de conteudo |
+| `npm run test:e2e` | Testes de navegador com Playwright |
+| `npm run smoke:homolog` | Smoke automatizado do ambiente de homologacao |
 | `npm run test:coverage` | Relatório de cobertura |
 | `npm run arch:graph` | Gera `architecture.dot` com o grafo de dependências |
 
 A arquitetura é **verificada por máquina**, não só documentada: importar um
 módulo de dentro de outro, ou fazer `core/` depender de `modules/`, **quebra o
 build**. Ver `docs/arquitetura/adr/0006-arquitetura-enforcada.md`.
+
+## Fluxo de release
+
+Depois dos testes internos, toda mudanca deve passar pelo fluxo operacional de
+validacao, commit, push e PR para `main`. O guia completo esta em
+[`docs/operacao/release.md`](docs/operacao/release.md).
+
+Resumo rapido:
+
+```bash
+git status -sb
+npm run ci
+npm run content:validate-published
+git diff --check
+git add <arquivos-da-mudanca>
+git commit -m "tipo: resumo objetivo"
+git push -u origin <branch>
+```
+
+No GitHub, abra PR para `main` e aguarde o workflow **CI** ficar verde antes de
+seguir com merge/release. E2E (`npm run test:e2e`) e smoke homolog
+(`npm run smoke:homolog`) entram quando a mudanca afetar fluxo de tela,
+autenticacao, conteudo publicado ou ambiente de homologacao.
 
 ## Como adicionar um módulo
 
