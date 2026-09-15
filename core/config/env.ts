@@ -23,7 +23,8 @@ export const env = {
   },
   get isDevAuthEnabled() {
     return (
-      process.env.NODE_ENV === "development" &&
+      (process.env.NODE_ENV === "development" ||
+        process.env.VERCEL_ENV === "preview") &&
       process.env.DEV_AUTH_ENABLED === "true"
     );
   },
@@ -52,13 +53,18 @@ export function validateEnv(): string[] {
   if (!process.env.AUTH_SECRET) {
     problems.push("AUTH_SECRET ausente (sessão JWT + criptografia).");
   }
-  if (env.isProduction && process.env.DEV_AUTH_ENABLED === "true") {
+  if (
+    env.isProduction &&
+    process.env.DEV_AUTH_ENABLED === "true" &&
+    process.env.VERCEL_ENV !== "preview"
+  ) {
     problems.push("DEV_AUTH_ENABLED=true em produção — proibido (login dev bypassa SSO).");
   }
-  if (env.isProduction && !env.isSsoConfigured) {
+  const isPublicProduction = env.isProduction && process.env.VERCEL_ENV !== "preview";
+  if (isPublicProduction && !env.isSsoConfigured) {
     problems.push("FUNCIONAL_SSO_GRAPHQL_URL ausente em produção.");
   }
-  if (env.isProduction && !process.env.GATEWAY_URL_ALLOWED_HOSTS?.trim()) {
+  if (isPublicProduction && !process.env.GATEWAY_URL_ALLOWED_HOSTS?.trim()) {
     problems.push("GATEWAY_URL_ALLOWED_HOSTS ausente em produção (allowlist de gateways).");
   }
   if (env.aiProvider !== "stub" && !process.env.AI_API_KEY) {

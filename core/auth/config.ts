@@ -5,8 +5,7 @@ import { getPermissionsConfig } from "@/core/auth/permissions-config";
 import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
 import { resolveRole, type UserRole } from "@/core/auth/roles";
 import { isSsoLoginConfigured, validateSsoCredentials } from "@/core/auth/sso";
-const isDevAuthEnabled =
-  process.env.NODE_ENV === "development" && process.env.DEV_AUTH_ENABLED === "true";
+import { env } from "@/core/config/env";
 
 const providers: NextAuthConfig["providers"] = [];
 
@@ -36,8 +35,8 @@ if (isSsoLoginConfigured()) {
   );
 }
 
-// Provider dev — LOCAL ONLY (nunca em produção). Login por e-mail, sem senha.
-if (isDevAuthEnabled) {
+// Provider dev — local e Preview protegido pela Vercel. Nunca habilitar em produção.
+if (env.isDevAuthEnabled) {
   providers.push(
     Credentials({
       id: "dev",
