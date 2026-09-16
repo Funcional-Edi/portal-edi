@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
+import { cachePublishedContent } from "@/modules/living-docs-externa/services/content-cache";
 
 import { getContentBackend } from "@/core/db/adapters";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
@@ -12,7 +12,7 @@ import {
 
 async function loadPublishedManualSections(slug: string): Promise<ManualSection[]> {
   const backend = getContentBackend();
-  const getCachedSections = unstable_cache(
+  const getCachedSections = cachePublishedContent(
     async () => {
       const project = await getProject(slug);
       if (!project?.config.published) return [];
