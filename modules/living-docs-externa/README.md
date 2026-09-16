@@ -61,6 +61,20 @@ npm run migrate:legacy-content -- --legacy-root ../documentacao-funcional
 
 Seções Markdown: `content/projects/{slug}/sections/*.md` (etapa 2.1).
 
+### Atualização de conteúdo e cache
+
+Os leitores de catálogo, manual, seções e referência de API compartilham a
+política de `services/content-cache.ts`:
+
+- Backend local: leitura a cada request, inclusive em Preview/produção. Edições
+  nos arquivos não exigem apagar `.next`. `React.cache` apenas deduplica dentro
+  da mesma renderização; recarregue a página para buscar os dados atualizados.
+- Backend GitHub: cache com revalidação de 60 segundos, tags de invalidação e
+  chave separada por repositório e commit do deploy Vercel. Após o intervalo,
+  a primeira requisição pode receber o valor anterior enquanto ele é renovado.
+- `published: false` continua ocultando o projeto e suas seções no leitor.
+  A correção de cache não publica rascunhos.
+
 Credenciais do gateway (login/senha) ficam cifradas (AES-256-GCM, chave
 derivada de `AUTH_SECRET`) em `data/projects/{slug}/credentials.enc`
 (gitignored). Nunca chegam ao browser após a gravação — ver

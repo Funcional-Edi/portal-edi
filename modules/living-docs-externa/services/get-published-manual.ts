@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
+import { cachePublishedContent } from "@/modules/living-docs-externa/services/content-cache";
 
 import { getContentBackend } from "@/core/db/adapters";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
@@ -11,7 +11,7 @@ import {
 
 async function loadPublishedManual(slug: string): Promise<Project | null> {
   const backend = getContentBackend();
-  const getCachedProject = unstable_cache(
+  const getCachedProject = cachePublishedContent(
     async () => {
       const project = await getProject(slug);
       if (!project?.config.published) return null;
@@ -26,6 +26,6 @@ async function loadPublishedManual(slug: string): Promise<Project | null> {
 
 /**
  * Manual publicado por slug. `cache()` deduplica chamadas na mesma request
- * (ex.: layout + page); `unstable_cache` persiste entre requests em produção.
+ * (ex.: layout + page); somente o CMS remoto persiste entre requests.
  */
 export const getPublishedManual = cache(loadPublishedManual);

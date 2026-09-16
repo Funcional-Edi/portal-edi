@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
+import { cachePublishedContent } from "@/modules/living-docs-externa/services/content-cache";
 
 import { getContentBackend } from "@/core/db/adapters";
 import { listPublishedProjectSummaries } from "@/modules/living-docs-externa/repository/project-repository";
@@ -11,7 +11,7 @@ import {
 
 async function loadPublishedManuals(): Promise<ProjectSummary[]> {
   const backend = getContentBackend();
-  const getCachedManuals = unstable_cache(
+  const getCachedManuals = cachePublishedContent(
     async () => listPublishedProjectSummaries(),
     [LIVING_DOCS_CACHE_KEYS.listPublishedManuals, backend],
     { tags: [LIVING_DOCS_CACHE_TAGS.projects] }
