@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cachePublishedContent } from "@/modules/living-docs-externa/services/content-cache";
 import { cache } from "react";
 
 import { getContentBackend } from "@/core/db/adapters";
@@ -78,7 +78,7 @@ async function loadPublishedSchemaReferenceCached(
   slug: string
 ): Promise<PublishedSchemaReference | null> {
   const backend = getContentBackend();
-  const getCached = unstable_cache(
+  const getCached = cachePublishedContent(
     async () => loadPublishedSchemaReference(slug),
     [LIVING_DOCS_CACHE_KEYS.getPublishedSchemaReference, backend, slug],
     { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
@@ -88,7 +88,7 @@ async function loadPublishedSchemaReferenceCached(
 
 async function loadPublishedSchemaCatalogCached(): Promise<SchemaCatalogEntry[]> {
   const backend = getContentBackend();
-  const getCached = unstable_cache(
+  const getCached = cachePublishedContent(
     async () => loadPublishedSchemaCatalog(),
     [LIVING_DOCS_CACHE_KEYS.listPublishedSchemaCatalog, backend],
     { tags: [LIVING_DOCS_CACHE_TAGS.projects] }
@@ -121,7 +121,7 @@ async function loadPublishedSchemaTypeDetailCached(
   typeName: string
 ): Promise<PublishedSchemaTypeDetail | null> {
   const backend = getContentBackend();
-  const getCached = unstable_cache(
+  const getCached = cachePublishedContent(
     async () => loadPublishedSchemaTypeDetail(slug, typeName),
     [LIVING_DOCS_CACHE_KEYS.getPublishedSchemaTypeDetail, backend, slug, typeName],
     { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
@@ -151,7 +151,7 @@ async function loadPublishedOperationSchemaDetailCached(
   operationName: string
 ): Promise<OperationSchemaDetail | null> {
   const backend = getContentBackend();
-  const getCached = unstable_cache(
+  const getCached = cachePublishedContent(
     async () => loadPublishedOperationSchemaDetail(slug, kind, operationName),
     [
       LIVING_DOCS_CACHE_KEYS.getPublishedOperationSchemaDetail,
@@ -179,7 +179,7 @@ async function loadHasPublishedSchemaSnapshot(slug: string): Promise<boolean> {
 
 async function loadHasPublishedSchemaSnapshotCached(slug: string): Promise<boolean> {
   const backend = getContentBackend();
-  const getCached = unstable_cache(
+  const getCached = cachePublishedContent(
     async () => loadHasPublishedSchemaSnapshot(slug),
     [LIVING_DOCS_CACHE_KEYS.hasPublishedSchemaSnapshot, backend, slug],
     { tags: [LIVING_DOCS_CACHE_TAGS.project(slug)] }
