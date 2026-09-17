@@ -1,11 +1,8 @@
-import { cache } from "react";
-
 import { listPublishedFlowSummaries } from "@/modules/fluxogramas/repository/flow-repository";
 import type { PublishedFlowSummary } from "@/modules/fluxogramas/repository/flow-repository";
-
-async function loadPublishedFlows(): Promise<PublishedFlowSummary[]> {
-  return listPublishedFlowSummaries();
-}
+import { cache } from "react";
 
 /** Fluxos publicados com `flow.json` existente. */
-export const listPublishedFlows = cache(loadPublishedFlows);
+export const listPublishedFlows = cache(
+  (): Promise<PublishedFlowSummary[]> => listPublishedFlowSummaries()
+);

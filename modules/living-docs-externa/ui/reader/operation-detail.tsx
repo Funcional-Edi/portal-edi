@@ -1,8 +1,8 @@
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
-import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
 import {
   DOCS_HOME_HREF,
   docsGuideHref,
+  docsPlaygroundHref,
 } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
@@ -131,7 +131,7 @@ export function OperationDetail({
           </pre>
           {canUsePlayground ? (
             <Link
-              href={buildPlaygroundHref(slug, operation.exampleQuery)}
+              href={docsPlaygroundHref(slug, operation.exampleQuery)}
               className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
             >
               Teste de Requisição
