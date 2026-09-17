@@ -81,5 +81,5 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Endpoint" })).toBeVisible();
   await expect(page.getByText("GET /pedidos/status")).toBeVisible();
   await expect(page.getByText("Exemplo GraphQL")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Testar no playground" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Teste de Requisição" })).toHaveCount(0);
 });

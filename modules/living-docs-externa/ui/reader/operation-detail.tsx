@@ -1,8 +1,8 @@
 import type { ManualOperation } from "@/modules/living-docs-externa/schema";
-import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
 import {
   DOCS_HOME_HREF,
   docsGuideHref,
+  docsPlaygroundHref,
 } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
@@ -116,7 +116,7 @@ export function OperationDetail({
             </>
           ) : null}
           <p className="mt-3 text-sm text-slate-600">
-            Esta API é <span className="font-medium">REST</span> — não há playground no portal.
+            Esta API é <span className="font-medium">REST</span> — o Teste de Requisição não está disponível para este protocolo.
             Use um cliente HTTP (Insomnia, Postman, curl) enviando o token JWT no header{" "}
             <code>Authorization: Bearer &lt;token&gt;</code>.
           </p>
@@ -131,14 +131,14 @@ export function OperationDetail({
           </pre>
           {canUsePlayground ? (
             <Link
-              href={buildPlaygroundHref(slug, operation.exampleQuery)}
+              href={docsPlaygroundHref(slug, operation.exampleQuery)}
               className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
             >
-              Testar no playground
+              Teste de Requisição
             </Link>
           ) : (
             <p className="mt-3 text-sm text-slate-600">
-              O playground executa contra o gateway real e está disponível apenas para perfil{" "}
+              O Teste de Requisição executa contra o gateway real e está disponível apenas para perfil{" "}
               <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao
               time de integração.
             </p>

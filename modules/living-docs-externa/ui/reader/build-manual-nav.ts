@@ -1,4 +1,5 @@
 import type { ManualSection, Project } from "@/modules/living-docs-externa/schema";
+import { auth, isAdminRole } from "@/core/auth";
 import {
   manualOperationKindSchema,
   sortOperations,
@@ -43,6 +44,9 @@ export async function buildManualNav(
   if (!project) return null;
 
   const basePath = docsGuideHref(slug);
+  const session = await auth();
+  const canUseRequestTest = session?.user?.role && isAdminRole(session.user.role)
+    && project.config.protocol === "graphql";
   const operations = sortOperations(project.manual);
   const sidebarGroups: ManualNavGroup[] = [
     {
@@ -50,7 +54,7 @@ export async function buildManualNav(
       items: [
         { href: DOCS_HOME_HREF, label: "Documentação" },
         { href: basePath, label: "Roteiro", active: !playground && (!kind || !name) },
-        { href: docsPlaygroundHref(slug), label: "Playground", active: !!playground },
+        ...(canUseRequestTest ? [{ href: docsPlaygroundHref(slug), label: "Teste de Requisição", active: !!playground }] : []),
       ],
     },
     {

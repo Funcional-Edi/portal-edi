@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import type { ManualSection } from "@/modules/living-docs-externa/schema";
-import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
+import { MarkdownBody } from "@/core/ui/markdown-body";
 
 interface SectionEditorProps {
   slug: string;
