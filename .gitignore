@@ -34,3 +34,6 @@ next-env.d.ts
 # obsidian — atalhos locais (junction); conteúdo real está em docs/ e content/
 /obsidian/docs
 /obsidian/produtos/*/sections
+
+# Notas/prompts de trabalho, não versionados
+PROMPT_*.md
