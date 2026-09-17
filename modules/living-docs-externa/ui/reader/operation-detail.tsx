@@ -116,7 +116,7 @@ export function OperationDetail({
             </>
           ) : null}
           <p className="mt-3 text-sm text-slate-600">
-            Esta API é <span className="font-medium">REST</span> — não há playground no portal.
+            Esta API é <span className="font-medium">REST</span> — o Teste de Requisição não está disponível para este protocolo.
             Use um cliente HTTP (Insomnia, Postman, curl) enviando o token JWT no header{" "}
             <code>Authorization: Bearer &lt;token&gt;</code>.
           </p>
@@ -134,11 +134,11 @@ export function OperationDetail({
               href={buildPlaygroundHref(slug, operation.exampleQuery)}
               className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
             >
-              Testar no playground
+              Teste de Requisição
             </Link>
           ) : (
             <p className="mt-3 text-sm text-slate-600">
-              O playground executa contra o gateway real e está disponível apenas para perfil{" "}
+              O Teste de Requisição executa contra o gateway real e está disponível apenas para perfil{" "}
               <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao
               time de integração.
             </p>

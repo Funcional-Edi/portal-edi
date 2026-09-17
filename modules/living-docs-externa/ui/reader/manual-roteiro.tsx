@@ -83,7 +83,7 @@ export function ManualRoteiro({
       {editor?.banner ? <div className="mb-6">{editor.banner}</div> : null}
 
       <header className="mb-8 border-b border-slate-200 pb-6">
-        <p className="text-sm font-medium text-brand-700">Manual de integração</p>
+        <p className="text-sm font-medium text-brand-700">Manual de integraçãooo</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">{manual.title}</h1>
         {manual.productName ? (
           <p className="mt-1 text-lg text-slate-700">{manual.productName}</p>
@@ -122,7 +122,7 @@ export function ManualRoteiro({
                   href={buildPlaygroundHref(config.slug)}
                   className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
                 >
-                  Abrir playground GraphQL
+                  Teste de Requisição
                 </Link>
               ) : null}
               {flowHref ?? editor?.flowHref ? (
