@@ -38,7 +38,7 @@ export default async function PlaygroundPage({ params, searchParams }: Playgroun
         </nav>
 
         <header className="mb-6 border-b border-slate-200 pb-6">
-          <p className="text-sm font-medium text-brand-700">Playground GraphQL</p>
+          <p className="text-sm font-medium text-brand-700">Teste de Requisição</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">{project.manual.title}</h1>
           <p className="mt-2 text-sm text-slate-600">
             Execute apenas as operações documentadas neste manual contra o gateway real do
@@ -52,7 +52,7 @@ export default async function PlaygroundPage({ params, searchParams }: Playgroun
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-950">
             <p className="font-medium">Acesso restrito a perfil admin</p>
             <p className="mt-2">
-              O playground executa queries e mutations contra o gateway real usando credenciais
+              O Teste de Requisição executa queries e mutations contra o gateway real usando credenciais
               salvas no servidor. Por segurança, apenas usuários com perfil{" "}
               <span className="font-medium">admin</span> podem usar esta ferramenta.
             </p>

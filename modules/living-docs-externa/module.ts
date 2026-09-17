@@ -7,9 +7,9 @@ import type { PortalModule } from "@/core/module-registry";
  */
 export const livingDocsExternaModule: PortalModule = {
   id: "living-docs-externa",
-  title: "Documentação Viva (Clientes)",
+  title: "Documentação de produtos",
   description:
-    "Manuais de integração gerados do schema GraphQL e curados por produto, para parceiros.",
+    "Conheça os produtos, consulte as regras de negócio e siga os roteiros de integração publicados.",
   status: "active",
   basePath: "/docs",
   access: "any",

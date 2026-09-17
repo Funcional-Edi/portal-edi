@@ -1,8 +1,7 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
-import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
-import { docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
-import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
+import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
+import { MarkdownBody } from "@/core/ui/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
 import { ArrowRight, PencilLine, Search, Send } from "lucide-react";
@@ -119,10 +118,10 @@ export function ManualRoteiro({
             <>
               {isGraphql && canUsePlayground ? (
                 <Link
-                  href={buildPlaygroundHref(config.slug)}
+                  href={docsPlaygroundHref(config.slug)}
                   className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
                 >
-                  Abrir playground GraphQL
+                  Teste de Requisição
                 </Link>
               ) : null}
               {flowHref ?? editor?.flowHref ? (
