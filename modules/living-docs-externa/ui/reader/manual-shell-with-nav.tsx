@@ -38,9 +38,7 @@ export async function ManualShellWithNav({
 
   return (
     <ManualShell
-      productNavigation={<ProductNavigation navigation={navigation} />}
-      sidebarGroups={nav.sidebarGroups}
-      tocItems={nav.tocItems}
+      productNavigation={<ProductNavigation navigation={navigation} tocItems={nav.tocItems}>{children}</ProductNavigation>}
       navItems={DOCS_NAV_ITEMS.map((item) => ({
         ...item,
         active: item.href === DOCS_NAV_ITEMS[0].href,

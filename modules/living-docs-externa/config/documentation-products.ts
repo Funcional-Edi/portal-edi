@@ -7,9 +7,11 @@ import type {
 import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 
 const actions: readonly DocumentationAction[] = [
-  { id: "documentacao", label: "Documentação", order: 1, enabled: true, visible: true, status: "published", destination: "documentation" },
-  { id: "roteiro", label: "Roteiro", order: 2, enabled: true, visible: true, status: "published", destination: "guide" },
-  { id: "teste-de-requisicao", label: "Teste de Requisição", order: 3, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] } },
+  { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
+  { id: "fluxograma-geral", label: "Fluxograma geral do produto", order: 2, enabled: true, visible: true, status: "no-documentation", destination: null },
+  { id: "roteiro-homologacao", label: "Roteiro de Homologação", order: 3, enabled: true, visible: true, status: "development", tag: "Estrutura futura", destination: null },
+  { id: "fluxos", label: "Fluxos", order: 4, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
+  { id: "teste-de-requisicao", label: "Teste de Requisição", order: 5, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
 ];
 
 function moduleItem(id: string, label: string, order: number, projectSlug?: string): DocumentationModule {
@@ -28,8 +30,13 @@ function product(
   order: number,
   description: string,
   modules: DocumentationModule[],
+  actionIds: readonly string[] = ["visao-geral", "fluxos"],
 ): DocumentationProduct {
-  return { id, label, order, description, modules, actions, enabled: true, visible: true, status: "no-documentation" };
+  return {
+    id, label, order, description, modules,
+    actions: actions.filter((action) => actionIds.includes(action.id)),
+    enabled: true, visible: true, status: "no-documentation",
+  };
 }
 
 /**
@@ -44,22 +51,17 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
       moduleItem("fluxo-optin", "Fluxo Opt-in", 2),
       moduleItem("fluxo-venda", "Fluxo de Venda", 3),
       moduleItem("fluxo-pbm-caixa", "Fluxo PBM direto no Caixa", 4),
+    ], ["visao-geral", "fluxograma-geral", "fluxos"]),
+    product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Área prevista para os processos de movimentação de vidas, com consultas, alterações e roteiros. Os detalhes de integração ainda serão documentados.", [], [
+      "visao-geral", "roteiro-homologacao", "fluxos",
     ]),
-    {
-      ...product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Área prevista para os processos de movimentação de vidas, com consultas, alterações e roteiros. Os detalhes de integração ainda serão documentados.", []),
-      actions: [
-        ...actions,
-        { id: "queries", label: "Queries", order: 4, enabled: true, visible: true, status: "no-documentation", destination: null },
-        { id: "mutations", label: "Mutations", order: 5, enabled: true, visible: true, status: "no-documentation", destination: null },
-      ],
-    },
     {
       ...product("trade", "Trade", 3, "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e IM. A estrutura também prevê EDI Redes, ainda sem documentação.", [
         moduleItem("canal-autorizador", "Canal Autorizador", 1, "canal-autorizador"),
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
         moduleItem("im", "IM", 4, "im"),
-      ]),
+      ], ["visao-geral", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {
@@ -72,4 +74,13 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
       moduleItem("reposicao", "Reposição", 1),
     ]),
   ],
+  clients: {
+    id: "clientes",
+    label: "Documentação (Clientes)",
+    order: 6,
+    enabled: true,
+    visible: true,
+    status: "no-documentation",
+    tag: "Área separada",
+  },
 };

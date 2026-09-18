@@ -205,6 +205,7 @@ async function renderHub(slugs: string[]): Promise<string> {
     "## Documentação do projeto",
     "",
     `- ${wikiLink("docs/estrutura/mapa-projeto", "Mapa do projeto")}`,
+    `- ${wikiLink("docs/estrutura/navbar-produtos", "Navbar de produtos EDI")}`,
     `- ${wikiLink("docs/migracao/mapa-documentacao-funcional", "Mapa documentação funcional")}`,
     `- ${wikiLink("docs/migracao/cronograma", "Cronograma de migração")}`,
     `- ${wikiLink("docs/migracao/README", "Migração — índice")}`,

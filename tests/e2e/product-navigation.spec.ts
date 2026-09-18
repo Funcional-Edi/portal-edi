@@ -10,70 +10,82 @@ async function login(page: Page, admin = false) {
   await page.goto("/docs");
 }
 
-test("vertical navbar exposes products, confirmed links and keyboard-accessible placeholders", async ({ page }, testInfo) => {
+test("one vertical navbar changes from products to product and integration context", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await login(page);
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
-  for (const label of ["Credenciado", "Movimentação de Vidas", "Trade", "APS", "PBM"]) {
-    await expect(nav.getByRole("button", { name: new RegExp(`^${label}`) })).toBeVisible();
+
+  for (const label of ["Credenciado", "Movimentação de Vidas", "Trade", "APS", "PBM", "Documentação (Clientes)"]) {
+    await expect(nav.getByText(label, { exact: true })).toBeVisible();
   }
-  await expect(nav.getByText("Documentação (Clientes)", { exact: true })).toHaveCount(0);
-  const credenciado = nav.getByRole("button", { name: /^Credenciado/ });
-  await credenciado.focus();
-  await page.keyboard.press("Enter");
-  await expect(credenciado).toHaveAttribute("aria-expanded", "true");
-  await expect(nav.getByText("Fluxo de Cadastro", { exact: true }).locator("..")).toHaveAttribute("aria-disabled", "true");
-  await page.keyboard.press("Space");
-  await expect(credenciado).toHaveAttribute("aria-expanded", "false");
-  await nav.getByRole("button", { name: "Trade", exact: true }).click();
+  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toHaveCount(0);
+
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await expect(page).toHaveURL("/docs?produto=trade");
+  await expect(page.getByRole("heading", { name: "Trade", exact: true })).toBeVisible();
+  await expect(nav.getByRole("link", { name: "Credenciado", exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: "Produtos", exact: true })).toBeVisible();
   await expect(nav.getByRole("link", { name: /^Canal Autorizador/ })).toHaveAttribute("href", "/docs/canal-autorizador");
   await expect(nav.getByRole("link", { name: /^Wholesaler/ })).toHaveAttribute("href", "/docs/wholesaler");
-  await expect(nav.getByRole("link", { name: /^IM homolog/ })).toHaveAttribute("href", "/docs/im");
-  await expect(nav.getByRole("link", { name: /EDI Redes/ })).toHaveCount(0);
-  await expect(nav.getByRole("button", { name: "Teste de Requisição" })).toHaveCount(0);
-  const navBox = await nav.boundingBox();
-  const mainBox = await page.getByRole("main").boundingBox();
-  expect(navBox!.x + navBox!.width).toBeLessThan(mainBox!.x);
-  await page.screenshot({ path: testInfo.outputPath("docs-desktop.png"), fullPage: true });
-  await nav.getByRole("link", { name: /^IM homolog/ }).click();
+  await expect(nav.getByRole("link", { name: /^IM/ })).toHaveAttribute("href", "/docs/im");
+  await expect(nav.getByRole("button", { name: /^EDI Redes/ })).toBeDisabled();
+
+  await nav.getByRole("link", { name: /^Canal Autorizador/ }).click();
+  await expect(page.getByRole("heading", { name: "Canal Autorizador", exact: true })).toBeVisible();
+  await expect(nav.getByRole("link", { name: "Trade", exact: true })).toHaveAttribute("href", "/docs?produto=trade");
+  const documentation = nav.getByRole("link", { name: "Documentação", exact: true }).last();
+  await expect(documentation).toHaveAttribute("href", "/docs/canal-autorizador");
+  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Métodos", exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: "Teste de Requisição", exact: true })).toHaveCount(0);
+  await expect(page).toHaveURL("/docs/canal-autorizador");
+  await expect(page.getByText("Seu ponto de partida", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Índice", { exact: true })).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL("/docs?produto=trade");
+  await nav.getByRole("link", { name: /^Wholesaler/ }).click();
+  await expect(page).toHaveURL("/docs/wholesaler");
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await expect(page).toHaveURL("/docs?produto=trade");
+  await nav.getByRole("link", { name: /^IM/ }).click();
   await expect(page).toHaveURL("/docs/im");
-  await expect(nav.getByRole("link", { name: /^IM homolog/ })).toHaveAttribute("aria-current", "page");
-  await expect(nav.getByRole("button", { name: "Trade", exact: true })).toHaveAttribute("aria-current", "location");
-  await nav.getByRole("button", { name: "Roteiro", exact: true }).click();
-  await nav.getByRole("link", { name: /^IM homolog/ }).click();
-  await expect(page).toHaveURL("/docs/im#roteiro-integracao");
-  await expect(nav.getByRole("button", { name: "Roteiro", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.goto("/docs/im/operations/mutation/createToken");
-  await expect(nav.getByRole("button", { name: "Roteiro", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.goto("/docs/api/im");
-  await expect(nav.getByRole("button", { name: "Documentação", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.goBack();
+  await expect(page).toHaveURL("/docs?produto=trade");
+  await nav.getByRole("link", { name: "Produtos", exact: true }).click();
+  await expect(page).toHaveURL("/docs");
+  await expect(page.getByText("Seu ponto de partida", { exact: true })).toBeVisible();
+
+  const navBox = await nav.boundingBox();
+  const contentBox = await page.getByRole("region", { name: "Conteúdo da documentação" }).boundingBox();
+  expect(navBox!.x + navBox!.width).toBeLessThan(contentBox!.x);
+  await page.screenshot({ path: testInfo.outputPath("docs-contextual-desktop.png"), fullPage: true });
 });
 
-test("mobile navbar expands, collapses and navigates without horizontal overflow", async ({ page }, testInfo) => {
+test("mobile navigation preserves context without horizontal overflow", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
-  const menu = nav.getByRole("button", { name: "Mostrar produtos" });
+  const menu = page.getByRole("button", { name: "Mostrar produtos" });
+
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await menu.click();
-  await nav.getByRole("button", { name: "Trade", exact: true }).click();
-  await page.screenshot({ path: testInfo.outputPath("docs-mobile.png"), fullPage: true });
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await nav.getByRole("link", { name: /^IM/ }).click();
+  await expect(page.getByRole("heading", { name: "IM", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await nav.getByRole("link", { name: /^IM homolog/ }).click();
-  await expect(page).toHaveURL("/docs/im");
-  await expect(menu).toHaveAttribute("aria-expanded", "false");
-  await menu.click();
-  await expect(nav.getByRole("link", { name: /^IM homolog/ })).toHaveAttribute("aria-current", "page");
+  await page.screenshot({ path: testInfo.outputPath("docs-contextual-mobile.png"), fullPage: true });
 });
 
-test("admin navigation reuses the existing request test route", async ({ page }) => {
+test("admins can reach the existing request test from a selected flow", async ({ page }) => {
   await login(page, true);
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
-  await nav.getByRole("button", { name: "Trade", exact: true }).click();
-  await nav.getByRole("button", { name: "Teste de Requisição", exact: true }).click();
-  await nav.getByRole("link", { name: /^IM homolog/ }).click();
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await nav.getByRole("link", { name: /^IM/ }).click();
+  const requestTest = nav.getByRole("link", { name: "Teste de Requisição", exact: true });
+  await expect(requestTest).toHaveAttribute("href", "/docs/im/playground");
+  await requestTest.click();
   await expect(page).toHaveURL("/docs/im/playground");
-  await expect(page.locator("#playground-query")).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Teste de Requisição", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("link", { name: /playground/i })).toHaveCount(0);
 });
