@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Preserve Edge by default, while allowing another installed Chromium browser locally.
+const browserChannel = process.env.PLAYWRIGHT_BROWSER_CHANNEL || "msedge";
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -27,8 +30,8 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "msedge",
-      use: { ...devices["Desktop Edge"], channel: "msedge" },
+      name: browserChannel,
+      use: { ...devices[browserChannel === "chrome" ? "Desktop Chrome" : "Desktop Edge"], channel: browserChannel },
     },
   ],
 });

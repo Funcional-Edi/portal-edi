@@ -3,8 +3,9 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 
 /**
- * Familias de produto (EDI Pharma / EDI Varejo): entrada em /docs, depois
- * catálogo por família. Os testes criam projetos descartaveis (apagados no fim).
+ * Catálogos legados por família continuam acessíveis diretamente.
+ * /docs agora é uma introdução por produto, sem duplicar esses catálogos.
+ * Os testes criam projetos descartáveis (apagados no fim).
  */
 const SLUG_VAREJO = "e2e-familia-varejo";
 const SLUG_RECLASSIFICA = "e2e-familia-reclassifica";
@@ -71,23 +72,23 @@ test.afterEach(async () => {
   await Promise.all(PROJECT_DIRS.map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-test("fluxo /docs escolhe familia e lista produtos publicados", async ({ page }) => {
+test("introducao em /docs preserva rotas de catalogos por familia", async ({ page }) => {
   await loginAsAdmin(page);
   await createPublishableProject(page, SLUG_VAREJO, "Familia Varejo E2E", "EDI Varejo");
 
   await page.goto("/docs");
   await expect(page.getByRole("heading", { name: "Documentação" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /EDI Pharma/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /EDI Varejo/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sua trilha de integração" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catálogos por família" })).toHaveCount(0);
 
-  await page.getByRole("link", { name: /EDI Varejo/ }).click();
+  await page.goto("/docs/edi-varejo");
   await expect(page).toHaveURL("/docs/edi-varejo");
   await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toBeVisible();
 
   await page.getByRole("link", { name: "Todas as famílias" }).click();
   await expect(page).toHaveURL("/docs");
 
-  await page.getByRole("link", { name: /EDI Pharma/ }).click();
+  await page.goto("/docs/edi-pharma");
   await expect(page).toHaveURL("/docs/edi-pharma");
   await expect(page.getByRole("link", { name: /IM - Inventario/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toHaveCount(0);

@@ -60,13 +60,16 @@ test("manual IM linka referencia GraphQL", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "IM - Inventario (homolog)" })).toBeVisible();
 });
 
-test("catalogo mostra produto pendente de sync", async ({ page }) => {
+test("catalogo mostra o schema publicado de Wholesaler", async ({ page }) => {
   await loginAsDevUser(page);
 
   await page.goto("/docs/api");
-  await expect(page.getByRole("heading", { name: "Pendentes de sync" })).toBeVisible();
-  await expect(page.getByText("Wholesaler - Pedido e recebimento")).toBeVisible();
-  await expect(page.getByText("Schema pendente de sync")).toBeVisible();
+  const wholesaler = page.getByRole("link", { name: /Wholesaler - Pedido e recebimento/ });
+  await expect(wholesaler).toHaveAttribute("href", "/docs/api/wholesaler");
+  await expect(wholesaler.getByText(/Schema sincronizado/)).toBeVisible();
+  await wholesaler.click();
+  await expect(page).toHaveURL("/docs/api/wholesaler");
+  await expect(page.getByRole("heading", { name: "Wholesaler - Pedido e recebimento", exact: true })).toBeVisible();
 });
 
 test("docs/api exige login", async ({ page }) => {

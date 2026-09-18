@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { buildManualNav } from "@/modules/living-docs-externa/ui/reader/build-manual-nav";
 import { ManualShell } from "@/modules/living-docs-externa/ui/reader/manual-shell";
 import { DOCS_NAV_ITEMS } from "@/modules/living-docs-externa/services/docs-routes";
+import { getDocumentationNavigation } from "@/modules/living-docs-externa/services/get-documentation-navigation";
+import { ProductNavigation } from "@/modules/living-docs-externa/ui/reader/product-navigation";
 
 interface ManualShellWithNavProps {
   slug: string;
@@ -25,7 +27,10 @@ export async function ManualShellWithNav({
   sections,
   children,
 }: ManualShellWithNavProps) {
-  const nav = await buildManualNav(slug, { kind, name, playground, project, sections });
+  const [nav, navigation] = await Promise.all([
+    buildManualNav(slug, { kind, name, playground, project, sections }),
+    getDocumentationNavigation(),
+  ]);
 
   if (!nav) {
     return <ManualShell>{children}</ManualShell>;
@@ -33,8 +38,7 @@ export async function ManualShellWithNav({
 
   return (
     <ManualShell
-      sidebarGroups={nav.sidebarGroups}
-      tocItems={nav.tocItems}
+      productNavigation={<ProductNavigation navigation={navigation} tocItems={nav.tocItems}>{children}</ProductNavigation>}
       navItems={DOCS_NAV_ITEMS.map((item) => ({
         ...item,
         active: item.href === DOCS_NAV_ITEMS[0].href,
