@@ -75,8 +75,9 @@ export function ManualShell({
         {productNavigation ?? (hasRailLayout ? (
           <div className={`grid gap-8 ${railColumns}`}>
             {hasSidebar ? (
-              <aside className="hidden lg:block">
-                <div className="sticky top-24 space-y-5">
+              <aside className={productNavigation ? "min-w-0" : "hidden lg:block"}>
+                <div className={productNavigation ? "space-y-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto" : "sticky top-24 space-y-5"}>
+                  {productNavigation}
                   {sidebarGroups.map((group) => (
                     <section
                       key={group.title}
