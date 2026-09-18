@@ -26,13 +26,8 @@ export async function DocsShell({
 
   return (
     <AppShell subtitle={subtitle} navItems={navItems} actions={<SessionActions />}>
-      <div className="mx-auto grid max-w-screen-2xl gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:py-10">
-        <aside className="min-w-0">
-          <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
-            <ProductNavigation navigation={navigation} />
-          </div>
-        </aside>
-        <main className="min-w-0">{children}</main>
+      <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10">
+        <ProductNavigation navigation={navigation}>{children}</ProductNavigation>
       </div>
     </AppShell>
   );

@@ -1,64 +1,137 @@
-# Entrada do portal e navegação por produtos
+---
+title: Navbar de produtos EDI
+status: atual
+tags:
+  - arquitetura
+  - documentacao
+  - navegacao
+  - portal-edi
+updated: 2026-09-18
+---
 
-## Decisões de interface
+# Navbar de produtos EDI
 
-- `/` exibe somente o login centralizado quando não há sessão. Após o acesso, apresenta o Portal de Integração, a documentação, os fluxogramas e a sequência de implementação e validação; os atalhos vêm dos módulos permitidos para o perfil.
-- `/docs` é a introdução à documentação: trilha de integração, preparativos, visão geral dos produtos e orientação sobre acesso e ambientes.
-- A navegação de produtos é vertical. No celular, o menu pode ser expandido e recolhido. Produtos e seções usam botões acessíveis; módulos publicados usam links e itens futuros permanecem desabilitados.
-- Não existe uma área separada chamada “Documentação (Clientes)”. Cliente, fornecedor e equipe EDI usam a mesma navegação, com permissões preservadas.
-- O cabeçalho compartilhado identifica o tipo de acesso real da sessão: “Administrador” ou “Cliente”, inclusive no celular. Textos genéricos repetidos sobre público e permissões foram removidos da Home e da introdução; mensagens contextuais de acesso negado permanecem.
-- Os cartões de famílias saíram da introdução. As rotas `/docs/edi-pharma` e `/docs/edi-varejo` continuam funcionando para compatibilidade.
+## Contrato atual
 
-## Inspeção: CodeGraph, aplicação e Obsidian
+A área de documentação usa uma única navbar vertical e dinâmica. O conteúdo ocupa a coluna central e, quando um manual está aberto, o índice daquele documento ocupa a coluna direita em telas largas.
 
-O índice `.codegraph/` foi consultado antes da implementação para localizar `HomePage`, `DocsHomePage`, `DocsShell`, `ManualShellWithNav`, `buildManualNav`, `Badge`, os registros de módulos e `canAccessModule`/`canAccessPath`.
+A navbar possui três estados no mesmo lugar:
 
-O cofre `obsidian/`, incluindo `.obsidian`, existe. `scripts/sync-obsidian-vault.ts` deriva seus índices e operações de `content/projects/*/config.json`, `manual.json` e seções Markdown. O frontmatter registra `generated`, `slug` e `published`; o ambiente aparece no índice do produto. Mapas, ADRs e notas internas não são rotas públicas.
+1. lista de produtos;
+2. áreas e integrações do produto escolhido;
+3. áreas da integração aberta.
 
-Há referências antigas a `/manual` no cofre e nos documentos de migração. A aplicação usa `/docs` e mantém o redirecionamento legado. O mapa gerado do Obsidian lista demo, IM e Wholesaler, enquanto o conteúdo atual também inclui Canal Autorizador. Nenhum nome do cofre foi transformado automaticamente em URL.
+`DocumentationIntroduction` aparece somente no estado inicial de `/docs`. Ela não é repetida em páginas de produto, manual, operação ou Teste de Requisição.
 
-As famílias EDI Pharma/EDI Varejo do CMS e os produtos da nova navegação são classificações distintas. A configuração de navegação faz o agrupamento solicitado sem migrar os dados ou renomear os manuais existentes.
+## Rotas e retorno
 
-## Configuração e disponibilidade
+O estado navegável é representado pela URL:
 
-`modules/living-docs-externa/config/documentation-products.ts` centraliza produtos, descrições, módulos, ações, ordem, visibilidade, status, tags e políticas de acesso.
+- `/docs`: início e lista de produtos;
+- `/docs?produto={id}`: contexto de um produto;
+- `/docs/{slug}`: documentação publicada de uma integração;
+- `/docs/{slug}/operations/{kind}/{name}`: detalhe de operação;
+- `/docs/{slug}/playground`: Teste de Requisição, quando autorizado.
 
-- Credenciado: Cadastro, Opt-in, Venda e PBM direto no Caixa, ainda sem documentação.
-- Movimentação de Vidas: estrutura para Documentação, Roteiro, Teste de Requisição, Queries e Mutations; sem conteúdos publicados.
-- Trade: Canal Autorizador, Wholesaler e IM publicados; EDI Redes sem documentação.
-- APS: Delivery sem documentação; produto identificado como “A confirmar”.
-- PBM: Reposição sem documentação.
+Produtos e integrações publicadas usam `Link`, não estado local. Assim, recarregar a página, copiar a URL e usar voltar/avançar do navegador preserva o contexto.
 
-Somente manuais publicados recebem links: `/docs/canal-autorizador`, `/docs/wholesaler` e `/docs/im`. Roteiro usa a âncora `#roteiro-integracao`. O nome público “Teste de Requisição” reutiliza `/docs/{slug}/playground`, sem criar uma ferramenta duplicada.
+Os retornos também são rotas:
 
-`published` e `environment` continuam vindo do CMS. A tag `homolog` usa `environmentBadgeTone` e não representa a conclusão de uma homologação. Os estados Publicado, Sem documentação, Em desenvolvimento e Indisponível compartilham `DocumentationStatusBadge`, que reutiliza os tons do `Badge` existente.
+- integração → `/docs?produto={id}`;
+- produto → `/docs`;
+- breadcrumb “Documentação” → `/docs`.
 
-## Acesso e evolução administrativa
+Canal Autorizador, Wholesaler e IM abrem diretamente suas rotas publicadas. EDI Redes e os demais itens sem manual publicado continuam visíveis e desabilitados; não são criadas páginas fictícias.
 
-`getDocumentationNavigation` resolve dados e sessão no servidor. `resolveDocumentationNavigation` filtra produtos, módulos e ações por perfil e permite regras futuras de permissão, usuário, organização e cliente. Restrições com claims ausentes não liberam acesso. Tanto a introdução quanto a navbar recebem os produtos já filtrados.
+## Layout
 
-A sessão atual fornece o perfil existente. Não foi criada autenticação alternativa nem inferida uma organização a partir do e-mail. O login de desenvolvimento usado pelos testes já fazia parte do projeto.
+- esquerda: uma única navbar vertical, fixa durante a rolagem em desktop;
+- centro: introdução, visão do produto, manual, operação ou Teste de Requisição;
+- direita: índice derivado de `tocItems`, exibido em desktop quando uma rota de manual está ativa.
 
-Documentação publicada, referência API e fluxogramas mantêm o acesso normal para clientes. Administração continua restrita a `admin`; execução de requisições usa os controles de servidor existentes. Esconder um item do menu não substitui autorização na rota ou API.
+Em telas menores, a navbar pode ser expandida e recolhida. Recolher a navbar não esconde o conteúdo. O índice lateral não disputa largura com o conteúdo fora do breakpoint desktop.
 
-Uma futura fonte de configuração administrativa deve fornecer overrides validados por ID no carregador de servidor. Inclusão e exclusão estrutural permanecem em código. Esta etapa não cria editor administrativo, API de configuração ou integração definitiva de claims SSO granulares.
+Os blocos antigos “Navegação” e “Operações” de `sidebarGroups` não são renderizados nas páginas públicas que usam a navbar de produtos. Queries, Mutations e Métodos aparecem no mesmo menu dinâmico somente quando existem operações daquele tipo.
+
+## Fonte de verdade e fluxo de dados
+
+`modules/living-docs-externa/config/documentation-products.ts` é o registro estrutural de produtos, ações e integrações. Inclusão ou exclusão estrutural permanece em código.
+
+`getDocumentationNavigation` combina:
+
+- configuração estrutural;
+- sessão autenticada;
+- manuais publicados;
+- operações de cada manual.
+
+`resolveDocumentationNavigation` aplica ordem, visibilidade, status e acesso. Somente rotas configuradas que correspondem a um manual publicado geram links.
+
+No cliente, `ProductNavigation`:
+
+- lê a rota com `usePathname`;
+- lê o produto com `useSearchParams`;
+- destaca produto, integração e área ativos;
+- recebe o conteúdo da rota como `children`;
+- recebe o índice pronto em `tocItems`.
+
+Ocultar um item não substitui autorização de rota ou API. Claims ausentes falham fechados.
+
+## Produtos configurados
+
+- Credenciado: Cadastro, Opt-in, Venda e PBM direto no Caixa; placeholders.
+- Movimentação de Vidas: estrutura futura para roteiro e integrações.
+- Trade: Canal Autorizador, Wholesaler e IM publicados; EDI Redes como placeholder.
+- APS: Delivery como placeholder; produto marcado “A confirmar”.
+- PBM: Reposição como placeholder.
+- Documentação (Clientes): área separada ainda sem conteúdo publicado.
+
+Os estados visuais reutilizam `DocumentationStatusBadge` e `Badge`. O ambiente, como `homolog`, vem do manual publicado e usa `environmentBadgeTone`.
 
 ## Arquivos principais
 
-- Entradas: `app/page.tsx`, `app/docs/page.tsx`.
-- Apresentação: `documentation-introduction.tsx`, `product-navigation.tsx`, `documentation-status.tsx`, `docs-shell.tsx`, `manual-shell.tsx` e `manual-shell-with-nav.tsx`, em `modules/living-docs-externa/ui/reader/`.
-- Modelo e resolução: `schema/documentation-navigation.ts`, `config/documentation-products.ts`, `services/documentation-navigation.ts` e `services/get-documentation-navigation.ts`, no mesmo módulo.
-- Consistência de rótulos: `build-manual-nav.ts`, `manual-roteiro.tsx`, `operation-detail.tsx` e `app/docs/[slug]/playground/page.tsx`.
-- Apresentação dos recursos: registros dos módulos `living-docs-externa` e `graphql-reference`.
-- Validação: `services/documentation-navigation.test.ts`, testes E2E de introdução, navbar, manuais, referência e compatibilidade de famílias. `playwright.config.ts` aceita `PLAYWRIGHT_BROWSER_CHANNEL=chrome`; Edge permanece como padrão.
+- `app/docs/page.tsx`: introdução inicial.
+- `modules/living-docs-externa/config/documentation-products.ts`: registro estrutural.
+- `modules/living-docs-externa/schema/documentation-navigation.ts`: contrato de dados.
+- `modules/living-docs-externa/services/documentation-navigation.ts`: resolução e seleção por rota.
+- `modules/living-docs-externa/services/get-documentation-navigation.ts`: integração servidor/sessão.
+- `modules/living-docs-externa/ui/reader/product-navigation.tsx`: navbar e composição das colunas.
+- `modules/living-docs-externa/ui/reader/docs-shell.tsx`: entrada de `/docs`.
+- `modules/living-docs-externa/ui/reader/manual-shell-with-nav.tsx`: manual e índice.
+- `tests/e2e/product-navigation.spec.ts`: rotas diretas, rollback, responsividade e acesso administrativo.
 
-## Validação realizada
+## CodeGraph
 
-- TypeScript, ESLint e regras de arquitetura aprovados.
-- 49 arquivos de testes unitários/integração: 293 testes aprovados.
-- 15 testes E2E selecionados aprovados no Chrome: introdução, login, navbar, navegação de manuais/referência, celular e acesso por perfil.
-- Capturas de `/docs`, Home e login revisadas visualmente; testes de celular em 390 px confirmam ausência de rolagem horizontal nessas entradas.
-- Cliente sem links administrativos, redirecionado de `/admin/projects` e `/interno`, e recebendo HTTP 403 ao tentar usar a API de requisições.
-- Testes antigos atualizados para o administrador padrão e para o snapshot já existente de Wholesaler. O cenário de publicação sem snapshot continua coberto por `get-published-schema.test.ts`.
+O repositório possui `.codegraph/`; esse índice é local e seus dados transitórios não são versionados.
 
-Não houve deploy ou alteração de credenciais. O texto introdutório é um esboço editorial a evoluir com o conteúdo e o escopo confirmados de cada produto.
+Depois de alterar este fluxo:
+
+```bash
+codegraph sync .
+codegraph status .
+codegraph explore "ProductNavigation documentation navigation routes"
+```
+
+Use `codegraph index .` somente quando for necessário reconstruir o índice completo. Para investigação, consulte CodeGraph antes de buscas textuais amplas.
+
+## Obsidian
+
+O cofre `obsidian/` é derivado do repositório. `docs/` entra no cofre como a pasta `obsidian/docs`, e os produtos publicados são gerados a partir de `content/projects`.
+
+Depois de alterar documentação ou conteúdo:
+
+```bash
+npm run obsidian:sync
+```
+
+Durante edição contínua, use `npm run obsidian:watch`. Não edite arquivos gerados no cofre como fonte de verdade; edite `docs/` ou `content/`.
+
+## Verificação mínima
+
+```bash
+npm run typecheck
+npm run lint
+npm test -- modules/living-docs-externa/services/documentation-navigation.test.ts
+$env:PLAYWRIGHT_BROWSER_CHANNEL='chrome'; npm run test:e2e -- tests/e2e/product-navigation.spec.ts
+```
+
+O E2E deve validar acesso direto a Canal Autorizador, Wholesaler e IM, retorno por link, histórico do navegador, índice lateral e ausência de overflow no mobile.

@@ -44,13 +44,13 @@ describe("documentation navigation", () => {
         ...p,
         enabled: p.id !== "aps",
         order: -p.order,
-        actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro" })),
+        actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro-homologacao" })),
         modules: p.modules.map((m) => ({ ...m, access: m.id === "im" ? { organizationIds: ["org-a"] } : undefined })),
       })),
     };
     const view = resolve(config);
     expect(view.products.map((p) => p.id)).toEqual(["pbm", "trade", "movimentacao-de-vidas", "credenciado"]);
-    expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro")).toBe(false);
+    expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro-homologacao")).toBe(false);
     expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).some((m) => m.id === "im")).toBe(false);
     expect(DOCUMENTATION_CONFIGURATION.products[0].id).toBe("credenciado");
   });
@@ -73,9 +73,9 @@ describe("documentation navigation", () => {
 
   it("selects the product/module/action for deep links without prefix collisions", () => {
     const view = resolve(undefined, manuals, "admin");
-    expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "roteiro", moduleId: "im" });
+    expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "mutations", moduleId: "im" });
     expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
-    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro");
+    expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
     expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
     expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
   });
