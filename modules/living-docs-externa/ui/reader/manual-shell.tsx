@@ -43,9 +43,12 @@ export function ManualShell({
   headerActions,
   productNavigation,
 }: ManualShellProps) {
-  const hasSidebar = Boolean(productNavigation) || sidebarGroups.some((group) => group.items.length > 0);
+  const hasSidebar = !productNavigation && sidebarGroups.some((group) => group.items.length > 0);
   const hasToc = tocItems.length > 0;
   const hasRailLayout = hasSidebar || hasToc;
+  const railColumns = hasSidebar
+    ? "lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_14rem]"
+    : "xl:grid-cols-[minmax(0,1fr)_14rem]";
   const showDefaultCatalogLink = headerActions == null && navItems.length === 0;
 
   return (
@@ -69,12 +72,11 @@ export function ManualShell({
         }
       />
       <main className={productNavigation ? "mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10" : "mx-auto max-w-7xl px-6 py-10"}>
-        {hasRailLayout ? (
-          <div className={`grid gap-8 ${productNavigation ? hasToc ? "lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[18rem_minmax(0,1fr)_14rem]" : "lg:grid-cols-[18rem_minmax(0,1fr)]" : "lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_14rem]"}`}>
+        {productNavigation ?? (hasRailLayout ? (
+          <div className={`grid gap-8 ${railColumns}`}>
             {hasSidebar ? (
-              <aside className={productNavigation ? "min-w-0" : "hidden lg:block"}>
-                <div className={productNavigation ? "space-y-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto" : "sticky top-24 space-y-5"}>
-                  {productNavigation}
+              <aside className="hidden lg:block">
+                <div className="sticky top-24 space-y-5">
                   {sidebarGroups.map((group) => (
                     <section
                       key={group.title}
@@ -150,7 +152,7 @@ export function ManualShell({
           </div>
         ) : (
           <div className="mx-auto max-w-4xl">{children}</div>
-        )}
+        ))}
       </main>
     </div>
   );

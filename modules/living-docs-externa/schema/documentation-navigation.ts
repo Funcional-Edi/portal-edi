@@ -1,4 +1,5 @@
 import type { UserRole } from "@/core/auth/roles";
+import type { ManualOperationKind } from "@/modules/living-docs-externa/schema/manual";
 
 export type DocumentationStatus = "published" | "no-documentation" | "development" | "unavailable";
 
@@ -38,6 +39,7 @@ export interface DocumentationModule extends DocumentationItem {
 
 export interface DocumentationAction extends DocumentationItem {
   destination: "documentation" | "guide" | "request-test" | null;
+  linkModules?: boolean;
 }
 
 export interface DocumentationProduct extends DocumentationItem {
@@ -48,6 +50,7 @@ export interface DocumentationProduct extends DocumentationItem {
 
 export interface DocumentationConfiguration {
   products: readonly DocumentationProduct[];
+  clients?: DocumentationItem;
 }
 
 /** Only presentation data crosses the server/client boundary. */
@@ -59,12 +62,22 @@ export interface DocumentationLinkView {
   environment?: string;
   status: DocumentationStatus;
   tag?: string;
+  operations?: DocumentationOperationView[];
+}
+
+export interface DocumentationOperationView {
+  kind: ManualOperationKind;
+  name: string;
+  label: string;
+  method?: string;
+  href: string;
 }
 
 export interface DocumentationActionView {
   id: string;
   label: string;
   tag?: string;
+  status: DocumentationStatus;
   links: DocumentationLinkView[];
 }
 
@@ -79,4 +92,5 @@ export interface DocumentationProductView {
 
 export interface DocumentationNavigationView {
   products: DocumentationProductView[];
+  clients?: Pick<DocumentationItem, "id" | "label" | "status" | "tag">;
 }
