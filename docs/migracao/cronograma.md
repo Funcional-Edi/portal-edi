@@ -224,7 +224,7 @@ travaria qualquer projeto novo em rascunho para sempre.
 
 | Entrega | Detalhe | Status |
 |---------|---------|--------|
-| Export PDF | API `/export/pdf` + botões leitor/admin | ✅ |
+| Export PDF | Removido na EDI-14324 | ✅ |
 | E2E smoke atualizado | login inline `/` + allowlist playground | ✅ |
 | Validação de conteúdo publicado | `npm run content:validate-published` | ✅ |
 | Paridade seed | `canal-autorizador` marcado como seed-only | ✅ |

@@ -27,6 +27,7 @@ const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visibl
 
 const FLOW_AREAS = [
   { id: "documentacao", label: "Documentação", icon: FileText },
+  { id: "roteiro-homologacao", label: "Roteiro de Homologação", icon: BookOpen },
   { id: "queries", label: "Queries", icon: Code2 },
   { id: "mutations", label: "Mutations", icon: Code2 },
   { id: "metodos", label: "Métodos", icon: Code2 },
@@ -40,6 +41,9 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
   if (areaId === "documentacao") {
     return product.actions.find((action) => action.id === "visao-geral")?.links.find((item) => item.id === link.id)?.href;
   }
+  if (areaId === "roteiro-homologacao") {
+    return product.actions.find((action) => action.id === "roteiro-homologacao")?.links.find((item) => item.id === link.id)?.href;
+  }
   if (areaId === "teste-de-requisicao") {
     return product.actions.find((action) => action.id === "teste-de-requisicao")?.links.find((item) => item.id === link.id)?.href;
   }
@@ -49,7 +53,7 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
   return FLOW_AREAS.filter((area) => {
-    if (area.id === "documentacao" || area.id === "teste-de-requisicao") {
+    if (area.id === "documentacao" || area.id === "roteiro-homologacao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
@@ -274,7 +278,7 @@ export function ProductNavigation({
                 </Link>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{product.label}</p>
                 <div className="space-y-1.5">
-                  {product.actions.filter((action) => action.id !== "fluxos" && action.id !== "teste-de-requisicao").map((action) => (
+                  {product.actions.filter((action) => action.id !== "fluxos" && action.id !== "roteiro-homologacao" && action.id !== "teste-de-requisicao").map((action) => (
                     <button
                       key={action.id}
                       type="button"
@@ -398,7 +402,7 @@ export function ProductNavigation({
                 </div>
                 <div className="mt-6">
                   {selectedAreaId === "fluxograma-geral" ? (
-                    <Placeholder>Espaço reservado para o fluxograma geral deste produto.</Placeholder>
+                    <Placeholder>Espaço reservado para o Fluxograma Completo deste produto.</Placeholder>
                   ) : selectedAreaId === "roteiro-homologacao" ? (
                     <Placeholder>Espaço reservado para o Roteiro de Homologação.</Placeholder>
                   ) : productArea?.links.some((link) => link.href) ? (

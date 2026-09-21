@@ -29,6 +29,19 @@ describe("documentation navigation", () => {
     expect(view.products.find((p) => p.id === "trade")?.status).toBe("no-documentation");
   });
 
+  it("exposes a complete flowchart at every product root and homologation guides per subproduct", () => {
+    const view = resolve();
+    expect(view.products.every((product) => product.actions[1]?.label === "Fluxograma Completo")).toBe(true);
+    const tradeGuide = view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "roteiro-homologacao")!;
+    expect(tradeGuide.links.map((link) => link.href)).toEqual([
+      "/docs/canal-autorizador#roteiro-integracao",
+      "/docs/wholesaler#roteiro-integracao",
+      null,
+      "/docs/im#roteiro-integracao",
+    ]);
+  });
+
   it("only offers request tests to admins and GraphQL manuals", () => {
     expect(resolve().products.every((p) => p.actions.every((a) => a.id !== "teste-de-requisicao"))).toBe(true);
     const admin = resolve(undefined, manuals.map((manual) => manual.slug === "wholesaler" ? { ...manual, protocol: "rest" } : manual), "admin");

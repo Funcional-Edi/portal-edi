@@ -45,7 +45,7 @@ export interface ManualRoteiroEditorSlots {
   banner?: ReactNode;
   /** Ações do bloco "Contexto" (nova seção). */
   sectionsToolbar?: ReactNode;
-  /** Ações do bloco "Roteiro de integração" (nova operação). */
+  /** Ações do bloco "Roteiro de Homologação" (nova operação). */
   operationsToolbar?: ReactNode;
 }
 
@@ -235,7 +235,7 @@ export function ManualRoteiro({
 
       <section id="roteiro-integracao" className="scroll-mt-24">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold">Roteiro de integração</h2>
+          <h2 className="text-lg font-semibold">Roteiro de Homologação</h2>
           {editor?.operationsToolbar}
         </div>
 

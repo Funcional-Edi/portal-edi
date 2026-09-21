@@ -58,7 +58,7 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
     ...(project.manual.referenceTables?.length
       ? [{ href: "#tabelas-referencia", label: "Tabelas de referência" }]
       : []),
-    { href: "#roteiro-integracao", label: "Roteiro de integração" },
+    { href: "#roteiro-integracao", label: "Roteiro de Homologação" },
   ];
 
   return (

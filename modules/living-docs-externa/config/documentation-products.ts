@@ -8,8 +8,8 @@ import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-route
 
 const actions: readonly DocumentationAction[] = [
   { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
-  { id: "fluxograma-geral", label: "Fluxograma geral do produto", order: 2, enabled: true, visible: true, status: "no-documentation", destination: null },
-  { id: "roteiro-homologacao", label: "Roteiro de Homologação", order: 3, enabled: true, visible: true, status: "development", tag: "Estrutura futura", destination: null },
+  { id: "fluxograma-geral", label: "Fluxograma Completo", order: 2, enabled: true, visible: true, status: "no-documentation", destination: null },
+  { id: "roteiro-homologacao", label: "Roteiro de Homologação", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
   { id: "fluxos", label: "Fluxos", order: 4, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
   { id: "teste-de-requisicao", label: "Teste de Requisição", order: 5, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
 ];
@@ -30,7 +30,7 @@ function product(
   order: number,
   description: string,
   modules: DocumentationModule[],
-  actionIds: readonly string[] = ["visao-geral", "fluxos"],
+  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "roteiro-homologacao", "fluxos"],
 ): DocumentationProduct {
   return {
     id, label, order, description, modules,
@@ -51,17 +51,15 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
       moduleItem("fluxo-optin", "Fluxo Opt-in", 2),
       moduleItem("fluxo-venda", "Fluxo de Venda", 3),
       moduleItem("fluxo-pbm-caixa", "Fluxo PBM direto no Caixa", 4),
-    ], ["visao-geral", "fluxograma-geral", "fluxos"]),
-    product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Área prevista para os processos de movimentação de vidas, com consultas, alterações e roteiros. Os detalhes de integração ainda serão documentados.", [], [
-      "visao-geral", "roteiro-homologacao", "fluxos",
     ]),
+    product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Área prevista para os processos de movimentação de vidas, com consultas, alterações e roteiros. Os detalhes de integração ainda serão documentados.", []),
     {
       ...product("trade", "Trade", 3, "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e IM. A estrutura também prevê EDI Redes, ainda sem documentação.", [
         moduleItem("canal-autorizador", "Canal Autorizador", 1, "canal-autorizador"),
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
         moduleItem("im", "IM", 4, "im"),
-      ], ["visao-geral", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "roteiro-homologacao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {
