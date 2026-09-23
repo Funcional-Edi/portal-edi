@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "syncedAt": "2026-09-23T00:00:00.000Z",
+  "source": {
+    "projectSlug": "movimentacao-de-vidas",
+    "graphqlUrl": "https://companies-uat.funcionalhealthtech.com.br/graphql",
+    "gatewaySlug": "gateway-companies-uat"
+  },
+  "introspection": {
+    "__schema": {
+      "queryType": { "name": "Query" },
+      "mutationType": { "name": "Mutation" },
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "fields": [
+            {
+              "name": "BRM_getBeneficiariesByIdentity",
+              "description": "Retorna a lista de beneficiários por CPF.",
+              "args": [
+                {
+                  "name": "beneficiaryIdentity",
+                  "description": "CPF do beneficiário.",
+                  "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } }
+                }
+              ],
+              "type": { "kind": "LIST", "name": null, "ofType": { "kind": "OBJECT", "name": "BRM_BeneficiaryProfileType", "ofType": null } }
+            },
+            {
+              "name": "BRM_getProcessingStatus",
+              "description": "Retorna o status atual do processamento da instrução.",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Identificador da instrução.",
+                  "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } }
+                }
+              ],
+              "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "OBJECT", "name": "BRM_BeneficiaryProcessingStatusType", "ofType": null } }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Mutation",
+          "fields": [
+            {
+              "name": "createToken",
+              "description": "Cria um token para autenticação.",
+              "args": [
+                { "name": "login", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } },
+                { "name": "password", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } }
+              ],
+              "type": { "kind": "OBJECT", "name": "Token", "ofType": null }
+            },
+            {
+              "name": "BRM_createOrUpdateBeneficiary",
+              "description": "Insere uma instrução de movimentação na fila de processamento.",
+              "args": [
+                { "name": "input", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "INPUT_OBJECT", "name": "BRM_BeneficiaryDetailInput", "ofType": null } } }
+              ],
+              "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "OBJECT", "name": "BRM_BeneficiaryProcessingStatusType", "ofType": null } }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Token",
+          "fields": [
+            { "name": "token", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "BRM_BeneficiaryProcessingStatusType",
+          "fields": [
+            { "name": "id", "type": { "kind": "SCALAR", "name": "String", "ofType": null } },
+            { "name": "status", "type": { "kind": "SCALAR", "name": "String", "ofType": null } },
+            { "name": "statusMessage", "type": { "kind": "SCALAR", "name": "String", "ofType": null } }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "BRM_BeneficiaryProfileType",
+          "fields": [
+            { "name": "id", "type": { "kind": "SCALAR", "name": "String", "ofType": null } },
+            { "name": "name", "type": { "kind": "SCALAR", "name": "String", "ofType": null } },
+            { "name": "statusBeneficiary", "type": { "kind": "SCALAR", "name": "String", "ofType": null } }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "BRM_BeneficiaryDetailInput",
+          "inputFields": [
+            { "name": "companyIdentity", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } },
+            { "name": "holderIdentity", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } },
+            { "name": "beneficiaryIdentity", "type": { "kind": "SCALAR", "name": "String", "ofType": null } },
+            { "name": "name", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "String", "ofType": null } } }
+          ]
+        },
+        { "kind": "SCALAR", "name": "String", "fields": null }
+      ]
+    }
+  },
+  "summary": {
+    "typeCount": 7,
+    "queryFieldCount": 2,
+    "mutationFieldCount": 2
+  }
+}

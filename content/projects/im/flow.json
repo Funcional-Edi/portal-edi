@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "Fluxo de Inventário",
+  "description": "Autenticação, envio da carga de estoque e consulta do resultado do processamento.",
+  "nodes": [
+    { "id": "start", "type": "start", "label": "Carga de inventário disponível", "position": { "x": 260, "y": 0 } },
+    { "id": "createToken", "type": "operation", "label": "Obter token", "position": { "x": 260, "y": 90 }, "operationRef": { "kind": "mutation", "name": "createToken" } },
+    { "id": "saveInventories", "type": "operation", "label": "Enviar carga", "position": { "x": 260, "y": 180 }, "operationRef": { "kind": "mutation", "name": "saveInventories" } },
+    { "id": "end", "type": "end", "label": "Carga enviada", "position": { "x": 260, "y": 270 } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start", "target": "createToken" },
+    { "id": "e2", "source": "createToken", "target": "saveInventories" },
+    { "id": "e3", "source": "saveInventories", "target": "end" }
+  ],
+  "updatedAt": "2026-09-23T00:00:00.000Z"
+}

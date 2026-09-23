@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   BookOpen,
   Code2,
   FileText,
@@ -84,6 +85,38 @@ function Placeholder({ children }: { children: string }) {
   );
 }
 
+function FlowchartList({ links }: { links: DocumentationLinkView[] }) {
+  const available = links.filter((link) => link.href);
+
+  if (available.length === 0) {
+    return <Placeholder>Este produto ainda não possui um fluxograma completo publicado.</Placeholder>;
+  }
+
+  return (
+    <div>
+      <p className="text-sm leading-relaxed text-slate-600">
+        Selecione o fluxograma completo do subproduto para visualizar a sequência de integração.
+      </p>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        {available.map((link) => (
+          <li key={link.id}>
+            <Link
+              href={link.href!}
+              className={"block rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm transition hover:border-brand-600 hover:bg-brand-50 " + focusClass}
+            >
+              <span className="font-semibold text-slate-900">{link.label}</span>
+              {link.environment ? (
+                <span className="mt-2 block text-xs uppercase tracking-wide text-slate-500">{link.environment}</span>
+              ) : null}
+              <span className="mt-3 block font-medium text-brand-700">Ver fluxograma →</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function OperationList({
   title,
   operations,
@@ -148,7 +181,7 @@ function FlowPanel({
           <h3 className="mt-2 text-xl font-semibold text-slate-900">{link.label}</h3>
         </div>
         <Link href={`/docs?produto=${encodeURIComponent(product.id)}`} className={"inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline " + focusClass}>
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar às áreas
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar ao produto {product.label}
         </Link>
       </div>
 
@@ -167,7 +200,7 @@ export function ProductNavigation({
   children,
 }: {
   navigation: DocumentationNavigationView;
-  tocItems?: { href: string; label: string }[];
+  tocItems?: { href: string; label: string; depth?: number }[];
   children?: ReactNode;
 }) {
   const pathname = usePathname();
@@ -176,12 +209,28 @@ export function ProductNavigation({
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedFlowId, setSelectedFlowId] = useState<string | null>(null);
   const [selectedAreaId, setSelectedAreaId] = useState<ProductAreaId | FlowAreaId | null>(null);
-  const active = documentationRouteSelection(navigation, pathname);
+  const [locationHash, setLocationHash] = useState("");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const active = documentationRouteSelection(navigation, pathname, locationHash);
   const activeProductId = active?.productId;
   const activeModuleId = active?.moduleId;
   const activeActionId = active?.actionId;
   const requestedProductId = searchParams.get("produto");
   const productIdFromQuery = navigation.products.some((item) => item.id === requestedProductId) ? requestedProductId : null;
+
+  useEffect(() => {
+    const updateHash = () => setLocationHash(window.location.hash);
+    updateHash();
+    window.addEventListener("hashchange", updateHash);
+    return () => window.removeEventListener("hashchange", updateHash);
+  }, [pathname]);
+
+  useEffect(() => {
+    const updateScrollState = () => setShowScrollTop(window.scrollY > 480);
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
 
   useEffect(() => {
     if (activeProductId && activeModuleId && activeActionId) {
@@ -236,8 +285,8 @@ export function ProductNavigation({
           <nav id="edi-product-list" aria-label="Produtos EDI" className={(mobileOpen ? "block" : "hidden") + " lg:sticky lg:top-6 lg:block lg:self-start"}>
             {selectedFlow && product ? (
               <>
-                <Link href={`/docs?produto=${encodeURIComponent(product.id)}`} className={"mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline " + focusClass}>
-                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> {product.label}
+                <Link href="/docs" className={"mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline " + focusClass}>
+                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> Voltar aos produtos
                 </Link>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{selectedFlow.label}</p>
                 <div className="space-y-1.5">
@@ -254,7 +303,14 @@ export function ProductNavigation({
                       {area.label}
                     </>;
                     return href ? (
-                      <Link key={area.id} href={href} aria-current={area.id === selectedAreaId ? "page" : undefined} className={className}>
+                      <Link
+                        key={area.id}
+                        href={href}
+                        replace={area.id === "roteiro-homologacao"}
+                        aria-current={area.id === selectedAreaId ? "page" : undefined}
+                        onClick={() => setLocationHash(area.id === "roteiro-homologacao" ? "#roteiro-integracao" : "")}
+                        className={className}
+                      >
                         {content}
                       </Link>
                     ) : (
@@ -402,7 +458,7 @@ export function ProductNavigation({
                 </div>
                 <div className="mt-6">
                   {selectedAreaId === "fluxograma-geral" ? (
-                    <Placeholder>Espaço reservado para o Fluxograma Completo deste produto.</Placeholder>
+                    <FlowchartList links={productArea?.links ?? []} />
                   ) : selectedAreaId === "roteiro-homologacao" ? (
                     <Placeholder>Espaço reservado para o Roteiro de Homologação.</Placeholder>
                   ) : productArea?.links.some((link) => link.href) ? (
@@ -421,7 +477,7 @@ export function ProductNavigation({
                 <ul className="space-y-1.5">
                   {tocItems.map((item) => (
                     <li key={item.href}>
-                      <Link href={item.href} className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-white hover:text-brand-700 " + focusClass}>
+                      <Link href={item.href} className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-white hover:text-brand-700 " + (item.depth ? "ml-4 border-l-2 border-slate-200 pl-3 " : "") + focusClass}>
                         {item.label}
                       </Link>
                     </li>
@@ -432,6 +488,17 @@ export function ProductNavigation({
           ) : null}
         </div>
       </div>
+      {showScrollTop ? (
+        <button
+          type="button"
+          aria-label="Voltar ao topo"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className={"fixed bottom-5 right-5 z-50 inline-flex items-center gap-1.5 rounded-full bg-brand-700 px-3 py-2 text-sm font-medium text-white shadow-lg transition hover:bg-brand-800 " + focusClass}
+        >
+          <ArrowUp className="h-4 w-4" aria-hidden="true" />
+          <span>Voltar ao topo</span>
+        </button>
+      ) : null}
     </div>
   );
 }

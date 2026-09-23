@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "title": "Fluxo de Movimentação de Vidas",
+  "description": "Autenticação, envio assíncrono da instrução e acompanhamento por status ou webhook.",
+  "nodes": [
+    { "id": "start", "type": "start", "label": "Necessidade de movimentação", "position": { "x": 260, "y": 0 } },
+    {
+      "id": "createToken",
+      "type": "operation",
+      "label": "Criar token",
+      "position": { "x": 260, "y": 90 },
+      "operationRef": { "kind": "mutation", "name": "createToken" }
+    },
+    {
+      "id": "createOrUpdateBeneficiary",
+      "type": "operation",
+      "label": "Enviar movimentação",
+      "position": { "x": 260, "y": 180 },
+      "operationRef": { "kind": "mutation", "name": "BRM_createOrUpdateBeneficiary" }
+    },
+    { "id": "decisionChannel", "type": "decision", "label": "Acompanhar por webhook?", "position": { "x": 260, "y": 280 } },
+    { "id": "webhook", "type": "end", "label": "Receber notificação no endpoint", "position": { "x": 80, "y": 390 } },
+    {
+      "id": "getProcessingStatus",
+      "type": "operation",
+      "label": "Consultar status",
+      "position": { "x": 440, "y": 390 },
+      "operationRef": { "kind": "query", "name": "BRM_getProcessingStatus" }
+    },
+    { "id": "end", "type": "end", "label": "Processamento acompanhado", "position": { "x": 440, "y": 500 } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start", "target": "createToken" },
+    { "id": "e2", "source": "createToken", "target": "createOrUpdateBeneficiary" },
+    { "id": "e3", "source": "createOrUpdateBeneficiary", "target": "decisionChannel" },
+    { "id": "e4", "source": "decisionChannel", "target": "webhook", "label": "Sim" },
+    { "id": "e5", "source": "decisionChannel", "target": "getProcessingStatus", "label": "Não" },
+    { "id": "e6", "source": "getProcessingStatus", "target": "end" }
+  ],
+  "updatedAt": "2026-09-23T00:00:00.000Z"
+}

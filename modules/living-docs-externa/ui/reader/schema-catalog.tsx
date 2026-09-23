@@ -2,8 +2,8 @@ import { ArrowRight, Braces, Clock, Database } from "lucide-react";
 import Link from "next/link";
 
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
+import { DOCUMENTATION_CONFIGURATION } from "@/modules/living-docs-externa/config/documentation-products";
 import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
-import { groupByFamily } from "@/modules/living-docs-externa/services/group-by-family";
 import type { SchemaCatalogEntry } from "@/modules/living-docs-externa/services/get-published-schema";
 
 interface SchemaCatalogProps {
@@ -23,7 +23,55 @@ function formatSyncedAt(iso?: string): string {
   });
 }
 
-function ReadyCard({ entry }: { entry: SchemaCatalogEntry }) {
+interface SchemaCatalogItem {
+  entry: SchemaCatalogEntry;
+  subproductLabel: string;
+}
+
+interface SchemaCatalogGroup {
+  id: string;
+  label: string;
+  description?: string;
+  items: SchemaCatalogItem[];
+}
+
+function groupByProduct(entries: SchemaCatalogEntry[]): SchemaCatalogGroup[] {
+  const relations = new Map(
+    DOCUMENTATION_CONFIGURATION.products.flatMap((product) =>
+      product.modules.flatMap((module) =>
+        module.projectSlug
+          ? [[module.projectSlug, { productId: product.id, subproductLabel: module.label }] as const]
+          : [],
+      ),
+    ),
+  );
+  const groups = new Map<string, SchemaCatalogGroup>(
+    DOCUMENTATION_CONFIGURATION.products.map((product) => [product.id, {
+      id: product.id,
+      label: product.label,
+      description: product.description,
+      items: [],
+    } satisfies SchemaCatalogGroup]),
+  );
+  const unmatched: SchemaCatalogItem[] = [];
+
+  for (const entry of entries) {
+    const relation = relations.get(entry.slug);
+    const item = { entry, subproductLabel: relation?.subproductLabel ?? entry.name };
+    const group = relation ? groups.get(relation.productId) : undefined;
+    if (group) group.items.push(item);
+    else unmatched.push(item);
+  }
+
+  const result = [...groups.values()].filter((group) => group.items.length > 0);
+  if (unmatched.length > 0) {
+    result.push({ id: "outros", label: "Outros produtos", items: unmatched });
+  }
+  return result;
+}
+
+function ReadyCard({ item }: { item: SchemaCatalogItem }) {
+  const { entry, subproductLabel } = item;
   return (
     <Link
       href={`/docs/api/${entry.slug}`}
@@ -38,7 +86,12 @@ function ReadyCard({ entry }: { entry: SchemaCatalogEntry }) {
         ) : null}
       </div>
 
-      <h2 className="mt-4 font-semibold text-slate-900">{entry.name}</h2>
+      <h2 className="mt-4 font-semibold text-slate-900">{subproductLabel}</h2>
+      {subproductLabel !== entry.name ? (
+        <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+          {entry.name}
+        </p>
+      ) : null}
       {entry.description ? (
         <p className="mt-2 flex-1 text-sm text-slate-600">{entry.description}</p>
       ) : (
@@ -72,7 +125,8 @@ function ReadyCard({ entry }: { entry: SchemaCatalogEntry }) {
   );
 }
 
-function PendingCard({ entry }: { entry: SchemaCatalogEntry }) {
+function PendingCard({ item }: { item: SchemaCatalogItem }) {
+  const { entry, subproductLabel } = item;
   return (
     <div className="flex h-full flex-col rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
       <div className="flex items-start justify-between gap-3">
@@ -84,7 +138,12 @@ function PendingCard({ entry }: { entry: SchemaCatalogEntry }) {
         ) : null}
       </div>
 
-      <h2 className="mt-4 font-semibold text-slate-700">{entry.name}</h2>
+      <h2 className="mt-4 font-semibold text-slate-700">{subproductLabel}</h2>
+      {subproductLabel !== entry.name ? (
+        <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+          {entry.name}
+        </p>
+      ) : null}
       {entry.description ? (
         <p className="mt-2 flex-1 text-sm text-slate-500">{entry.description}</p>
       ) : (
@@ -122,16 +181,16 @@ export function SchemaCatalog({ entries }: SchemaCatalogProps) {
     );
   }
 
-  const groups = groupByFamily(entries);
+  const groups = groupByProduct(entries);
 
   return (
     <div className="space-y-12">
       {groups.map((group) => {
-        const ready = group.items.filter((entry) => entry.hasSchema);
-        const pending = group.items.filter((entry) => !entry.hasSchema);
+        const ready = group.items.filter((item) => item.entry.hasSchema);
+        const pending = group.items.filter((item) => !item.entry.hasSchema);
 
         return (
-          <section key={group.family}>
+          <section key={group.id}>
             <header className="mb-5 border-b border-slate-200 pb-3">
               <h2 className="text-lg font-semibold text-slate-900">{group.label}</h2>
               {group.description ? (
@@ -146,9 +205,9 @@ export function SchemaCatalog({ entries }: SchemaCatalogProps) {
                     Schemas disponíveis
                   </h3>
                   <ul className="grid gap-4 sm:grid-cols-2">
-                    {ready.map((entry) => (
-                      <li key={entry.slug}>
-                        <ReadyCard entry={entry} />
+                    {ready.map((item) => (
+                      <li key={item.entry.slug}>
+                        <ReadyCard item={item} />
                       </li>
                     ))}
                   </ul>
@@ -161,9 +220,9 @@ export function SchemaCatalog({ entries }: SchemaCatalogProps) {
                     Pendentes de sync
                   </h3>
                   <ul className="grid gap-4 sm:grid-cols-2">
-                    {pending.map((entry) => (
-                      <li key={entry.slug}>
-                        <PendingCard entry={entry} />
+                    {pending.map((item) => (
+                      <li key={item.entry.slug}>
+                        <PendingCard item={item} />
                       </li>
                     ))}
                   </ul>

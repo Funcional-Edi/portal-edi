@@ -31,6 +31,7 @@ export function resolveDocumentationNavigation(
   manuals: readonly ProjectSummary[],
   audience: DocumentationAudience,
   operationsBySlug: ReadonlyMap<string, readonly ManualOperation[]> = new Map(),
+  flowSlugs: ReadonlySet<string> = new Set(),
 ): DocumentationNavigationView {
   const published = new Map(manuals.filter((manual) => manual.published).map((manual) => [manual.slug, manual]));
   const products = ordered(config.products, audience).filter((product) => product.enabled).map((product) => {
@@ -50,6 +51,7 @@ export function resolveDocumentationNavigation(
         if (available && base) {
           if (action.destination === "documentation") href = base;
           if (action.destination === "guide") href = `${base}#roteiro-integracao`;
+          if (action.destination === "flowchart" && flowSlugs.has(manual.slug)) href = `/fluxogramas/${manual.slug}`;
           if (action.destination === "request-test" && audience.role === "admin" && manual.protocol === "graphql") {
             href = docsPlaygroundHref(manual.slug);
           }
@@ -103,7 +105,11 @@ export function resolveDocumentationNavigation(
 }
 
 /** Exact slug boundaries avoid activating IM for unrelated routes such as /docs/im-extra. */
-export function documentationRouteSelection(view: DocumentationNavigationView, pathname: string) {
+export function documentationRouteSelection(
+  view: DocumentationNavigationView,
+  pathname: string,
+  hash = "",
+) {
   for (const product of view.products) {
     for (const action of product.actions) {
       for (const link of action.links) {
@@ -114,10 +120,11 @@ export function documentationRouteSelection(view: DocumentationNavigationView, p
           const operationKind = pathname.startsWith(`${manual}/operations/`)
             ? pathname.slice(`${manual}/operations/`.length).split("/")[0]
             : null;
-          const actionId = pathname.startsWith(`${manual}/playground`) ? "teste-de-requisicao"
-            : operationKind === "query" ? "queries"
-              : operationKind === "mutation" ? "mutations"
-                : operationKind === "rest" ? "metodos" : "documentacao";
+          const actionId = hash === "#roteiro-integracao" ? "roteiro-homologacao"
+            : pathname.startsWith(`${manual}/playground`) ? "teste-de-requisicao"
+              : operationKind === "query" ? "queries"
+                : operationKind === "mutation" ? "mutations"
+                  : operationKind === "rest" ? "metodos" : "documentacao";
           return { productId: product.id, actionId, moduleId: link.id };
         }
       }

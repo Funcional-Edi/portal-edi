@@ -78,8 +78,8 @@ Ocultar um item não substitui autorização de rota ou API. Claims ausentes fal
 
 ## Produtos configurados
 
-- Credenciado: Cadastro, Opt-in, Venda e PBM direto no Caixa; placeholders.
-- Movimentação de Vidas: estrutura futura para roteiro e integrações.
+- Credenciado: Cadastro, Opt-in, Venda e Fluxo PBM no Caixa; placeholders.
+- Movimentação de Vidas: manual, roteiro de homologação, referência GraphQL e fluxograma publicados.
 - Trade: Canal Autorizador, Wholesaler e IM publicados; EDI Redes como placeholder.
 - APS: Delivery como placeholder; produto marcado “A confirmar”.
 - PBM: Reposição como placeholder.
@@ -102,6 +102,8 @@ Os estados visuais reutilizam `DocumentationStatusBadge` e `Badge`. O ambiente, 
 ## CodeGraph
 
 O repositório possui `.codegraph/`; esse índice é local e seus dados transitórios não são versionados.
+
+O procedimento completo de instalação, configuração do MCP e preparação de um novo ambiente está em [Configuração do CodeGraph](codegraph-setup.md).
 
 Depois de alterar este fluxo:
 

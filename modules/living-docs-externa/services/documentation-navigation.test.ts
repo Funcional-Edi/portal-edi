@@ -8,8 +8,9 @@ import { canViewDocumentation, documentationRouteSelection, resolveDocumentation
 const manuals: ProjectSummary[] = ["im", "canal-autorizador", "wholesaler"].map((slug) => ({
   slug, name: slug, published: true, protocol: "graphql", environment: "homolog", updatedAt: "2026-09-16T00:00:00.000Z",
 }));
+const flowSlugs = new Set(manuals.map((manual) => manual.slug));
 const resolve = (config = DOCUMENTATION_CONFIGURATION, projects = manuals, role: "admin" | "client" = "client") =>
-  resolveDocumentationNavigation(config, projects, { role });
+  resolveDocumentationNavigation(config, projects, { role }, new Map(), flowSlugs);
 
 describe("documentation navigation", () => {
   it("uses published manuals and keeps unknown/future routes disabled", () => {
@@ -32,6 +33,11 @@ describe("documentation navigation", () => {
   it("exposes a complete flowchart at every product root and homologation guides per subproduct", () => {
     const view = resolve();
     expect(view.products.every((product) => product.actions[1]?.label === "Fluxograma Completo")).toBe(true);
+    const tradeFlow = view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "fluxograma-geral")!;
+    expect(tradeFlow.links.map((link) => link.href)).toEqual([
+      "/fluxogramas/canal-autorizador", "/fluxogramas/wholesaler", null, "/fluxogramas/im",
+    ]);
     const tradeGuide = view.products.find((product) => product.id === "trade")!.actions
       .find((action) => action.id === "roteiro-homologacao")!;
     expect(tradeGuide.links.map((link) => link.href)).toEqual([
@@ -89,6 +95,7 @@ describe("documentation navigation", () => {
     expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "mutations", moduleId: "im" });
     expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
     expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
+    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-homologacao");
     expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
     expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
   });

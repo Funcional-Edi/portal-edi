@@ -8,6 +8,8 @@
   },
   "scripts": {
     "dev": "next dev -p 3002",
+    "codegraph:sync": "codegraph sync .",
+    "codegraph:check": "codegraph status .",
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint .",

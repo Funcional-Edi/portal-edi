@@ -4,7 +4,6 @@ import {
   listGithubSubdirs,
   readGithubJson,
   readGithubText,
-  githubContentStore,
 } from "@/core/db/adapters/github-content-store";
 import {
   deleteLocalFile,
@@ -12,11 +11,9 @@ import {
   listLocalSubdirs,
   readLocalJson,
   readLocalText,
-  localContentStore,
   writeLocalJson,
   writeLocalText,
 } from "@/core/db/adapters/local-content-store";
-import type { DataStore } from "@/core/db";
 
 /** Seleciona backend de conteúdo conforme variáveis GITHUB_*. */
 export function getContentBackend(): ContentBackend {
@@ -77,8 +74,4 @@ export async function deleteContentFile(relativePath: string): Promise<boolean> 
     throw new Error("Escrita no GitHub CMS ainda não implementada.");
   }
   return deleteLocalFile(relativePath);
-}
-
-export function getContentStore(): DataStore {
-  return getContentBackend() === "github" ? githubContentStore : localContentStore;
 }

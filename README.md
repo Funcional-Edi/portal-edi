@@ -49,6 +49,23 @@ npm run dev                    # http://localhost:3002
 - Healthcheck / planta viva: `GET /api/health`.
 - Smoke homolog: `npm run smoke:homolog` (ver [`docs/migracao/deploy-homolog.md`](docs/migracao/deploy-homolog.md)).
 
+### Primeiro passo no desenvolvimento
+
+Antes de investigar ou alterar o código, confirme que o índice local do CodeGraph está atualizado quando o CLI estiver disponível no ambiente.
+
+```bash
+npm run codegraph:check
+```
+
+Se o status indicar alterações pendentes, sincronize o índice e repita a conferência:
+
+```bash
+npm run codegraph:sync
+npm run codegraph:check
+```
+
+Em um ambiente novo, instale e inicialize o CodeGraph conforme o guia [Configuração do CodeGraph](docs/estrutura/codegraph-setup.md). Para investigar uma rota ou fluxo, use `codegraph explore` antes de buscas textuais amplas.
+
 ## Deploy homolog
 
 ```bash

@@ -7,7 +7,7 @@
         "serve",
         "--mcp",
         "--path",
-        "C:\\Projetos\\portal-edi"
+        "D:\\Projetos\\portal-edi"
       ]
     }
   }

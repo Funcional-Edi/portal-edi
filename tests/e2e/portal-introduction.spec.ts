@@ -4,7 +4,7 @@ async function login(page: Page, admin = false) {
   await page.goto("/");
   const devTab = page.getByRole("tab", { name: "Login local (dev)" });
   if (await devTab.count()) await devTab.click();
-  await page.getByLabel("E-mail").fill(admin ? "admin@funcionalcorp.com.br" : "qa-distribuidor@fidelize.com.br");
+  await page.getByLabel("E-mail").fill(admin ? "admin@empresa.com" : "qa@distribuidor.com");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
   await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }
@@ -48,13 +48,13 @@ test("client uses the shared portal and documentation without gaining privileged
   await expect(page.getByRole("heading", { name: "Antes de começar" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "O que você encontra por aqui" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Catálogos por família" })).toHaveCount(0);
-  await expect(page.getByText("Documentação (Clientes)", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Documentação (Clientes)", { exact: true })).toBeHidden();
   await expect(page.getByRole("heading", { name: "Navegação compartilhada, acesso conforme seu perfil" })).toHaveCount(0);
   await expect(page.getByLabel("Tipo de acesso: Cliente", { exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/docs?produto=trade");
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
-  await nav.getByRole("button", { name: "Mostrar produtos" }).click();
-  await nav.getByRole("button", { name: "Trade", exact: true }).click();
-  await expect(nav.getByRole("link", { name: /^IM homolog/ })).toBeVisible();
+  await expect(nav.getByRole("link", { name: /^IM/ })).toBeVisible();
   await expect(nav.getByRole("button", { name: "Teste de Requisição" })).toHaveCount(0);
   await page.goto("/admin/projects");
   await expect(page).toHaveURL("/docs");
@@ -80,6 +80,16 @@ test("admin retains project management and the shared documentation entry", asyn
   await page.getByRole("link", { name: "Começar pela documentação" }).click();
   await expect(page).toHaveURL("/docs");
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
-  await nav.getByRole("button", { name: "Trade", exact: true }).click();
-  await expect(nav.getByRole("button", { name: "Teste de Requisição" })).toBeVisible();
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await nav.getByRole("link", { name: /^IM/ }).click();
+  await expect(nav.getByRole("link", { name: "Teste de Requisição", exact: true })).toBeVisible();
+});
+
+test("logout clears the session and returns to the public home", async ({ page }) => {
+  await login(page);
+  await page.getByRole("button", { name: "Sair" }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.getByRole("button", { name: "Entrar (dev)" })).toBeVisible();
+  await page.goto("/docs");
+  await expect(page).toHaveURL(/callbackUrl=%2Fdocs/);
 });

@@ -51,9 +51,3 @@ export function requireDatabase(feature: string, capability: DataCapability): vo
   if (isDatabaseAvailable(capability)) return;
   throw new DatabaseRequiredError(feature, capability);
 }
-
-/** Porta que qualquer adapter de persistência futuro (github, postgres) implementa. */
-export interface DataStore {
-  readonly kind: string;
-  readonly capabilities: ReadonlySet<DataCapability>;
-}

@@ -14,7 +14,7 @@ export function FlowShell({ children, subtitle = "Fluxogramas" }: FlowShellProps
       subtitle={subtitle}
       navItems={[
         { href: "/fluxogramas", label: "Fluxogramas", active: true },
-        { href: "/manual", label: "Manuais" },
+        { href: "/docs", label: "Documentação" },
       ]}
       actions={<SessionActions />}
     >
