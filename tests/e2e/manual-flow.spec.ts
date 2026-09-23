@@ -11,7 +11,7 @@ async function loginAsDevUser(page: Page) {
 
 async function loginAsDevAdmin(page: Page) {
   await page.goto("/");
-  await page.getByLabel("E-mail").fill("admin@empresa.com");
+  await page.getByLabel("E-mail").fill("admin@funcionalcorp.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
   await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }

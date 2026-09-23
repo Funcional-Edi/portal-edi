@@ -4,7 +4,7 @@ async function login(page: Page, admin = false) {
   await page.goto("/");
   const dev = page.getByRole("tab", { name: "Login local (dev)" });
   if (await dev.count()) await dev.click();
-  await page.getByLabel("E-mail").fill(admin ? "admin@empresa.com" : "qa@distribuidor.com");
+  await page.getByLabel("E-mail").fill(admin ? "admin@funcionalcorp.com.br" : "qa@distribuidor.com");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
   await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
   await page.goto("/docs");

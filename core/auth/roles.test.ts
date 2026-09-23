@@ -8,7 +8,7 @@ import {
 
 describe("RBAC — resolução de papel", () => {
   it("reconhece admin pela lista de permissões padrão", () => {
-  expect(resolveRole("admin@empresa.com")).toBe("admin");
+    expect(resolveRole("admin@funcionalcorp.com.br")).toBe("admin");
   });
 
   it("é insensível a maiúsculas no e-mail", () => {
@@ -23,7 +23,7 @@ describe("RBAC — resolução de papel", () => {
 
   it("trata qualquer outro e-mail como client (papel padrão)", () => {
     expect(resolveRole("distribuidor@parceiro.com")).toBe("client");
-    expect(resolveRole("admin@outra-empresa.com")).toBe("client");
+    expect(resolveRole("admin@empresa.com")).toBe("client");
   });
 
   it("usa o papel padrão quando não há e-mail", () => {
