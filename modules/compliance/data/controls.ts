@@ -111,7 +111,7 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autorizacao",
     status: "ativo",
     description:
-      "Admins e clients definidos em data/permissions.json (gitignored) ou PERMISSIONS_CONFIG_JSON. Defaults em código usam placeholders genéricos.",
+      "Admins e clients definidos em data/permissions.json (gitignored) ou PERMISSIONS_CONFIG_JSON. O fallback local usa o administrador padrão; homolog/prod devem configurar a fonte externa.",
     verification: "Copiar permissions.example.json → permissions.json no deploy.",
     reference: "data/permissions.example.json",
     implementedAt: "2026-08-10",
