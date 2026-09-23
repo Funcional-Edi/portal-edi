@@ -1,0 +1,36 @@
+{
+  "id": "credenciado",
+  "name": "Credenciado",
+  "description": "Reúne os fluxos de cadastro, opt-in, venda e PBM direto no caixa para a integração do credenciado.",
+  "order": 1,
+  "visible": true,
+  "status": "no-documentation",
+  "modules": [
+    {
+      "id": "fluxo-de-cadastro",
+      "label": "Fluxo de Cadastro",
+      "order": 1
+    },
+    {
+      "id": "fluxo-optin",
+      "label": "Fluxo Opt-in",
+      "order": 2
+    },
+    {
+      "id": "fluxo-venda",
+      "label": "Fluxo de Venda",
+      "order": 3
+    },
+    {
+      "id": "fluxo-pbm-caixa",
+      "label": "Fluxo PBM direto no Caixa",
+      "order": 4
+    },
+    {
+      "id": "teste-01",
+      "label": "teste-01",
+      "order": 5,
+      "projectSlug": "teste-01"
+    }
+  ]
+}

@@ -5,8 +5,13 @@
 
 export const CONTENT_PATHS = {
   projectsPrefix: "content/projects",
+  productsPrefix: "content/products",
   dataProjectsPrefix: "data/projects",
 } as const;
+
+export function catalogProductPath(id: string): string {
+  return `${CONTENT_PATHS.productsPrefix}/${id}/config.json`;
+}
 
 export function projectConfigPath(slug: string): string {
   return `${CONTENT_PATHS.projectsPrefix}/${slug}/config.json`;

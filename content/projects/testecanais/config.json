@@ -1,0 +1,10 @@
+{
+  "slug": "testecanais",
+  "name": "teste-canais",
+  "productId": "movimentacao-de-vidas",
+  "protocol": "graphql",
+  "published": false,
+  "manualStatus": "draft",
+  "createdAt": "2026-09-23T18:38:46.553Z",
+  "updatedAt": "2026-09-23T18:38:46.553Z"
+}

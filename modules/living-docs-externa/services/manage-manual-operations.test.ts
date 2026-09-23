@@ -13,6 +13,7 @@ import { createProject, getManual } from "@/modules/living-docs-externa/reposito
 import {
   ManageOperationError,
   addManualOperation,
+  addManualOperationsBulk,
   removeManualOperation,
   updateManualOperation,
 } from "@/modules/living-docs-externa/services/manage-manual-operations";
@@ -151,6 +152,55 @@ describe("manage-manual-operations service", () => {
       await expect(removeManualOperation("nao-existe", "query", "x")).rejects.toBeInstanceOf(
         ManageOperationError
       );
+    });
+  });
+
+  describe("addManualOperationsBulk", () => {
+    it("adiciona várias operações válidas numa única escrita, atribuindo order sequencial", async () => {
+      const result = await addManualOperationsBulk("demo", [
+        { kind: "query", name: "groupedOrder", title: "Consultar pedido" },
+        { kind: "mutation", name: "createGroupedOrder", title: "Criar pedido" },
+      ]);
+
+      expect(result.added.map((op) => op.name)).toEqual(["groupedOrder", "createGroupedOrder"]);
+      expect(result.added.map((op) => op.order)).toEqual([1, 2]);
+      expect(result.skipped).toEqual([]);
+
+      const manual = await getManual("demo");
+      expect(manual?.operations).toHaveLength(2);
+    });
+
+    it("reporta duplicadas em `skipped` sem abortar o restante do lote", async () => {
+      await addManualOperation("demo", { kind: "query", name: "groupedOrder", order: 1 });
+
+      const result = await addManualOperationsBulk("demo", [
+        { kind: "query", name: "groupedOrder" },
+        { kind: "mutation", name: "createGroupedOrder" },
+      ]);
+
+      expect(result.added.map((op) => op.name)).toEqual(["createGroupedOrder"]);
+      expect(result.skipped).toEqual([
+        { kind: "query", name: "groupedOrder", reason: "ALREADY_EXISTS" },
+      ]);
+
+      const manual = await getManual("demo");
+      expect(manual?.operations).toHaveLength(2);
+    });
+
+    it("reporta entradas inválidas em `skipped` sem escrever nada quando o lote inteiro falha", async () => {
+      const result = await addManualOperationsBulk("demo", [{ kind: "invalid-kind", name: "x" }]);
+
+      expect(result.added).toEqual([]);
+      expect(result.skipped).toEqual([{ kind: "invalid-kind", name: "x", reason: "VALIDATION" }]);
+
+      const manual = await getManual("demo");
+      expect(manual?.operations).toHaveLength(0);
+    });
+
+    it("rejeita projeto inexistente", async () => {
+      await expect(addManualOperationsBulk("nao-existe", [])).rejects.toMatchObject({
+        code: "PROJECT_NOT_FOUND",
+      });
     });
   });
 });
