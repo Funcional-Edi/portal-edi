@@ -57,10 +57,10 @@ export default async function PlaygroundPage({ params, searchParams }: Playgroun
               <span className="font-medium">admin</span> podem usar esta ferramenta.
             </p>
             <Link
-              href={docsGuideHref(slug)}
+              href={`${docsGuideHref(slug)}#roteiro-integracao`}
               className="mt-4 inline-flex text-sm font-medium text-brand-700 hover:underline"
             >
-              ← Voltar ao roteiro
+              ← Voltar ao Roteiro de Homologação
             </Link>
           </div>
         )}

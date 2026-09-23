@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function loginAsDevUser(page: Page) {
   await page.goto("/");
-  await page.getByLabel("E-mail").fill("qa-distribuidor@fidelize.com.br");
+  await page.getByLabel("E-mail").fill("qa@distribuidor.com");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
   await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }

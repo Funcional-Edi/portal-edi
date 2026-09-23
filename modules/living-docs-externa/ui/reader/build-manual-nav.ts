@@ -115,6 +115,7 @@ export async function buildManualNav(
       ...operations.map((op) => ({
         href: `${basePath}/operations/${op.kind}/${op.name}`,
         label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+        depth: 1,
       })),
     ],
   };

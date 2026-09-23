@@ -25,10 +25,6 @@ vi.mock("@/core/db/adapters/local-content-store", () => ({
   readLocalText: readLocalTextMock,
   listLocalSubdirs: listLocalSubdirsMock,
   listLocalFiles: listLocalFilesMock,
-  localContentStore: {
-    kind: "local-filesystem",
-    capabilities: new Set(["content"]),
-  },
 }));
 
 vi.mock("@/core/db/adapters/github-content-store", () => ({
@@ -36,15 +32,10 @@ vi.mock("@/core/db/adapters/github-content-store", () => ({
   readGithubText: readGithubTextMock,
   listGithubSubdirs: listGithubSubdirsMock,
   listGithubFiles: listGithubFilesMock,
-  githubContentStore: {
-    kind: "github-content",
-    capabilities: new Set(["content"]),
-  },
 }));
 
 import {
   getContentBackend,
-  getContentStore,
   listContentFiles,
   listContentSubdirs,
   readContentJson,
@@ -81,7 +72,6 @@ describe("content adapters facade", () => {
     listLocalFilesMock.mockResolvedValueOnce(["a.md"]);
 
     expect(getContentBackend()).toBe("local");
-    expect(getContentStore().kind).toBe("local-filesystem");
     expect(await readContentJson("content/projects/demo/config.json")).toEqual({ ok: true });
     expect(await readContentText("content/projects/demo/sections/a.md")).toBe("texto local");
     expect(await listContentSubdirs("content/projects")).toEqual(["demo"]);
@@ -99,7 +89,6 @@ describe("content adapters facade", () => {
     listGithubFilesMock.mockResolvedValueOnce(["intro.md"]);
 
     expect(getContentBackend()).toBe("github");
-    expect(getContentStore().kind).toBe("github-content");
     expect(await readContentJson("content/projects/demo/config.json")).toEqual({
       ok: "github",
     });

@@ -19,6 +19,7 @@ export interface ManualNavGroup {
 export interface ManualTocItem {
   href: string;
   label: string;
+  depth?: number;
 }
 
 interface ManualShellProps {
@@ -119,7 +120,7 @@ export function ManualShell({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+                      className={"shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + (item.depth ? "ml-2" : "")}
                     >
                       {item.label}
                     </Link>
@@ -140,7 +141,7 @@ export function ManualShell({
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className="block rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+                          className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100 " + (item.depth ? "ml-4 border-l-2 border-slate-200 pl-3" : "")}
                         >
                           {item.label}
                         </Link>

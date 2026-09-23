@@ -19,7 +19,7 @@ export interface PermissionsConfig {
  * Domínio = auto-identificação: qualquer e-mail daquele sufixo casa a regra.
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: ["admin@funcionalcorp.com.br"],
+  admins: ["admin@empresa.com"],
   clients: ["@distribuidor.com"],
   defaultRole: "client",
 };

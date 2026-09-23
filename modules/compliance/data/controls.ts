@@ -100,7 +100,7 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autenticacao",
     status: "ativo",
     description:
-      "DEV_AUTH_ENABLED só funciona com NODE_ENV=development; validateEnv bloqueia em produção. Rate limit também aplicado.",
+      "DEV_AUTH_ENABLED só funciona em desenvolvimento local ou Preview protegido; validateEnv bloqueia em produção pública. Rate limit também aplicado.",
     verification: "validateEnv() + core/auth/config.ts",
     reference: ".env.example",
     implementedAt: "2026-08-10",

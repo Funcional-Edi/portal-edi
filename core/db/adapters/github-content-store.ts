@@ -1,7 +1,5 @@
 import { Octokit } from "@octokit/rest";
 
-import type { DataCapability, DataStore } from "@/core/db";
-
 type GithubFileContent = {
   type: "file";
   content?: string;
@@ -98,8 +96,3 @@ export async function listGithubFiles(relativeDir: string): Promise<string[]> {
 
   return content.filter((entry) => entry.type === "file").map((entry) => entry.name);
 }
-
-export const githubContentStore: DataStore = {
-  kind: "github-content",
-  capabilities: new Set<DataCapability>(["content"]),
-};

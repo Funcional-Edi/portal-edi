@@ -1,16 +1,11 @@
 /**
- * Wiring dos módulos no registro central. Módulos planejados que exijam
+ * Catálogo central dos módulos. Módulos planejados que exijam
  * capacidades de dados indisponíveis aparecem em `listBlockedModules()` — o
  * "alerta" de que é preciso decidir sobre banco antes de ativá-los (ADR-0002).
  */
 
 import { isDatabaseAvailable, type DataCapability } from "@/core/db";
-import {
-  listModules,
-  registerModule,
-  resetModuleRegistry,
-  type PortalModule,
-} from "@/core/module-registry";
+import type { PortalModule } from "@/core/module-registry";
 
 import { livingDocsExternaModule } from "@/modules/living-docs-externa/module";
 import { manuaisInternosModule } from "@/modules/manuais-internos/module";
@@ -30,11 +25,9 @@ const ALL_MODULES: PortalModule[] = [
   complianceModule,
 ];
 
-/** Registra todos os módulos conhecidos. Idempotente. */
+/** Retorna uma cópia dos módulos conhecidos. */
 export function registerAllModules(): PortalModule[] {
-  resetModuleRegistry();
-  for (const portalModule of ALL_MODULES) registerModule(portalModule);
-  return listModules();
+  return [...ALL_MODULES];
 }
 
 export function missingCapabilities(portalModule: PortalModule): DataCapability[] {

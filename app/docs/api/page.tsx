@@ -12,8 +12,8 @@ export default async function DocsApiCatalogPage() {
           Referência GraphQL
         </h1>
         <p className="mt-2 max-w-2xl text-slate-600">
-          Schema técnico completo por produto, gerado a partir do sync do admin. Complementa
-          o manual curado — leitura only, sem introspection live no browser.
+          Schema técnico completo organizado por produto e subproduto, gerado a partir do
+          sync do admin. Complementa o manual curado — somente leitura, sem introspection live no browser.
         </p>
       </header>
       <SchemaCatalog entries={entries} />

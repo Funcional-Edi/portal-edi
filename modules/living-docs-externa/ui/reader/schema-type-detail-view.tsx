@@ -165,7 +165,7 @@ export function SchemaTypeDetailView({ data }: SchemaTypeDetailViewProps) {
     <article>
       <nav className="mb-6 text-sm text-slate-500">
         <Link href="/docs/api" className="hover:text-brand-700">
-          Referência API
+          Referência GraphQL
         </Link>
         <span className="mx-2">/</span>
         <Link href={`/docs/api/${slug}`} className="hover:text-brand-700">

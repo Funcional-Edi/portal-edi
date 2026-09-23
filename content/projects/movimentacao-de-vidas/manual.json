@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "title": "Roteiro de Homologação — Movimentação de Vidas",
+  "productName": "Gateway Companies",
+  "manualVersion": "1.0.0",
+  "versionHistory": [
+    {
+      "date": "2026-09-23",
+      "author": "Time EDI",
+      "details": "Documentação inicial do fluxo de movimentação de beneficiários.",
+      "version": "1.0.0"
+    }
+  ],
+  "referenceTables": [
+    {
+      "id": "processing-status",
+      "title": "Status do processamento",
+      "columns": ["Status", "Orientação"],
+      "rows": [
+        ["WAITING", "A instrução foi recebida e aguarda processamento."],
+        ["PROCESSING", "A instrução está sendo processada."],
+        ["SUCCESS", "A instrução foi processada com sucesso."],
+        ["ERROR", "O processamento terminou com erro; consulte a mensagem retornada."]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "kind": "mutation",
+      "name": "createToken",
+      "order": 1,
+      "title": "1. Criar token",
+      "description": "Autentica o cliente no gateway e retorna o token usado nas chamadas seguintes.",
+      "authRequired": false,
+      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "BRM_createOrUpdateBeneficiary",
+      "order": 2,
+      "title": "2. Enviar movimentação",
+      "description": "Enfileira a inclusão, atualização, reativação ou transferência do beneficiário conforme a situação atual do cadastro.",
+      "prerequisites": ["createToken"],
+      "businessNotes": [
+        "Envie primeiro a instrução do titular quando houver dependentes.",
+        "A resposta contém o identificador da instrução; guarde-o para acompanhar o processamento."
+      ],
+      "relatedSections": ["visao-geral"],
+      "exampleQuery": "mutation BRM_createOrUpdateBeneficiary($input: BRM_BeneficiaryDetailInput!) {\n  BRM_createOrUpdateBeneficiary(input: $input) {\n    id\n    status\n    statusMessage\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "BRM_getProcessingStatus",
+      "order": 3,
+      "title": "3. Consultar status do processamento",
+      "description": "Consulta o status atual da instrução enviada ao processamento assíncrono.",
+      "prerequisites": ["BRM_createOrUpdateBeneficiary"],
+      "relatedSections": ["visao-geral"],
+      "exampleQuery": "query BRM_getProcessingStatus($id: String!) {\n  BRM_getProcessingStatus(id: $id) {\n    id\n    status\n    statusMessage\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "BRM_getBeneficiariesByIdentity",
+      "order": 4,
+      "title": "4. Consultar beneficiário",
+      "description": "Consulta os dados do beneficiário a partir do CPF informado.",
+      "prerequisites": ["createToken"],
+      "relatedSections": ["visao-geral"],
+      "exampleQuery": "query BRM_getBeneficiariesByIdentity($beneficiaryIdentity: String!) {\n  BRM_getBeneficiariesByIdentity(beneficiaryIdentity: $beneficiaryIdentity) {\n    id\n    name\n    statusBeneficiary\n  }\n}"
+    }
+  ]
+}
