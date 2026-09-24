@@ -34,6 +34,8 @@ Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](d
 
 Migração da documentação viva: [`docs/migracao/mapa-documentacao-funcional.md`](docs/migracao/mapa-documentacao-funcional.md) · [`docs/migracao/cronograma.md`](docs/migracao/cronograma.md).
 
+Refinamento EDI-14331 — Jornada e Roteiro de Integração: [`docs/estrutura/edi-14331-jornada-integracao.md`](docs/estrutura/edi-14331-jornada-integracao.md).
+
 Regra de dependência: `app → modules → core`. Módulos não se importam entre si —
 comunicam-se por eventos (`core/events`).
 
