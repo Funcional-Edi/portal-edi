@@ -34,7 +34,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
 
   await page.goto("/admin/projects/new");
   await page.getByLabel("Subproduto").fill("e2e rest flow");
-  await page.getByLabel("Produto").selectOption({ label: "PBM" });
+  await page.getByLabel("Produto", { exact: true }).selectOption({ label: "PBM" });
   await page.getByLabel("Protocolo").selectOption({ label: "REST" });
   await page.getByRole("button", { name: "Criar projeto" }).click();
 
