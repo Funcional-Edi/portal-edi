@@ -33,24 +33,24 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
   ).toHaveClass(/ml-4/);
 
   await page
-    .locator("#roteiro-integracao")
+    .locator("#jornada-integracao")
     .getByRole("link", { name: /1\. Obter token do gateway/ })
     .click();
 
   await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
   await expect(page.getByText("mutation createToken", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Consulte o Roteiro de Homologação" })).toBeVisible();
-  const homologation = page.getByRole("link", { name: "Ver o Roteiro de Homologação" });
-  await expect(homologation).toHaveAttribute(
+  await expect(page.getByRole("heading", { name: "Consulte o Roteiro de Integração" })).toBeVisible();
+  const integrationGuide = page.getByRole("link", { name: "Ver o Roteiro de Integração" });
+  await expect(integrationGuide).toHaveAttribute(
     "href",
     "/docs/im#roteiro-integracao",
   );
-  await homologation.click();
+  await integrationGuide.click();
   await expect(page).toHaveURL("/docs/im#roteiro-integracao");
   await expect(
     page.getByRole("navigation", { name: "Produtos EDI" }).getByRole("link", {
-      name: "Roteiro de Homologação",
+      name: "Roteiro de Integração",
       exact: true,
     }),
   ).toHaveAttribute("aria-current", "page");

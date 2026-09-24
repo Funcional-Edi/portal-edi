@@ -45,7 +45,7 @@ export interface ManualRoteiroEditorSlots {
   banner?: ReactNode;
   /** Ações do bloco "Contexto" (nova seção). */
   sectionsToolbar?: ReactNode;
-  /** Ações do bloco "Roteiro de Homologação" (nova operação). */
+  /** Ações do bloco "Jornada da Integração" (nova operação). */
   operationsToolbar?: ReactNode;
 }
 
@@ -233,9 +233,15 @@ export function ManualRoteiro({
         </section>
       ) : null}
 
-      <section id="roteiro-integracao" className="scroll-mt-24">
+      <section id="jornada-integracao" className="scroll-mt-24">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold">Roteiro de Homologação</h2>
+          <div>
+            <h2 className="text-lg font-semibold">Jornada da Integração</h2>
+            <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
+              Siga as etapas na ordem para entender o processo completo. Cada operação leva à
+              próxima decisão da integração e abre o detalhamento técnico correspondente.
+            </p>
+          </div>
           {editor?.operationsToolbar}
         </div>
 
@@ -294,6 +300,35 @@ export function ManualRoteiro({
             );
           })}
         </ol>
+      </section>
+
+      <section id="roteiro-integracao" className="mt-10 scroll-mt-24">
+        <h2 className="text-lg font-semibold">Roteiro de Integração</h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
+          Use este roteiro para analisar cada fluxo com profundidade antes de implementá-lo ou
+          apresentá-lo na homologação. O detalhamento deve registrar os seguintes pontos:
+        </p>
+        <div className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-5">
+          <ul className="grid gap-2 text-sm leading-relaxed text-brand-900 sm:grid-cols-2">
+            <li>Objetivo e momento de uso do fluxo.</li>
+            <li>Pré-requisitos, autenticação e headers.</li>
+            <li>Dados obrigatórios, resposta e status possíveis.</li>
+            <li>Regra para decidir o próximo passo.</li>
+            <li>Erros, rejeições, reprocessamento e idempotência.</li>
+            <li>Evidência necessária para a homologação.</li>
+          </ul>
+          <p className="mt-4 border-t border-brand-200 pt-4 text-sm leading-relaxed text-brand-800">
+            Enquanto o detalhamento específico por fluxo é construído, consulte as operações da
+            Jornada da Integração para acessar os exemplos, regras de negócio e campos técnicos já
+            publicados.
+          </p>
+          <Link
+            href="#jornada-integracao"
+            className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
+          >
+            Ver a Jornada da Integração
+          </Link>
+        </div>
       </section>
     </article>
   );

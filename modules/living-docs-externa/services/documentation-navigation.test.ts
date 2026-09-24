@@ -30,7 +30,7 @@ describe("documentation navigation", () => {
     expect(view.products.find((p) => p.id === "trade")?.status).toBe("no-documentation");
   });
 
-  it("exposes a complete flowchart at every product root and homologation guides per subproduct", () => {
+  it("exposes a complete flowchart at every product root and integration guides per subproduct", () => {
     const view = resolve();
     expect(view.products.every((product) => product.actions[1]?.label === "Fluxograma Completo")).toBe(true);
     const tradeFlow = view.products.find((product) => product.id === "trade")!.actions
@@ -38,9 +38,16 @@ describe("documentation navigation", () => {
     expect(tradeFlow.links.map((link) => link.href)).toEqual([
       "/fluxogramas/canal-autorizador", "/fluxogramas/wholesaler", null, "/fluxogramas/im",
     ]);
-    const tradeGuide = view.products.find((product) => product.id === "trade")!.actions
-      .find((action) => action.id === "roteiro-homologacao")!;
-    expect(tradeGuide.links.map((link) => link.href)).toEqual([
+    const tradeJourney = view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "jornada-integracao")!;
+    expect(tradeJourney.links.map((link) => link.href)).toEqual([
+      "/docs/canal-autorizador#jornada-integracao",
+      "/docs/wholesaler#jornada-integracao",
+      null,
+      "/docs/im#jornada-integracao",
+    ]);
+    expect(view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "roteiro-integracao")!.links.map((link) => link.href)).toEqual([
       "/docs/canal-autorizador#roteiro-integracao",
       "/docs/wholesaler#roteiro-integracao",
       null,
@@ -63,13 +70,13 @@ describe("documentation navigation", () => {
         ...p,
         enabled: p.id !== "aps",
         order: -p.order,
-        actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro-homologacao" })),
+        actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro-integracao" })),
         modules: p.modules.map((m) => ({ ...m, access: m.id === "im" ? { organizationIds: ["org-a"] } : undefined })),
       })),
     };
     const view = resolve(config);
     expect(view.products.map((p) => p.id)).toEqual(["pbm", "trade", "movimentacao-de-vidas", "credenciado"]);
-    expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro-homologacao")).toBe(false);
+    expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro-integracao")).toBe(false);
     expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).some((m) => m.id === "im")).toBe(false);
     expect(DOCUMENTATION_CONFIGURATION.products[0].id).toBe("credenciado");
   });
@@ -95,7 +102,8 @@ describe("documentation navigation", () => {
     expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "mutations", moduleId: "im" });
     expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
     expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
-    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-homologacao");
+    expect(documentationRouteSelection(view, "/docs/im", "#jornada-integracao")?.actionId).toBe("jornada-integracao");
+    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-integracao");
     expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
     expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
   });

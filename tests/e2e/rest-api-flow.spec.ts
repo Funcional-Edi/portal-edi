@@ -49,6 +49,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await page.getByRole("button", { name: "Nova seção" }).click();
   await page.getByLabel("Título da seção").fill("Visao geral");
   await page.getByRole("button", { name: "Criar seção" }).click();
+  await expect(page.getByRole("dialog", { name: "Nova seção de contexto" })).toBeHidden();
   await page.getByRole("button", { name: "Editar", exact: true }).click();
   await page
     .getByLabel("Markdown")
@@ -59,7 +60,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Salvar seção" })).toBeHidden();
 
   await page.getByRole("button", { name: "Nova operação" }).click();
-  await page.getByLabel("Tipo").selectOption("rest");
+  await page.getByLabel("Tipo", { exact: true }).selectOption("rest");
   await page.getByLabel("Nome (identificador único)").fill("consultaStatus");
   await page.getByLabel("Descrição").fill("Consulta o status do pedido no PSP.");
   await page.getByLabel("Método").selectOption("GET");
@@ -74,7 +75,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await expect(page.getByText("GET").first()).toBeVisible();
 
   await page
-    .locator("#roteiro-integracao")
+    .locator("#jornada-integracao")
     .getByRole("link", { name: /consultaStatus/ })
     .click();
   await expect(page).toHaveURL(`/docs/${SLUG_REST}/operations/rest/consultaStatus`);
