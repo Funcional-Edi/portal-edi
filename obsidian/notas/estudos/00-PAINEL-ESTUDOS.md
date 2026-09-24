@@ -40,7 +40,7 @@ abra direto no navegador (duplo-clique). Kanban e checkboxes de estudo salvam no
 ## UI / casca do portal
 
 - Decisão: `docs/arquitetura/adr/0010-ui-shell-compartilhado.md` (via `obsidian/docs/…`)
-- Checklist e diagnóstico: `docs/migracao/decisoes-ui.md`
+- Checklist e diagnóstico: `content/interno/guides/decisoes-ui-portal-edi.md`
 - Código: `core/ui/` (`AppShell`, `Badge`, `SessionActions`)
 
 ## Estudo

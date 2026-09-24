@@ -47,7 +47,7 @@ gantt
 **Entregáveis**
 
 - [x] `docs/migracao/mapa-documentacao-funcional.md`
-- [x] `docs/migracao/cronograma.md` (este arquivo)
+- [x] `content/interno/guides/cronograma-portal-edi.md` (este arquivo)
 - [x] ADR-0009 — persistência `content` (local + GitHub)
 - [x] Atualizar índices (`docs/migracao/README`, ADR README)
 
