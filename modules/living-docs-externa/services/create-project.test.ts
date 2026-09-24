@@ -9,6 +9,7 @@ vi.mock("next/cache", () => ({
   revalidateTag: revalidateTagMock,
 }));
 
+import { writeCatalogProduct } from "@/modules/living-docs-externa/repository/catalog-product-repository";
 import { createProject } from "@/modules/living-docs-externa/services/create-project";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 
@@ -20,6 +21,15 @@ describe("createProject service", () => {
     tempRoot = await mkdtemp(path.join(os.tmpdir(), "portal-edi-create-"));
     process.env.CONTENT_ROOT = tempRoot;
     revalidateTagMock.mockClear();
+    await writeCatalogProduct({
+      id: "trade",
+      name: "Trade",
+      description: "",
+      order: 1,
+      visible: true,
+      status: "published",
+      modules: [],
+    });
   });
 
   afterEach(async () => {
@@ -36,9 +46,11 @@ describe("createProject service", () => {
       slug: "test-im",
       name: "Test IM",
       description: "Projeto de teste",
+      productId: "trade",
     });
 
     expect(project.config.slug).toBe("test-im");
+    expect(project.config.productId).toBe("trade");
     expect(project.config.published).toBe(false);
     expect(project.manual.operations).toEqual([]);
 
@@ -47,50 +59,40 @@ describe("createProject service", () => {
   });
 
   it("invalida tags de cache após criar", async () => {
-    await createProject({ slug: "cache-test", name: "Cache Test" });
+    await createProject({ slug: "cache-test", name: "Cache Test", productId: "trade" });
 
     expect(revalidateTagMock).toHaveBeenCalledWith("living-docs:projects");
     expect(revalidateTagMock).toHaveBeenCalledWith("living-docs:project:cache-test");
   });
 
   it("rejeita slug duplicado", async () => {
-    await createProject({ slug: "dup", name: "Primeiro" });
+    await createProject({ slug: "dup", name: "Primeiro", productId: "trade" });
 
-    await expect(createProject({ slug: "dup", name: "Segundo" })).rejects.toMatchObject({
+    await expect(createProject({ slug: "dup", name: "Segundo", productId: "trade" })).rejects.toMatchObject({
       code: "ALREADY_EXISTS",
     });
   });
 
   it("normaliza slug com maiúsculas, espaços e underscore", async () => {
-    const project = await createProject({ slug: "EDI_Canais Teste", name: "X" });
+    const project = await createProject({ slug: "EDI_Canais Teste", name: "X", productId: "trade" });
     expect(project.config.slug).toBe("edi-canais-teste");
   });
 
   it("rejeita slug inválido após normalização", async () => {
-    await expect(createProject({ slug: "!!!", name: "X" })).rejects.toMatchObject({
+    await expect(createProject({ slug: "!!!", name: "X", productId: "trade" })).rejects.toMatchObject({
       code: "VALIDATION",
     });
-    await expect(createProject({ slug: "a", name: "X" })).rejects.toMatchObject({
+    await expect(createProject({ slug: "a", name: "X", productId: "trade" })).rejects.toMatchObject({
       code: "VALIDATION",
     });
   });
 
-  it("cria projeto já classificado numa família", async () => {
-    const project = await createProject({
-      slug: "test-varejo",
-      name: "Test Varejo",
-      family: "edi-varejo",
+  it("exige um produto do menu de documentação", async () => {
+    await expect(createProject({ slug: "sem-produto", name: "X" })).rejects.toMatchObject({
+      code: "VALIDATION",
     });
-
-    expect(project.config.family).toBe("edi-varejo");
-
-    const loaded = await getProject("test-varejo");
-    expect(loaded?.config.family).toBe("edi-varejo");
-  });
-
-  it("rejeita família fora do enum conhecido", async () => {
     await expect(
-      createProject({ slug: "test-invalido", name: "X", family: "edi-inexistente" })
-    ).rejects.toMatchObject({ code: "VALIDATION" });
+      createProject({ slug: "produto-invalido", name: "X", productId: "edi-pharma" }),
+    ).rejects.toMatchObject({ code: "PRODUCT_NOT_FOUND" });
   });
 });

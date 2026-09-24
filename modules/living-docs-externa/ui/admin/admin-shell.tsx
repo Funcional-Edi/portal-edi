@@ -14,6 +14,7 @@ export function AdminShell({ children, activeNavHref = "/admin/projects" }: Admi
       <AppHeader
         subtitle="Admin — Documentação viva"
         navItems={[
+          { href: "/admin/products", label: "Produtos", active: activeNavHref === "/admin/products" },
           { href: "/admin/projects", label: "Projetos", active: activeNavHref === "/admin/projects" },
           { href: "/admin/metrics", label: "Métricas", active: activeNavHref === "/admin/metrics" },
           { href: "/docs", label: "Ver catálogo" },

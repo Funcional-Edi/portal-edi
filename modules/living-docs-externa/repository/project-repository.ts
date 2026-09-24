@@ -84,6 +84,7 @@ export async function createProject(input: {
   name: string;
   description?: string;
   family?: ProductFamily;
+  productId?: ProjectConfig["productId"];
   protocol?: ProjectProtocol;
 }): Promise<Project> {
   if (await projectExists(input.slug)) {
@@ -96,6 +97,7 @@ export async function createProject(input: {
     name: input.name,
     description: input.description,
     family: input.family,
+    productId: input.productId,
     protocol: input.protocol ?? "graphql",
     published: false,
     manualStatus: "draft",

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "title": "Manual de integração — teste-01",
+  "operations": [
+    {
+      "kind": "query",
+      "name": "Pharma_assessEligibility",
+      "title": "Pharma assess eligibility",
+      "description": "A partir de um CPF e EAN, avalia se o produto pertence à algum programa, e se o CPF precisa ser cadastrado no programa ou no produto específico",
+      "exampleQuery": "query Pharma_assessEligibility {\n  Pharma_assessEligibility(\n    customerCode: \"\"\n    origin: null\n    productCode: \"\"\n    storeCode: \"\"\n  ) {\n    dependents\n    eligibilityAssessment\n    registrationPolicy\n    validationResult\n  }\n}",
+      "authRequired": true,
+      "order": 1
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_checkPricesAndRules",
+      "title": "Pharma check prices and rules",
+      "description": "Consultar preço e regras",
+      "exampleQuery": "query Pharma_checkPricesAndRules {\n  Pharma_checkPricesAndRules(\n    customerCode: \"\"\n    origin: null\n    products: [{ ean: \"\", medicalPrescription: null, price: 0, saleAmount: 0 }]\n    storeCode: \"\"\n  ) {\n    aproved\n    cardPaidValue\n    createdAt\n    moneyPaidValue\n    products\n    requiredUploadWithPrescription\n    totalDiscountAmount\n    totalValue\n    totalValueMaxConsumerPrice\n    totalValueWithoutPrescription\n    totalValueWithPrescription\n  }\n}",
+      "authRequired": true,
+      "order": 2
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_discountPrograms",
+      "title": "Pharma discount programs",
+      "description": "Consultar a base de programas da indústria e seus produtos a partir de um CNPJ",
+      "exampleQuery": "query Pharma_discountPrograms {\n  Pharma_discountPrograms(\n    origin: null\n    storeCode: \"\"\n  ) {\n    allowedOrigins\n    id\n    name\n    rules\n    url\n  }\n}",
+      "authRequired": true,
+      "order": 3
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_displayProductDiscountRules",
+      "title": "Pharma display product discount rules",
+      "description": "Consulta informações sobre as regras de desconto de um produto para exibição em uma interface gráfica",
+      "exampleQuery": "query Pharma_displayProductDiscountRules {\n  Pharma_displayProductDiscountRules(\n    customerCode: \"\"\n    detailed: false\n    origin: null\n    productEan: \"\"\n    storeCode: \"\"\n  ) {\n    discounts\n    messages\n    nameProgram\n    priority\n    products\n    status\n    statusMessage\n  }\n}",
+      "authRequired": true,
+      "order": 4
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_prescriber",
+      "title": "Pharma prescriber",
+      "description": "Consulta um prescritor existe ativamente",
+      "exampleQuery": "query Pharma_prescriber {\n  Pharma_prescriber(\n    data: { council: null, registerNumber: 0, stateAbbr: \"\" }\n  ) {\n    errors\n    message\n    status\n  }\n}",
+      "authRequired": true,
+      "order": 5
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_retrieveTextTermsOptIn",
+      "title": "Pharma retrieve text terms opt in",
+      "description": "Consulta os termos de aceite de determinado programa, seu link e código de envio para o beneficiário informado.",
+      "exampleQuery": "query Pharma_retrieveTextTermsOptIn {\n  Pharma_retrieveTextTermsOptIn(\n    input: { CPF: \"\", Ean: \"\", Origem: 0 }\n    origin: null\n  ) {\n    CodigoEnvio\n    LinkTermos\n    Mensagem\n    Status\n    TextoTermos\n  }\n}",
+      "authRequired": true,
+      "order": 6
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_verifyOptIn",
+      "title": "Pharma verify opt in",
+      "description": "Consulta se um determinado beneficiário já aceitou os termos de um programa, e se esse aceite é obrigatório ou não.",
+      "exampleQuery": "query Pharma_verifyOptIn {\n  Pharma_verifyOptIn(\n    input: { CNPJ: \"\", CodCre: 0, CPF: \"\", EAN: \"\", Origem: 0 }\n    origin: null\n  ) {\n    Mensagem\n    OptInObrigatorio\n    OptInRealizado\n  }\n}",
+      "authRequired": true,
+      "order": 7
+    },
+    {
+      "kind": "query",
+      "name": "Prescription_prescriber",
+      "title": "Prescription prescriber",
+      "exampleQuery": "query Prescription_prescriber {\n  Prescription_prescriber(\n    council: null\n    enrollment: \"\"\n    fu: \"\"\n  ) {\n    active\n    council\n    enrollment\n    fu\n    name\n  }\n}",
+      "authRequired": true,
+      "order": 8
+    }
+  ]
+}

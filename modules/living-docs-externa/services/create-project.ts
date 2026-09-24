@@ -2,10 +2,11 @@ import { revalidateTag } from "next/cache";
 
 import type { Project } from "@/modules/living-docs-externa/schema";
 import { createProjectInputSchema } from "@/modules/living-docs-externa/schema/project";
+import { catalogProductExists } from "@/modules/living-docs-externa/repository/catalog-product-repository";
 import { createProject as createProjectInStore } from "@/modules/living-docs-externa/repository/project-repository";
 import { LIVING_DOCS_CACHE_TAGS } from "@/modules/living-docs-externa/services/cache-tags";
 
-export type CreateProjectErrorCode = "VALIDATION" | "ALREADY_EXISTS";
+export type CreateProjectErrorCode = "VALIDATION" | "ALREADY_EXISTS" | "PRODUCT_NOT_FOUND";
 
 export class CreateProjectError extends Error {
   constructor(
@@ -22,6 +23,13 @@ export async function createProject(input: unknown): Promise<Project> {
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message ?? "Dados inválidos.";
     throw new CreateProjectError("VALIDATION", message);
+  }
+
+  if (!(await catalogProductExists(parsed.data.productId))) {
+    throw new CreateProjectError(
+      "PRODUCT_NOT_FOUND",
+      `Produto "${parsed.data.productId}" não existe. Crie o produto em Produtos antes do manual.`,
+    );
   }
 
   try {

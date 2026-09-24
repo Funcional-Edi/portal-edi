@@ -1,0 +1,14 @@
+{
+  "id": "trade",
+  "name": "Trade",
+  "description": "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e IM. A estrutura também prevê EDI Redes, ainda sem documentação.",
+  "order": 3,
+  "visible": true,
+  "status": "published",
+  "modules": [
+    { "id": "canal-autorizador", "label": "Canal Autorizador", "order": 1, "projectSlug": "canal-autorizador" },
+    { "id": "wholesaler", "label": "Wholesaler", "order": 2, "projectSlug": "wholesaler" },
+    { "id": "edi-redes", "label": "EDI Redes", "order": 3 },
+    { "id": "im", "label": "IM", "order": 4, "projectSlug": "im" }
+  ]
+}

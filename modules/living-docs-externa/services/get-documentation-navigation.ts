@@ -4,9 +4,11 @@ import { cache } from "react";
 import { auth } from "@/core/auth";
 import { listContentFiles, listContentSubdirs } from "@/core/db/adapters";
 import { CONTENT_PATHS } from "@/core/db/adapters/content-paths";
-import { DOCUMENTATION_CONFIGURATION } from "@/modules/living-docs-externa/config/documentation-products";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { resolveDocumentationNavigation } from "@/modules/living-docs-externa/services/documentation-navigation";
+import { attachProjectsToProducts } from "@/modules/living-docs-externa/services/documentation-navigation";
+import { loadDocumentationConfiguration } from "@/modules/living-docs-externa/services/manage-catalog-products";
+import { listProjects } from "@/modules/living-docs-externa/services/list-projects";
 import { listPublishedManuals } from "@/modules/living-docs-externa/services/list-published-manuals";
 
 async function listProjectSlugsWithFlow(): Promise<string[]> {
@@ -26,9 +28,11 @@ async function listProjectSlugsWithFlow(): Promise<string[]> {
  * Session currently supplies role only. Missing granular claims fail closed in the resolver.
  */
 export const getDocumentationNavigation = cache(async () => {
-  const [session, manuals, flowSlugs] = await Promise.all([
+  const [session, manuals, projects, configuration, flowSlugs] = await Promise.all([
     auth(),
     listPublishedManuals(),
+    listProjects(),
+    loadDocumentationConfiguration(),
     listProjectSlugsWithFlow(),
   ]);
   const details = await Promise.all(
@@ -40,7 +44,7 @@ export const getDocumentationNavigation = cache(async () => {
       .map(([slug, project]) => [slug, project.manual.operations] as const),
   );
 
-  return resolveDocumentationNavigation(DOCUMENTATION_CONFIGURATION, manuals, {
+  return resolveDocumentationNavigation(attachProjectsToProducts(configuration, projects), manuals, {
     role: session?.user?.role,
     userId: session?.user?.id,
   }, operationsBySlug, new Set(flowSlugs));

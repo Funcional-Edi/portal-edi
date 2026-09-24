@@ -4,13 +4,15 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
 import { ConnectApiForm } from "@/modules/living-docs-externa/ui/admin/connect-api-form";
-import { FamilySelect } from "@/modules/living-docs-externa/ui/admin/family-select";
+import { getCatalogProduct } from "@/modules/living-docs-externa/repository/catalog-product-repository";
 import { SyncSchemaForm } from "@/modules/living-docs-externa/ui/admin/sync-schema-form";
 import { OperationsList } from "@/modules/living-docs-externa/ui/admin/operations-list";
+import { SuggestOperationsPanel } from "@/modules/living-docs-externa/ui/admin/suggest-operations-panel";
 import { PublishToggle } from "@/modules/living-docs-externa/ui/admin/publish-toggle";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 import { getManualQualityReport } from "@/modules/living-docs-externa/services/manual-quality";
+import { getSuggestedOperations } from "@/modules/living-docs-externa/services/suggest-operations-from-schema";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -21,11 +23,17 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const qualityReport = await getManualQualityReport(slug);
+  const [qualityReport, catalogProduct] = await Promise.all([
+    getManualQualityReport(slug),
+    project.config.productId ? getCatalogProduct(project.config.productId) : Promise.resolve(null),
+  ]);
   const isGraphql = project.config.protocol !== "rest";
   const gatewayConnected = Boolean(
     isGraphql ? project.config.graphqlUrl : project.config.apiBaseUrl
   );
+  const suggestedOperations = isGraphql
+    ? await getSuggestedOperations(slug)
+    : { hasSchema: false, suggestions: [] };
 
   return (
     <AdminShell>
@@ -67,9 +75,18 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase text-slate-500">Família</dt>
-            <dd className="mt-1">
-              <FamilySelect slug={project.config.slug} family={project.config.family} />
+            <dt className="text-xs font-semibold uppercase text-slate-500">Produto</dt>
+            <dd className="mt-1 text-sm text-slate-900">
+              {project.config.productId ? (
+                <Link
+                  href={`/docs?produto=${project.config.productId}`}
+                  className="font-medium text-brand-700 hover:underline"
+                >
+                  {catalogProduct?.name ?? project.config.productId}
+                </Link>
+              ) : (
+                "Não vinculado"
+              )}
             </dd>
           </div>
           <div>
@@ -149,6 +166,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           </p>
         </div>
       )}
+
+      {isGraphql ? (
+        <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-slate-900">Sugestões a partir do schema</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            O portal descobre as queries e mutations do schema sincronizado e monta um
+            rascunho de cada uma. Marque as que fazem parte deste produto — sem IA, sem
+            custo, e nada entra no manual sem você confirmar.
+          </p>
+          <div className="mt-5">
+            <SuggestOperationsPanel slug={project.config.slug} result={suggestedOperations} />
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Operações do manual</h2>
