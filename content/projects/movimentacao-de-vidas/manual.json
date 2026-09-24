@@ -15,12 +15,27 @@
     {
       "id": "processing-status",
       "title": "Status do processamento",
-      "columns": ["Status", "Orientação"],
+      "columns": [
+        "Status",
+        "Orientação"
+      ],
       "rows": [
-        ["WAITING", "A instrução foi recebida e aguarda processamento."],
-        ["PROCESSING", "A instrução está sendo processada."],
-        ["SUCCESS", "A instrução foi processada com sucesso."],
-        ["ERROR", "O processamento terminou com erro; consulte a mensagem retornada."]
+        [
+          "WAITING",
+          "A instrução foi recebida e aguarda processamento."
+        ],
+        [
+          "PROCESSING",
+          "A instrução está sendo processada."
+        ],
+        [
+          "SUCCESS",
+          "A instrução foi processada com sucesso."
+        ],
+        [
+          "ERROR",
+          "O processamento terminou com erro; consulte a mensagem retornada."
+        ]
       ]
     }
   ],
@@ -31,8 +46,8 @@
       "order": 1,
       "title": "1. Criar token",
       "description": "Autentica o cliente no gateway e retorna o token usado nas chamadas seguintes.",
-      "authRequired": false,
-      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}"
+      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}",
+      "authRequired": false
     },
     {
       "kind": "mutation",
@@ -40,13 +55,17 @@
       "order": 2,
       "title": "2. Enviar movimentação",
       "description": "Enfileira a inclusão, atualização, reativação ou transferência do beneficiário conforme a situação atual do cadastro.",
-      "prerequisites": ["createToken"],
+      "exampleQuery": "mutation BRM_createOrUpdateBeneficiary($input: BRM_BeneficiaryDetailInput!) {\n  BRM_createOrUpdateBeneficiary(input: $input) {\n    id\n    status\n    statusMessage\n  }\n}",
+      "prerequisites": [
+        "createToken"
+      ],
       "businessNotes": [
         "Envie primeiro a instrução do titular quando houver dependentes.",
         "A resposta contém o identificador da instrução; guarde-o para acompanhar o processamento."
       ],
-      "relatedSections": ["visao-geral"],
-      "exampleQuery": "mutation BRM_createOrUpdateBeneficiary($input: BRM_BeneficiaryDetailInput!) {\n  BRM_createOrUpdateBeneficiary(input: $input) {\n    id\n    status\n    statusMessage\n  }\n}"
+      "relatedSections": [
+        "visao-geral"
+      ]
     },
     {
       "kind": "query",
@@ -54,9 +73,13 @@
       "order": 3,
       "title": "3. Consultar status do processamento",
       "description": "Consulta o status atual da instrução enviada ao processamento assíncrono.",
-      "prerequisites": ["BRM_createOrUpdateBeneficiary"],
-      "relatedSections": ["visao-geral"],
-      "exampleQuery": "query BRM_getProcessingStatus($id: String!) {\n  BRM_getProcessingStatus(id: $id) {\n    id\n    status\n    statusMessage\n  }\n}"
+      "exampleQuery": "query BRM_getProcessingStatus($id: String!) {\n  BRM_getProcessingStatus(id: $id) {\n    id\n    status\n    statusMessage\n  }\n}",
+      "prerequisites": [
+        "BRM_createOrUpdateBeneficiary"
+      ],
+      "relatedSections": [
+        "visao-geral"
+      ]
     },
     {
       "kind": "query",
@@ -64,9 +87,13 @@
       "order": 4,
       "title": "4. Consultar beneficiário",
       "description": "Consulta os dados do beneficiário a partir do CPF informado.",
-      "prerequisites": ["createToken"],
-      "relatedSections": ["visao-geral"],
-      "exampleQuery": "query BRM_getBeneficiariesByIdentity($beneficiaryIdentity: String!) {\n  BRM_getBeneficiariesByIdentity(beneficiaryIdentity: $beneficiaryIdentity) {\n    id\n    name\n    statusBeneficiary\n  }\n}"
+      "exampleQuery": "query BRM_getBeneficiariesByIdentity($beneficiaryIdentity: String!) {\n  BRM_getBeneficiariesByIdentity(beneficiaryIdentity: $beneficiaryIdentity) {\n    id\n    name\n    statusBeneficiary\n  }\n}",
+      "prerequisites": [
+        "createToken"
+      ],
+      "relatedSections": [
+        "visao-geral"
+      ]
     }
   ]
 }

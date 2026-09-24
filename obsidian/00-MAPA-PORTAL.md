@@ -15,18 +15,17 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 - [[docs/migracao/README|Migração — índice]]
 - [[docs/arquitetura/adr/README|ADRs (decisões de arquitetura)]]
 
-## Arquitetura e produtividade
-
-- [[arquitetura/codegraph|CodeGraph — cérebro técnico do portal]]
-
 ## Produtos / manuais
 
 - [[produtos/canal-autorizador/_index|canal-autorizador]]
 - [[produtos/demo/_index|demo]]
 - [[produtos/edi-canais/_index|edi-canais]]
 - [[produtos/im/_index|im]]
+- [[produtos/movimentacao-de-vidas/_index|movimentacao-de-vidas]]
 - [[produtos/psp/_index|psp]]
 - [[produtos/teste/_index|teste]]
+- [[produtos/teste-01/_index|teste-01]]
+- [[produtos/testecanais/_index|testecanais]]
 - [[produtos/wholesaler/_index|wholesaler]]
 
 ## Estudos

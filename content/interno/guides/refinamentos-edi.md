@@ -49,7 +49,7 @@ o fornecedor a interpretar se o conteúdo exibido pertence à opção escolhida.
 - **Jornada da Integração:** exibir a jornada completa, seus passos e as
   tabelas de referência ao final do índice.
 - **Roteiro de Integração:** exibir somente o roteiro técnico e seus conteúdos
-  relacionados.
+  relacionados, adicionar dentro: **Fluxograma Individual** aplicar o fluxograma individual do subproduto.
 - **Queries:** exibir a lista de queries disponíveis e um índice rápido das
   operações para navegação direta.
 - **Mutations:** exibir a lista de mutations disponíveis e um índice rápido
@@ -116,9 +116,21 @@ Pontos envolvidos na análise atual:
 - substituir a Jornada da Integração pelo Roteiro de Integração;
 - criar uma nova camada de navegação paralela à navbar existente.
 
+### Status da implementação
+
+- Implementado o filtro contextual no componente compartilhado de navegação dos
+  subprodutos.
+- O índice de **Documentação** acompanha apenas o **Contexto** e suas seções;
+  **Jornada da Integração**, **Roteiro de Integração**, **Queries**,
+  **Mutations** e **Métodos** mantêm índices próprios.
+- O **Fluxograma Individual** é exibido como item subordinado ao roteiro quando
+  existe fluxograma publicado para o subproduto.
+- Índices extensos possuem rolagem interna no desktop, sem deslocar o conteúdo
+  principal da página.
+- A navegação rápida mobile usa os mesmos itens do índice desktop.
+- Validação E2E concluída no Canal Autorizador para desktop e mobile.
+
 ### Próximo passo
 
-Implementar o filtro contextual do índice e validar o comportamento no Canal
-Autorizador para Documentação, Jornada da Integração, Roteiro de Integração,
-Queries, Mutations e Teste de Requisição. Depois, repetir a conferência nos
-demais subprodutos publicados.
+Repetir a conferência nos demais subprodutos publicados, verificando em especial
+as áreas sem documentação disponível e os links de fluxograma individual.
