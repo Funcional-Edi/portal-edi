@@ -2,7 +2,7 @@
 
 Guia de entrada e acompanhamento do portal modular do time EDI.
 
-**Atualizado em:** 23/09/2026
+**Atualizado em:** 24/09/2026
 
 ## Visão atual do projeto
 
@@ -17,14 +17,17 @@ internas de família em títulos da documentação geral.
 
 - **Documentação geral:** `/docs` apresenta a visão inicial e os produtos
   disponíveis.
-- **Subproduto:** `/docs/{slug}` exibe o contexto, o roteiro completo e as
-  operações do produto.
+- **Subproduto:** `/docs/{slug}` exibe o contexto, a Jornada da Integração, o
+  Roteiro de Integração e as operações do produto.
 - **Referência GraphQL:** `/docs/api` mantém a navegação por produto e
   subproduto.
-- **Roteiro de Homologação:** aparece como seção principal, com as operações
-  indentadas na navegação lateral.
-- **Queries e mutations:** cada operação orienta o leitor a consultar o roteiro
-  completo antes de executar a chamada.
+- **Jornada da Integração:** apresenta a sequência macro das operações, com os
+  endpoints em ordem e links indentados para o detalhamento publicado.
+- **Roteiro de Integração:** possui uma seção própria para registrar
+  pré-requisitos, entradas, respostas, decisões de continuidade, exceções e
+  evidências de homologação por fluxo.
+- **Queries e mutations:** cada operação orienta o leitor a consultar o Roteiro
+  de Integração antes de executar a chamada.
 - **Fluxograma:** `/fluxogramas/{slug}` apresenta o fluxo completo publicado.
 - **Teste de requisição:** fica disponível para o perfil administrativo no
   playground do subproduto.
@@ -32,6 +35,9 @@ internas de família em títulos da documentação geral.
   retorno ao produto no fluxo e existe botão de voltar ao topo em páginas longas.
 - **Compatibilidade:** URLs antigas em `/manual/*` continuam sendo aceitas e
   redirecionadas para `/docs/*` pelo middleware.
+- **Âncoras:** `#jornada-integracao` identifica a sequência de operações;
+  `#roteiro-integracao` identifica o novo roteiro técnico e continua válido
+  para links antigos compartilhados.
 
 ## Atualização da EDI-14324
 
@@ -47,12 +53,29 @@ As principais frentes da issue foram incorporadas ao portal:
 - atualização do subproduto para **Fluxo PBM no Caixa**;
 - revisão do destaque ativo ao navegar para o roteiro por âncora.
 
+## Atualização da EDI-14331
+
+Nesta frente, a documentação dos subprodutos passou a separar a visão macro da
+integração do detalhamento técnico:
+
+- o conteúdo que era exibido como **Roteiro de Homologação** foi renomeado para
+  **Jornada da Integração**;
+- foi criado o item **Roteiro de Integração**, com estrutura própria para a
+  documentação técnica por fluxo;
+- a Jornada mantém os links indentados para as operações publicadas;
+- as páginas de operação e o editor administrativo passaram a usar a nova
+  nomenclatura;
+- os links existentes para `#roteiro-integracao` continuam funcionando e
+  apontam para a seção do novo roteiro;
+- a mudança foi aplicada ao catálogo compartilhado, alcançando os
+  subprodutos publicados e a estrutura dos próximos subprodutos.
+
 ## Papéis
 
 - **Admin (EDI):** cria projetos, conecta gateway, sincroniza schema, cura
   manual, revisa qualidade, publica e acessa o teste de requisição.
-- **Client (distribuidor):** consulta produtos publicados, segue o roteiro de
-  homologação e acessa as operações permitidas.
+- **Client (distribuidor):** consulta produtos publicados, segue a Jornada e o
+  Roteiro de Integração e acessa as operações permitidas.
 
 ## Fluxo típico de um manual novo
 
@@ -61,7 +84,8 @@ As principais frentes da issue foram incorporadas ao portal:
 3. Curar operações e seções no editor unificado em
    `/admin/projects/{slug}/edit`.
 4. Conferir o checklist de qualidade e publicar.
-5. Revisar o roteiro, o fluxograma e a referência GraphQL em `/docs`.
+5. Revisar a Jornada, o Roteiro de Integração, o fluxograma e a referência
+   GraphQL em `/docs`.
 6. Executar a homologação com as operações na ordem indicada.
 
 ## Onde ficam os arquivos

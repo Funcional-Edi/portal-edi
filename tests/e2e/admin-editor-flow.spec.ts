@@ -94,7 +94,7 @@ test("admin monta o manual no editor unificado e distribuidor ve o resultado", a
   await expect(page.getByRole("heading", { name: MANUAL_TITLE })).toBeVisible();
   await expect(page.getByText(SECTION_MARKER)).toBeVisible();
   await expect(
-    page.locator("#roteiro-integracao").getByRole("link", { name: /listItems/ })
+    page.locator("#jornada-integracao").getByRole("link", { name: /listItems/ })
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Nova seção" })).toHaveCount(0);
 });

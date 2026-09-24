@@ -53,7 +53,7 @@ export async function buildManualNav(
       title: "Navegação",
       items: [
         { href: DOCS_HOME_HREF, label: "Documentação" },
-        { href: basePath, label: "Roteiro de Homologação", active: !playground && (!kind || !name) },
+        { href: `${basePath}#jornada-integracao`, label: "Jornada da Integração", active: !playground && (!kind || !name) },
         ...(canUseRequestTest ? [{ href: docsPlaygroundHref(slug), label: "Teste de Requisição", active: !!playground }] : []),
       ],
     },
@@ -106,17 +106,16 @@ export async function buildManualNav(
   if (sections.length > 0) tocItems.push({ href: "#contexto", label: "Contexto" });
   if (project.manual.referenceTables?.length)
     tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
-  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Homologação" });
+  tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
+  tocItems.push(...operations.map((op) => ({
+    href: `${basePath}/operations/${op.kind}/${op.name}`,
+    label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+    depth: 1,
+  })));
+  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
 
   return {
     sidebarGroups,
-    tocItems: [
-      ...tocItems,
-      ...operations.map((op) => ({
-        href: `${basePath}/operations/${op.kind}/${op.name}`,
-        label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
-        depth: 1,
-      })),
-    ],
+    tocItems,
   };
 }

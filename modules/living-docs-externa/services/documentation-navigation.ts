@@ -50,7 +50,10 @@ export function resolveDocumentationNavigation(
         let href: string | null = null;
         if (available && base) {
           if (action.destination === "documentation") href = base;
-          if (action.destination === "guide") href = `${base}#roteiro-integracao`;
+          if (action.destination === "guide") {
+            const anchor = action.id === "jornada-integracao" ? "jornada-integracao" : "roteiro-integracao";
+            href = `${base}#${anchor}`;
+          }
           if (action.destination === "flowchart" && flowSlugs.has(manual.slug)) href = `/fluxogramas/${manual.slug}`;
           if (action.destination === "request-test" && audience.role === "admin" && manual.protocol === "graphql") {
             href = docsPlaygroundHref(manual.slug);
@@ -120,7 +123,8 @@ export function documentationRouteSelection(
           const operationKind = pathname.startsWith(`${manual}/operations/`)
             ? pathname.slice(`${manual}/operations/`.length).split("/")[0]
             : null;
-          const actionId = hash === "#roteiro-integracao" ? "roteiro-homologacao"
+          const actionId = hash === "#jornada-integracao" ? "jornada-integracao"
+            : hash === "#roteiro-integracao" ? "roteiro-integracao"
             : pathname.startsWith(`${manual}/playground`) ? "teste-de-requisicao"
               : operationKind === "query" ? "queries"
                 : operationKind === "mutation" ? "mutations"

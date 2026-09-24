@@ -43,10 +43,14 @@ test("one vertical navbar changes from products to product and integration conte
   await expect(page).toHaveURL("/docs/canal-autorizador");
   await expect(page.getByText("Seu ponto de partida", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Índice", { exact: true })).toBeVisible();
-  const homologation = nav.getByRole("link", { name: "Roteiro de Homologação", exact: true });
-  await homologation.click();
+  const journey = nav.getByRole("link", { name: "Jornada da Integração", exact: true });
+  await journey.click();
+  await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
+  await expect(journey).toHaveAttribute("aria-current", "page");
+  const integrationGuide = nav.getByRole("link", { name: "Roteiro de Integração", exact: true });
+  await integrationGuide.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#roteiro-integracao");
-  await expect(homologation).toHaveAttribute("aria-current", "page");
+  await expect(integrationGuide).toHaveAttribute("aria-current", "page");
 
   await page.goBack();
   await expect(page).toHaveURL("/docs?produto=trade");

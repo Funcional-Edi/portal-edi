@@ -13,6 +13,7 @@
 architecture.dot
 /test-results
 /playwright-report
+/.tmp-vitest
 
 # ambiente (NUNCA commitar segredos)
 .env

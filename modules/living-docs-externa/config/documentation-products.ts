@@ -9,9 +9,10 @@ import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-route
 const actions: readonly DocumentationAction[] = [
   { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
   { id: "fluxograma-geral", label: "Fluxograma Completo", order: 2, enabled: true, visible: true, status: "published", destination: "flowchart", linkModules: true },
-  { id: "roteiro-homologacao", label: "Roteiro de Homologação", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
-  { id: "fluxos", label: "Fluxos", order: 4, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
-  { id: "teste-de-requisicao", label: "Teste de Requisição", order: 5, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
+  { id: "jornada-integracao", label: "Jornada da Integração", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "roteiro-integracao", label: "Roteiro de Integração", order: 4, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "fluxos", label: "Fluxos", order: 5, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
+  { id: "teste-de-requisicao", label: "Teste de Requisição", order: 6, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
 ];
 
 function moduleItem(id: string, label: string, order: number, projectSlug?: string): DocumentationModule {
@@ -30,7 +31,7 @@ function product(
   order: number,
   description: string,
   modules: DocumentationModule[],
-  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "roteiro-homologacao", "fluxos"],
+  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos"],
 ): DocumentationProduct {
   return {
     id, label, order, description, modules,
@@ -55,7 +56,7 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
     {
       ...product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Integração de cadastros de beneficiários e colaboradores, com processamento assíncrono e acompanhamento por status ou webhook.", [
         moduleItem("movimentacao-de-vidas", "Movimentação de Vidas", 1, "movimentacao-de-vidas"),
-      ], ["visao-geral", "fluxograma-geral", "roteiro-homologacao", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {
@@ -64,7 +65,7 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
         moduleItem("im", "IM", 4, "im"),
-      ], ["visao-geral", "fluxograma-geral", "roteiro-homologacao", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {

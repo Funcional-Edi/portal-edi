@@ -8,6 +8,7 @@ import {
   Code2,
   FileText,
   Menu,
+  Route,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -28,22 +29,23 @@ const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visibl
 
 const FLOW_AREAS = [
   { id: "documentacao", label: "Documentação", icon: FileText },
-  { id: "roteiro-homologacao", label: "Roteiro de Homologação", icon: BookOpen },
+  { id: "jornada-integracao", label: "Jornada da Integração", icon: Route },
+  { id: "roteiro-integracao", label: "Roteiro de Integração", icon: BookOpen },
   { id: "queries", label: "Queries", icon: Code2 },
   { id: "mutations", label: "Mutations", icon: Code2 },
   { id: "metodos", label: "Métodos", icon: Code2 },
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral" | "roteiro-homologacao";
+type ProductAreaId = "visao-geral" | "fluxograma-geral";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
   if (areaId === "documentacao") {
     return product.actions.find((action) => action.id === "visao-geral")?.links.find((item) => item.id === link.id)?.href;
   }
-  if (areaId === "roteiro-homologacao") {
-    return product.actions.find((action) => action.id === "roteiro-homologacao")?.links.find((item) => item.id === link.id)?.href;
+  if (areaId === "jornada-integracao" || areaId === "roteiro-integracao") {
+    return product.actions.find((action) => action.id === areaId)?.links.find((item) => item.id === link.id)?.href;
   }
   if (areaId === "teste-de-requisicao") {
     return product.actions.find((action) => action.id === "teste-de-requisicao")?.links.find((item) => item.id === link.id)?.href;
@@ -54,7 +56,7 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
   return FLOW_AREAS.filter((area) => {
-    if (area.id === "documentacao" || area.id === "roteiro-homologacao" || area.id === "teste-de-requisicao") {
+    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "roteiro-integracao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
@@ -306,9 +308,9 @@ export function ProductNavigation({
                       <Link
                         key={area.id}
                         href={href}
-                        replace={area.id === "roteiro-homologacao"}
+                        replace={area.id === "jornada-integracao" || area.id === "roteiro-integracao"}
                         aria-current={area.id === selectedAreaId ? "page" : undefined}
-                        onClick={() => setLocationHash(area.id === "roteiro-homologacao" ? "#roteiro-integracao" : "")}
+                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : area.id === "roteiro-integracao" ? "#roteiro-integracao" : "")}
                         className={className}
                       >
                         {content}
@@ -334,7 +336,7 @@ export function ProductNavigation({
                 </Link>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{product.label}</p>
                 <div className="space-y-1.5">
-                  {product.actions.filter((action) => action.id !== "fluxos" && action.id !== "roteiro-homologacao" && action.id !== "teste-de-requisicao").map((action) => (
+                  {product.actions.filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "roteiro-integracao" && action.id !== "teste-de-requisicao").map((action) => (
                     <button
                       key={action.id}
                       type="button"
@@ -459,8 +461,6 @@ export function ProductNavigation({
                 <div className="mt-6">
                   {selectedAreaId === "fluxograma-geral" ? (
                     <FlowchartList links={productArea?.links ?? []} />
-                  ) : selectedAreaId === "roteiro-homologacao" ? (
-                    <Placeholder>Espaço reservado para o Roteiro de Homologação.</Placeholder>
                   ) : productArea?.links.some((link) => link.href) ? (
                     <p className="text-sm text-slate-600">Selecione uma integração na navbar para acessar sua documentação.</p>
                   ) : (

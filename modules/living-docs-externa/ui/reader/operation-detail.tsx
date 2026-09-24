@@ -149,17 +149,17 @@ export function OperationDetail({
       {!isRest ? (
         <section className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4">
           <h2 className="text-sm font-semibold text-brand-900">
-            Consulte o Roteiro de Homologação
+            Consulte o Roteiro de Integração
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-brand-800">
             Queries e mutations precisam ser analisadas dentro do processo completo de uso.
-            Consulte o roteiro para conferir pré-requisitos, ordem das etapas e validações do subproduto.
+            Consulte o roteiro para conferir pré-requisitos, ordem das etapas, decisões de continuidade e validações do subproduto.
           </p>
           <Link
             href={`${docsGuideHref(slug)}#roteiro-integracao`}
             className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
           >
-            Ver o Roteiro de Homologação
+            Ver o Roteiro de Integração
           </Link>
         </section>
       ) : null}
