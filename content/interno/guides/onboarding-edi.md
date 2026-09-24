@@ -62,6 +62,8 @@ integração do detalhamento técnico:
   **Jornada da Integração**;
 - foi criado o item **Roteiro de Integração**, com estrutura própria para a
   documentação técnica por fluxo;
+- o Roteiro passou a exibir o detalhamento por fluxo a partir dos metadados já
+  curados no manual, aplicado inicialmente ao conjunto Trade;
 - a Jornada mantém os links indentados para as operações publicadas;
 - as páginas de operação e o editor administrativo passaram a usar a nova
   nomenclatura;
@@ -126,8 +128,8 @@ npm.cmd run build
 
 Na última validação registrada:
 
-- o índice do CodeGraph foi sincronizado e validado com 272 arquivos, 2.223
-  nós e 5.197 relações;
+- o índice do CodeGraph foi sincronizado e validado com 273 arquivos, 2.226
+  nós e 5.199 relações;
 - typecheck, lint, arquitetura e validação de conteúdo publicado passaram;
 - a suíte unitária passou com 47 arquivos e 288 testes;
 - os fluxos E2E de navegação, editor e REST passaram com 12 testes;
@@ -153,8 +155,8 @@ Na última validação registrada:
 
 ## Próximos pontos de acompanhamento
 
-- detalhar o Roteiro de Integração por fluxo, começando pelo Canal Autorizador
-  e replicando o modelo nos demais subprodutos publicados;
+- coletar e validar as informações necessárias antes de detalhar o Roteiro nos
+  demais produtos e subprodutos;
 - homologar a navegação de todos os produtos e subprodutos publicados;
 - confirmar em produção o redirect de `/manual/*` para `/docs/*`;
 - validar o roteiro completo, incluindo queries, mutations e teste de requisição;
