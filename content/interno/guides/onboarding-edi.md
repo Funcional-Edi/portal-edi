@@ -131,10 +131,14 @@ Na última validação registrada:
 - typecheck, lint, arquitetura e validação de conteúdo publicado passaram;
 - a suíte unitária passou com 47 arquivos e 288 testes;
 - os fluxos E2E de navegação, editor e REST passaram com 12 testes;
+- o build de produção compilou, validou tipos, gerou as 18 páginas e concluiu
+  a otimização; nesta sessão, a execução direta ainda encontra `EPERM` ao
+  gravar `.next/trace`, um bloqueio do ambiente de saída do Next.js;
 - o executor de scripts TypeScript trata a limitação `ENOMEM` do `tsx` no
   Windows, e os testes usam fallback local somente quando o diretório
   temporário do sistema bloqueia cópia recursiva;
-- não há falhas `EPERM` pendentes nas validações executadas.
+- não há falhas `EPERM` pendentes na suíte de testes ou na validação de
+  conteúdo.
 
 ## Decisões técnicas recentes
 
