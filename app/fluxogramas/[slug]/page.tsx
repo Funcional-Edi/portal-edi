@@ -21,8 +21,8 @@ export default async function FlowDetailPage({ params }: FlowDetailPageProps) {
     if (!config) notFound();
 
     return (
-      <FlowShell subtitle={`Fluxograma — ${config.name}`}>
-        <FlowViewer flow={flow} projectName={config.name} />
+      <FlowShell subtitle={`Fluxograma — ${config.name}`} documentationHref={`/docs/${slug}`}>
+        <FlowViewer flow={flow} projectName={config.name} documentationHref={`/docs/${slug}`} />
       </FlowShell>
     );
   } catch (error) {

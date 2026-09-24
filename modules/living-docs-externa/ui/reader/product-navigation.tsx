@@ -24,6 +24,7 @@ import type {
 } from "@/modules/living-docs-externa/schema/documentation-navigation";
 import { documentationRouteSelection } from "@/modules/living-docs-externa/services/documentation-navigation";
 import { DocumentationStatusBadge as StatusBadge } from "@/modules/living-docs-externa/ui/reader/documentation-status";
+import type { ManualTocItem } from "@/modules/living-docs-externa/ui/reader/manual-shell";
 
 const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2";
 
@@ -62,6 +63,76 @@ function availableFlowAreas(product: DocumentationProductView, link: Documentati
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
     return operations.some((operation) => operation.kind === kind);
   });
+}
+
+function individualFlowchartHref(product: DocumentationProductView, link: DocumentationLinkView) {
+  return product.actions
+    .find((action) => action.id === "fluxograma-geral")
+    ?.links.find((item) => item.id === link.id)?.href ?? null;
+}
+
+function tocDesktopIndent(depth?: number): string {
+  if (depth && depth > 1) return "ml-8 border-l-2 border-slate-200 pl-3 ";
+  if (depth) return "ml-4 border-l-2 border-slate-200 pl-3 ";
+  return "";
+}
+
+function tocMobileIndent(depth?: number): string {
+  if (depth && depth > 1) return "ml-4 ";
+  if (depth) return "ml-2 ";
+  return "";
+}
+
+function contextualTocItems({
+  items,
+  areaId,
+  product,
+  link,
+  pathname,
+}: {
+  items: ManualTocItem[];
+  areaId: ProductAreaId | FlowAreaId | null;
+  product: DocumentationProductView | undefined;
+  link: DocumentationLinkView | null;
+  pathname: string;
+}): ManualTocItem[] {
+  if (!product || !link || !areaId) return [];
+
+  const isOperationPage = pathname.includes("/operations/");
+  if (isOperationPage && (areaId === "queries" || areaId === "mutations" || areaId === "metodos")) {
+    return items;
+  }
+
+  if (areaId === "documentacao") {
+    return items.filter((item) => item.href === "#contexto"
+      || item.href.startsWith("#section-"));
+  }
+
+  if (areaId === "jornada-integracao") {
+    return [
+      ...items.filter((item) => item.href === "#jornada-integracao"),
+      ...items.filter((item) => item.href.includes("/operations/")),
+      ...items.filter((item) => item.href === "#tabelas-referencia"),
+    ];
+  }
+
+  if (areaId === "roteiro-integracao") {
+    const flowchartHref = individualFlowchartHref(product, link);
+    return [
+      ...items.filter((item) => item.href === "#roteiro-integracao"),
+      ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),
+      ...items.filter((item) => item.href === "#roteiro-detalhamento" || item.href.startsWith("#roteiro-fluxo-")),
+    ];
+  }
+
+  if (areaId === "queries" || areaId === "mutations" || areaId === "metodos") {
+    const kind = areaId === "queries" ? "query" : areaId === "mutations" ? "mutation" : "rest";
+    return (link.operations ?? [])
+      .filter((operation) => operation.kind === kind)
+      .map((operation) => ({ href: operation.href, label: operation.label, depth: 1 }));
+  }
+
+  return [];
 }
 
 function ActionStatus({ action }: { action: DocumentationActionView }) {
@@ -261,7 +332,18 @@ export function ProductNavigation({
     && activeProductId === selectedProductId
     && activeModuleId === selectedFlowId
     && activeActionId === selectedAreaId;
-  const showIndex = showRouteContent && tocItems.length > 0;
+  const visibleTocItems = contextualTocItems({
+    items: tocItems,
+    areaId: selectedAreaId,
+    product,
+    link: selectedFlow,
+    pathname,
+  });
+  const isOperationListArea = selectedAreaId === "queries"
+    || selectedAreaId === "mutations"
+    || selectedAreaId === "metodos";
+  const showIndex = visibleTocItems.length > 0
+    && (showRouteContent || (selectedFlow != null && isOperationListArea && !pathname.includes("/operations/")));
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -343,25 +425,24 @@ export function ProductNavigation({
                       aria-pressed={action.id === selectedAreaId}
                       onClick={() => setSelectedAreaId(action.id as ProductAreaId)}
                       className={[
-                        "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-sm",
+                        "block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                         focusClass,
-                        action.id === selectedAreaId ? "bg-brand-50 font-semibold text-brand-800" : "text-slate-700 hover:bg-slate-100",
+                        action.id === selectedAreaId ? "bg-brand-50 font-semibold text-brand-800" : "text-slate-700 hover:bg-slate-100 hover:text-brand-800",
                       ].join(" ")}
                     >
                       <span>
                         <span className="block">{action.label}</span>
                         <ActionStatus action={action} />
                       </span>
-                      <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
                     </button>
                   ))}
                   {flows.length ? <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Integrações</p> : null}
                   {flows.map((link) => {
                     const href = flowAreaHref(product, link, "documentacao");
                     const className = [
-                      "flex w-full items-start justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-sm",
+                      "block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                       focusClass,
-                      href ? "text-slate-700 hover:bg-slate-100" : "cursor-not-allowed text-slate-500",
+                      href ? "text-slate-700 hover:bg-slate-100 hover:text-brand-800" : "cursor-not-allowed text-slate-500",
                     ].join(" ");
                     const content = <>
                       <span>
@@ -373,7 +454,6 @@ export function ProductNavigation({
                           {link.tag ? <Badge>{link.tag}</Badge> : null}
                         </span>
                       </span>
-                      <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                     </>;
                     return href ? (
                       <Link key={link.id} href={href} className={className}>
@@ -401,7 +481,7 @@ export function ProductNavigation({
                     <li key={item.id}>
                       <Link
                         href={`/docs?produto=${encodeURIComponent(item.id)}`}
-                        className={"flex w-full items-start justify-between gap-2 rounded-lg px-3 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100 " + focusClass}
+                        className={"block w-full rounded-lg px-3 py-3 text-left text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-brand-800 " + focusClass}
                       >
                         <span className="min-w-0">
                           <span className="block">{item.label}</span>
@@ -412,7 +492,6 @@ export function ProductNavigation({
                             </span>
                           ) : null}
                         </span>
-                        <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                       </Link>
                     </li>
                   ))}
@@ -430,7 +509,24 @@ export function ProductNavigation({
             )}
           </nav>
 
-          <section aria-label="Conteúdo da documentação" className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <section
+            aria-label="Conteúdo da documentação"
+            data-documentation-active-area={selectedFlow ? selectedAreaId ?? "documentacao" : undefined}
+            className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5"
+          >
+            {showIndex ? (
+              <nav aria-label="Navegação rápida" className="mb-5 flex gap-2 overflow-x-auto pb-1 xl:hidden">
+                {visibleTocItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={"shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + tocMobileIndent(item.depth) + focusClass}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            ) : null}
             {!product ? (
               children ?? <div className="flex min-h-48 flex-col justify-center">
                 <BookOpen className="h-6 w-6 text-brand-700" aria-hidden="true" />
@@ -472,12 +568,12 @@ export function ProductNavigation({
           </section>
           {showIndex ? (
             <aside className="hidden xl:block">
-              <div className="sticky top-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="docs-index-scroll sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Índice</p>
                 <ul className="space-y-1.5">
-                  {tocItems.map((item) => (
+                  {visibleTocItems.map((item) => (
                     <li key={item.href}>
-                      <Link href={item.href} className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-white hover:text-brand-700 " + (item.depth ? "ml-4 border-l-2 border-slate-200 pl-3 " : "") + focusClass}>
+                      <Link href={item.href} className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-white hover:text-brand-700 " + tocDesktopIndent(item.depth) + focusClass}>
                         {item.label}
                       </Link>
                     </li>

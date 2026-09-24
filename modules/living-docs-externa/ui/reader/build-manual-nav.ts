@@ -103,16 +103,31 @@ export async function buildManualNav(
 
   const sections = sectionsInput ?? (await getPublishedManualSections(slug));
   const tocItems: ManualTocItem[] = [];
-  if (sections.length > 0) tocItems.push({ href: "#contexto", label: "Contexto" });
-  if (project.manual.referenceTables?.length)
-    tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
+  if (sections.length > 0) {
+    tocItems.push({ href: "#contexto", label: "Contexto" });
+    tocItems.push(...sections.map((section) => ({
+      href: `#section-${section.id}`,
+      label: section.title,
+      depth: 1,
+    })));
+  }
   tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
   tocItems.push(...operations.map((op) => ({
     href: `${basePath}/operations/${op.kind}/${op.name}`,
     label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
     depth: 1,
   })));
+  if (project.manual.referenceTables?.length)
+    tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
   tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
+  if (operations.length > 0) {
+    tocItems.push({ href: "#roteiro-detalhamento", label: "Detalhamento por fluxo", depth: 1 });
+    tocItems.push(...operations.map((op) => ({
+      href: `#roteiro-fluxo-${op.kind}-${encodeURIComponent(op.name)}`,
+      label: op.title ?? op.name,
+      depth: 2,
+    })));
+  }
 
   return {
     sidebarGroups,

@@ -18,6 +18,10 @@ function formatUpdatedAt(iso: string): string {
   });
 }
 
+function roteiroOperationId(operation: ManualOperation): string {
+  return `roteiro-fluxo-${operation.kind}-${encodeURIComponent(operation.name)}`;
+}
+
 /** Ícone por tipo de operação — ajuda a escanear o roteiro visualmente. */
 function OperationKindIcon({ kind }: { kind: ManualOperation["kind"] }) {
   if (kind === "query") return <Search className="h-4 w-4" aria-hidden="true" />;
@@ -81,11 +85,11 @@ export function ManualRoteiro({
     <article>
       {editor?.banner ? <div className="mb-6">{editor.banner}</div> : null}
 
-      <header className="mb-8 border-b border-slate-200 pb-6">
+      <header id="documentacao" data-documentation-area="documentacao" className="mb-8 border-b border-slate-200 pb-6">
         <p className="text-sm font-medium text-brand-700">Manual de integração</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">{manual.title}</h1>
+        <h1 id="documentacao-titulo" className="mt-1 text-3xl font-bold tracking-tight">{manual.title}</h1>
         {manual.productName ? (
-          <p className="mt-1 text-lg text-slate-700">{manual.productName}</p>
+          <p id="documentacao-subtitulo" className="mt-1 text-lg text-slate-700">{manual.productName}</p>
         ) : null}
         {config.description ? (
           <p className="mt-3 text-slate-600">{config.description}</p>
@@ -147,7 +151,7 @@ export function ManualRoteiro({
       </header>
 
       {showContext ? (
-        <section id="contexto" className="mb-10 space-y-8 scroll-mt-24">
+        <section id="contexto" data-documentation-area="documentacao" className="mb-10 space-y-8 scroll-mt-24">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-semibold">Contexto</h2>
             {editor?.sectionsToolbar}
@@ -178,62 +182,7 @@ export function ManualRoteiro({
         </section>
       ) : null}
 
-      {manual.referenceTables && manual.referenceTables.length > 0 ? (
-        <section id="tabelas-referencia" className="mb-10 scroll-mt-24">
-          <h2 className="mb-4 text-lg font-semibold">Tabelas de referência</h2>
-          <div className="space-y-3">
-            {manual.referenceTables.map((table, index) => (
-              <details
-                key={table.id}
-                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
-                open={index === 0}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3">
-                  <span className="font-medium text-slate-800">{table.title}</span>
-                  <span className="flex items-center gap-2">
-                    <Badge tone="neutral">
-                      {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
-                    </Badge>
-                    <ArrowRight
-                      className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-90"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </summary>
-                <div className="overflow-x-auto border-t border-slate-100">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50">
-                      <tr>
-                        {table.columns.map((col) => (
-                          <th
-                            key={col}
-                            className="px-3 py-2 text-left font-medium text-slate-700"
-                          >
-                            {col}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="border-t border-slate-100">
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} className="px-3 py-2 text-slate-600">
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <section id="jornada-integracao" className="scroll-mt-24">
+      <section id="jornada-integracao" data-documentation-area="jornada-integracao" className="scroll-mt-24">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">Jornada da Integração</h2>
@@ -302,7 +251,62 @@ export function ManualRoteiro({
         </ol>
       </section>
 
-      <section id="roteiro-integracao" className="mt-10 scroll-mt-24">
+      {manual.referenceTables && manual.referenceTables.length > 0 ? (
+        <section id="tabelas-referencia" data-documentation-area="jornada-integracao" className="mb-10 scroll-mt-24">
+          <h2 className="mb-4 text-lg font-semibold">Tabelas de referência</h2>
+          <div className="space-y-3">
+            {manual.referenceTables.map((table, index) => (
+              <details
+                key={table.id}
+                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
+                open={index === 0}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3">
+                  <span className="font-medium text-slate-800">{table.title}</span>
+                  <span className="flex items-center gap-2">
+                    <Badge tone="neutral">
+                      {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
+                    </Badge>
+                    <ArrowRight
+                      className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-90"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </summary>
+                <div className="overflow-x-auto border-t border-slate-100">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        {table.columns.map((col) => (
+                          <th
+                            key={col}
+                            className="px-3 py-2 text-left font-medium text-slate-700"
+                          >
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {table.rows.map((row, rowIndex) => (
+                        <tr key={rowIndex} className="border-t border-slate-100">
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} className="px-3 py-2 text-slate-600">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section id="roteiro-integracao" data-documentation-area="roteiro-integracao" className="mt-10 scroll-mt-24">
         <h2 className="text-lg font-semibold">Roteiro de Integração</h2>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
           Use este roteiro para analisar cada fluxo com profundidade antes de implementá-lo ou
@@ -332,7 +336,7 @@ export function ManualRoteiro({
 
         {operations.length > 0 ? (
           <div className="mt-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h3 id="roteiro-detalhamento" className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Detalhamento por fluxo
             </h3>
             <ol className="mt-3 space-y-3">
@@ -348,6 +352,7 @@ export function ManualRoteiro({
                 return (
                   <li
                     key={`roteiro-${op.kind}-${op.name}`}
+                    id={roteiroOperationId(op)}
                     className="rounded-lg border border-slate-200 bg-white p-4"
                   >
                     <div className="flex gap-3">

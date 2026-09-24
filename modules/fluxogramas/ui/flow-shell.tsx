@@ -6,15 +6,16 @@ import { SessionActions } from "@/core/ui/session-actions";
 interface FlowShellProps {
   children: ReactNode;
   subtitle?: string;
+  documentationHref?: string;
 }
 
-export function FlowShell({ children, subtitle = "Fluxogramas" }: FlowShellProps) {
+export function FlowShell({ children, subtitle = "Fluxogramas", documentationHref = "/docs" }: FlowShellProps) {
   return (
     <AppShell
       subtitle={subtitle}
       navItems={[
         { href: "/fluxogramas", label: "Fluxogramas", active: true },
-        { href: "/docs", label: "Documentação" },
+        { href: documentationHref, label: "Documentação" },
       ]}
       actions={<SessionActions />}
     >
