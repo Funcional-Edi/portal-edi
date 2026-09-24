@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -35,6 +35,10 @@ async function loginAsAdmin(page: Page) {
 
 test.afterEach(async () => {
   await rm(PROJECT_DIR, { recursive: true, force: true });
+  const productFile = path.join(process.cwd(), "content", "products", "trade", "config.json");
+  const product = JSON.parse(await readFile(productFile, "utf8")) as { modules: { projectSlug?: string }[] };
+  product.modules = product.modules.filter((module) => module.projectSlug !== SLUG);
+  await writeFile(productFile, `${JSON.stringify(product, null, 2)}\n`);
 });
 
 test("admin monta o manual no editor unificado e distribuidor ve o resultado", async ({
@@ -42,14 +46,11 @@ test("admin monta o manual no editor unificado e distribuidor ve o resultado", a
 }) => {
   await loginAsAdmin(page);
 
-  await page.goto("/admin/projects/new");
-  await page.getByLabel("Slug").fill(SLUG);
-  await page.getByLabel("Nome", { exact: true }).fill("Editor E2E");
-  await page.getByRole("button", { name: "Criar projeto" }).click();
-
-  await expect(page).toHaveURL(`/admin/projects/${SLUG}`);
-
-  await page.getByRole("link", { name: "Abrir editor do manual" }).click();
+  const created = await page.request.post("/api/living-docs/projects", {
+    data: { slug: SLUG, name: "Editor E2E", productId: "trade", protocol: "graphql" },
+  });
+  expect(created.ok()).toBeTruthy();
+  await page.goto(`/admin/projects/${SLUG}/edit`);
   await expect(page).toHaveURL(`/admin/projects/${SLUG}/edit`);
 
   // Projeto novo reprova no checklist: publicar fica bloqueado.
@@ -102,11 +103,10 @@ test("admin monta o manual no editor unificado e distribuidor ve o resultado", a
 test("rota legacy /curate redireciona para o editor", async ({ page }) => {
   await loginAsAdmin(page);
 
-  await page.goto("/admin/projects/new");
-  await page.getByLabel("Slug").fill(SLUG);
-  await page.getByLabel("Nome", { exact: true }).fill("Editor E2E");
-  await page.getByRole("button", { name: "Criar projeto" }).click();
-  await expect(page).toHaveURL(`/admin/projects/${SLUG}`);
+  const created = await page.request.post("/api/living-docs/projects", {
+    data: { slug: SLUG, name: "Editor E2E", productId: "trade", protocol: "graphql" },
+  });
+  expect(created.ok()).toBeTruthy();
 
   await page.goto(`/admin/projects/${SLUG}/curate`);
   await expect(page).toHaveURL(`/admin/projects/${SLUG}/edit`);

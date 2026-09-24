@@ -120,6 +120,62 @@ export async function updateManualOperation(
   return updatedOperation;
 }
 
+export interface BulkAddManualOperationsResult {
+  added: ManualOperation[];
+  skipped: Array<{
+    kind?: ManualOperationKind;
+    name?: string;
+    reason: "ALREADY_EXISTS" | "VALIDATION";
+  }>;
+}
+
+/**
+ * Adiciona várias operações de uma vez (fluxo "aceitar sugestões do schema").
+ * Lê e grava o manual uma única vez — evita N escritas/N revalidações para um
+ * lote típico de 10-40 operações descobertas na sincronização.
+ *
+ * Entradas inválidas ou já existentes são reportadas em `skipped` em vez de
+ * abortar o lote inteiro: o operador pode ter desmarcado só parte, o resto
+ * deve entrar.
+ */
+export async function addManualOperationsBulk(
+  slug: string,
+  inputs: unknown[]
+): Promise<BulkAddManualOperationsResult> {
+  const manual = await loadManualOrThrow(slug);
+  const operations = [...manual.operations];
+  const added: ManualOperation[] = [];
+  const skipped: BulkAddManualOperationsResult["skipped"] = [];
+  let cursor = nextOrder(manual);
+
+  for (const raw of inputs) {
+    const parsed = createManualOperationInputSchema.safeParse(raw);
+    if (!parsed.success) {
+      const partial = raw as { kind?: ManualOperationKind; name?: string };
+      skipped.push({ kind: partial?.kind, name: partial?.name, reason: "VALIDATION" });
+      continue;
+    }
+
+    if (operations.some((op) => op.kind === parsed.data.kind && op.name === parsed.data.name)) {
+      skipped.push({ kind: parsed.data.kind, name: parsed.data.name, reason: "ALREADY_EXISTS" });
+      continue;
+    }
+
+    const operation: ManualOperation = {
+      ...parsed.data,
+      order: parsed.data.order ?? cursor++,
+    };
+    operations.push(operation);
+    added.push(operation);
+  }
+
+  if (added.length > 0) {
+    await persistManual(slug, { ...manual, operations });
+  }
+
+  return { added, skipped };
+}
+
 /** Remove uma operação do manual. */
 export async function removeManualOperation(
   slug: string,

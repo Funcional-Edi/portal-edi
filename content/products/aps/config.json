@@ -1,0 +1,12 @@
+{
+  "id": "aps",
+  "name": "APS",
+  "description": "Espaço previsto para Delivery. O enquadramento do produto e seu escopo de integração ainda estão sujeitos a confirmação.",
+  "order": 4,
+  "visible": true,
+  "status": "no-documentation",
+  "tag": "A confirmar",
+  "modules": [
+    { "id": "delivery", "label": "Delivery", "order": 1 }
+  ]
+}

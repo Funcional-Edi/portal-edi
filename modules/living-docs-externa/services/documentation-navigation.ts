@@ -10,6 +10,49 @@ import type {
 } from "@/modules/living-docs-externa/schema/documentation-navigation";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 
+/**
+ * Projetos criados na tela admin entram no produto escolhido.
+ * Módulos já declarados no registry (mesmo `projectSlug`) não são duplicados.
+ */
+export function attachProjectsToProducts(
+  config: DocumentationConfiguration,
+  projects: readonly { slug: string; name: string; productId?: string }[],
+): DocumentationConfiguration {
+  return {
+    ...config,
+    products: config.products.map((product) => {
+      const taken = new Set(
+        product.modules.map((module) => module.projectSlug).filter((slug): slug is string => Boolean(slug)),
+      );
+      const extras = projects.filter(
+        (project) => project.productId === product.id && !taken.has(project.slug),
+      );
+      if (extras.length === 0) return product;
+
+      let order = product.modules.reduce((max, module) => Math.max(max, module.order), 0);
+      return {
+        ...product,
+        modules: [
+          ...product.modules,
+          ...extras.map((project) => {
+            order += 1;
+            return {
+              id: project.slug,
+              label: project.name,
+              order,
+              projectSlug: project.slug,
+              enabled: true,
+              visible: true,
+              status: "published" as const,
+              route: `/docs/${project.slug}`,
+            };
+          }),
+        ],
+      };
+    }),
+  };
+}
+
 /** Visibility is not route authorization; existing middleware/API guards still apply. */
 export function canViewDocumentation(access: DocumentationAccess | undefined, audience: DocumentationAudience): boolean {
   if (!access) return true;
@@ -43,7 +86,7 @@ export function resolveDocumentationNavigation(
       status: action.status,
       links: action.linkModules ? modules.map((module): DocumentationLinkView => {
         const manual = module.projectSlug ? published.get(module.projectSlug) : undefined;
-        const available = product.status === "published" && module.enabled && action.enabled
+        const available = module.enabled && action.enabled
           && module.status === "published" && action.status === "published" && manual;
         // Routes are explicitly configured, and must belong to the published manual.
         const base = manual && module.route === `/docs/${manual.slug}` ? module.route : null;

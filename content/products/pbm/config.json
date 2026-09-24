@@ -1,0 +1,11 @@
+{
+  "id": "pbm",
+  "name": "PBM",
+  "description": "Área prevista para a integração de Reposição. O roteiro e as regras desse fluxo serão detalhados na documentação do produto.",
+  "order": 5,
+  "visible": true,
+  "status": "no-documentation",
+  "modules": [
+    { "id": "reposicao", "label": "Reposição", "order": 1 }
+  ]
+}

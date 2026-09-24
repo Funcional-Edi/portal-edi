@@ -51,8 +51,10 @@ export const projectConfigSchema = z.object({
   slug: slugSchema,
   name: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  /** Agrupamento visual no catálogo/admin (ex.: EDI Pharma, EDI Varejo). */
+  /** Agrupamento legado (EDI Pharma / EDI Varejo). Projetos novos usam `productId`. */
   family: productFamilySchema.optional(),
+  /** Id do produto em `content/products/<id>/` ao qual este manual pertence. */
+  productId: slugSchema.optional(),
   environment: projectEnvironmentSchema.optional(),
   /** Protocolo de integração do produto. Default `graphql` preserva os projetos existentes. */
   protocol: projectProtocolSchema.default("graphql"),
@@ -73,7 +75,7 @@ export const createProjectInputSchema = z.object({
   slug: slugSchema,
   name: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  family: productFamilySchema.optional(),
+  productId: slugSchema,
   protocol: projectProtocolSchema.optional(),
 });
 
@@ -114,6 +116,7 @@ export interface ProjectSummary {
   name: string;
   description?: string;
   family?: ProductFamily;
+  productId?: string;
   environment?: z.infer<typeof projectEnvironmentSchema>;
   protocol: z.infer<typeof projectProtocolSchema>;
   gatewaySlug?: string;
@@ -133,6 +136,7 @@ export function toProjectSummary(config: ProjectConfig): ProjectSummary {
     name: config.name,
     description: config.description,
     family: config.family,
+    productId: config.productId,
     environment: config.environment,
     protocol: config.protocol,
     gatewaySlug: config.gatewaySlug,
