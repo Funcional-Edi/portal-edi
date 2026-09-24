@@ -1,0 +1,128 @@
+import { describe, expect, it } from "vitest";
+
+import { DOCUMENTATION_CONFIGURATION } from "@/modules/living-docs-externa/config/documentation-products";
+import type { ProjectSummary } from "@/modules/living-docs-externa/schema";
+import type { DocumentationConfiguration } from "@/modules/living-docs-externa/schema/documentation-navigation";
+import { attachProjectsToProducts, canViewDocumentation, documentationRouteSelection, resolveDocumentationNavigation } from "./documentation-navigation";
+
+const manuals: ProjectSummary[] = ["im", "canal-autorizador", "wholesaler"].map((slug) => ({
+  slug, name: slug, published: true, protocol: "graphql", environment: "homolog", updatedAt: "2026-09-16T00:00:00.000Z",
+}));
+const flowSlugs = new Set(manuals.map((manual) => manual.slug));
+const resolve = (config = DOCUMENTATION_CONFIGURATION, projects = manuals, role: "admin" | "client" = "client") =>
+  resolveDocumentationNavigation(config, projects, { role }, new Map(), flowSlugs);
+
+describe("documentation navigation", () => {
+  it("uses published manuals and keeps unknown/future routes disabled", () => {
+    const view = resolve();
+    expect(view.products.map((p) => p.label)).toEqual(["Credenciado", "Movimentação de Vidas", "Trade", "APS", "PBM"]);
+    const trade = view.products.find((p) => p.id === "trade")!;
+    expect(trade.actions[0].links.map((link) => link.href)).toEqual([
+      "/docs/canal-autorizador", "/docs/wholesaler", null, "/docs/im",
+    ]);
+    expect(trade.actions[0].links.at(-1)?.environment).toBe("homolog");
+    expect(view.products[0].actions[0].links.every((link) => !link.href && link.status === "no-documentation")).toBe(true);
+  });
+
+  it("removes links after unpublishing without changing the registry", () => {
+    const view = resolve(undefined, manuals.map((manual) => ({ ...manual, published: false })));
+    expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).every((link) => link.href === null)).toBe(true);
+    expect(view.products.find((p) => p.id === "trade")?.status).toBe("no-documentation");
+  });
+
+  it("exposes a complete flowchart at every product root and integration guides per subproduct", () => {
+    const view = resolve();
+    expect(view.products.every((product) => product.actions[1]?.label === "Fluxograma Completo")).toBe(true);
+    const tradeFlow = view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "fluxograma-geral")!;
+    expect(tradeFlow.links.map((link) => link.href)).toEqual([
+      "/fluxogramas/canal-autorizador", "/fluxogramas/wholesaler", null, "/fluxogramas/im",
+    ]);
+    const tradeJourney = view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "jornada-integracao")!;
+    expect(tradeJourney.links.map((link) => link.href)).toEqual([
+      "/docs/canal-autorizador#jornada-integracao",
+      "/docs/wholesaler#jornada-integracao",
+      null,
+      "/docs/im#jornada-integracao",
+    ]);
+    expect(view.products.find((product) => product.id === "trade")!.actions
+      .find((action) => action.id === "roteiro-integracao")!.links.map((link) => link.href)).toEqual([
+      "/docs/canal-autorizador#roteiro-integracao",
+      "/docs/wholesaler#roteiro-integracao",
+      null,
+      "/docs/im#roteiro-integracao",
+    ]);
+  });
+
+  it("only offers request tests to admins and GraphQL manuals", () => {
+    expect(resolve().products.every((p) => p.actions.every((a) => a.id !== "teste-de-requisicao"))).toBe(true);
+    const admin = resolve(undefined, manuals.map((manual) => manual.slug === "wholesaler" ? { ...manual, protocol: "rest" } : manual), "admin");
+    const request = admin.products.find((p) => p.id === "trade")!.actions.find((a) => a.id === "teste-de-requisicao")!;
+    expect(request.links.find((link) => link.id === "im")?.href).toBe("/docs/im/playground");
+    expect(request.links.find((link) => link.id === "wholesaler")?.href).toBeNull();
+  });
+
+  it("filters products, modules and actions centrally and preserves the original registry", () => {
+    const config: DocumentationConfiguration = {
+      ...DOCUMENTATION_CONFIGURATION,
+      products: DOCUMENTATION_CONFIGURATION.products.map((p) => ({
+        ...p,
+        enabled: p.id !== "aps",
+        order: -p.order,
+        actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro-integracao" })),
+        modules: p.modules.map((m) => ({ ...m, access: m.id === "im" ? { organizationIds: ["org-a"] } : undefined })),
+      })),
+    };
+    const view = resolve(config);
+    expect(view.products.map((p) => p.id)).toEqual(["pbm", "trade", "movimentacao-de-vidas", "credenciado"]);
+    expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro-integracao")).toBe(false);
+    expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).some((m) => m.id === "im")).toBe(false);
+    expect(DOCUMENTATION_CONFIGURATION.products[0].id).toBe("credenciado");
+  });
+
+  it("fails closed on missing SSO claims, even for admins", () => {
+    const access = { roles: ["admin" as const], organizationIds: ["org"], clientIds: ["client"], userIds: ["user"], requiredPermission: "docs.trade.view" };
+    expect(canViewDocumentation(access, { role: "admin" })).toBe(false);
+    expect(canViewDocumentation(access, { role: "admin", organizationId: "org", clientId: "client", userId: "user", permissions: ["docs.trade.view"] })).toBe(true);
+    expect(canViewDocumentation({ roles: [] }, { role: "admin" })).toBe(false);
+  });
+
+  it("does not expose disabled modules, development content or arbitrary configured URLs as links", () => {
+    for (const change of [{ enabled: false }, { status: "development" as const }, { route: "https://example.com" }, { route: "/docs/inexistente" }]) {
+      const config = { ...DOCUMENTATION_CONFIGURATION, products: DOCUMENTATION_CONFIGURATION.products.map((p) => ({
+        ...p, modules: p.modules.map((m) => ({ ...m, ...change })),
+      })) };
+      expect(resolve(config).products.flatMap((p) => p.actions.flatMap((a) => a.links)).every((link) => link.href === null)).toBe(true);
+    }
+  });
+
+  it("selects the product/module/action for deep links without prefix collisions", () => {
+    const view = resolve(undefined, manuals, "admin");
+    expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "mutations", moduleId: "im" });
+    expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
+    expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
+    expect(documentationRouteSelection(view, "/docs/im", "#jornada-integracao")?.actionId).toBe("jornada-integracao");
+    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-integracao");
+    expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
+    expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
+  });
+
+  it("anexa um projeto novo ao produto escolhido sem duplicar modulo ja cadastrado", () => {
+    const config = attachProjectsToProducts(DOCUMENTATION_CONFIGURATION, [
+      { slug: "canal-autorizador", name: "Canal Autorizador", productId: "trade" },
+      { slug: "novo-manual", name: "Novo manual", productId: "trade" },
+    ]);
+    const trade = config.products.find((product) => product.id === "trade")!;
+    expect(trade.modules.filter((module) => module.projectSlug === "canal-autorizador")).toHaveLength(1);
+    expect(trade.modules.some((module) => module.projectSlug === "novo-manual")).toBe(true);
+
+    const view = resolveDocumentationNavigation(
+      config,
+      [...manuals, { slug: "novo-manual", name: "Novo manual", published: true, protocol: "graphql", updatedAt: "2026-09-23T00:00:00.000Z" }],
+      { role: "client" },
+    );
+    const links = view.products.find((product) => product.id === "trade")!.actions[0].links;
+    expect(links.some((link) => link.href === "/docs/novo-manual")).toBe(true);
+  });
+});

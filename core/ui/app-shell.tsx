@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  * admin, login). Antes desta fundação cada área reimplementava seu próprio
  * `<header>` do zero — três variações levemente diferentes do mesmo elemento,
  * a principal causa da inconsistência visual do portal (ver
- * `docs/migracao/decisoes-ui.md`).
+ * `content/interno/guides/decisoes-ui-portal-edi.md`).
  *
  * `AppHeader` é exportado separadamente porque telas com layout próprio
  * (ex.: `ManualShell`, que monta um grid de sidebar + conteúdo + TOC) só
@@ -30,7 +30,7 @@ interface AppHeaderProps {
 export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) {
   return (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-white">
             <LayoutGrid className="h-5 w-5" aria-hidden="true" />
@@ -45,9 +45,9 @@ export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) 
           </span>
         </Link>
 
-        <div className="flex items-center gap-3 sm:gap-6">
+        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2 sm:gap-4">
           {navItems.length > 0 ? (
-            <details className="relative sm:hidden">
+            <details className="relative lg:hidden">
               <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-sm text-slate-600">
                 <Menu className="h-4 w-4" aria-hidden="true" />
                 Menu
@@ -70,7 +70,7 @@ export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) 
             </details>
           ) : null}
           {navItems.length > 0 ? (
-            <nav className="hidden items-center gap-5 text-sm font-medium sm:flex">
+            <nav className="hidden items-center gap-5 text-sm font-medium lg:flex">
               {navItems.map((item) => (
                 <Link
                   key={item.href}

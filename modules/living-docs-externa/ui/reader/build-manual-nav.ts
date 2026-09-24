@@ -1,4 +1,5 @@
 import type { ManualSection, Project } from "@/modules/living-docs-externa/schema";
+import { auth, isAdminRole } from "@/core/auth";
 import {
   manualOperationKindSchema,
   sortOperations,
@@ -43,14 +44,17 @@ export async function buildManualNav(
   if (!project) return null;
 
   const basePath = docsGuideHref(slug);
+  const session = await auth();
+  const canUseRequestTest = session?.user?.role && isAdminRole(session.user.role)
+    && project.config.protocol === "graphql";
   const operations = sortOperations(project.manual);
   const sidebarGroups: ManualNavGroup[] = [
     {
       title: "Navegação",
       items: [
         { href: DOCS_HOME_HREF, label: "Documentação" },
-        { href: basePath, label: "Roteiro", active: !playground && (!kind || !name) },
-        { href: docsPlaygroundHref(slug), label: "Playground", active: !!playground },
+        { href: `${basePath}#jornada-integracao`, label: "Jornada da Integração", active: !playground && (!kind || !name) },
+        ...(canUseRequestTest ? [{ href: docsPlaygroundHref(slug), label: "Teste de Requisição", active: !!playground }] : []),
       ],
     },
     {
@@ -102,16 +106,16 @@ export async function buildManualNav(
   if (sections.length > 0) tocItems.push({ href: "#contexto", label: "Contexto" });
   if (project.manual.referenceTables?.length)
     tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
-  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de integração" });
+  tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
+  tocItems.push(...operations.map((op) => ({
+    href: `${basePath}/operations/${op.kind}/${op.name}`,
+    label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+    depth: 1,
+  })));
+  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
 
   return {
     sidebarGroups,
-    tocItems: [
-      ...tocItems,
-      ...operations.map((op) => ({
-        href: `${basePath}/operations/${op.kind}/${op.name}`,
-        label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
-      })),
-    ],
+    tocItems,
   };
 }

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -15,7 +15,7 @@ async function loginAsAdmin(page: Page) {
   await page.goto("/admin/projects");
   await expect(page).toHaveURL(/callbackUrl=%2Fadmin%2Fprojects/);
 
-  await page.getByLabel("E-mail").fill("admin@empresa.com");
+  await page.getByLabel("E-mail").fill("admin@funcionalcorp.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
 
   await expect(page).toHaveURL("/admin/projects");
@@ -23,15 +23,18 @@ async function loginAsAdmin(page: Page) {
 
 test.afterEach(async () => {
   await rm(PROJECT_DIR, { recursive: true, force: true });
+  const productFile = path.join(process.cwd(), "content", "products", "pbm", "config.json");
+  const product = JSON.parse(await readFile(productFile, "utf8")) as { modules: { projectSlug?: string }[] };
+  product.modules = product.modules.filter((module) => module.projectSlug !== SLUG_REST);
+  await writeFile(productFile, `${JSON.stringify(product, null, 2)}\n`);
 });
 
 test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await loginAsAdmin(page);
 
   await page.goto("/admin/projects/new");
-  await page.getByLabel("Slug").fill(SLUG_REST);
-  await page.getByLabel("Nome", { exact: true }).fill("REST Flow E2E");
-  await page.getByLabel("Família").selectOption({ label: "EDI Varejo" });
+  await page.getByLabel("Subproduto").fill("e2e rest flow");
+  await page.getByLabel("Produto", { exact: true }).selectOption({ label: "PBM" });
   await page.getByLabel("Protocolo").selectOption({ label: "REST" });
   await page.getByRole("button", { name: "Criar projeto" }).click();
 
@@ -49,6 +52,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await page.getByRole("button", { name: "Nova seção" }).click();
   await page.getByLabel("Título da seção").fill("Visao geral");
   await page.getByRole("button", { name: "Criar seção" }).click();
+  await expect(page.getByRole("dialog", { name: "Nova seção de contexto" })).toBeHidden();
   await page.getByRole("button", { name: "Editar", exact: true }).click();
   await page
     .getByLabel("Markdown")
@@ -59,7 +63,7 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Salvar seção" })).toBeHidden();
 
   await page.getByRole("button", { name: "Nova operação" }).click();
-  await page.getByLabel("Tipo").selectOption("rest");
+  await page.getByLabel("Tipo", { exact: true }).selectOption("rest");
   await page.getByLabel("Nome (identificador único)").fill("consultaStatus");
   await page.getByLabel("Descrição").fill("Consulta o status do pedido no PSP.");
   await page.getByLabel("Método").selectOption("GET");
@@ -74,12 +78,12 @@ test("cria projeto REST, cadastra endpoint e publica", async ({ page }) => {
   await expect(page.getByText("GET").first()).toBeVisible();
 
   await page
-    .locator("#roteiro-integracao")
+    .locator("#jornada-integracao")
     .getByRole("link", { name: /consultaStatus/ })
     .click();
   await expect(page).toHaveURL(`/docs/${SLUG_REST}/operations/rest/consultaStatus`);
   await expect(page.getByRole("heading", { name: "Endpoint" })).toBeVisible();
   await expect(page.getByText("GET /pedidos/status")).toBeVisible();
   await expect(page.getByText("Exemplo GraphQL")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Testar no playground" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Teste de Requisição" })).toHaveCount(0);
 });

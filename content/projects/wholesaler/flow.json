@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "title": "Fluxo Wholesaler",
+  "description": "Autenticação, criação do pedido e consulta do status de processamento.",
+  "nodes": [
+    { "id": "start", "type": "start", "label": "Pedido pronto para envio", "position": { "x": 260, "y": 0 } },
+    { "id": "createToken", "type": "operation", "label": "Obter token", "position": { "x": 260, "y": 90 }, "operationRef": { "kind": "mutation", "name": "createToken" } },
+    { "id": "createOrder", "type": "operation", "label": "Criar pedido", "position": { "x": 260, "y": 180 }, "operationRef": { "kind": "mutation", "name": "createOrder" } },
+    { "id": "orderStatus", "type": "operation", "label": "Consultar status", "position": { "x": 260, "y": 270 }, "operationRef": { "kind": "query", "name": "orderStatus" } },
+    { "id": "end", "type": "end", "label": "Pedido acompanhado", "position": { "x": 260, "y": 360 } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start", "target": "createToken" },
+    { "id": "e2", "source": "createToken", "target": "createOrder" },
+    { "id": "e3", "source": "createOrder", "target": "orderStatus" },
+    { "id": "e4", "source": "orderStatus", "target": "end" }
+  ],
+  "updatedAt": "2026-09-23T00:00:00.000Z"
+}

@@ -1,0 +1,89 @@
+import type {
+  DocumentationAction,
+  DocumentationConfiguration,
+  DocumentationModule,
+  DocumentationProduct,
+} from "@/modules/living-docs-externa/schema/documentation-navigation";
+import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
+
+const actions: readonly DocumentationAction[] = [
+  { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
+  { id: "fluxograma-geral", label: "Fluxograma Completo", order: 2, enabled: true, visible: true, status: "published", destination: "flowchart", linkModules: true },
+  { id: "jornada-integracao", label: "Jornada da Integração", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "roteiro-integracao", label: "Roteiro de Integração", order: 4, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "fluxos", label: "Fluxos", order: 5, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
+  { id: "teste-de-requisicao", label: "Teste de Requisição", order: 6, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
+];
+
+function moduleItem(id: string, label: string, order: number, projectSlug?: string): DocumentationModule {
+  return {
+    id, label, order, projectSlug,
+    enabled: true,
+    visible: true,
+    status: projectSlug ? "published" : "no-documentation",
+    route: projectSlug ? docsGuideHref(projectSlug) : null,
+  };
+}
+
+function product(
+  id: string,
+  label: string,
+  order: number,
+  description: string,
+  modules: DocumentationModule[],
+  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos"],
+): DocumentationProduct {
+  return {
+    id, label, order, description, modules,
+    actions: actions.filter((action) => actionIds.includes(action.id)),
+    enabled: true, visible: true, status: "no-documentation",
+  };
+}
+
+/**
+ * Molde das seções e fixture dos testes de navegação.
+ * A lista que o portal exibe vem de `content/products/<id>/config.json`.
+ */
+export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
+  products: [
+    product("credenciado", "Credenciado", 1, "Reúne os fluxos de cadastro, opt-in, venda e PBM direto no caixa para a integração do credenciado.", [
+      moduleItem("fluxo-de-cadastro", "Fluxo de Cadastro", 1),
+      moduleItem("fluxo-optin", "Fluxo Opt-in", 2),
+      moduleItem("fluxo-venda", "Fluxo de Venda", 3),
+      moduleItem("fluxo-pbm-caixa", "Fluxo PBM no Caixa", 4),
+    ]),
+    {
+      ...product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Integração de cadastros de beneficiários e colaboradores, com processamento assíncrono e acompanhamento por status ou webhook.", [
+        moduleItem("movimentacao-de-vidas", "Movimentação de Vidas", 1, "movimentacao-de-vidas"),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
+      status: "published",
+    },
+    {
+      ...product("trade", "Trade", 3, "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e IM. A estrutura também prevê EDI Redes, ainda sem documentação.", [
+        moduleItem("canal-autorizador", "Canal Autorizador", 1, "canal-autorizador"),
+        moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
+        moduleItem("edi-redes", "EDI Redes", 3),
+        moduleItem("im", "IM", 4, "im"),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
+      status: "published",
+    },
+    {
+      ...product("aps", "APS", 4, "Espaço previsto para Delivery. O enquadramento do produto e seu escopo de integração ainda estão sujeitos a confirmação.", [
+        moduleItem("delivery", "Delivery", 1),
+      ]),
+      tag: "A confirmar",
+    },
+    product("pbm", "PBM", 5, "Área prevista para a integração de Reposição. O roteiro e as regras desse fluxo serão detalhados na documentação do produto.", [
+      moduleItem("reposicao", "Reposição", 1),
+    ]),
+  ],
+  clients: {
+    id: "clientes",
+    label: "Documentação (Clientes)",
+    order: 6,
+    enabled: true,
+    visible: true,
+    status: "no-documentation",
+    tag: "Área separada",
+  },
+};

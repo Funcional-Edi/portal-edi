@@ -9,8 +9,9 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 ## Documentação do projeto
 
 - [[docs/estrutura/mapa-projeto|Mapa do projeto]]
+- [[docs/estrutura/navbar-produtos|Navbar de produtos EDI]]
 - [[docs/migracao/mapa-documentacao-funcional|Mapa documentação funcional]]
-- [[docs/migracao/cronograma|Cronograma de migração]]
+- [[interno/cronograma-portal-edi|Cronograma do Portal EDI]]
 - [[docs/migracao/README|Migração — índice]]
 - [[docs/arquitetura/adr/README|ADRs (decisões de arquitetura)]]
 
@@ -20,9 +21,20 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 
 ## Produtos / manuais
 
+- [[produtos/canal-autorizador/_index|canal-autorizador]]
 - [[produtos/demo/_index|demo]]
+- [[produtos/edi-canais/_index|edi-canais]]
 - [[produtos/im/_index|im]]
+- [[produtos/psp/_index|psp]]
+- [[produtos/teste/_index|teste]]
 - [[produtos/wholesaler/_index|wholesaler]]
+
+## Estudos
+
+- [[00-PAINEL-ESTUDOS|Painel de estudos (comandos, fluxos, cronograma)]]
+- [[cronograma-estudos|Cronograma de estudos]]
+- [[glossario|Glossário]]
+- [[diario|Diário de aprendizado]]
 
 ## Suas anotações
 

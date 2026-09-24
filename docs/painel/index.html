@@ -815,12 +815,14 @@ const DEFAULT_BOARD = [
       { id: "c8", title: "Smoke SSO homolog manual", desc: "Automação cobre checks locais; fluxo completo com SSO real ainda é manual.", prio: "media" },
     ]
   },
-  { id: "doing", title: "Em Progresso", cards: [] },
+  { id: "doing", title: "Em Progresso", cards: [
+      { id: "c23", title: "EDI-14324 — documentação de produtos", desc: "Fluxogramas completos na primeira seção, Referência GraphQL e documentação de Movimentação de Vidas.", prio: "alta" },
+    ] },
   {
     id: "done", title: "Feito", cards: [
       { id: "c7", title: "Migrar conteúdo real do canal-autorizador", desc: "Manual completo migrado do PDF legado (v1.7): config/manual/sections/flow + schema.json (introspecção GraphQL fiel à API — createToken, createGroupedOrder, groupedInvoiceDevolutions etc.). Publicado em /docs/canal-autorizador, /docs/api/canal-autorizador e /fluxogramas/canal-autorizador, família EDI Pharma.", prio: "alta" },
       { id: "c20", title: "Suporte a operações REST no portal (PSP)", desc: "manual.ts (kind rest + method/path/exampleBody) e project.ts (protocol + apiBaseUrl); checklist de qualidade, exports (Postman/Insomnia/PDF), leitura (Endpoint em vez de playground) e admin (Conectar API, seletor de Protocolo) todos sensíveis a protocolo. edi-canais (GraphQL) e psp (REST) reestruturados em família EDI Varejo, com introdução real migrada de developer.funcionalmais.com.", prio: "alta" },
-      { id: "c19", title: "Famílias de produto (EDI Pharma/Varejo) no catálogo", desc: "Campo family opcional no projeto, admin classifica/reclassifica, catálogos /manual e /docs/api agrupados por família. URLs não mudaram.", prio: "alta" },
+      { id: "c19", title: "Famílias de produto (EDI Pharma/Varejo) no catálogo", desc: "Campo family opcional no projeto e classificação no admin; /manual mantém o agrupamento por família, enquanto /docs/api preserva a relação produto/subproduto. URLs não mudaram.", prio: "alta" },
       { id: "c15", title: "UX /docs/api — schema no Ctrl+K", desc: "Campos/tipos do snapshot indexados na busca global (Ctrl+K).", prio: "media" },
       { id: "c14", title: "UX /docs/api — detalhe de tipo", desc: "Página /docs/api/[slug]/types/[name] com campos, args e tipos de retorno.", prio: "media" },
       { id: "c6", title: "Referência GraphQL global (/docs/api)", desc: "MVP: catálogo + schema read-only por produto publicado.", prio: "alta" },

@@ -38,6 +38,29 @@ data/projects/{slug}/credentials.enc   # nunca no Git — só runtime/secrets
 - **Escrita** remota (admin connect/sync/edit): ainda lança erro — homolog EDI usa backend local ou aguarda Fase futura de write GitHub.
 - Cache: services usam `unstable_cache` + tags (`LIVING_DOCS_CACHE_TAGS`); após publish local, `revalidateTag` invalida. Em GitHub puro, TTL do cache prevalece até redeploy ou tag manual.
 
+## Fluxo planejado para escrita controlada
+
+O portal não deve fazer `git push` diretamente na branch de produção nem gravar
+credenciais no conteúdo. Quando a edição administrativa precisar persistir no
+GitHub, o fluxo deverá ser:
+
+1. O administrador salva uma alteração autenticada no portal.
+2. O servidor valida o payload com os schemas do módulo e cria uma branch de
+   trabalho isolada.
+3. O adapter GitHub grava somente os arquivos permitidos nessa branch, usando a
+   API de Contents/commits e o SHA atual para detectar conflito.
+4. O servidor abre um Pull Request com resumo, autor, ambiente e validações
+   executadas; a branch protegida não recebe escrita direta.
+5. CI e os responsáveis pelo repositório validam e aprovam o PR. O merge é a
+   operação que promove o conteúdo versionado.
+6. O deploy de homologação ou produção ocorre conforme a política do repositório
+   e atualiza o conteúdo lido pelo portal.
+
+Enquanto essa etapa não existir, `GITHUB_TOKEN` deve permanecer com permissão de
+leitura. A implementação futura precisa separar token de leitura e token de
+escrita, limitar caminhos permitidos, registrar o PR retornado e tratar conflitos
+de SHA/rebase sem sobrescrever alterações de outro administrador.
+
 ## Validar configuração
 
 ```bash

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
  * Badge com tons semânticos. Antes, cada tela escrevia sua própria
  * `<span className="rounded-full bg-... px-2 py-0.5">` — sem padrão de cor
  * por significado, os badges (status, ambiente, gateway) ficavam quase
- * idênticos e difíceis de escanear (ver `docs/migracao/decisoes-ui.md`).
+ * idênticos e difíceis de escanear (ver `content/interno/guides/decisoes-ui-portal-edi.md`).
  */
 export type BadgeTone = "brand" | "neutral" | "success" | "warning";
 

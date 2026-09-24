@@ -2,8 +2,6 @@ import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { getContentRoot } from "@/core/config/env";
-import type { DataCapability } from "@/core/db";
-import type { DataStore } from "@/core/db";
 
 function resolvePath(relativePath: string): string {
   return path.join(getContentRoot(), relativePath);
@@ -74,8 +72,3 @@ export async function listLocalFiles(relativeDir: string): Promise<string[]> {
     return [];
   }
 }
-
-export const localContentStore: DataStore = {
-  kind: "local-filesystem",
-  capabilities: new Set<DataCapability>(["content"]),
-};

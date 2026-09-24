@@ -32,7 +32,9 @@ Mapa completo de pastas e arquivos da raiz: [`docs/estrutura/mapa-projeto.md`](d
 
 **Painel do projeto** (mapa, segurança, Kanban de prioridades e trilhas de estudo, tudo em uma tela): [`docs/painel/index.html`](docs/painel/index.html) — abra direto no navegador.
 
-Migração da documentação viva: [`docs/migracao/mapa-documentacao-funcional.md`](docs/migracao/mapa-documentacao-funcional.md) · [`docs/migracao/cronograma.md`](docs/migracao/cronograma.md).
+Migração da documentação viva: [`docs/migracao/mapa-documentacao-funcional.md`](docs/migracao/mapa-documentacao-funcional.md) · [`content/interno/guides/cronograma-portal-edi.md`](content/interno/guides/cronograma-portal-edi.md).
+
+Refinamentos e rastreamento interno: [`content/interno/guides/refinamentos-edi.md`](content/interno/guides/refinamentos-edi.md).
 
 Regra de dependência: `app → modules → core`. Módulos não se importam entre si —
 comunicam-se por eventos (`core/events`).
@@ -48,6 +50,23 @@ npm run dev                    # http://localhost:3002
 - Login dev (local): habilite `DEV_AUTH_ENABLED=true` em `.env.local`.
 - Healthcheck / planta viva: `GET /api/health`.
 - Smoke homolog: `npm run smoke:homolog` (ver [`docs/migracao/deploy-homolog.md`](docs/migracao/deploy-homolog.md)).
+
+### Primeiro passo no desenvolvimento
+
+Antes de investigar ou alterar o código, confirme que o índice local do CodeGraph está atualizado quando o CLI estiver disponível no ambiente.
+
+```bash
+npm run codegraph:check
+```
+
+Se o status indicar alterações pendentes, sincronize o índice e repita a conferência:
+
+```bash
+npm run codegraph:sync
+npm run codegraph:check
+```
+
+Em um ambiente novo, instale e inicialize o CodeGraph conforme o guia [Configuração do CodeGraph](docs/estrutura/codegraph-setup.md). Para investigar uma rota ou fluxo, use `codegraph explore` antes de buscas textuais amplas.
 
 ## Deploy homolog
 

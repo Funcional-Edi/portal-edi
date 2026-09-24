@@ -100,7 +100,7 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autenticacao",
     status: "ativo",
     description:
-      "DEV_AUTH_ENABLED só funciona com NODE_ENV=development; validateEnv bloqueia em produção. Rate limit também aplicado.",
+      "DEV_AUTH_ENABLED só funciona em desenvolvimento local ou Preview protegido; validateEnv bloqueia em produção pública. Rate limit também aplicado.",
     verification: "validateEnv() + core/auth/config.ts",
     reference: ".env.example",
     implementedAt: "2026-08-10",
@@ -111,7 +111,7 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autorizacao",
     status: "ativo",
     description:
-      "Admins e clients definidos em data/permissions.json (gitignored) ou PERMISSIONS_CONFIG_JSON. Defaults em código usam placeholders genéricos.",
+      "Admins e clients definidos em data/permissions.json (gitignored) ou PERMISSIONS_CONFIG_JSON. O fallback local usa o administrador padrão; homolog/prod devem configurar a fonte externa.",
     verification: "Copiar permissions.example.json → permissions.json no deploy.",
     reference: "data/permissions.example.json",
     implementedAt: "2026-08-10",

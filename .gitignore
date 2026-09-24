@@ -13,6 +13,7 @@
 architecture.dot
 /test-results
 /playwright-report
+/.tmp-vitest
 
 # ambiente (NUNCA commitar segredos)
 .env
@@ -34,3 +35,9 @@ next-env.d.ts
 # obsidian — atalhos locais (junction); conteúdo real está em docs/ e content/
 /obsidian/docs
 /obsidian/produtos/*/sections
+
+# PROMPTS de trabalho, não versionados
+PROMPT_*.md
+
+# PDFS de trabalho, não versionados
+*.pdf

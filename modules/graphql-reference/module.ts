@@ -5,11 +5,11 @@ export const graphqlReferenceModule: PortalModule = {
   id: "graphql-reference",
   title: "Referência GraphQL",
   description:
-    "Navegador read-only do schema GraphQL sincronizado por produto (snapshot de introspection).",
+    "Consulte os campos, tipos e operações GraphQL pela relação publicada de produto e subproduto.",
   status: "active",
   basePath: "/docs",
   access: "any",
   audience: "externo",
   requiresCapabilities: ["content"],
-  nav: [{ label: "Referência API", href: "/docs/api", access: "any" }],
+  nav: [{ label: "Referência GraphQL", href: "/docs/api", access: "any" }],
 };

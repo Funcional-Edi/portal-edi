@@ -19,6 +19,7 @@ export interface ManualNavGroup {
 export interface ManualTocItem {
   href: string;
   label: string;
+  depth?: number;
 }
 
 interface ManualShellProps {
@@ -31,6 +32,7 @@ interface ManualShellProps {
   navItems?: AppNavItem[];
   /** Links à direita do cabeçalho. Padrão: catálogo do distribuidor. */
   headerActions?: ReactNode;
+  productNavigation?: ReactNode;
 }
 
 export function ManualShell({
@@ -40,10 +42,14 @@ export function ManualShell({
   subtitle = "Documentação viva",
   navItems = [],
   headerActions,
+  productNavigation,
 }: ManualShellProps) {
-  const hasSidebar = sidebarGroups.some((group) => group.items.length > 0);
+  const hasSidebar = !productNavigation && sidebarGroups.some((group) => group.items.length > 0);
   const hasToc = tocItems.length > 0;
   const hasRailLayout = hasSidebar || hasToc;
+  const railColumns = hasSidebar
+    ? "lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_14rem]"
+    : "xl:grid-cols-[minmax(0,1fr)_14rem]";
   const showDefaultCatalogLink = headerActions == null && navItems.length === 0;
 
   return (
@@ -66,16 +72,17 @@ export function ManualShell({
           </div>
         }
       />
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        {hasRailLayout ? (
-          <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_14rem]">
+      <main className={productNavigation ? "mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10" : "mx-auto max-w-7xl px-6 py-10"}>
+        {productNavigation ?? (hasRailLayout ? (
+          <div className={`grid gap-8 ${railColumns}`}>
             {hasSidebar ? (
-              <aside className="hidden lg:block">
-                <div className="sticky top-24 space-y-5">
+              <aside className={productNavigation ? "min-w-0" : "hidden lg:block"}>
+                <div className={productNavigation ? "space-y-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto" : "sticky top-24 space-y-5"}>
+                  {productNavigation}
                   {sidebarGroups.map((group) => (
                     <section
                       key={group.title}
-                      className="rounded-lg border border-slate-200 bg-white p-4"
+                      className="hidden rounded-lg border border-slate-200 bg-white p-4 lg:block"
                     >
                       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         {group.title}
@@ -85,7 +92,8 @@ export function ManualShell({
                           <li key={item.href}>
                             <Link
                               href={item.href}
-                              className={`block rounded-md px-2 py-1.5 text-sm transition ${
+                              aria-current={item.active ? "page" : undefined}
+                              className={`block rounded-md px-2 py-1.5 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
                                 item.active
                                   ? "bg-brand-50 font-medium text-brand-800"
                                   : "text-slate-700 hover:bg-slate-100"
@@ -112,7 +120,7 @@ export function ManualShell({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+                      className={"shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + (item.depth ? "ml-2" : "")}
                     >
                       {item.label}
                     </Link>
@@ -133,7 +141,7 @@ export function ManualShell({
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className="block rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+                          className={"block rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100 " + (item.depth ? "ml-4 border-l-2 border-slate-200 pl-3" : "")}
                         >
                           {item.label}
                         </Link>
@@ -146,7 +154,7 @@ export function ManualShell({
           </div>
         ) : (
           <div className="mx-auto max-w-4xl">{children}</div>
-        )}
+        ))}
       </main>
     </div>
   );

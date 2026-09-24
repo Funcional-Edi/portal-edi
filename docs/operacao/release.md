@@ -126,6 +126,52 @@ publicacao. Portanto, o criterio minimo de release e: PR aprovado, CI verde e
 merge na `main`. Qualquer tag/release formal deve ser criada no GitHub conforme
 o procedimento do time.
 
+## Deploy no Vercel
+
+O deploy automatico via Git (preview por push, preview por PR, deploy ao
+fechar PR) esta **desativado de proposito**. O projeto define isso em
+`vercel.json`, na raiz:
+
+```json
+{
+  "git": {
+    "deploymentEnabled": false
+  }
+}
+```
+
+Motivo: evitar previews desnecessarios a cada push/PR, que consomem minutos de
+build e poluem os checks do PR sem necessidade real na maior parte das
+mudancas.
+
+Com isso, PR aprovado e CI verde na `main` (secao anterior) **nao** disparam
+deploy sozinhos. O deploy so acontece quando alguem decide de proposito,
+atraves de um dos caminhos abaixo.
+
+### Deploy manual via CLI
+
+```bash
+vercel deploy       # gera um preview a partir do estado atual da branch
+vercel --prod        # deploy de producao
+```
+
+Requer estar logado na CLI (`vercel login`) e o projeto vinculado
+(`vercel link`), uma vez por maquina.
+
+### Deploy manual via dashboard
+
+No [dashboard do projeto na Vercel](https://vercel.com/funcional-edi/portal-edi),
+use o botao **Redeploy** em cima de um deployment anterior, ou **Create
+Deployment** apontando para a branch desejada.
+
+### Quando disparar
+
+- Depois do merge na `main`, se a mudanca precisar estar visivel em
+  producao/preview para validacao externa.
+- Antes de compartilhar um link de preview com alguem fora do time (QA,
+  stakeholder), para revisar uma branch especifica.
+- Nao e necessario disparar deploy so porque um PR foi aberto ou fechado.
+
 ## Modelo de descricao do PR
 
 ```md
@@ -162,3 +208,5 @@ Baixo. Mudanca restrita a testes automatizados e fixtures temporarias de teste.
 - [ ] Push realizado.
 - [ ] PR aberto para `main`.
 - [ ] CI do GitHub verde antes de merge/release.
+- [ ] Deploy manual disparado (CLI ou dashboard), se a mudanca precisar estar
+      visivel em producao/preview agora.

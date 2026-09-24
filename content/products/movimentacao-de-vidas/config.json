@@ -1,0 +1,16 @@
+{
+  "id": "movimentacao-de-vidas",
+  "name": "Movimentação de Vidas",
+  "description": "Área prevista para os processos de movimentação de vidas, com consultas, alterações e roteiros. Os detalhes de integração ainda serão documentados.",
+  "order": 2,
+  "visible": true,
+  "status": "published",
+  "modules": [
+    {
+      "id": "movimentacao-de-vidas",
+      "label": "Movimentação de Vidas",
+      "order": 1,
+      "projectSlug": "movimentacao-de-vidas"
+    }
+  ]
+}

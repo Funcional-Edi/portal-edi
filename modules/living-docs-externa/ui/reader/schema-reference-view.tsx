@@ -105,7 +105,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
     <article>
       <nav className="mb-6 text-sm text-slate-500">
         <Link href="/docs/api" className="hover:text-brand-700">
-          Referência API
+          Referência GraphQL
         </Link>
         <span className="mx-2">/</span>
         <span>{project.config.name}</span>

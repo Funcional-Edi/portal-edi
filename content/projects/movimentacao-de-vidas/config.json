@@ -1,0 +1,15 @@
+{
+  "slug": "movimentacao-de-vidas",
+  "name": "Movimentação de Vidas",
+  "description": "Integração GraphQL para inclusão, atualização, transferência, ativação e desativação de beneficiários, com processamento assíncrono.",
+  "family": "edi-varejo",
+  "environment": "homolog",
+  "protocol": "graphql",
+  "graphqlUrl": "https://companies-uat.funcionalhealthtech.com.br/graphql",
+  "gatewaySlug": "gateway-companies-uat",
+  "published": true,
+  "audience": "distribuidor",
+  "manualStatus": "published",
+  "createdAt": "2026-09-23T00:00:00.000Z",
+  "updatedAt": "2026-09-23T00:00:00.000Z"
+}

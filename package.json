@@ -8,6 +8,8 @@
   },
   "scripts": {
     "dev": "next dev -p 3002",
+    "codegraph:sync": "codegraph sync .",
+    "codegraph:check": "codegraph status .",
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint .",
@@ -19,11 +21,11 @@
     "test:e2e:headed": "playwright test --config=playwright.config.ts --headed",
     "arch": "depcruise app core modules --config config/dependency-cruiser.cjs",
     "arch:graph": "depcruise app core modules --config config/dependency-cruiser.cjs --output-type dot > architecture.dot",
-    "migrate:legacy-content": "tsx scripts/migrate-content-from-legacy.ts",
-    "content:validate-published": "tsx scripts/validate-published-projects.ts",
-    "smoke:homolog": "tsx scripts/smoke-homolog-checklist.ts",
-    "obsidian:sync": "tsx scripts/sync-obsidian-vault.ts",
-    "obsidian:watch": "tsx scripts/watch-obsidian-vault.ts",
+    "migrate:legacy-content": "node scripts/run-tsx.cjs scripts/migrate-content-from-legacy.ts",
+    "content:validate-published": "node scripts/run-tsx.cjs scripts/validate-published-projects.ts",
+    "smoke:homolog": "node scripts/run-tsx.cjs scripts/smoke-homolog-checklist.ts",
+    "obsidian:sync": "node scripts/run-tsx.cjs scripts/sync-obsidian-vault.ts",
+    "obsidian:watch": "node scripts/run-tsx.cjs scripts/watch-obsidian-vault.ts",
     "ci": "npm run typecheck && npm run lint && npm run arch && npm run test && npm run build"
   },
   "dependencies": {

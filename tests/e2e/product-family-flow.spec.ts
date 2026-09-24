@@ -1,10 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
- * Familias de produto (EDI Pharma / EDI Varejo): entrada em /docs, depois
- * catálogo por família. Os testes criam projetos descartaveis (apagados no fim).
+ * Catálogos legados por família continuam acessíveis diretamente.
+ * /docs agora é uma introdução por produto, sem duplicar esses catálogos.
+ * Os testes criam projetos descartáveis (apagados no fim).
  */
 const SLUG_VAREJO = "e2e-familia-varejo";
 const SLUG_RECLASSIFICA = "e2e-familia-reclassifica";
@@ -17,27 +18,22 @@ async function loginAsAdmin(page: Page) {
   await page.goto("/admin/projects");
   await expect(page).toHaveURL(/callbackUrl=%2Fadmin%2Fprojects/);
 
-  await page.getByLabel("E-mail").fill("admin@empresa.com");
+  await page.getByLabel("E-mail").fill("admin@funcionalcorp.com.br");
   await page.getByRole("button", { name: "Entrar (dev)" }).click();
 
   await expect(page).toHaveURL("/admin/projects");
 }
 
-async function createPublishableProject(
-  page: Page,
-  slug: string,
-  name: string,
-  familyLabel: string
-) {
-  await page.goto("/admin/projects/new");
-  await page.getByLabel("Slug").fill(slug);
-  await page.getByLabel("Nome", { exact: true }).fill(name);
-  await page.getByLabel("Família").selectOption({ label: familyLabel });
-  await page.getByRole("button", { name: "Criar projeto" }).click();
+async function createPublishableProject(page: Page, slug: string, name: string) {
+  const created = await page.request.post("/api/living-docs/projects", {
+    data: { slug, name, productId: "trade", protocol: "graphql" },
+  });
+  expect(created.ok()).toBeTruthy();
 
-  await expect(page).toHaveURL(`/admin/projects/${slug}`);
+  await page.goto("/docs?produto=trade");
+  await expect(page.getByRole("button", { name })).toBeVisible();
 
-  await page.getByRole("link", { name: "Abrir editor do manual" }).click();
+  await page.goto(`/admin/projects/${slug}/edit`);
   await expect(page).toHaveURL(`/admin/projects/${slug}/edit`);
 
   await page.getByRole("button", { name: "Editar cabeçalho" }).click();
@@ -69,50 +65,45 @@ async function createPublishableProject(
 
 test.afterEach(async () => {
   await Promise.all(PROJECT_DIRS.map((dir) => rm(dir, { recursive: true, force: true })));
+  for (const [productId, slug] of [
+    ["trade", SLUG_VAREJO],
+    ["credenciado", SLUG_RECLASSIFICA],
+  ] as const) {
+    const productFile = path.join(process.cwd(), "content", "products", productId, "config.json");
+    const product = JSON.parse(await readFile(productFile, "utf8")) as { modules: { projectSlug?: string }[] };
+    product.modules = product.modules.filter((module) => module.projectSlug !== slug);
+    await writeFile(productFile, `${JSON.stringify(product, null, 2)}\n`);
+  }
 });
 
-test("fluxo /docs escolhe familia e lista produtos publicados", async ({ page }) => {
+test("introducao em /docs preserva rotas de catalogos por familia", async ({ page }) => {
   await loginAsAdmin(page);
-  await createPublishableProject(page, SLUG_VAREJO, "Familia Varejo E2E", "EDI Varejo");
+  await createPublishableProject(page, SLUG_VAREJO, "Familia Varejo E2E");
 
   await page.goto("/docs");
   await expect(page.getByRole("heading", { name: "Documentação" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /EDI Pharma/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /EDI Varejo/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sua trilha de integração" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catálogos por família" })).toHaveCount(0);
 
-  await page.getByRole("link", { name: /EDI Varejo/ }).click();
-  await expect(page).toHaveURL("/docs/edi-varejo");
+  await page.goto("/docs?produto=trade");
   await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toBeVisible();
 
-  await page.getByRole("link", { name: "Todas as famílias" }).click();
-  await expect(page).toHaveURL("/docs");
-
-  await page.getByRole("link", { name: /EDI Pharma/ }).click();
+  await page.goto("/docs/edi-pharma");
   await expect(page).toHaveURL("/docs/edi-pharma");
   await expect(page.getByRole("link", { name: /IM - Inventario/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Familia Varejo E2E/ })).toHaveCount(0);
 });
 
-test("admin reclassifica a familia de um projeto existente", async ({ page }) => {
+test("projeto novo aparece no produto escolhido, nao numa familia", async ({ page }) => {
   await loginAsAdmin(page);
 
-  await page.goto("/admin/projects/new");
-  await page.getByLabel("Slug").fill(SLUG_RECLASSIFICA);
-  await page.getByLabel("Nome", { exact: true }).fill("Reclassifica E2E");
-  await page.getByLabel("Família").selectOption({ label: "EDI Pharma" });
-  await page.getByRole("button", { name: "Criar projeto" }).click();
-  await expect(page).toHaveURL(`/admin/projects/${SLUG_RECLASSIFICA}`);
+  const created = await page.request.post("/api/living-docs/projects", {
+    data: { slug: SLUG_RECLASSIFICA, name: "Reclassifica E2E", productId: "credenciado", protocol: "graphql" },
+  });
+  expect(created.ok()).toBeTruthy();
+  await page.goto("/docs?produto=credenciado");
 
-  const familySelect = page.getByLabel("Família do produto");
-  await expect(familySelect).toHaveValue("edi-pharma");
-
-  const familyPatch = page.waitForResponse(
-    (response) => response.url().includes("/family") && response.request().method() === "PATCH"
-  );
-  await familySelect.selectOption({ label: "EDI Varejo" });
-  await familyPatch;
-  await expect(page.getByLabel("Família do produto")).toHaveValue("edi-varejo");
-
-  await page.reload();
-  await expect(page.getByLabel("Família do produto")).toHaveValue("edi-varejo");
+  await expect(page).toHaveURL("/docs?produto=credenciado");
+  await expect(page.getByRole("button", { name: "Reclassifica E2E" })).toBeVisible();
+  await expect(page.getByLabel("Família")).toHaveCount(0);
 });

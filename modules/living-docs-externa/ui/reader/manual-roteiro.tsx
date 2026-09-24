@@ -1,8 +1,7 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
-import { buildPlaygroundHref } from "@/modules/living-docs-externa/services/playground-access";
-import { docsOperationHref } from "@/modules/living-docs-externa/services/docs-routes";
-import { MarkdownBody } from "@/modules/living-docs-externa/ui/reader/markdown-body";
+import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
+import { MarkdownBody } from "@/core/ui/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
 import { ArrowRight, PencilLine, Search, Send } from "lucide-react";
@@ -46,7 +45,7 @@ export interface ManualRoteiroEditorSlots {
   banner?: ReactNode;
   /** Ações do bloco "Contexto" (nova seção). */
   sectionsToolbar?: ReactNode;
-  /** Ações do bloco "Roteiro de integração" (nova operação). */
+  /** Ações do bloco "Jornada da Integração" (nova operação). */
   operationsToolbar?: ReactNode;
 }
 
@@ -119,10 +118,10 @@ export function ManualRoteiro({
             <>
               {isGraphql && canUsePlayground ? (
                 <Link
-                  href={buildPlaygroundHref(config.slug)}
+                  href={docsPlaygroundHref(config.slug)}
                   className="inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
                 >
-                  Abrir playground GraphQL
+                  Teste de Requisição
                 </Link>
               ) : null}
               {flowHref ?? editor?.flowHref ? (
@@ -234,9 +233,15 @@ export function ManualRoteiro({
         </section>
       ) : null}
 
-      <section id="roteiro-integracao" className="scroll-mt-24">
+      <section id="jornada-integracao" className="scroll-mt-24">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold">Roteiro de integração</h2>
+          <div>
+            <h2 className="text-lg font-semibold">Jornada da Integração</h2>
+            <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
+              Siga as etapas na ordem para entender o processo completo. Cada operação leva à
+              próxima decisão da integração e abre o detalhamento técnico correspondente.
+            </p>
+          </div>
           {editor?.operationsToolbar}
         </div>
 
@@ -295,6 +300,148 @@ export function ManualRoteiro({
             );
           })}
         </ol>
+      </section>
+
+      <section id="roteiro-integracao" className="mt-10 scroll-mt-24">
+        <h2 className="text-lg font-semibold">Roteiro de Integração</h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
+          Use este roteiro para analisar cada fluxo com profundidade antes de implementá-lo ou
+          apresentá-lo na homologação. O detalhamento deve registrar os seguintes pontos:
+        </p>
+        <div className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-5">
+          <ul className="grid gap-2 text-sm leading-relaxed text-brand-900 sm:grid-cols-2">
+            <li>Objetivo e momento de uso do fluxo.</li>
+            <li>Pré-requisitos, autenticação e headers.</li>
+            <li>Dados obrigatórios, resposta e status possíveis.</li>
+            <li>Regra para decidir o próximo passo.</li>
+            <li>Erros, rejeições, reprocessamento e idempotência.</li>
+            <li>Evidência necessária para a homologação.</li>
+          </ul>
+          <p className="mt-4 border-t border-brand-200 pt-4 text-sm leading-relaxed text-brand-800">
+            Enquanto o detalhamento específico por fluxo é construído, consulte as operações da
+            Jornada da Integração para acessar os exemplos, regras de negócio e campos técnicos já
+            publicados.
+          </p>
+          <Link
+            href="#jornada-integracao"
+            className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
+          >
+            Ver a Jornada da Integração
+          </Link>
+        </div>
+
+        {operations.length > 0 ? (
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Detalhamento por fluxo
+            </h3>
+            <ol className="mt-3 space-y-3">
+              {operations.map((op, index) => {
+                const prerequisites = (op.prerequisites ?? []).map((name) => ({
+                  name,
+                  operation: operations.find((candidate) => candidate.name === name),
+                }));
+                const relatedSections = (op.relatedSections ?? [])
+                  .map((id) => sections.find((section) => section.id === id))
+                  .filter((section): section is ManualSection => section !== undefined);
+
+                return (
+                  <li
+                    key={`roteiro-${op.kind}-${op.name}`}
+                    className="rounded-lg border border-slate-200 bg-white p-4"
+                  >
+                    <div className="flex gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium uppercase text-brand-700">
+                          {op.kind === "rest" ? op.method ?? "rest" : op.kind} · {op.name}
+                        </p>
+                        <h4 className="mt-1 font-semibold text-slate-900">
+                          {op.title ?? op.name}
+                        </h4>
+                        {op.description ? (
+                          <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                            {op.description}
+                          </p>
+                        ) : null}
+
+                        {prerequisites.length > 0 || op.authRequired ? (
+                          <dl className="mt-3 space-y-2 text-sm text-slate-600">
+                            {prerequisites.length > 0 ? (
+                              <div>
+                                <dt className="font-medium text-slate-800">Pré-requisitos</dt>
+                                <dd>
+                                  {prerequisites.map(({ name, operation }, prerequisiteIndex) => (
+                                    <span key={name}>
+                                      {prerequisiteIndex > 0 ? ", " : null}
+                                      {operation ? (
+                                        <Link
+                                          href={docsOperationHref(config.slug, operation.kind, operation.name)}
+                                          className="text-brand-700 underline hover:text-brand-900"
+                                        >
+                                          {operation.title ?? name}
+                                        </Link>
+                                      ) : (
+                                        name
+                                      )}
+                                    </span>
+                                  ))}
+                                </dd>
+                              </div>
+                            ) : null}
+                            {op.authRequired ? (
+                              <div>
+                                <dt className="font-medium text-slate-800">Autenticação</dt>
+                                <dd>Obrigatória para executar este fluxo.</dd>
+                              </div>
+                            ) : null}
+                          </dl>
+                        ) : null}
+
+                        {op.businessNotes && op.businessNotes.length > 0 ? (
+                          <div className="mt-3">
+                            <p className="text-sm font-medium text-slate-800">Regras e decisões</p>
+                            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-600">
+                              {op.businessNotes.map((note, noteIndex) => (
+                                <li key={noteIndex}>{note}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+
+                        {relatedSections.length > 0 ? (
+                          <p className="mt-3 text-sm text-slate-600">
+                            <span className="font-medium text-slate-800">Contexto relacionado: </span>
+                            {relatedSections.map((section, sectionIndex) => (
+                              <span key={section.id}>
+                                {sectionIndex > 0 ? ", " : null}
+                                <Link
+                                  href={`#section-${section.id}`}
+                                  className="text-brand-700 underline hover:text-brand-900"
+                                >
+                                  {section.title}
+                                </Link>
+                              </span>
+                            ))}
+                          </p>
+                        ) : null}
+
+                        <Link
+                          href={docsOperationHref(config.slug, op.kind, op.name)}
+                          className="mt-3 inline-flex text-sm font-medium text-brand-700 underline hover:text-brand-900"
+                        >
+                          Ver operação completa →
+                        </Link>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ) : null}
       </section>
     </article>
   );

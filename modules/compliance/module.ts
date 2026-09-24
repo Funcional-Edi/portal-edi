@@ -2,7 +2,7 @@ import type { PortalModule } from "@/core/module-registry";
 
 /**
  * Módulo de compliance — painel interno de controles de proteção de dados,
- * confidencialidade e auditoria. Atualize `data/controls.ts` ao adicionar
+ * confidencialidade e auditoria. Atualize `modules/compliance/data/controls.ts` ao adicionar
  * novos controles de segurança.
  */
 export const complianceModule: PortalModule = {
