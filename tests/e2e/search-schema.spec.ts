@@ -15,10 +15,11 @@ test("Ctrl+K encontra tipo GraphQL do schema publicado", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: "Busca no portal" })).toBeVisible();
 
   await page.getByLabel("Termo de busca").fill("TokenPayload");
-  await expect(page.getByRole("option", { name: /TokenPayload/ })).toBeVisible();
-  await expect(page.getByText("Tipo GraphQL")).toBeVisible();
+  const tokenPayload = page.getByRole("option", { name: /Tipo GraphQL TokenPayload OBJECT · IM - Inventario/ });
+  await expect(tokenPayload).toBeVisible();
+  await expect(tokenPayload.getByText("Tipo GraphQL", { exact: true })).toBeVisible();
 
-  await page.getByRole("option", { name: /TokenPayload/ }).click();
+  await tokenPayload.click();
   await expect(page).toHaveURL("/docs/api/im/types/TokenPayload");
   await expect(page.getByRole("heading", { name: "TokenPayload" })).toBeVisible();
 });

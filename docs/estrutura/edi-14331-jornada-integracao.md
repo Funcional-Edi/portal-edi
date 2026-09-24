@@ -154,3 +154,15 @@ A migração deverá preservar a compatibilidade com links existentes ou criar u
 5. Replicar a análise nos demais subprodutos publicados.
 6. Registrar a atividade futura de construção detalhada do roteiro por fluxo.
 
+## Ponto de observação para continuidade
+
+A estrutura de navegação e a apresentação do Roteiro de Integração foram
+implementadas nesta etapa. O próximo ciclo deve concentrar-se no conteúdo
+técnico detalhado por fluxo, começando pelo Trade, que possui informação
+suficiente para validação do processo.
+
+Para os demais subprodutos, o detalhamento deve aguardar informações validadas
+pela equipe responsável e pelo processo de homologação. Não devem ser
+inferidos endpoints, respostas, status, regras de erro, reprocessamento,
+idempotência ou evidências sem respaldo técnico. Enquanto isso, a estrutura
+permanece disponível sem apresentar conteúdo fictício como definitivo.
