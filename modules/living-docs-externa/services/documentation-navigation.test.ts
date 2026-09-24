@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { DOCUMENTATION_CONFIGURATION } from "@/modules/living-docs-externa/config/documentation-products";
 import type { ProjectSummary } from "@/modules/living-docs-externa/schema";
 import type { DocumentationConfiguration } from "@/modules/living-docs-externa/schema/documentation-navigation";
-import { canViewDocumentation, documentationRouteSelection, resolveDocumentationNavigation } from "./documentation-navigation";
+import { attachProjectsToProducts, canViewDocumentation, documentationRouteSelection, resolveDocumentationNavigation } from "./documentation-navigation";
 
 const manuals: ProjectSummary[] = ["im", "canal-autorizador", "wholesaler"].map((slug) => ({
   slug, name: slug, published: true, protocol: "graphql", environment: "homolog", updatedAt: "2026-09-16T00:00:00.000Z",
@@ -106,5 +106,23 @@ describe("documentation navigation", () => {
     expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-integracao");
     expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
     expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
+  });
+
+  it("anexa um projeto novo ao produto escolhido sem duplicar modulo ja cadastrado", () => {
+    const config = attachProjectsToProducts(DOCUMENTATION_CONFIGURATION, [
+      { slug: "canal-autorizador", name: "Canal Autorizador", productId: "trade" },
+      { slug: "novo-manual", name: "Novo manual", productId: "trade" },
+    ]);
+    const trade = config.products.find((product) => product.id === "trade")!;
+    expect(trade.modules.filter((module) => module.projectSlug === "canal-autorizador")).toHaveLength(1);
+    expect(trade.modules.some((module) => module.projectSlug === "novo-manual")).toBe(true);
+
+    const view = resolveDocumentationNavigation(
+      config,
+      [...manuals, { slug: "novo-manual", name: "Novo manual", published: true, protocol: "graphql", updatedAt: "2026-09-23T00:00:00.000Z" }],
+      { role: "client" },
+    );
+    const links = view.products.find((product) => product.id === "trade")!.actions[0].links;
+    expect(links.some((link) => link.href === "/docs/novo-manual")).toBe(true);
   });
 });

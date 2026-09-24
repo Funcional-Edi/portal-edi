@@ -2,10 +2,11 @@ import Link from "next/link";
 
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ProjectList } from "@/modules/living-docs-externa/ui/admin/project-list";
+import { listCatalogProducts } from "@/modules/living-docs-externa/repository/catalog-product-repository";
 import { listProjects } from "@/modules/living-docs-externa/services/list-projects";
 
 export default async function AdminProjectsPage() {
-  const projects = await listProjects();
+  const [projects, products] = await Promise.all([listProjects(), listCatalogProducts()]);
 
   return (
     <AdminShell>
@@ -23,7 +24,7 @@ export default async function AdminProjectsPage() {
           Novo projeto
         </Link>
       </header>
-      <ProjectList projects={projects} />
+      <ProjectList projects={projects} products={products} />
     </AdminShell>
   );
 }

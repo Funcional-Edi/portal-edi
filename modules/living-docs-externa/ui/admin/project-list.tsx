@@ -1,11 +1,12 @@
 import type { ProjectSummary } from "@/modules/living-docs-externa/schema";
-import { PRODUCT_FAMILY_METADATA } from "@/modules/living-docs-externa/schema/family";
+import type { CatalogProduct } from "@/modules/living-docs-externa/schema/catalog-product";
 import Link from "next/link";
 
 import { Badge } from "@/core/ui/badge";
 
 interface ProjectListProps {
   projects: ProjectSummary[];
+  products: CatalogProduct[];
 }
 
 function statusLabel(project: ProjectSummary): string {
@@ -20,7 +21,7 @@ function statusClass(project: ProjectSummary): string {
   return "bg-slate-100 text-slate-700";
 }
 
-export function ProjectList({ projects }: ProjectListProps) {
+export function ProjectList({ projects, products }: ProjectListProps) {
   if (projects.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-600">
@@ -40,7 +41,7 @@ export function ProjectList({ projects }: ProjectListProps) {
           <tr>
             <th className="px-4 py-3 text-left font-semibold text-slate-700">Projeto</th>
             <th className="px-4 py-3 text-left font-semibold text-slate-700">Slug</th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">Família</th>
+            <th className="px-4 py-3 text-left font-semibold text-slate-700">Produto</th>
             <th className="px-4 py-3 text-left font-semibold text-slate-700">Status</th>
             <th className="px-4 py-3 text-left font-semibold text-slate-700">Ambiente</th>
             <th className="px-4 py-3 text-right font-semibold text-slate-700">Ações</th>
@@ -57,8 +58,10 @@ export function ProjectList({ projects }: ProjectListProps) {
               </td>
               <td className="px-4 py-3 font-mono text-xs text-slate-600">{project.slug}</td>
               <td className="px-4 py-3">
-                {project.family ? (
-                  <Badge tone="brand">{PRODUCT_FAMILY_METADATA[project.family].name}</Badge>
+                {project.productId ? (
+                  <Badge tone="brand">
+                    {products.find((product) => product.id === project.productId)?.name ?? project.productId}
+                  </Badge>
                 ) : (
                   <span className="text-xs text-slate-400">—</span>
                 )}

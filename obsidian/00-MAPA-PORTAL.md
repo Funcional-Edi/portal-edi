@@ -15,6 +15,10 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 - [[docs/migracao/README|Migração — índice]]
 - [[docs/arquitetura/adr/README|ADRs (decisões de arquitetura)]]
 
+## Arquitetura e produtividade
+
+- [[arquitetura/codegraph|CodeGraph — cérebro técnico do portal]]
+
 ## Produtos / manuais
 
 - [[produtos/canal-autorizador/_index|canal-autorizador]]

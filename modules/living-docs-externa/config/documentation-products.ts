@@ -41,9 +41,8 @@ function product(
 }
 
 /**
- * Structural registry: IDs, products and modules are added/removed only in code.
- * Future admin configuration can override presentation/access fields by ID in the
- * server loader. It must not replace this registry or expose structural deletion.
+ * Molde das seções e fixture dos testes de navegação.
+ * A lista que o portal exibe vem de `content/products/<id>/config.json`.
  */
 export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
   products: [
