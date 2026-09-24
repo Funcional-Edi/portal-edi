@@ -126,14 +126,15 @@ npm.cmd run build
 
 Na última validação registrada:
 
-- typecheck, lint e arquitetura passaram;
-- 9 testes E2E de navegação passaram;
-- os testes direcionados de banco, adapters e eventos passaram;
-- a suíte completa teve 275 testes aprovados e 13 falhas de ambiente com
-  `EPERM` ao copiar arquivos em `C:\Users\RICARD~1`; essas falhas devem ser
-  reexecutadas em um ambiente limpo ou no CI.
-- o build ainda precisa ser executado isoladamente antes da publicação; a
-  última tentativa ficou bloqueada pelo processo de desenvolvimento ativo.
+- o índice do CodeGraph foi sincronizado e validado com 272 arquivos, 2.223
+  nós e 5.197 relações;
+- typecheck, lint, arquitetura e validação de conteúdo publicado passaram;
+- a suíte unitária passou com 47 arquivos e 288 testes;
+- os fluxos E2E de navegação, editor e REST passaram com 12 testes;
+- o executor de scripts TypeScript trata a limitação `ENOMEM` do `tsx` no
+  Windows, e os testes usam fallback local somente quando o diretório
+  temporário do sistema bloqueia cópia recursiva;
+- não há falhas `EPERM` pendentes nas validações executadas.
 
 ## Decisões técnicas recentes
 
@@ -148,9 +149,13 @@ Na última validação registrada:
 
 ## Próximos pontos de acompanhamento
 
+- detalhar o Roteiro de Integração por fluxo, começando pelo Canal Autorizador
+  e replicando o modelo nos demais subprodutos publicados;
 - homologar a navegação de todos os produtos e subprodutos publicados;
 - confirmar em produção o redirect de `/manual/*` para `/docs/*`;
 - validar o roteiro completo, incluindo queries, mutations e teste de requisição;
-- repetir a suíte completa em ambiente limpo para eliminar o erro `EPERM`;
+- decidir se o projeto `demo`, atualmente publicado no conteúdo mas fora do
+  catálogo produto → subproduto, deve ser associado a um subproduto ou permanecer
+  somente como conteúdo interno de desenvolvimento;
 - atualizar este guia sempre que uma nova frente de produto ou documentação for
   publicada.
