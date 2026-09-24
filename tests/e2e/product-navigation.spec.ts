@@ -89,6 +89,71 @@ test("mobile navigation preserves context without horizontal overflow", async ({
   await page.screenshot({ path: testInfo.outputPath("docs-contextual-mobile.png"), fullPage: true });
 });
 
+test("contextual index follows the selected subproduct area", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await login(page);
+  await page.goto("/docs/canal-autorizador");
+
+  const productNav = page.getByRole("navigation", { name: "Produtos EDI" });
+  const index = page.locator("aside").filter({ hasText: "Índice" });
+  await expect(index).toHaveCount(1);
+  await expect(index.locator("div.sticky")).toHaveClass(/overflow-y-auto/);
+  await expect(index).not.toContainText("Integração Canal Autorizador — Transfer Order");
+  await expect(index).not.toContainText("Canal Autorizador");
+  await expect(index).toContainText("Contexto");
+  await expect(index).not.toContainText("Jornada da Integração");
+  await expect(index).not.toContainText("Roteiro de Integração");
+  await expect(page.locator("#contexto")).toBeVisible();
+  await expect(page.locator("#jornada-integracao")).toBeHidden();
+  await expect(page.locator("#tabelas-referencia")).toBeHidden();
+  await expect(page.locator("#roteiro-integracao")).toBeHidden();
+
+  await productNav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
+  await expect(index).toContainText("Jornada da Integração");
+  await expect(index).toContainText("Tabelas de referência");
+  await expect(index).not.toContainText("Contexto");
+  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#jornada-integracao")).toBeVisible();
+  await expect(page.locator("#tabelas-referencia")).toBeVisible();
+  await expect(page.locator("#roteiro-integracao")).toBeHidden();
+  const journeyItems = await index.locator("ul > li > a").allTextContents();
+  expect(journeyItems[0].trim()).toBe("Jornada da Integração");
+  expect(journeyItems[journeyItems.length - 1].trim()).toBe("Tabelas de referência");
+
+  await productNav.getByRole("link", { name: "Roteiro de Integração", exact: true }).click();
+  await expect(index).toContainText("Roteiro de Integração");
+  await expect(index.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador",
+  );
+  await expect(index.getByRole("link", { name: /1\. Autenticar/ })).toHaveClass(/ml-8/);
+  await expect(index).not.toContainText("Jornada da Integração");
+  await expect(index).not.toContainText("Tabelas de referência");
+  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#jornada-integracao")).toBeHidden();
+  await expect(page.locator("#tabelas-referencia")).toBeHidden();
+  await expect(page.locator("#roteiro-integracao")).toBeVisible();
+
+  await productNav.getByRole("button", { name: "Queries", exact: true }).click();
+  await expect(index.locator('a[href^="/docs/canal-autorizador/operations/query/"]')).not.toHaveCount(0);
+  await expect(index).not.toContainText("Roteiro de Integração");
+});
+
+test("contextual index remains available in mobile navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await login(page);
+  await page.goto("/docs/canal-autorizador#roteiro-integracao");
+
+  const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
+  await expect(quickNavigation).toBeVisible();
+  await expect(quickNavigation.getByRole("link", { name: "Roteiro de Integração", exact: true })).toBeVisible();
+  await expect(quickNavigation.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador",
+  );
+  await expect(quickNavigation).not.toContainText("Tabelas de referência");
+});
+
 test("admins can reach the existing request test from a selected flow", async ({ page }) => {
   await login(page, true);
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
@@ -112,6 +177,14 @@ test("published product shows the complete flowchart and homologation manual", a
   await flowchartLink.click();
   await expect(page).toHaveURL("/fluxogramas/movimentacao-de-vidas");
   await expect(page.getByRole("heading", { name: "Fluxo de Movimentação de Vidas" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Voltar à documentação", exact: true })).toHaveAttribute(
+    "href",
+    "/docs/movimentacao-de-vidas",
+  );
+  await expect(page.locator("header").first().getByRole("link", { name: "Documentação", exact: true })).toHaveAttribute(
+    "href",
+    "/docs/movimentacao-de-vidas",
+  );
 });
 
 test("long subproduct pages expose a scroll-to-top control", async ({ page }) => {

@@ -18,16 +18,8 @@ export interface InsomniaExportV4 {
   resources: InsomniaResource[];
 }
 
-function defaultExampleQuery(kind: string, name: string): string {
-  return `${kind} ${name} {\n  ${name}\n}`;
-}
-
 function graphqlBodyText(query: string): string {
   return JSON.stringify({ query });
-}
-
-function joinUrl(base: string, path: string): string {
-  return `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /** Gera export Insomnia v4 a partir do manual curado (sem credenciais). */
@@ -58,6 +50,8 @@ export function buildInsomniaExport(
   for (const op of sortOperations(manual)) {
     const requestId = `req_${config.slug}_${op.kind}_${op.name}`;
     const isRestOp = isRest || op.kind === "rest";
+    const path = op.path ?? "/";
+    const query = op.exampleQuery?.trim() || `${op.kind} ${op.name} {\n  ${op.name}\n}`;
 
     resources.push(
       isRestOp
@@ -69,7 +63,7 @@ export function buildInsomniaExport(
             created: now,
             name: op.title ?? op.name,
             description: op.description ?? "",
-            url: joinUrl(config.apiBaseUrl ?? baseUrl, op.path ?? "/"),
+            url: `${(config.apiBaseUrl ?? baseUrl).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
             method: op.method ?? "GET",
             body: op.exampleBody?.trim()
               ? { mimeType: "application/json", text: op.exampleBody }
@@ -88,7 +82,7 @@ export function buildInsomniaExport(
             method: "POST",
             body: {
               mimeType: "application/graphql",
-              text: graphqlBodyText(op.exampleQuery?.trim() || defaultExampleQuery(op.kind, op.name)),
+              text: graphqlBodyText(query),
             },
             headers: [{ name: "Content-Type", value: "application/json" }],
           }

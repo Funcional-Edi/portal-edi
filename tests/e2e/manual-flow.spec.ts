@@ -28,8 +28,13 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
 
   await expect(page).toHaveURL("/docs/im");
   await expect(page.getByRole("heading", { name: "Integracao IM - Inventario" })).toBeVisible();
+  const index = page.locator("aside").last();
+  await expect(index.getByRole("link", { name: "Contexto", exact: true })).toBeVisible();
+  await expect(index.getByRole("link", { name: /1\. Obter token do gateway/ })).toHaveCount(0);
+
+  await products.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(
-    page.locator("aside").last().getByRole("link", { name: /1\. Obter token do gateway/ }),
+    index.getByRole("link", { name: /1\. Obter token do gateway/ }),
   ).toHaveClass(/ml-4/);
 
   await page

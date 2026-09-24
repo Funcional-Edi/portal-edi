@@ -29,19 +29,11 @@ interface PostmanRequestItem {
   };
 }
 
-function defaultExampleQuery(kind: string, name: string): string {
-  return `${kind} ${name} {\n  ${name}\n}`;
-}
-
-function joinUrl(base: string, path: string): string {
-  return `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
-}
-
 function buildGraphqlRequestItem(
   op: ReturnType<typeof sortOperations>[number],
   graphqlUrl: string
 ): PostmanRequestItem {
-  const query = op.exampleQuery?.trim() || defaultExampleQuery(op.kind, op.name);
+  const query = op.exampleQuery?.trim() || `${op.kind} ${op.name} {\n  ${op.name}\n}`;
 
   return {
     name: op.title ?? op.name,
@@ -62,6 +54,8 @@ function buildRestRequestItem(
   op: ReturnType<typeof sortOperations>[number],
   apiBaseUrl: string
 ): PostmanRequestItem {
+  const path = op.path ?? "/";
+
   return {
     name: op.title ?? op.name,
     request: {
@@ -70,7 +64,7 @@ function buildRestRequestItem(
       body: op.exampleBody?.trim()
         ? { mode: "raw", raw: op.exampleBody, options: { raw: { language: "json" } } }
         : undefined,
-      url: joinUrl(apiBaseUrl, op.path ?? "/"),
+      url: `${apiBaseUrl.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
       description: op.description,
     },
   };
