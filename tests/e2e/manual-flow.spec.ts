@@ -54,6 +54,8 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
       exact: true,
     }),
   ).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("heading", { name: "Detalhamento por fluxo" })).toBeVisible();
+  await expect(page.getByText("Pré-requisitos", { exact: true })).toBeVisible();
 });
 
 test("/manual redireciona para /docs", async ({ page }) => {

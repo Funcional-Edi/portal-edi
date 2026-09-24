@@ -329,6 +329,119 @@ export function ManualRoteiro({
             Ver a Jornada da Integração
           </Link>
         </div>
+
+        {operations.length > 0 ? (
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Detalhamento por fluxo
+            </h3>
+            <ol className="mt-3 space-y-3">
+              {operations.map((op, index) => {
+                const prerequisites = (op.prerequisites ?? []).map((name) => ({
+                  name,
+                  operation: operations.find((candidate) => candidate.name === name),
+                }));
+                const relatedSections = (op.relatedSections ?? [])
+                  .map((id) => sections.find((section) => section.id === id))
+                  .filter((section): section is ManualSection => section !== undefined);
+
+                return (
+                  <li
+                    key={`roteiro-${op.kind}-${op.name}`}
+                    className="rounded-lg border border-slate-200 bg-white p-4"
+                  >
+                    <div className="flex gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium uppercase text-brand-700">
+                          {op.kind === "rest" ? op.method ?? "rest" : op.kind} · {op.name}
+                        </p>
+                        <h4 className="mt-1 font-semibold text-slate-900">
+                          {op.title ?? op.name}
+                        </h4>
+                        {op.description ? (
+                          <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                            {op.description}
+                          </p>
+                        ) : null}
+
+                        {prerequisites.length > 0 || op.authRequired ? (
+                          <dl className="mt-3 space-y-2 text-sm text-slate-600">
+                            {prerequisites.length > 0 ? (
+                              <div>
+                                <dt className="font-medium text-slate-800">Pré-requisitos</dt>
+                                <dd>
+                                  {prerequisites.map(({ name, operation }, prerequisiteIndex) => (
+                                    <span key={name}>
+                                      {prerequisiteIndex > 0 ? ", " : null}
+                                      {operation ? (
+                                        <Link
+                                          href={docsOperationHref(config.slug, operation.kind, operation.name)}
+                                          className="text-brand-700 underline hover:text-brand-900"
+                                        >
+                                          {operation.title ?? name}
+                                        </Link>
+                                      ) : (
+                                        name
+                                      )}
+                                    </span>
+                                  ))}
+                                </dd>
+                              </div>
+                            ) : null}
+                            {op.authRequired ? (
+                              <div>
+                                <dt className="font-medium text-slate-800">Autenticação</dt>
+                                <dd>Obrigatória para executar este fluxo.</dd>
+                              </div>
+                            ) : null}
+                          </dl>
+                        ) : null}
+
+                        {op.businessNotes && op.businessNotes.length > 0 ? (
+                          <div className="mt-3">
+                            <p className="text-sm font-medium text-slate-800">Regras e decisões</p>
+                            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-600">
+                              {op.businessNotes.map((note, noteIndex) => (
+                                <li key={noteIndex}>{note}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+
+                        {relatedSections.length > 0 ? (
+                          <p className="mt-3 text-sm text-slate-600">
+                            <span className="font-medium text-slate-800">Contexto relacionado: </span>
+                            {relatedSections.map((section, sectionIndex) => (
+                              <span key={section.id}>
+                                {sectionIndex > 0 ? ", " : null}
+                                <Link
+                                  href={`#section-${section.id}`}
+                                  className="text-brand-700 underline hover:text-brand-900"
+                                >
+                                  {section.title}
+                                </Link>
+                              </span>
+                            ))}
+                          </p>
+                        ) : null}
+
+                        <Link
+                          href={docsOperationHref(config.slug, op.kind, op.name)}
+                          className="mt-3 inline-flex text-sm font-medium text-brand-700 underline hover:text-brand-900"
+                        >
+                          Ver operação completa →
+                        </Link>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ) : null}
       </section>
     </article>
   );
