@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  * admin, login). Antes desta fundação cada área reimplementava seu próprio
  * `<header>` do zero — três variações levemente diferentes do mesmo elemento,
  * a principal causa da inconsistência visual do portal (ver
- * `docs/migracao/decisoes-ui.md`).
+ * `content/interno/guides/decisoes-ui-portal-edi.md`).
  *
  * `AppHeader` é exportado separadamente porque telas com layout próprio
  * (ex.: `ManualShell`, que monta um grid de sidebar + conteúdo + TOC) só

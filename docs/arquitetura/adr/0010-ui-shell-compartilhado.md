@@ -62,4 +62,4 @@ eles compõem `AppHeader` + layout específico (sidebar, TOC, main admin).
 - Se a home deixar de ser “planta de módulos” e virar produto marketing —
   revisar hierarquia visual sem mover a fundação
 
-Detalhamento de UX e checklist: [`docs/migracao/decisoes-ui.md`](../../migracao/decisoes-ui.md).
+Detalhamento de UX e checklist: [`decisoes-ui-portal-edi.md`](../../../content/interno/guides/decisoes-ui-portal-edi.md).

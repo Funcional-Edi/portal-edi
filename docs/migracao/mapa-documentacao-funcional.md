@@ -218,7 +218,7 @@ Seed local incluído: `content/projects/demo/` (desenvolvimento e testes).
 
 ## 10. Checklist por fase
 
-Ver [`cronograma.md`](./cronograma.md) para datas e entregáveis detalhados.
+Ver [`cronograma-portal-edi.md`](../../content/interno/guides/cronograma-portal-edi.md) para datas e entregáveis detalhados.
 
 - [x] **Fase 0** — Mapa + ADR-0009 + cronograma
 - [x] **Fase 1** — Schemas, adapter local, catálogo + roteiro + operação

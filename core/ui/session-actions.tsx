@@ -8,7 +8,7 @@ import { Badge } from "@/core/ui/badge";
  * Slot de sessão do header: perfil, e-mail e "Sair" quando logado, "Entrar" quando
  * não. Antes desta peça NÃO havia botão de logout em lugar nenhum do portal —
  * a única forma de encerrar a sessão era apagar o cookie manualmente (ver
- * `docs/migracao/decisoes-ui.md`, item "logout ausente").
+ * `content/interno/guides/decisoes-ui-portal-edi.md`, item "logout ausente").
  *
  * Server Component: lê a sessão direto (`auth()`), sem round-trip client.
  */

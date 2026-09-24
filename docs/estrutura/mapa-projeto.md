@@ -50,7 +50,7 @@ Convenção interna de cada módulo: `module.ts`, `schema/`, `repository/`,
 | `docs/operacao/` | Guias operacionais de release e rotina de validacao |
 | `docs/estrutura/mapa-projeto.md` | Este arquivo |
 | `docs/estrutura/navbar-produtos.md` | Contrato, rotas e manutenção da navbar de produtos EDI |
-| `docs/estrutura/edi-14331-jornada-integracao.md` | Refinamento da Jornada e do Roteiro de Integração dos subprodutos |
+| `content/interno/guides/edi-14331-jornada-integracao.md` | Refinamento da Jornada e do Roteiro de Integração dos subprodutos |
 
 ## Configuração (`config/`)
 

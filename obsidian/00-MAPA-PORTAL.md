@@ -11,7 +11,7 @@ Cofre gerado a partir do repositório. Rode `npm run obsidian:watch` para manter
 - [[docs/estrutura/mapa-projeto|Mapa do projeto]]
 - [[docs/estrutura/navbar-produtos|Navbar de produtos EDI]]
 - [[docs/migracao/mapa-documentacao-funcional|Mapa documentação funcional]]
-- [[docs/migracao/cronograma|Cronograma de migração]]
+- [[interno/cronograma-portal-edi|Cronograma do Portal EDI]]
 - [[docs/migracao/README|Migração — índice]]
 - [[docs/arquitetura/adr/README|ADRs (decisões de arquitetura)]]
 

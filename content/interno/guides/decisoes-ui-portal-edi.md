@@ -66,7 +66,7 @@ UX, arquivos tocados e checklist de validação.
 | Arquivo | Mudança |
 |---------|---------|
 | `docs/arquitetura/adr/0010-ui-shell-compartilhado.md` | Decisão estrutural |
-| `docs/migracao/decisoes-ui.md` | Este arquivo |
+| `content/interno/guides/decisoes-ui-portal-edi.md` | Este arquivo |
 | `docs/migracao/README.md` | Link |
 | `docs/estrutura/mapa-projeto.md` | `core/ui` no mapa |
 | `core/README.md` | Linha `ui/` |
