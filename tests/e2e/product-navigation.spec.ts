@@ -74,6 +74,32 @@ test("one vertical navbar changes from products to product and integration conte
   await page.screenshot({ path: testInfo.outputPath("docs-contextual-desktop.png"), fullPage: true });
 });
 
+test("Credenciado apresenta estrutura inicial sem simular documentação", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await login(page);
+  const nav = page.getByRole("navigation", { name: "Produtos EDI" });
+
+  const credenciado = nav.getByRole("link", { name: /^Credenciado/ });
+  await expect(credenciado).toContainText("Sem documentação");
+  await expect(credenciado).toContainText("homolog");
+  await credenciado.click();
+  await expect(page).toHaveURL("/docs?produto=credenciado");
+  const content = page.getByRole("region", { name: "Conteúdo da documentação" });
+  await expect(content).toContainText("Sem documentação");
+  await expect(content).toContainText("homolog");
+  await expect(page.getByRole("heading", { name: "Estrutura do Credenciado", exact: true })).toHaveCount(0);
+  await expect(nav.getByText("Estrutura do Credenciado", { exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Visão Geral", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Roteiro de Integração", exact: true })).toBeVisible();
+  await expect(nav.getByText("Fluxo de Cadastro", { exact: true })).toBeVisible();
+  await expect(nav.getByText("Fluxo PBM no Caixa", { exact: true })).toBeVisible();
+  await expect(nav.getByText("SUBPRODUTOS", { exact: true })).toHaveCount(0);
+  await expect(nav.getByText("teste-01", { exact: true })).toHaveCount(0);
+  await expect(nav.getByText("Associar o produto ao cadastro do beneficiário", { exact: true })).toHaveCount(0);
+  await expect(nav.getByText("Versão do subproduto", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Jornada do anexo de receita", { exact: true })).toHaveCount(0);
+});
+
 test("mobile navigation preserves context without horizontal overflow", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
@@ -145,13 +171,40 @@ test("contextual index remains available in mobile navigation", async ({ page })
   await page.goto("/docs/canal-autorizador#roteiro-integracao");
 
   const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
+  await expect(page.locator("footer")).toContainText("Funcional Health Tech");
   await expect(quickNavigation).toBeVisible();
+  await expect(quickNavigation).toHaveClass(/docs-quick-nav/);
   await expect(quickNavigation.getByRole("link", { name: "Roteiro de Integração", exact: true })).toBeVisible();
   await expect(quickNavigation.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
     "href",
     "/fluxogramas/canal-autorizador",
   );
   await expect(quickNavigation).not.toContainText("Tabelas de referência");
+});
+
+test("quick navigation can be dragged horizontally", async ({ page }) => {
+  await page.setViewportSize({ width: 1099, height: 898 });
+  await login(page);
+  await page.goto("/docs/canal-autorizador#jornada-integracao");
+
+  const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
+  await expect(quickNavigation).toBeVisible();
+  const dimensions = await quickNavigation.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollLeft: element.scrollLeft,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+
+  const box = await quickNavigation.boundingBox();
+  if (!box) throw new Error("Navegação rápida sem área visível para arraste");
+  const y = box.y + box.height / 2;
+  await page.mouse.move(box.x + box.width - 24, y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 24, y, { steps: 6 });
+  await page.mouse.up();
+
+  await expect.poll(() => quickNavigation.evaluate((element) => element.scrollLeft)).toBeGreaterThan(dimensions.scrollLeft);
 });
 
 test("admins can reach the existing request test from a selected flow", async ({ page }) => {
@@ -196,4 +249,13 @@ test("long subproduct pages expose a scroll-to-top control", async ({ page }) =>
   await expect(scrollTop).toBeVisible();
   await scrollTop.click();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(100);
+});
+
+test("long Markdown code examples stay within the page width", async ({ page }) => {
+  await page.setViewportSize({ width: 1099, height: 898 });
+  await login(page);
+  await page.goto("/docs/canal-autorizador");
+
+  await expect(page.locator("#section-visao-geral pre")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

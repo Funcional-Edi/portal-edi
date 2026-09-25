@@ -15,6 +15,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
+import { HorizontalDragNav } from "@/core/ui/horizontal-drag-nav";
 import type {
   DocumentationActionView,
   DocumentationLinkView,
@@ -38,7 +39,7 @@ const FLOW_AREAS = [
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral";
+type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
@@ -99,6 +100,7 @@ function contextualTocItems({
   if (!product || !link || !areaId) return [];
 
   const isOperationPage = pathname.includes("/operations/");
+  const subproductVersionItems = items.filter((item) => item.label.toLowerCase() === "versão do subproduto");
   if (isOperationPage && (areaId === "queries" || areaId === "mutations" || areaId === "metodos")) {
     return items;
   }
@@ -113,6 +115,7 @@ function contextualTocItems({
       ...items.filter((item) => item.href === "#jornada-integracao"),
       ...items.filter((item) => item.href.includes("/operations/")),
       ...items.filter((item) => item.href === "#tabelas-referencia"),
+      ...subproductVersionItems,
     ];
   }
 
@@ -122,6 +125,7 @@ function contextualTocItems({
       ...items.filter((item) => item.href === "#roteiro-integracao"),
       ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),
       ...items.filter((item) => item.href === "#roteiro-detalhamento" || item.href.startsWith("#roteiro-fluxo-")),
+      ...subproductVersionItems,
     ];
   }
 
@@ -227,6 +231,76 @@ function OperationList({
   );
 }
 
+type CredenciadoStructureItem = {
+  label: string;
+  areaId?: ProductAreaId;
+};
+
+const CREDENCIADO_STRUCTURE = [
+  { label: "Visão Geral", areaId: "visao-geral" },
+  { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
+  { label: "Roteiro de Integração", areaId: "roteiro-integracao" },
+  { label: "Fluxo de Cadastro" },
+  { label: "Fluxo Opt-in" },
+  { label: "Fluxo de Venda" },
+  { label: "Fluxo PBM no Caixa" },
+] satisfies readonly CredenciadoStructureItem[];
+
+function CredenciadoStructureItem({
+  item,
+  selectedAreaId,
+  onSelectArea,
+}: {
+  item: CredenciadoStructureItem;
+  selectedAreaId: ProductAreaId | FlowAreaId | null;
+  onSelectArea: (areaId: ProductAreaId) => void;
+}) {
+  return (
+    <li>
+      {item.areaId ? (
+        <button
+          type="button"
+          aria-pressed={item.areaId === selectedAreaId}
+          onClick={() => onSelectArea(item.areaId!)}
+          className={[
+            "block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors",
+            focusClass,
+            item.areaId === selectedAreaId ? "bg-brand-50 font-semibold text-brand-800" : "text-slate-700 hover:bg-slate-100 hover:text-brand-800",
+          ].join(" ")}
+        >
+          {item.label}
+        </button>
+      ) : (
+        <p className="px-3 py-2 text-sm font-medium text-slate-800">{item.label}</p>
+      )}
+    </li>
+  );
+}
+
+function CredenciadoStructureNavigation({
+  selectedAreaId,
+  onSelectArea,
+}: {
+  selectedAreaId: ProductAreaId | FlowAreaId | null;
+  onSelectArea: (areaId: ProductAreaId) => void;
+}) {
+  return (
+    <div className="mt-4 border-t border-slate-200 pt-4">
+      <p className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Estrutura do Credenciado</p>
+      <ul className="mt-2 space-y-1.5">
+        {CREDENCIADO_STRUCTURE.map((item) => (
+          <CredenciadoStructureItem
+            key={item.label}
+            item={item}
+            selectedAreaId={selectedAreaId}
+            onSelectArea={onSelectArea}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function FlowPanel({
   product,
   link,
@@ -325,6 +399,9 @@ export function ProductNavigation({
 
   const product = navigation.products.find((item) => item.id === selectedProductId);
   const flows = product?.actions.find((action) => action.id === "fluxos")?.links ?? [];
+  const visibleFlows = product?.id === "credenciado"
+    ? flows.filter((link) => !CREDENCIADO_STRUCTURE.some((item) => !item.areaId && item.label === link.label))
+    : flows;
   const selectedFlow = flows.find((link) => link.id === selectedFlowId) ?? null;
   const productArea = product?.actions.find((action) => action.id === selectedAreaId);
   const flowAreas = product && selectedFlow ? availableFlowAreas(product, selectedFlow) : [];
@@ -417,27 +494,40 @@ export function ProductNavigation({
                   <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> Produtos
                 </Link>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{product.label}</p>
+                <div className="mb-3 flex flex-wrap gap-1 px-3">
+                  {product.status !== "published" ? <StatusBadge status={product.status} /> : null}
+                  {product.tag ? <Badge>{product.tag}</Badge> : null}
+                </div>
                 <div className="space-y-1.5">
-                  {product.actions.filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "roteiro-integracao" && action.id !== "teste-de-requisicao").map((action) => (
-                    <button
-                      key={action.id}
-                      type="button"
-                      aria-pressed={action.id === selectedAreaId}
-                      onClick={() => setSelectedAreaId(action.id as ProductAreaId)}
-                      className={[
-                        "block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
-                        focusClass,
-                        action.id === selectedAreaId ? "bg-brand-50 font-semibold text-brand-800" : "text-slate-700 hover:bg-slate-100 hover:text-brand-800",
-                      ].join(" ")}
-                    >
-                      <span>
-                        <span className="block">{action.label}</span>
-                        <ActionStatus action={action} />
-                      </span>
-                    </button>
-                  ))}
-                  {flows.length ? <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Integrações</p> : null}
-                  {flows.map((link) => {
+                  {product.actions
+                    .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "roteiro-integracao" && action.id !== "teste-de-requisicao")
+                    .filter((action) => product.id !== "credenciado" || (action.id !== "visao-geral" && action.id !== "fluxograma-geral"))
+                    .map((action) => (
+                      <button
+                        key={action.id}
+                        type="button"
+                        aria-pressed={action.id === selectedAreaId}
+                        onClick={() => setSelectedAreaId(action.id as ProductAreaId)}
+                        className={[
+                          "block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+                          focusClass,
+                          action.id === selectedAreaId ? "bg-brand-50 font-semibold text-brand-800" : "text-slate-700 hover:bg-slate-100 hover:text-brand-800",
+                        ].join(" ")}
+                      >
+                        <span>
+                          <span className="block">{action.label}</span>
+                          <ActionStatus action={action} />
+                        </span>
+                      </button>
+                    ))}
+                  {product.id === "credenciado" ? (
+                    <CredenciadoStructureNavigation
+                      selectedAreaId={selectedAreaId}
+                      onSelectArea={setSelectedAreaId}
+                    />
+                  ) : null}
+                  {visibleFlows.length ? <div className="mt-3 space-y-1.5 border-t border-slate-200 pt-3">
+                    {visibleFlows.map((link) => {
                     const href = flowAreaHref(product, link, "documentacao");
                     const className = [
                       "block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
@@ -470,7 +560,8 @@ export function ProductNavigation({
                         {content}
                       </button>
                     );
-                  })}
+                    })}
+                  </div> : null}
                 </div>
               </>
             ) : (
@@ -515,17 +606,17 @@ export function ProductNavigation({
             className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5"
           >
             {showIndex ? (
-              <nav aria-label="Navegação rápida" className="mb-5 flex gap-2 overflow-x-auto pb-1 xl:hidden">
+              <HorizontalDragNav className="docs-quick-nav mb-5 flex snap-x snap-proximity gap-2 overflow-x-auto pb-1 xl:hidden">
                 {visibleTocItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={"shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + tocMobileIndent(item.depth) + focusClass}
+                    className={"shrink-0 snap-start whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + tocMobileIndent(item.depth) + focusClass}
                   >
                     {item.label}
                   </Link>
                 ))}
-              </nav>
+              </HorizontalDragNav>
             ) : null}
             {!product ? (
               children ?? <div className="flex min-h-48 flex-col justify-center">
@@ -552,7 +643,10 @@ export function ProductNavigation({
                     <h2 id="documentation-context-title" className="text-xl font-semibold text-slate-900">{product.label}</h2>
                     <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{product.description}</p>
                   </div>
-                  {product.status !== "published" ? <StatusBadge status={product.status} /> : null}
+                  <div className="flex flex-wrap gap-1">
+                    {product.status !== "published" ? <StatusBadge status={product.status} /> : null}
+                    {product.tag ? <Badge>{product.tag}</Badge> : null}
+                  </div>
                 </div>
                 <div className="mt-6">
                   {selectedAreaId === "fluxograma-geral" ? (

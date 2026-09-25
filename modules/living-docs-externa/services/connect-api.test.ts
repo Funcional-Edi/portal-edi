@@ -35,7 +35,7 @@ describe("connectApi service", () => {
     if (originalAuthSecret === undefined) delete process.env.AUTH_SECRET;
     else process.env.AUTH_SECRET = originalAuthSecret;
 
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   const validInput = {
