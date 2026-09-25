@@ -38,7 +38,12 @@ describe("createProject service", () => {
     } else {
       process.env.CONTENT_ROOT = originalContentRoot;
     }
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, {
+      recursive: true,
+      force: true,
+      maxRetries: 3,
+      retryDelay: 100,
+    });
   });
 
   it("cria projeto com config e manual iniciais", async () => {

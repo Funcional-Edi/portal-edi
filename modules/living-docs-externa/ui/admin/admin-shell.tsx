@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AppHeader } from "@/core/ui/app-shell";
+import { PortalFooter } from "@/core/ui/portal-footer";
 import { SessionActions } from "@/core/ui/session-actions";
 
 interface AdminShellProps {
@@ -10,7 +11,7 @@ interface AdminShellProps {
 
 export function AdminShell({ children, activeNavHref = "/admin/projects" }: AdminShellProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <AppHeader
         subtitle="Admin — Documentação viva"
         navItems={[
@@ -21,7 +22,8 @@ export function AdminShell({ children, activeNavHref = "/admin/projects" }: Admi
         ]}
         actions={<SessionActions />}
       />
-      <main className="mx-auto max-w-7xl px-6 py-10">{children}</main>
+      <main className="flex-1 mx-auto w-full max-w-7xl px-6 py-10">{children}</main>
+      <PortalFooter />
     </div>
   );
 }

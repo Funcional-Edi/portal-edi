@@ -52,7 +52,7 @@ describe("publishProject service", () => {
     if (originalContentRoot === undefined) delete process.env.CONTENT_ROOT;
     else process.env.CONTENT_ROOT = originalContentRoot;
 
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("publica um projeto: seta published e manualStatus, invalida cache", async () => {

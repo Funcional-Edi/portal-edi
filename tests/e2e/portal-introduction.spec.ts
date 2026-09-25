@@ -33,6 +33,8 @@ test("client uses the shared portal and documentation without gaining privileged
   await expect(page.getByRole("banner").getByLabel("Tipo de acesso: Cliente", { exact: true })).toBeVisible();
   await expect(page.getByText("Uma experiência compartilhada.", { exact: true })).toHaveCount(0);
   await expect(main.getByRole("heading", { name: "Recursos para sua integração" })).toBeVisible();
+  await expect(main.getByAltText("Funcional", { exact: true })).toBeVisible();
+  await expect(page.locator("footer")).toContainText("Funcional Health Tech");
   await expect(main.getByRole("link", { name: /Documentação de produtos/ })).toHaveAttribute("href", "/docs");
   await expect(main.getByRole("link", { name: /Referência GraphQL/ })).toHaveAttribute("href", "/docs/api");
   await expect(main.getByRole("link", { name: /Fluxogramas/ })).toHaveAttribute("href", "/fluxogramas");

@@ -50,7 +50,7 @@ describe("syncSchema service", () => {
     else process.env.AUTH_SECRET = originalAuthSecret;
 
     vi.unstubAllGlobals();
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("sincroniza schema e persiste snapshot com resumo", async () => {

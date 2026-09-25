@@ -88,7 +88,7 @@ describe("buildSchemaSearchIndex", () => {
   afterEach(async () => {
     if (originalContentRoot === undefined) delete process.env.CONTENT_ROOT;
     else process.env.CONTENT_ROOT = originalContentRoot;
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("indexa queries, mutations e tipos de produtos publicados com schema", async () => {

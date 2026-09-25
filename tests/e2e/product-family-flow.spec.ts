@@ -64,7 +64,12 @@ async function createPublishableProject(page: Page, slug: string, name: string) 
 }
 
 test.afterEach(async () => {
-  await Promise.all(PROJECT_DIRS.map((dir) => rm(dir, { recursive: true, force: true })));
+  await Promise.all(PROJECT_DIRS.map((dir) => rm(dir, {
+    recursive: true,
+    force: true,
+    maxRetries: 3,
+    retryDelay: 100,
+  })));
   for (const [productId, slug] of [
     ["trade", SLUG_VAREJO],
     ["credenciado", SLUG_RECLASSIFICA],

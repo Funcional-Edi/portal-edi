@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
 html,
@@ -48,4 +48,15 @@ body {
 .docs-index-scroll:hover::-webkit-scrollbar-thumb,
 .docs-index-scroll:focus-within::-webkit-scrollbar-thumb {
   background: rgb(148 163 184 / 0.45);
+}
+
+.docs-quick-nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
+}
+
+.docs-quick-nav::-webkit-scrollbar {
+  display: none;
 }

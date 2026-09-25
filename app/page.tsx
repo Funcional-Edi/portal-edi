@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense, type ReactNode } from "react";
 import {
   ArrowRight,
@@ -22,6 +23,8 @@ import { registerAllModules } from "@/modules/registry";
 
 import { LoginForm } from "./login/login-form";
 
+import functionalLogoWhite from "@/img/Logotipo branco.png";
+
 const MODULE_ICONS: Record<string, LucideIcon> = {
   "living-docs-externa": BookOpen,
   "graphql-reference": Code2,
@@ -37,6 +40,14 @@ function PortalIntroduction({ children }: { children?: ReactNode }) {
     <header className="relative overflow-hidden rounded-2xl bg-brand-900 px-6 py-9 text-white sm:p-10">
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full border-[40px] border-white/5" />
       <div className="relative">
+        <Image
+          src={functionalLogoWhite}
+          alt="Funcional"
+          width={160}
+          height={90}
+          priority
+          className="-ml-6 -mt-8 h-24 w-56 object-contain object-left"
+        />
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-100">Conexões que começam com informação</p>
         <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Portal de Integração</h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-brand-50">Um ponto de encontro para entender os produtos EDI e construir sua integração.</p>
