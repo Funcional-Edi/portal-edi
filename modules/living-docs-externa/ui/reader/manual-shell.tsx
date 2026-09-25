@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { AppHeader, type AppNavItem } from "@/core/ui/app-shell";
+import { PortalFooter } from "@/core/ui/portal-footer";
+import { HorizontalDragNav } from "@/core/ui/horizontal-drag-nav";
 import { SessionActions } from "@/core/ui/session-actions";
 import { DOCS_HOME_HREF } from "@/modules/living-docs-externa/services/docs-routes";
 
@@ -53,7 +55,7 @@ export function ManualShell({
   const showDefaultCatalogLink = headerActions == null && navItems.length === 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <AppHeader
         subtitle={subtitle}
         navItems={navItems}
@@ -72,7 +74,7 @@ export function ManualShell({
           </div>
         }
       />
-      <main className={productNavigation ? "mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10" : "mx-auto max-w-7xl px-6 py-10"}>
+      <main className={"flex-1 " + (productNavigation ? "mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10" : "mx-auto w-full max-w-7xl px-6 py-10")}>
         {productNavigation ?? (hasRailLayout ? (
           <div className={`grid gap-8 ${railColumns}`}>
             {hasSidebar ? (
@@ -112,20 +114,19 @@ export function ManualShell({
 
             <div className="min-w-0">
               {hasToc ? (
-                <nav
-                  aria-label="Navegação rápida"
-                  className="mb-6 flex gap-2 overflow-x-auto pb-1 xl:hidden"
+                <HorizontalDragNav
+                  className="docs-quick-nav mb-6 flex snap-x snap-proximity gap-2 overflow-x-auto pb-1 xl:hidden"
                 >
                   {tocItems.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={"shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + (item.depth ? "ml-2" : "")}
+                      className={"shrink-0 snap-start whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-600 hover:text-brand-700 " + (item.depth ? "ml-2" : "")}
                     >
                       {item.label}
                     </Link>
                   ))}
-                </nav>
+                </HorizontalDragNav>
               ) : null}
               {children}
             </div>
@@ -156,6 +157,7 @@ export function ManualShell({
           <div className="mx-auto max-w-4xl">{children}</div>
         ))}
       </main>
+      <PortalFooter />
     </div>
   );
 }

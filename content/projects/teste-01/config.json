@@ -1,7 +1,6 @@
 {
   "slug": "teste-01",
   "name": "teste-01",
-  "productId": "credenciado",
   "protocol": "graphql",
   "graphqlUrl": "https://stores-uat.funcionalmais.com/graphql",
   "gatewaySlug": "teste-01",

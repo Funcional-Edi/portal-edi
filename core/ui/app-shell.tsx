@@ -1,6 +1,10 @@
 import Link from "next/link";
-import { LayoutGrid, Menu } from "lucide-react";
+import Image from "next/image";
+import { Menu } from "lucide-react";
 import type { ReactNode } from "react";
+
+import functionalLogo from "@/img/AF-Funcional-LogoPref-RGB_PreferencialPositivaVerde.png";
+import { PortalFooter } from "@/core/ui/portal-footer";
 
 /**
  * Header e casca visual COMPARTILHADOS por toda a aplicação (home, manual,
@@ -29,11 +33,17 @@ interface AppHeaderProps {
 
 export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) {
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-brand-100 bg-white shadow-[0_1px_0_rgba(11,36,38,0.03)]">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-white">
-            <LayoutGrid className="h-5 w-5" aria-hidden="true" />
+        <Link href="/" className="flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2">
+          <span className="flex h-10 w-32 shrink-0 items-center overflow-hidden rounded-lg border border-brand-100 bg-brand-50 px-2">
+            <Image
+              src={functionalLogo}
+              alt="Funcional"
+              priority
+              sizes="128px"
+              className="h-auto w-full"
+            />
           </span>
           <span className="leading-tight">
             <span className="block text-sm font-semibold text-slate-900">
@@ -100,9 +110,10 @@ interface AppShellProps extends AppHeaderProps {
 /** Para telas simples (ex.: home). Telas com grid próprio usam `AppHeader` direto. */
 export function AppShell({ children, ...headerProps }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <AppHeader {...headerProps} />
-      {children}
+      <div className="flex-1">{children}</div>
+      <PortalFooter />
     </div>
   );
 }

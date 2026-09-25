@@ -88,7 +88,7 @@ describe("suggest-operations-from-schema service", () => {
   afterEach(async () => {
     if (originalContentRoot === undefined) delete process.env.CONTENT_ROOT;
     else process.env.CONTENT_ROOT = originalContentRoot;
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("hasSchema: false quando o projeto nunca sincronizou", async () => {

@@ -266,7 +266,7 @@ describe("getManualQualityReport", () => {
     if (originalContentRoot === undefined) delete process.env.CONTENT_ROOT;
     else process.env.CONTENT_ROOT = originalContentRoot;
 
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("retorna null para projeto inexistente", async () => {

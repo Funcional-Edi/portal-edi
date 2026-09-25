@@ -58,7 +58,7 @@ describe("runPlaygroundQuery", () => {
     else process.env.AUTH_SECRET = originalAuthSecret;
 
     vi.unstubAllGlobals();
-    await rm(tempRoot, { recursive: true, force: true });
+    await rm(tempRoot, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   });
 
   it("obtém token e encaminha a query, devolvendo { data, errors }", async () => {
