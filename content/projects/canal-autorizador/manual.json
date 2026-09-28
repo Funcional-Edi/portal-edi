@@ -216,26 +216,149 @@
         ["604", "Produto bloqueado pela logística"],
         ["704", "Produto não cadastrado na promoção"]
       ]
-    },
+    }
+  ],
+  "homologationFlows": [
     {
-      "id": "validation-headers",
-      "title": "Parâmetros de validação (General Header)",
-      "columns": ["Parâmetro", "Tipo", "Descrição"],
-      "rows": [
-        ["statusCode", "Integer", "0 = requisição válida; diferente de 0 = código de erro de validação, descrito em statusMessage"],
-        ["statusMessage", "String", "Descrição referente ao código de retorno"]
+      "title": "Fluxo Normal",
+      "scenarios": [
+        {
+          "title": "Pedido totalmente faturado",
+          "preconditions": ["Pedido criado com produtos e condições comerciais válidos."],
+          "operations": ["createGroupedOrder", "createGroupedResponse", "createGroupedInvoice"],
+          "expectedResult": "Nota fiscal enviada com todos os produtos faturados e processamento confirmado na consulta do pedido.",
+          "evidence": ["Retornos das três requisições.", "Consulta do status do pedido."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido parcialmente faturado",
+          "preconditions": ["Pedido criado com mais de um produto ou com quantidade faturada menor que a pedida."],
+          "operations": ["createGroupedOrder", "createGroupedResponse", "createGroupedInvoice"],
+          "expectedResult": "Nota fiscal enviada somente com os produtos ou quantidades faturados, incluindo quantidade zero quando aplicável.",
+          "evidence": ["Retorno do pedido e da nota fiscal.", "Consulta dos produtos e quantidades processados."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido não aceito",
+          "preconditions": ["Pedido criado e disponível para envio do retorno."],
+          "operations": ["createGroupedOrder", "createGroupedResponse"],
+          "expectedResult": "Retorno enviado com quantidade zero para todos os produtos.",
+          "evidence": ["Resposta de createGroupedResponse.", "Consulta do status e dos motivos dos produtos."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido rejeitado",
+          "preconditions": ["Produto ou desconto inválido para a indústria no cenário de homologação."],
+          "operations": ["createGroupedOrder"],
+          "expectedResult": "Pedido retorna com status PROCESSED; nenhuma requisição adicional deve ser enviada para esse pedido.",
+          "evidence": ["Resposta de createGroupedOrder.", "Consulta do motivo da rejeição e registro da validação com KAM ou Funcional."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido parcialmente rejeitado",
+          "preconditions": ["Pedido com vários produtos, sendo pelo menos um produto ou desconto inválido para a indústria."],
+          "operations": ["createGroupedOrder", "createGroupedResponse", "createGroupedInvoice"],
+          "expectedResult": "Pedido criado com os produtos aprovados e rejeição dos demais conforme as regras comerciais.",
+          "evidence": ["Resposta com o resultado de cada produto.", "Consulta dos status, motivos e nota fiscal."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido cancelado",
+          "preconditions": ["Retorno do pedido enviado e nota fiscal ainda não enviada."],
+          "operations": ["createGroupedOrder", "createGroupedResponse", "createGroupedCancellation"],
+          "expectedResult": "Cancelamento processado somente após o retorno e antes do faturamento.",
+          "evidence": ["Resposta do cancelamento.", "Consulta do status e dos produtos cancelados."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido com nota estornada",
+          "preconditions": ["Nota fiscal do pedido já enviada e disponível para substituição."],
+          "operations": ["createGroupedOrder", "createGroupedResponse", "createGroupedInvoice", "createGroupedInvoiceReversal"],
+          "expectedResult": "Nota anterior substituída pelos novos dados fiscais enviados.",
+          "evidence": ["Resposta da substituição.", "Consulta das notas e do status do pedido."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Ressarcimento",
+          "preconditions": ["Nota fiscal processada e dados de ressarcimento disponíveis para consulta."],
+          "operations": ["groupedInvoices"],
+          "expectedResult": "Distribuidor confirma que o valor de ressarcimento está disponível na consulta groupedInvoices.",
+          "evidence": ["Resposta da query groupedInvoices com os dados de ressarcimento."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        }
       ]
     },
     {
-      "id": "rate-limit",
-      "title": "Limite de requisições — Rate limit (Response Header)",
-      "columns": ["Parâmetro", "Descrição"],
-      "rows": [
-        ["X-RateLimit-Limit", "Limite de requisições por minuto (atualmente 3000 requisições/min)"],
-        ["X-RateLimit-Remaining", "Número de requisições restantes no momento"],
-        ["Retry-After", "Tempo em segundos para o envio da próxima requisição"]
+      "title": "Fluxo Order",
+      "scenarios": [
+        {
+          "title": "Pedido totalmente faturado",
+          "preconditions": ["Pedido criado com produtos e condições comerciais válidos."],
+          "operations": ["createGroupedOrder", "createGroupedInvoice"],
+          "expectedResult": "Nota fiscal enviada com todos os produtos faturados e processamento confirmado na consulta do pedido.",
+          "evidence": ["Retornos das requisições.", "Consulta do status do pedido."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido parcialmente faturado",
+          "preconditions": ["Pedido criado com produtos ou quantidades parcialmente faturados."],
+          "operations": ["createGroupedOrder", "createGroupedInvoice"],
+          "expectedResult": "Nota fiscal enviada somente com os produtos faturados.",
+          "evidence": ["Resposta da nota fiscal.", "Consulta dos produtos e quantidades processados."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido rejeitado",
+          "preconditions": ["Produto ou desconto inválido para a indústria no cenário de homologação."],
+          "operations": ["createGroupedOrder"],
+          "expectedResult": "Pedido retorna com status PROCESSED e não recebe requisições posteriores.",
+          "evidence": ["Resposta do pedido.", "Consulta do motivo da rejeição."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido parcialmente rejeitado",
+          "preconditions": ["Pedido com vários produtos, sendo pelo menos um produto ou desconto inválido."],
+          "operations": ["createGroupedOrder", "createGroupedInvoice"],
+          "expectedResult": "Pedido criado com os produtos aprovados e nota fiscal enviada para os produtos faturados.",
+          "evidence": ["Resposta de cada produto.", "Consulta do status, motivos e nota fiscal."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido cancelado",
+          "preconditions": ["Status do pedido alterado para AWAITING_ORDER_INVOICE e nota fiscal ainda não enviada."],
+          "operations": ["createGroupedOrder", "createGroupedCancellation"],
+          "expectedResult": "Cancelamento enviado após a atualização do status e processado antes do faturamento.",
+          "evidence": ["Consulta do status anterior.", "Resposta do cancelamento e consulta do resultado."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Pedido com atualização de nota",
+          "preconditions": ["Nota fiscal do pedido já enviada e disponível para atualização."],
+          "operations": ["createGroupedOrder", "createGroupedInvoice", "createGroupedInvoiceReversal"],
+          "expectedResult": "Dados da nota anterior substituídos pelos novos dados fiscais enviados.",
+          "evidence": ["Resposta da substituição.", "Consulta das notas e do status do pedido."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        },
+        {
+          "title": "Ressarcimento",
+          "preconditions": ["Nota fiscal processada e dados de ressarcimento disponíveis para consulta."],
+          "operations": ["groupedInvoices"],
+          "expectedResult": "Distribuidor confirma que o valor de ressarcimento está disponível na consulta groupedInvoices.",
+          "evidence": ["Resposta da query groupedInvoices com os dados de ressarcimento."],
+          "approval": "Registrar as respostas e evidências para aprovação da homologação pela equipe EDI."
+        }
       ]
     }
+  ],
+  "homologationValidations": [
+    "Quando o pedido estiver com status PROCESSED, não envie outra requisição para esse pedido.",
+    "Valide o motivo da rejeição com o KAM ou com a Funcional e, após o ajuste, envie um novo pedido, gerando um novo ID.",
+    "Quando houver vários produtos, a Funcional poderá rejeitar parcialmente o pedido por questões comerciais da indústria.",
+    "Envie o percentual de desconto de acordo com o combinado com a indústria.",
+    "Envie createGroupedInvoice em até 48 horas.",
+    "Envie o cancelamento somente após o retorno e antes do envio da nota fiscal.",
+    "Acompanhe o processamento de toda requisição enviada por meio das consultas de status.",
+    "Utilize groupedOrder ou groupedOrders para acompanhar os pedidos enviados pelo Canal Autorizador."
   ],
   "operations": [
     {
@@ -257,6 +380,7 @@
       "kind": "mutation",
       "name": "createGroupedOrder",
       "order": 2,
+      "referenceTableIds": ["industry-codes"],
       "title": "2. Criar pré-pedido (Transfer Order)",
       "description": "Cria um pré-pedido na Funcional com os produtos e a condição comercial do pedido faturado pelo distribuidor.",
       "prerequisites": ["createToken"],
@@ -273,6 +397,7 @@
       "kind": "query",
       "name": "groupedOrder",
       "order": 3,
+      "referenceTableIds": ["order-status", "product-reason-query"],
       "title": "3. Consultar um pedido",
       "description": "Consulta, pelo id do pedido na Funcional, todos os dados do pedido: produtos, retorno, notas, cancelamentos e devoluções.",
       "prerequisites": ["createGroupedOrder"],
@@ -288,6 +413,7 @@
       "kind": "mutation",
       "name": "createGroupedResponse",
       "order": 4,
+      "referenceTableIds": ["order-motive-response", "product-reason-response"],
       "title": "4. Enviar retorno do pedido (opcional)",
       "description": "Envia o retorno (aceite, rejeição ou aceite parcial) do pedido à Funcional, produto a produto.",
       "prerequisites": ["createGroupedOrder"],
@@ -355,6 +481,7 @@
       "kind": "query",
       "name": "groupedOrders",
       "order": 9,
+      "referenceTableIds": ["order-status"],
       "title": "9. Consultar pedidos por filtro",
       "description": "Consulta pedidos do Canal Autorizador paginados, filtrando por status, filial, condição comercial, cliente e data.",
       "prerequisites": ["createGroupedOrder"],
@@ -367,6 +494,7 @@
       "kind": "query",
       "name": "groupedStatusChanges",
       "order": 10,
+      "referenceTableIds": ["order-status"],
       "title": "10. Consultar pedidos com status atualizado (stream)",
       "description": "Retorna os pedidos cujo status foi atualizado desde a última leitura, em vez de o distribuidor precisar consultá-los um a um.",
       "prerequisites": ["createGroupedOrder"],
@@ -381,6 +509,7 @@
       "kind": "mutation",
       "name": "createGroupedInvoiceDevolution",
       "order": 11,
+      "referenceTableIds": ["product-code-reason"],
       "title": "11. Enviar a devolução da nota",
       "description": "Registra a devolução de produtos de uma nota já enviada, informando o produto devolvido, o lote e os dados da nova nota de devolução.",
       "prerequisites": ["createGroupedInvoice"],
@@ -391,6 +520,7 @@
       "kind": "query",
       "name": "groupedInvoiceDevolution",
       "order": 12,
+      "referenceTableIds": ["product-code-reason"],
       "title": "12. Consultar uma devolução específica",
       "description": "Consulta os dados de uma devolução de nota específica, pelo id do pedido devolvido ou pelo número da nota de devolução.",
       "prerequisites": ["createGroupedInvoiceDevolution"],
@@ -400,6 +530,7 @@
       "kind": "query",
       "name": "groupedInvoiceDevolutions",
       "order": 13,
+      "referenceTableIds": ["product-code-reason"],
       "title": "13. Consultar devoluções (paginado)",
       "description": "Consulta várias devoluções de nota, paginadas e com filtros por CFOP, DANFE, pedido, data e número da nota.",
       "prerequisites": ["createGroupedInvoiceDevolution"],

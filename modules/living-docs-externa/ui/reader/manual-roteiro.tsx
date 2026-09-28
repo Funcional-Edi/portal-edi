@@ -22,6 +22,10 @@ function roteiroOperationId(operation: ManualOperation): string {
   return `roteiro-fluxo-${operation.kind}-${encodeURIComponent(operation.name)}`;
 }
 
+function roteiroScenarioId(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 /** Ícone por tipo de operação — ajuda a escanear o roteiro visualmente. */
 function OperationKindIcon({ kind }: { kind: ManualOperation["kind"] }) {
   if (kind === "query") return <Search className="h-4 w-4" aria-hidden="true" />;
@@ -128,14 +132,6 @@ export function ManualRoteiro({
                   Teste de Requisição
                 </Link>
               ) : null}
-              {flowHref ?? editor?.flowHref ? (
-                <Link
-                  href={flowHref ?? editor!.flowHref!}
-                  className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  Ver fluxograma
-                </Link>
-              ) : null}
               {schemaReferenceHref ? (
                 <Link
                   href={schemaReferenceHref}
@@ -151,11 +147,12 @@ export function ManualRoteiro({
       </header>
 
       {showContext ? (
-        <section id="contexto" data-documentation-area="documentacao" className="mb-10 space-y-8 scroll-mt-24">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold">Contexto</h2>
-            {editor?.sectionsToolbar}
-          </div>
+        <section data-documentation-area="documentacao" className="mb-10 space-y-8 scroll-mt-24">
+          {editor?.sectionsToolbar ? (
+            <div className="flex items-center justify-between gap-4">
+              {editor.sectionsToolbar}
+            </div>
+          ) : null}
 
           {sections.length === 0 ? (
             <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-600">
@@ -190,6 +187,14 @@ export function ManualRoteiro({
               Siga as etapas na ordem para entender o processo completo. Cada operação leva à
               próxima decisão da integração e abre o detalhamento técnico correspondente.
             </p>
+            {flowHref ?? editor?.flowHref ? (
+              <Link
+                href={flowHref ?? editor!.flowHref!}
+                className="mt-3 inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Ver Fluxo Geral
+              </Link>
+            ) : null}
           </div>
           {editor?.operationsToolbar}
         </div>
@@ -251,61 +256,6 @@ export function ManualRoteiro({
         </ol>
       </section>
 
-      {manual.referenceTables && manual.referenceTables.length > 0 ? (
-        <section id="tabelas-referencia" data-documentation-area="jornada-integracao" className="mb-10 scroll-mt-24">
-          <h2 className="mb-4 text-lg font-semibold">Tabelas de referência</h2>
-          <div className="space-y-3">
-            {manual.referenceTables.map((table, index) => (
-              <details
-                key={table.id}
-                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
-                open={index === 0}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3">
-                  <span className="font-medium text-slate-800">{table.title}</span>
-                  <span className="flex items-center gap-2">
-                    <Badge tone="neutral">
-                      {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
-                    </Badge>
-                    <ArrowRight
-                      className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-90"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </summary>
-                <div className="overflow-x-auto border-t border-slate-100">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50">
-                      <tr>
-                        {table.columns.map((col) => (
-                          <th
-                            key={col}
-                            className="px-3 py-2 text-left font-medium text-slate-700"
-                          >
-                            {col}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="border-t border-slate-100">
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} className="px-3 py-2 text-slate-600">
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       <section id="roteiro-integracao" data-documentation-area="roteiro-integracao" className="mt-10 scroll-mt-24">
         <h2 className="text-lg font-semibold">Roteiro de Integração</h2>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
@@ -333,6 +283,97 @@ export function ManualRoteiro({
             Ver a Jornada da Integração
           </Link>
         </div>
+
+        {manual.homologationFlows?.length ? (
+          <div className="mt-6">
+            <h3 id="roteiro-cenarios" className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Cenários de testes
+            </h3>
+            <div className="mt-3 space-y-6">
+              {manual.homologationFlows.map((flow) => (
+                <section
+                  key={flow.title}
+                  id={`roteiro-cenario-${roteiroScenarioId(flow.title)}`}
+                >
+                  <h4 className="font-semibold text-slate-900">{flow.title}</h4>
+                  <ol className="mt-3 space-y-3">
+                    {flow.scenarios.map((scenario, index) => (
+                      <li
+                        key={scenario.title}
+                        className="rounded-lg border border-slate-200 bg-white p-4"
+                      >
+                        <div className="flex gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
+                            {index + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <h5 className="font-semibold text-slate-900">{scenario.title}</h5>
+                            <dl className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                              <div>
+                                <dt className="font-medium text-slate-800">Pré-condições</dt>
+                                <dd>
+                                  <ul className="mt-1 list-disc space-y-1 pl-5">
+                                    {scenario.preconditions.map((item) => <li key={item}>{item}</li>)}
+                                  </ul>
+                                </dd>
+                              </div>
+                              <div>
+                                <dt className="font-medium text-slate-800">Operações</dt>
+                                <dd className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                  {scenario.operations.map((name) => {
+                                    const operation = operations.find((candidate) => candidate.name === name);
+                                    return operation ? (
+                                      <Link
+                                        key={name}
+                                        href={docsOperationHref(config.slug, operation.kind, operation.name)}
+                                        className="font-mono text-brand-700 underline hover:text-brand-900"
+                                      >
+                                        {name}
+                                      </Link>
+                                    ) : (
+                                      <code key={name}>{name}</code>
+                                    );
+                                  })}
+                                </dd>
+                              </div>
+                              <div>
+                                <dt className="font-medium text-slate-800">Resultado esperado</dt>
+                                <dd className="mt-1">{scenario.expectedResult}</dd>
+                              </div>
+                              <div>
+                                <dt className="font-medium text-slate-800">Evidências</dt>
+                                <dd>
+                                  <ul className="mt-1 list-disc space-y-1 pl-5">
+                                    {scenario.evidence.map((item) => <li key={item}>{item}</li>)}
+                                  </ul>
+                                </dd>
+                              </div>
+                              <div>
+                                <dt className="font-medium text-slate-800">Aprovação</dt>
+                                <dd className="mt-1">{scenario.approval}</dd>
+                              </div>
+                            </dl>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {manual.homologationValidations?.length ? (
+          <section id="roteiro-validacoes" className="mt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Validações
+            </h3>
+            <ul className="mt-3 list-disc space-y-2 rounded-lg border border-slate-200 bg-white p-5 pl-10 text-sm leading-relaxed text-slate-700">
+              {manual.homologationValidations.map((validation) => <li key={validation}>{validation}</li>)}
+            </ul>
+          </section>
+        ) : null}
 
         {operations.length > 0 ? (
           <div className="mt-6">
@@ -448,6 +489,28 @@ export function ManualRoteiro({
           </div>
         ) : null}
       </section>
+
+      <section id="versao-subproduto" data-documentation-area="documentacao" className="mt-10 scroll-mt-24">
+          <h2 className="text-lg font-semibold">Versão da integração</h2>
+          {manual.manualVersion ? (
+            <p className="mt-1 text-sm text-slate-600">
+              Versão atual: <span className="font-medium text-slate-900">{manual.manualVersion}</span>
+            </p>
+          ) : <p className="mt-1 text-sm text-slate-600">Versão atual não informada.</p>}
+          {manual.versionHistory?.length ? (
+            <ol className="mt-4 space-y-3">
+              {manual.versionHistory.map((entry) => (
+                <li key={`${entry.version}-${entry.date}`} className="rounded-lg border border-slate-200 bg-white p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="font-semibold text-slate-900">Versão {entry.version}</h3>
+                    <time className="text-xs text-slate-500">{entry.date}</time>
+                  </div>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{entry.details}</p>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+        </section>
     </article>
   );
 }

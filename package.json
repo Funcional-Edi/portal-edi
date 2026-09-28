@@ -35,7 +35,7 @@
     "geist": "^1.7.2",
     "graphql": "^16.14.2",
     "lucide-react": "^1.28.0",
-    "next": "15.5.21",
+    "next": "15.5.26",
     "next-auth": "^5.0.0-beta.32",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -48,15 +48,20 @@
     "@types/node": "^20.17.24",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "dependency-cruiser": "^17.4.3",
     "eslint": "^8.57.1",
-    "eslint-config-next": "15.5.21",
+    "eslint-config-next": "15.5.26",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.23"
+    }
   }
 }

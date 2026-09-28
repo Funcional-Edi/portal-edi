@@ -28,6 +28,256 @@ A estrutura de navegação entre Jornada da Integração e Roteiro de Integraç�
 está implementada. O próximo refinamento é detalhar os fluxos do Trade e
 aguardar informações validadas para os demais subprodutos.
 
+## EDI-14321 — revisão do modelo de implementação dos índices
+
+### Objetivo
+
+Adequar o modelo **Modelo Implementação - Portal EDI** à estrutura real do
+Canal Autorizador, preparando a documentação para desenvolvimento sem alterar
+radicalmente o portal ou reinterpretar o conteúdo aprovado pelo responsável do
+subproduto.
+
+Esta etapa é um refinamento técnico e estrutural. A documentação validada pelo
+responsável do Canal Autorizador é a fonte oficial para regras, prazos,
+endpoints, status, cenários, mensagens e demais orientações.
+
+### Premissas da implementação
+
+- preservar a estrutura atual do portal e seus componentes reutilizáveis;
+- manter a navbar como fonte principal de navegação entre as áreas;
+- fazer o índice acompanhar a área selecionada na navbar;
+- manter separadas Documentação, Jornada, Roteiro, Queries, Mutations e Teste
+  de Requisição;
+- aplicar o conteúdo aprovado sem criar regras novas ou substituir textos
+  validados;
+- iniciar o desenvolvimento na branch `edi-14321`, derivada de `homolog`;
+- não transportar alterações das issues EDI-14331, EDI-14332, EDI-14333 ou
+  EDI-14334.
+
+### Estrutura de navegação a preservar
+
+#### Documentação
+
+- Contexto;
+- Segurança e ferramentas;
+- referências gerais relacionadas ao subproduto.
+
+O Fluxo Geral do pedido não deve ser criado como uma área paralela de
+Documentação. Ele pertence à Jornada da Integração.
+
+#### Jornada da Integração
+
+- Fluxo Geral do pedido;
+- Autenticar e obter token;
+- Criar pré-pedido;
+- Consultar um pedido;
+- Enviar retorno do pedido;
+- Enviar nota fiscal;
+- Cancelar pedido;
+- Consultar ressarcimento;
+- Substituir nota fiscal;
+- Consultar pedidos por filtro;
+- Consultar status atualizado;
+- Enviar devolução da nota;
+- Consultar uma devolução;
+- Consultar devoluções paginadas;
+- tabelas de referência separadas conforme o DOCX e vinculadas às etapas
+  correspondentes.
+
+As tabelas devem aparecer quando a Jornada estiver selecionada. Elas não devem
+ser exibidas no índice da Documentação nem funcionar como uma área superior
+independente da navbar.
+
+#### Roteiro de Integração
+
+- cenários do Fluxo Normal;
+- cenários do Fluxo Order;
+- pré-condições e etapas de teste;
+- regras de rejeição total e parcial;
+- resultado esperado e evidências;
+- Fluxograma Individual, quando publicado.
+
+#### Queries e Mutations
+
+Cada área deve exibir somente suas próprias operações e manter links rápidos
+para navegação direta.
+
+#### Versão do subproduto
+
+A versão do subproduto e o histórico de alterações devem aparecer na parte final
+da documentação, seguindo a estrutura utilizada nos demais produtos. Essa
+seção não é uma nova operação da Jornada.
+
+### Inventário original do Word
+
+O inventário abaixo é mantido como referência de origem. A exibição do portal
+deve seguir os grupos da navbar, e não uma lista linear única.
+
+| # | Índice de referência |
+|---:|---|
+| 1 | Contexto |
+| 2 | Tabelas de referência |
+| 3 | Autenticar e obter token |
+| 4 | Criar pré-pedido |
+| 5 | Consultar um pedido |
+| 6 | Enviar retorno do pedido |
+| 7 | Enviar nota fiscal |
+| 8 | Cancelar pedido |
+| 9 | Consultar ressarcimento |
+| 10 | Substituir nota fiscal |
+| 11 | Consultar pedidos por filtro |
+| 12 | Consultar status atualizado |
+| 13 | Enviar devolução da nota |
+| 14 | Consultar uma devolução |
+| 15 | Consultar devoluções paginadas |
+
+### Decisões por índice
+
+| Índice | Decisão | Aplicação prevista |
+|---|---|---|
+| Contexto | Adaptar | Reaproveitar a estrutura atual e manter objetivo, escopo e participantes relacionados ao subproduto. |
+| Tabelas de referência | Adaptar o schema e vincular por operação | Exibir as separações do DOCX dentro da Jornada, junto das etapas que utilizam cada tabela. |
+| Autenticar e obter token | Reaproveitar | Manter `createToken` e o conteúdo aprovado. |
+| Criar pré-pedido | Adaptar | Manter `createGroupedOrder`; as regras de rejeição e sua validação serão detalhadas no Roteiro. |
+| Consultar um pedido | Reaproveitar | Manter `groupedOrder` e seus vínculos de consulta. |
+| Enviar retorno do pedido | Adaptar | Manter `createGroupedResponse` e sua tabela de motivos correspondente. |
+| Enviar nota fiscal | Adaptar | Manter `createGroupedInvoice` e o conteúdo aprovado. |
+| Cancelar pedido | Adaptar | Manter `createGroupedCancellation` e as pré-condições aprovadas. |
+| Consultar ressarcimento | Reaproveitar | Manter `groupedInvoices` na relação com faturamento. |
+| Substituir nota fiscal | Reaproveitar | Manter `createGroupedInvoiceReversal` e sua nomenclatura aprovada. |
+| Consultar pedidos por filtro | Reaproveitar | Manter `groupedOrders`, filtros e paginação publicados. |
+| Consultar status atualizado | Reaproveitar | Manter `groupedStatusChanges` e seus critérios de consumo. |
+| Enviar devolução da nota | Adaptar | Manter `createGroupedInvoiceDevolution` e associar a tabela `code_reason`. |
+| Consultar uma devolução | Reaproveitar | Manter `groupedInvoiceDevolution`. |
+| Consultar devoluções paginadas | Reaproveitar | Manter `groupedInvoiceDevolutions`. |
+
+### Referências por operação
+
+O schema deverá aceitar referências de tabelas por operação, sem criar uma
+segunda fonte de dados. Uma operação pode receber as referências definidas no
+DOCX e uma mesma tabela poderá ser reutilizada quando fizer parte de mais de
+uma etapa.
+
+O vínculo deve seguir o uso aprovado no subproduto, incluindo:
+
+- códigos de indústria e referências do pré-pedido em `createGroupedOrder`;
+- status e motivos nas operações de consulta correspondentes;
+- motivos do retorno em `createGroupedResponse`;
+- `code_reason` em `createGroupedInvoiceDevolution`;
+- General Header, Rate Limit e demais orientações transversais na seção de
+  Segurança e Consumo da API.
+
+Quando uma tabela estiver vinculada à operação, ela deve ser exibida antes do
+exemplo GraphQL correspondente. O bloco global consolidado deixa de ser a
+forma principal de navegação depois que as referências forem migradas.
+
+### Redistribuição de conteúdo
+
+- conteúdo de Contexto permanece na Documentação;
+- Fluxo Geral do pedido pertence à Jornada;
+- regras de rejeição total e parcial pertencem ao Roteiro de Integração;
+- status, prazos e demais orientações permanecem na etapa correspondente;
+- Fluxograma Individual pertence ao Roteiro;
+- informações de segurança permanecem em Segurança e ferramentas;
+- referências e responsáveis só devem ser mantidos quando estiverem
+  relacionados ao subproduto, ao processo ou à integração;
+- não é necessário transportar o nome de quem produziu a documentação.
+
+`Visão geral` e `Pontos importantes` só poderão deixar de ser exibidos depois
+que seus conteúdos aprovados estiverem redistribuídos nos destinos corretos.
+Essa remoção não autoriza apagar informação nem modificar regra de negócio.
+
+### Versão do subproduto e histórico
+
+O histórico existente em `manual.json.versionHistory` deve ser utilizado como
+fonte única. A versão atual e os registros de alteração serão exibidos na parte
+final da documentação do subproduto.
+
+Antes de definir a apresentação final, comparar o padrão utilizado no Canal
+Autorizador, Credenciado e demais subprodutos. A convenção oficial encontrada
+deve ser aplicada de forma consistente no cabeçalho e na seção final, sem
+assumir automaticamente se o formato correto é `1.7` ou `1.7.0`.
+
+### Mudanças efetivas
+
+O desenvolvimento deve limitar-se a:
+
+1. filtrar o índice conforme a área selecionada na navbar;
+2. manter o Fluxo Geral dentro da Jornada;
+3. associar as tabelas às operações no schema;
+4. exibir cada tabela na etapa correspondente, incluindo `code_reason` na
+   devolução da nota;
+5. completar o Roteiro com cenários, rejeições, validações e Fluxograma
+   Individual;
+6. redistribuir o conteúdo antes de retirar índices antigos;
+7. exibir versão e histórico na parte final do subproduto.
+
+Devem ser preservados as rotas, hashes, operações, estrutura de componentes,
+conteúdo aprovado e o `flow.json` já existente. Não criar uma nova arquitetura
+de documentação.
+
+### Critérios de aceite
+
+- a área selecionada na navbar controla o conteúdo central e o índice;
+- Documentação não mostra tabelas da Jornada;
+- Jornada mostra o Fluxo Geral, as operações e suas tabelas relacionadas;
+- `createGroupedInvoiceDevolution` mostra a tabela `code_reason`;
+- Roteiro mostra cenários de teste, regras de rejeição, validações e o
+  Fluxograma Individual quando disponível;
+- Queries e Mutations mostram somente suas operações;
+- versão e histórico aparecem na seção final do subproduto;
+- o padrão de versão é igual ao padrão oficial dos demais produtos;
+- o conteúdo validado não é reinterpretado;
+- índices antigos só são removidos após a redistribuição;
+- links, hashes e navegação desktop/mobile continuam funcionando.
+
+### Fora do escopo
+
+- alterar regras de negócio aprovadas;
+- alterar endpoints, queries ou mutations existentes;
+- criar uma nova arquitetura ou banco de dados para documentação;
+- transportar autoria da documentação sem relação com o subproduto;
+- criar o Fluxo Order sem fonte validada;
+- misturar alterações de outras issues;
+- publicar conteúdo novo sem seguir a documentação validada.
+
+### Prompt para o desenvolvimento da EDI-14321
+
+> Leia integralmente o arquivo `content/interno/guides/refinamentos-edi.md`,
+> especialmente a seção **EDI-14321 — revisão do modelo de implementação dos
+> índices**, antes de alterar qualquer arquivo. Use a documentação validada pelo
+> responsável do Canal Autorizador como fonte oficial.
+>
+> Trabalhe na branch `edi-14321`, derivada de `homolog`. Não utilize como base
+> as branches EDI-14331, EDI-14332, EDI-14333 ou EDI-14334 e não transporte
+> alterações dessas issues.
+>
+> Reaproveite a estrutura atual do portal. Faça a navbar controlar o conteúdo
+> e o índice da área selecionada. Mantenha Documentação, Jornada, Roteiro,
+> Queries, Mutations e Teste de Requisição separados. Apresente o Fluxo Geral
+> dentro da Jornada e o Fluxograma Individual dentro do Roteiro quando houver
+> conteúdo publicado.
+>
+> Faça o schema aceitar referências de tabelas por operação. Aplique as
+> separações do DOCX quando a Jornada estiver selecionada e renderize cada
+> tabela antes do exemplo GraphQL da operação correspondente. Inclua a tabela
+> `code_reason` em `createGroupedInvoiceDevolution`. Remova o bloco global apenas
+> depois da redistribuição das referências.
+>
+> Complete o Roteiro com os cenários aprovados, incluindo regras de rejeição,
+> pré-condições, resultado esperado e evidências. Redistribua `Visão geral` e
+> `Pontos importantes` antes de retirar esses índices. Não altere nem
+> reinterprete o conteúdo validado.
+>
+> Exiba a versão do subproduto e o histórico de `manual.json.versionHistory` na
+> parte final da documentação. Compare o padrão de versão dos demais produtos
+> antes de decidir entre `1.7` e `1.7.0`. Preserve rotas, hashes, operações,
+> links e comportamento responsivo.
+>
+> Execute a validação desktop/mobile e os testes existentes. Entregue o menor
+> diff compatível com a estrutura atual, sem criar arquitetura paralela ou
+> transportar alterações de outras issues.
+
 ## EDI-14332 — navegação contextual dentro do subproduto
 
 ### Objetivo

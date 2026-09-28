@@ -1,4 +1,7 @@
-import type { ManualOperation } from "@/modules/living-docs-externa/schema";
+import type {
+  ManualOperation,
+  ManualReferenceTable,
+} from "@/modules/living-docs-externa/schema";
 import {
   DOCS_HOME_HREF,
   docsGuideHref,
@@ -18,6 +21,8 @@ interface OperationDetailProps {
   schemaFieldHref?: string;
   /** Campos de requisição/resposta extraídos do schema GraphQL (equivalente ao PDF). */
   schemaDetail?: OperationSchemaDetail | null;
+  /** Tabelas usadas diretamente pelos campos desta operação. */
+  referenceTables?: ManualReferenceTable[];
   /** Playground executa contra gateway real — só perfil admin, e só faz sentido em GraphQL. */
   canUsePlayground?: boolean;
 }
@@ -29,6 +34,7 @@ export function OperationDetail({
   gatewayConnected = false,
   schemaFieldHref,
   schemaDetail,
+  referenceTables = [],
   canUsePlayground = false,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
@@ -95,6 +101,54 @@ export function OperationDetail({
 
       {!isRest && schemaDetail ? (
         <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} />
+      ) : null}
+
+      {referenceTables.length > 0 ? (
+        <section id="tabelas-referencia" className="mb-6 scroll-mt-24">
+          <h2 className="mb-3 text-sm font-semibold uppercase text-slate-500">
+            Tabelas de referência
+          </h2>
+          <div className="space-y-3">
+            {referenceTables.map((table, index) => (
+              <details
+                key={table.id}
+                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
+                open={index === 0}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+                  <span className="font-medium text-slate-800">{table.title}</span>
+                  <span className="text-xs text-slate-500">
+                    {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
+                  </span>
+                </summary>
+                <div className="overflow-x-auto border-t border-slate-100">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        {table.columns.map((column) => (
+                          <th key={column} className="px-3 py-2 text-left font-medium text-slate-700">
+                            {column}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {table.rows.map((row, rowIndex) => (
+                        <tr key={rowIndex} className="border-t border-slate-100">
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} className="px-3 py-2 text-slate-600">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       {isRest ? (

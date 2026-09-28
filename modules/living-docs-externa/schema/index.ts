@@ -38,6 +38,7 @@ export {
   type IntegrationManual,
   type ManualOperation,
   type ManualOperationKind,
+  type ManualReferenceTable,
   type CreateManualOperationInput,
   type UpdateManualOperationInput,
   type UpdateManualMetadataInput,
