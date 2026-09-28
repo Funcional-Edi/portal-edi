@@ -6,9 +6,12 @@ export const DOCS_HOME_HREF = "/docs";
 
 export const DOCS_API_HREF = "/docs/api";
 
+export const FAQ_HREF = "/faq";
+
 export const DOCS_NAV_ITEMS = [
   { href: DOCS_HOME_HREF, label: "Documentação" },
   { href: DOCS_API_HREF, label: "Referência GraphQL" },
+  { href: FAQ_HREF, label: "FAQ" },
 ] as const;
 
 export function docsFamilyHref(family: ProductFamily): string {

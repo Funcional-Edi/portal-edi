@@ -16,6 +16,7 @@ export function FlowShell({ children, subtitle = "Fluxogramas", documentationHre
       navItems={[
         { href: "/fluxogramas", label: "Fluxogramas", active: true },
         { href: documentationHref, label: "Documentação" },
+        { href: "/faq", label: "FAQ" },
       ]}
       actions={<SessionActions />}
     >

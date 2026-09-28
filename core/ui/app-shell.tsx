@@ -67,6 +67,7 @@ export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) 
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={item.active ? "page" : undefined}
                     className={`block rounded px-2 py-1.5 text-sm ${
                       item.active
                         ? "bg-brand-50 text-brand-700"
@@ -85,6 +86,7 @@ export function AppHeader({ subtitle, navItems = [], actions }: AppHeaderProps) 
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={item.active ? "page" : undefined}
                   className={
                     item.active
                       ? "text-brand-700"
