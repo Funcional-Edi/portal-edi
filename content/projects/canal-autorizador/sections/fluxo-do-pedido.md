@@ -11,6 +11,10 @@ condição comercial e produtos. A Funcional valida as regras comerciais (descon
 condição, cadastro do produto/cliente) e cria o pedido no portal da indústria — podendo
 **rejeitar produtos individualmente** dentro do mesmo pedido.
 
+O percentual de desconto deve ser enviado de acordo com o combinado com a indústria.
+O campo `industry_abbreviation` só é obrigatório quando exigido pela indústria — hoje,
+AstraZeneca, sigla `AZN`, exige o envio.
+
 - Se o pedido inteiro for rejeitado, o `status` retorna `PROCESSED`. Nesse caso, **não
   envie nenhuma requisição adicional para este pedido**: valide com o KAM ou o comercial
   da Funcional o motivo da rejeição e, após o ajuste, envie o pedido novamente (o novo
@@ -40,6 +44,9 @@ Depois de enviada, a nota pode ser:
 - **Parcial ou totalmente devolvida** com `createGroupedInvoiceDevolution` (ex.: produto
   devolvido pelo cliente final).
 
+A requisição `createGroupedInvoice` deve ser enviada em até 48 horas, conforme o cenário
+de homologação aprovado.
+
 ## 4. Cancelamento
 
 O cancelamento (`createGroupedCancellation`) só pode ser enviado **depois do retorno e
@@ -58,5 +65,5 @@ Três formas de consultar o andamento dos pedidos, dependendo do caso de uso:
 
 ## Regras de calendário
 
-O distribuidor deve encaminhar os pedidos no mesmo dia (D) ou no dia seguinte (D-1), de
+O distribuidor deve encaminhar os pedidos no mesmo dia (D) ou no dia seguinte (D+1), de
 acordo com o que foi combinado com a indústria.

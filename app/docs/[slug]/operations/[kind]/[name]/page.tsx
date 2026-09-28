@@ -34,6 +34,10 @@ export default async function OperationPage({ params }: OperationPageProps) {
   const operation = findOperation(project.manual, kindResult.data, name);
   if (!operation) notFound();
 
+  const referenceTables = (project.manual.referenceTables ?? []).filter((table) =>
+    operation.referenceTableIds?.includes(table.id)
+  );
+
   const gatewayConnected = Boolean(
     project.config.protocol === "rest" ? project.config.apiBaseUrl : project.config.graphqlUrl
   );
@@ -55,6 +59,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
           : undefined
       }
       schemaDetail={schemaDetail}
+      referenceTables={referenceTables}
       canUsePlayground={canUsePlayground}
     />
   );

@@ -100,22 +100,18 @@ function contextualTocItems({
   if (!product || !link || !areaId) return [];
 
   const isOperationPage = pathname.includes("/operations/");
-  const subproductVersionItems = items.filter((item) => item.label.toLowerCase() === "versão do subproduto");
   if (isOperationPage && (areaId === "queries" || areaId === "mutations" || areaId === "metodos")) {
     return items;
   }
 
   if (areaId === "documentacao") {
-    return items.filter((item) => item.href === "#contexto"
-      || item.href.startsWith("#section-"));
+    return items.filter((item) => item.href.startsWith("#section-") || item.href === "#versao-subproduto");
   }
 
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
       ...items.filter((item) => item.href.includes("/operations/")),
-      ...items.filter((item) => item.href === "#tabelas-referencia"),
-      ...subproductVersionItems,
     ];
   }
 
@@ -124,8 +120,11 @@ function contextualTocItems({
     return [
       ...items.filter((item) => item.href === "#roteiro-integracao"),
       ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),
-      ...items.filter((item) => item.href === "#roteiro-detalhamento" || item.href.startsWith("#roteiro-fluxo-")),
-      ...subproductVersionItems,
+      ...items.filter((item) => item.href === "#roteiro-cenarios"
+        || item.href.startsWith("#roteiro-cenario-")
+        || item.href === "#roteiro-validacoes"
+        || item.href === "#roteiro-detalhamento"
+        || item.href.startsWith("#roteiro-fluxo-")),
     ];
   }
 
@@ -409,6 +408,18 @@ export function ProductNavigation({
     && activeProductId === selectedProductId
     && activeModuleId === selectedFlowId
     && activeActionId === selectedAreaId;
+
+  useEffect(() => {
+    if (locationHash !== "#versao-subproduto" || !showRouteContent) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById("versao-subproduto")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [locationHash, showRouteContent]);
+
   const visibleTocItems = contextualTocItems({
     items: tocItems,
     areaId: selectedAreaId,

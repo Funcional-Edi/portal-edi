@@ -1,4 +1,4 @@
-# Segurança e ferramentas
+# Diretrizes de Segurança e Consumo da API
 
 ## Autenticação
 
@@ -78,3 +78,21 @@ resposta, e não no HTTP status code:
 |---|---|---|
 | `errors` | Array | Array de objetos com `message` (mensagem) e `code` (código da mensagem). |
 | `data` | Objeto | Objeto do tipo solicitado, quando a requisição é bem-sucedida. |
+
+## Certificado
+
+Para consultar o certificado utilizado pela API, acesse:
+
+https://gateway-homologa.fidelize.com.br/graphql/
+
+Em sistemas Windows:
+
+1. Acesse a URL da API.
+2. Clique no ícone de segurança exibido ao lado da URL.
+3. Selecione a opção para visualizar os detalhes do certificado.
+4. Consulte o emissor, a validade, a cadeia de certificação e a impressão digital
+   (*thumbprint*).
+
+Caso a aplicação utilize certificado instalado localmente ou *Certificate Pinning*,
+a Funcional comunicará previamente qualquer alteração de certificado por e-mail para
+que os parceiros possam ajustar seus ambientes antes da mudança entrar em vigor.

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   createManualOperationInputSchema,
+  integrationManualSchema,
   manualOperationSchema,
 } from "@/modules/living-docs-externa/schema/manual";
 
@@ -69,6 +70,34 @@ describe("createManualOperationInputSchema", () => {
       name: "autoriza",
       method: "GET",
       path: "/status",
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("integrationManualSchema", () => {
+  it("aceita tabelas por operação e cenários de homologação", () => {
+    const result = integrationManualSchema.safeParse({
+      version: 1,
+      title: "Canal Autorizador",
+      referenceTables: [{ id: "order-status", title: "Status", columns: ["Código"], rows: [["OK"]] }],
+      homologationFlows: [{
+        title: "Fluxo Normal",
+        scenarios: [{
+          title: "Pedido faturado",
+          preconditions: ["Pedido válido"],
+          operations: ["createGroupedOrder"],
+          expectedResult: "Pedido processado",
+          evidence: ["Resposta da API"],
+          approval: "Registrar para homologação",
+        }],
+      }],
+      operations: [{
+        kind: "mutation",
+        name: "createGroupedOrder",
+        order: 1,
+        referenceTableIds: ["order-status"],
+      }],
     });
     expect(result.success).toBe(true);
   });

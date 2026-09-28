@@ -4,6 +4,15 @@ export const manualOperationKindSchema = z.enum(["query", "mutation", "rest"]);
 
 export const restMethodSchema = z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]);
 
+const homologationScenarioSchema = z.object({
+  title: z.string().min(1),
+  preconditions: z.array(z.string().min(1)).min(1),
+  operations: z.array(z.string().min(1)).min(1),
+  expectedResult: z.string().min(1),
+  evidence: z.array(z.string().min(1)).min(1),
+  approval: z.string().min(1),
+});
+
 /** Forma "crua" (sem o refine cross-field) — usada para `.extend`/`.omit` em inputs derivados. */
 export const manualOperationShapeSchema = z.object({
   kind: manualOperationKindSchema,
@@ -30,6 +39,8 @@ export const manualOperationShapeSchema = z.object({
         .regex(/^[a-z0-9-]+$/)
     )
     .optional(),
+  /** IDs das tabelas de referência exibidas antes do exemplo da operação. */
+  referenceTableIds: z.array(z.string().min(1)).optional(),
 });
 
 function requireRestFields(
@@ -80,6 +91,15 @@ export const integrationManualSchema = z.object({
       })
     )
     .optional(),
+  homologationFlows: z
+    .array(
+      z.object({
+        title: z.string().min(1),
+        scenarios: z.array(homologationScenarioSchema).min(1),
+      })
+    )
+    .optional(),
+  homologationValidations: z.array(z.string().min(1)).optional(),
   operations: z.array(manualOperationSchema),
 });
 
@@ -110,6 +130,7 @@ export const updateManualMetadataInputSchema = integrationManualSchema.pick({
 export type ManualOperationKind = z.infer<typeof manualOperationKindSchema>;
 export type ManualOperation = z.infer<typeof manualOperationSchema>;
 export type IntegrationManual = z.infer<typeof integrationManualSchema>;
+export type ManualReferenceTable = NonNullable<IntegrationManual["referenceTables"]>[number];
 export type CreateManualOperationInput = z.infer<typeof createManualOperationInputSchema>;
 export type UpdateManualOperationInput = z.infer<typeof updateManualOperationInputSchema>;
 export type UpdateManualMetadataInput = z.infer<typeof updateManualMetadataInputSchema>;

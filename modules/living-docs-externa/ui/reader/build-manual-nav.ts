@@ -96,6 +96,9 @@ export async function buildManualNav(
       }
     }
 
+    if (operation?.referenceTableIds?.length) {
+      tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
+    }
     if (operation?.exampleQuery)
       tocItems.push({ href: "#exemplo-graphql", label: "Exemplo GraphQL" });
     return { sidebarGroups, tocItems };
@@ -103,23 +106,39 @@ export async function buildManualNav(
 
   const sections = sectionsInput ?? (await getPublishedManualSections(slug));
   const tocItems: ManualTocItem[] = [];
-  if (sections.length > 0) {
-    tocItems.push({ href: "#contexto", label: "Contexto" });
-    tocItems.push(...sections.map((section) => ({
-      href: `#section-${section.id}`,
-      label: section.title,
-      depth: 1,
-    })));
-  }
-  tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
-  tocItems.push(...operations.map((op) => ({
-    href: `${basePath}/operations/${op.kind}/${op.name}`,
-    label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+  tocItems.push(...sections.map((section) => ({
+    href: `#section-${section.id}`,
+    label: section.title,
     depth: 1,
   })));
-  if (project.manual.referenceTables?.length)
-    tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
+  tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
+  tocItems.push(
+    ...operations.flatMap((op) => {
+      const href = `${basePath}/operations/${op.kind}/${op.name}`;
+      return [
+        {
+          href,
+          label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+          depth: 1,
+        },
+        ...(op.referenceTableIds?.length
+          ? [{ href: `${href}#tabelas-referencia`, label: "Tabelas de referência", depth: 2 }]
+          : []),
+      ];
+    })
+  );
   tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
+  if (project.manual.homologationFlows?.length) {
+    tocItems.push({ href: "#roteiro-cenarios", label: "Cenários de testes", depth: 1 });
+    tocItems.push(...project.manual.homologationFlows.map((flow) => ({
+      href: `#roteiro-cenario-${flow.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
+      label: flow.title,
+      depth: 2,
+    })));
+  }
+  if (project.manual.homologationValidations?.length) {
+    tocItems.push({ href: "#roteiro-validacoes", label: "Validações", depth: 1 });
+  }
   if (operations.length > 0) {
     tocItems.push({ href: "#roteiro-detalhamento", label: "Detalhamento por fluxo", depth: 1 });
     tocItems.push(...operations.map((op) => ({
@@ -128,6 +147,7 @@ export async function buildManualNav(
       depth: 2,
     })));
   }
+  tocItems.push({ href: "#versao-subproduto", label: "Versão da integração" });
 
   return {
     sidebarGroups,

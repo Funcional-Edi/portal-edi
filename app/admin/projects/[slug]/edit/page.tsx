@@ -54,12 +54,20 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
   ];
 
   const tocItems: ManualTocItem[] = [
-    { href: "#contexto", label: "Contexto" },
-    ...(project.manual.referenceTables?.length
-      ? [{ href: "#tabelas-referencia", label: "Tabelas de referência" }]
-      : []),
+    ...sections.map((section) => ({
+      href: `#section-${section.id}`,
+      label: section.title,
+      depth: 1,
+    })),
     { href: "#jornada-integracao", label: "Jornada da Integração" },
     { href: "#roteiro-integracao", label: "Roteiro de Integração" },
+    ...(project.manual.homologationFlows?.length
+      ? [{ href: "#roteiro-cenarios", label: "Cenários de testes" }]
+      : []),
+    ...(project.manual.homologationValidations?.length
+      ? [{ href: "#roteiro-validacoes", label: "Validações" }]
+      : []),
+    { href: "#versao-subproduto", label: "Versão da integração" },
   ];
 
   return (
