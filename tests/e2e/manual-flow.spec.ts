@@ -29,33 +29,33 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
   await expect(page).toHaveURL("/docs/im");
   await expect(page.getByRole("heading", { name: "Integracao IM - Inventario" })).toBeVisible();
   const index = page.locator("aside").last();
-  await expect(index.getByRole("link", { name: "Contexto", exact: true })).toBeVisible();
+  await expect(index.getByRole("link", { name: "Janela de processamento", exact: true })).toBeVisible();
   await expect(index.getByRole("link", { name: /1\. Obter token do gateway/ })).toHaveCount(0);
 
   await products.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(
-    index.getByRole("link", { name: /1\. Obter token do gateway/ }),
+    index.getByRole("link", { name: /1\. Obter token do gateway/ }).first(),
   ).toHaveClass(/ml-4/);
 
   await page
     .locator("#jornada-integracao")
-    .getByRole("link", { name: /1\. Obter token do gateway/ })
+    .getByRole("link", { name: /1\. Obter token do gateway/ }).first()
     .click();
 
   await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
   await expect(page.getByText("mutation createToken", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Consulte o Roteiro de Integração" })).toBeVisible();
-  const integrationGuide = page.getByRole("link", { name: "Ver o Roteiro de Integração" });
+  await expect(page.getByRole("heading", { name: "Consulte a Jornada da Integração" })).toBeVisible();
+  const integrationGuide = page.getByRole("link", { name: "Ver a Jornada da Integração" });
   await expect(integrationGuide).toHaveAttribute(
     "href",
-    "/docs/im#roteiro-integracao",
+    "/docs/im#jornada-integracao",
   );
   await integrationGuide.click();
-  await expect(page).toHaveURL("/docs/im#roteiro-integracao");
+  await expect(page).toHaveURL("/docs/im#jornada-integracao");
   await expect(
     page.getByRole("navigation", { name: "Produtos EDI" }).getByRole("link", {
-      name: "Roteiro de Integração",
+      name: "Jornada da Integração",
       exact: true,
     }),
   ).toHaveAttribute("aria-current", "page");

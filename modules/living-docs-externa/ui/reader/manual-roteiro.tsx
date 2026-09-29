@@ -180,6 +180,7 @@ export function ManualRoteiro({
       ) : null}
 
       <section id="jornada-integracao" data-documentation-area="jornada-integracao" className="scroll-mt-24">
+        <span id="roteiro-integracao" aria-hidden="true" />
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">Jornada da Integração</h2>
@@ -188,12 +189,18 @@ export function ManualRoteiro({
               próxima decisão da integração e abre o detalhamento técnico correspondente.
             </p>
             {flowHref ?? editor?.flowHref ? (
-              <Link
-                href={flowHref ?? editor!.flowHref!}
-                className="mt-3 inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                Ver Fluxo Geral
-              </Link>
+              <div id="fluxograma-individual" className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4">
+                <h3 className="font-semibold text-brand-950">Fluxograma individual</h3>
+                <p className="mt-1 text-sm leading-relaxed text-brand-800">
+                  Consulte a sequência visual deste subproduto antes de seguir para as operações.
+                </p>
+                <Link
+                  href={flowHref ?? editor!.flowHref!}
+                  className="mt-3 inline-flex items-center rounded-md border border-brand-300 bg-white px-3 py-1.5 text-sm font-medium text-brand-800 hover:bg-brand-100"
+                >
+                  Abrir fluxograma individual
+                </Link>
+              </div>
             ) : null}
           </div>
           {editor?.operationsToolbar}
@@ -254,12 +261,10 @@ export function ManualRoteiro({
             );
           })}
         </ol>
-      </section>
-
-      <section id="roteiro-integracao" data-documentation-area="roteiro-integracao" className="mt-10 scroll-mt-24">
-        <h2 className="text-lg font-semibold">Roteiro de Integração</h2>
+      <div className="mt-10 scroll-mt-24">
+        <h3 className="text-lg font-semibold">Detalhamento e homologação</h3>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
-          Use este roteiro para analisar cada fluxo com profundidade antes de implementá-lo ou
+          Use esta jornada para analisar cada fluxo com profundidade antes de implementá-lo ou
           apresentá-lo na homologação. O detalhamento deve registrar os seguintes pontos:
         </p>
         <div className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-5">
@@ -280,7 +285,7 @@ export function ManualRoteiro({
             href="#jornada-integracao"
             className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
           >
-            Ver a Jornada da Integração
+            Voltar ao início da Jornada
           </Link>
         </div>
 
@@ -488,6 +493,7 @@ export function ManualRoteiro({
             </ol>
           </div>
         ) : null}
+      </div>
       </section>
 
       <section id="versao-subproduto" data-documentation-area="documentacao" className="mt-10 scroll-mt-24">

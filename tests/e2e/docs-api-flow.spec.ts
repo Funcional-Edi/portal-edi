@@ -26,7 +26,7 @@ test("catalogo docs/api para referencia de schema (IM)", async ({ page }) => {
   await expect(page.getByText("createToken")).toBeVisible();
   await expect(page.getByText("saveInventories")).toBeVisible();
 
-  await page.getByRole("link", { name: "Ver no roteiro" }).first().click();
+  await page.getByRole("link", { name: "Ver na Jornada" }).first().click();
   await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
 
