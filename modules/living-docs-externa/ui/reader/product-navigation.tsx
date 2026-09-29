@@ -32,21 +32,20 @@ const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visibl
 const FLOW_AREAS = [
   { id: "documentacao", label: "Documentação", icon: FileText },
   { id: "jornada-integracao", label: "Jornada da Integração", icon: Route },
-  { id: "roteiro-integracao", label: "Roteiro de Integração", icon: BookOpen },
   { id: "queries", label: "Queries", icon: Code2 },
   { id: "mutations", label: "Mutations", icon: Code2 },
   { id: "metodos", label: "Métodos", icon: Code2 },
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
+type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "teste-de-requisicao";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
   if (areaId === "documentacao") {
     return product.actions.find((action) => action.id === "visao-geral")?.links.find((item) => item.id === link.id)?.href;
   }
-  if (areaId === "jornada-integracao" || areaId === "roteiro-integracao") {
+  if (areaId === "jornada-integracao") {
     return product.actions.find((action) => action.id === areaId)?.links.find((item) => item.id === link.id)?.href;
   }
   if (areaId === "teste-de-requisicao") {
@@ -58,18 +57,12 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
   return FLOW_AREAS.filter((area) => {
-    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "roteiro-integracao" || area.id === "teste-de-requisicao") {
+    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
     return operations.some((operation) => operation.kind === kind);
   });
-}
-
-function individualFlowchartHref(product: DocumentationProductView, link: DocumentationLinkView) {
-  return product.actions
-    .find((action) => action.id === "fluxograma-geral")
-    ?.links.find((item) => item.id === link.id)?.href ?? null;
 }
 
 function tocDesktopIndent(depth?: number): string {
@@ -111,15 +104,8 @@ function contextualTocItems({
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
+      ...items.filter((item) => item.href === "#fluxograma-individual"),
       ...items.filter((item) => item.href.includes("/operations/")),
-    ];
-  }
-
-  if (areaId === "roteiro-integracao") {
-    const flowchartHref = individualFlowchartHref(product, link);
-    return [
-      ...items.filter((item) => item.href === "#roteiro-integracao"),
-      ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),
       ...items.filter((item) => item.href === "#roteiro-cenarios"
         || item.href.startsWith("#roteiro-cenario-")
         || item.href === "#roteiro-validacoes"
@@ -238,7 +224,7 @@ type CredenciadoStructureItem = {
 const CREDENCIADO_STRUCTURE = [
   { label: "Visão Geral", areaId: "visao-geral" },
   { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
-  { label: "Roteiro de Integração", areaId: "roteiro-integracao" },
+  { label: "Jornada da Integração", areaId: "jornada-integracao" },
   { label: "Fluxo de Cadastro" },
   { label: "Fluxo Opt-in" },
   { label: "Fluxo de Venda" },
@@ -478,9 +464,9 @@ export function ProductNavigation({
                       <Link
                         key={area.id}
                         href={href}
-                        replace={area.id === "jornada-integracao" || area.id === "roteiro-integracao"}
+                        replace={area.id === "jornada-integracao"}
                         aria-current={area.id === selectedAreaId ? "page" : undefined}
-                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : area.id === "roteiro-integracao" ? "#roteiro-integracao" : "")}
+                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : "")}
                         className={className}
                       >
                         {content}
@@ -511,7 +497,7 @@ export function ProductNavigation({
                 </div>
                 <div className="space-y-1.5">
                   {product.actions
-                    .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "roteiro-integracao" && action.id !== "teste-de-requisicao")
+                    .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "teste-de-requisicao")
                     .filter((action) => product.id !== "credenciado" || (action.id !== "visao-geral" && action.id !== "fluxograma-geral"))
                     .map((action) => (
                       <button

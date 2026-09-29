@@ -60,7 +60,6 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
       depth: 1,
     })),
     { href: "#jornada-integracao", label: "Jornada da Integração" },
-    { href: "#roteiro-integracao", label: "Roteiro de Integração" },
     ...(project.manual.homologationFlows?.length
       ? [{ href: "#roteiro-cenarios", label: "Cenários de testes" }]
       : []),

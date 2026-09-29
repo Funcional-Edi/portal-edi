@@ -18,6 +18,13 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    // Gerado pelo Playwright; não é necessário no build de produção.
+    ".next-e2e/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -47,10 +47,7 @@ test("one vertical navbar changes from products to product and integration conte
   await journey.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
   await expect(journey).toHaveAttribute("aria-current", "page");
-  const integrationGuide = nav.getByRole("link", { name: "Roteiro de Integração", exact: true });
-  await integrationGuide.click();
-  await expect(page).toHaveURL("/docs/canal-autorizador#roteiro-integracao");
-  await expect(integrationGuide).toHaveAttribute("aria-current", "page");
+  await expect(nav.getByRole("link", { name: "Roteiro de Integração", exact: true })).toHaveCount(0);
 
   await page.goBack();
   await expect(page).toHaveURL("/docs?produto=trade");
@@ -90,7 +87,7 @@ test("Credenciado apresenta estrutura inicial sem simular documentação", async
   await expect(page.getByRole("heading", { name: "Estrutura do Credenciado", exact: true })).toHaveCount(0);
   await expect(nav.getByText("Estrutura do Credenciado", { exact: true })).toBeVisible();
   await expect(nav.getByRole("button", { name: "Visão Geral", exact: true })).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Roteiro de Integração", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Jornada da Integração", exact: true })).toBeVisible();
   await expect(nav.getByText("Fluxo de Cadastro", { exact: true })).toBeVisible();
   await expect(nav.getByText("Fluxo PBM no Caixa", { exact: true })).toBeVisible();
   await expect(nav.getByText("SUBPRODUTOS", { exact: true })).toHaveCount(0);
@@ -129,36 +126,28 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).toContainText("Contexto");
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Roteiro de Integração");
-  await expect(page.locator("#contexto")).toBeVisible();
+  await expect(page.locator("#section-contexto")).toBeVisible();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
-  await expect(page.locator("#tabelas-referencia")).toBeHidden();
-  await expect(page.locator("#roteiro-integracao")).toBeHidden();
 
   await productNav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(index).toContainText("Jornada da Integração");
   await expect(index).toContainText("Tabelas de referência");
   await expect(index).not.toContainText("Contexto");
-  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeVisible();
-  await expect(page.locator("#tabelas-referencia")).toBeVisible();
-  await expect(page.locator("#roteiro-integracao")).toBeHidden();
-  const journeyItems = await index.locator("ul > li > a").allTextContents();
-  expect(journeyItems[0].trim()).toBe("Jornada da Integração");
-  expect(journeyItems[journeyItems.length - 1].trim()).toBe("Tabelas de referência");
-
-  await productNav.getByRole("link", { name: "Roteiro de Integração", exact: true }).click();
-  await expect(index).toContainText("Roteiro de Integração");
-  await expect(index.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("heading", { name: "Detalhamento e homologação", exact: true })).toBeVisible();
+  await expect(index.getByRole("link", { name: "Fluxograma individual", exact: true })).toHaveAttribute(
+    "href",
+    "#fluxograma-individual",
+  );
+  await expect(page.locator("#fluxograma-individual").getByRole("link", { name: "Abrir fluxograma individual", exact: true })).toHaveAttribute(
     "href",
     "/fluxogramas/canal-autorizador",
   );
-  await expect(index.getByRole("link", { name: /1\. Autenticar/ })).toHaveClass(/ml-8/);
-  await expect(index).not.toContainText("Jornada da Integração");
-  await expect(index).not.toContainText("Tabelas de referência");
-  await expect(page.locator("#contexto")).toBeHidden();
-  await expect(page.locator("#jornada-integracao")).toBeHidden();
-  await expect(page.locator("#tabelas-referencia")).toBeHidden();
-  await expect(page.locator("#roteiro-integracao")).toBeVisible();
+  const journeyItems = await index.locator("ul > li > a").allTextContents();
+  expect(journeyItems[0].trim()).toBe("Jornada da Integração");
+  expect(journeyItems[1].trim()).toBe("Fluxograma individual");
+  expect(journeyItems).toContain("Detalhamento por fluxo");
 
   await productNav.getByRole("button", { name: "Queries", exact: true }).click();
   await expect(index.locator('a[href^="/docs/canal-autorizador/operations/query/"]')).not.toHaveCount(0);
@@ -168,18 +157,18 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
 test("contextual index remains available in mobile navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
-  await page.goto("/docs/canal-autorizador#roteiro-integracao");
+  await page.goto("/docs/canal-autorizador#jornada-integracao");
 
   const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
   await expect(page.locator("footer")).toContainText("Funcional Health Tech");
   await expect(quickNavigation).toBeVisible();
   await expect(quickNavigation).toHaveClass(/docs-quick-nav/);
-  await expect(quickNavigation.getByRole("link", { name: "Roteiro de Integração", exact: true })).toBeVisible();
-  await expect(quickNavigation.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
+  await expect(quickNavigation.getByRole("link", { name: "Jornada da Integração", exact: true })).toBeVisible();
+  await expect(quickNavigation.getByRole("link", { name: "Fluxograma individual", exact: true })).toHaveAttribute(
     "href",
-    "/fluxogramas/canal-autorizador",
+    "#fluxograma-individual",
   );
-  await expect(quickNavigation).not.toContainText("Tabelas de referência");
+  await expect(quickNavigation).toContainText("Tabelas de referência");
 });
 
 test("quick navigation can be dragged horizontally", async ({ page }) => {
@@ -256,6 +245,6 @@ test("long Markdown code examples stay within the page width", async ({ page }) 
   await login(page);
   await page.goto("/docs/canal-autorizador");
 
-  await expect(page.locator("#section-visao-geral pre")).toBeVisible();
+  await expect(page.locator("#section-seguranca-e-ferramentas pre").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

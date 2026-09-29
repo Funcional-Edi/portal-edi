@@ -17,8 +17,7 @@ body {
 }
 
 [data-documentation-active-area="documentacao"] [data-documentation-area="documentacao"],
-[data-documentation-active-area="jornada-integracao"] [data-documentation-area="jornada-integracao"],
-[data-documentation-active-area="roteiro-integracao"] [data-documentation-area="roteiro-integracao"] {
+[data-documentation-active-area="jornada-integracao"] [data-documentation-area="jornada-integracao"] {
   display: block;
 }
 

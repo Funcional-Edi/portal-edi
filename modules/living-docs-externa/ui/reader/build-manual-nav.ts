@@ -26,6 +26,7 @@ interface BuildManualNavOptions {
   project?: Project;
   /** Quando a page já carregou seções (roteiro), evita reler `sections/*.md`. */
   sections?: ManualSection[];
+  flowAvailable?: boolean;
 }
 
 export interface ManualNavData {
@@ -37,7 +38,7 @@ export async function buildManualNav(
   slug: string,
   options: BuildManualNavOptions = {},
 ): Promise<ManualNavData | null> {
-  const { kind, name, playground, project: projectInput, sections: sectionsInput } =
+  const { kind, name, playground, project: projectInput, sections: sectionsInput, flowAvailable } =
     options;
 
   const project = projectInput ?? (await getPublishedManual(slug));
@@ -112,6 +113,9 @@ export async function buildManualNav(
     depth: 1,
   })));
   tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
+  if (flowAvailable) {
+    tocItems.push({ href: "#fluxograma-individual", label: "Fluxograma individual", depth: 1 });
+  }
   tocItems.push(
     ...operations.flatMap((op) => {
       const href = `${basePath}/operations/${op.kind}/${op.name}`;
@@ -127,7 +131,6 @@ export async function buildManualNav(
       ];
     })
   );
-  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
   if (project.manual.homologationFlows?.length) {
     tocItems.push({ href: "#roteiro-cenarios", label: "Cenários de testes", depth: 1 });
     tocItems.push(...project.manual.homologationFlows.map((flow) => ({
