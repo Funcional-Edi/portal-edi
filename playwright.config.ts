@@ -13,18 +13,19 @@ export default defineConfig({
   timeout: 120 * 1000,
   expect: { timeout: 20 * 1000 },
   use: {
-    baseURL: "http://localhost:3002",
+    baseURL: "http://localhost:3003",
     trace: "on-first-retry",
   },
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3002/",
+    command: "npm run dev:e2e",
+    url: "http://localhost:3003/",
     reuseExistingServer: !process.env.CI,
     env: {
       NODE_ENV: "development",
       AUTH_SECRET: "dev-auth-secret-e2e",
-      AUTH_URL: "http://localhost:3002",
+      AUTH_URL: "http://localhost:3003",
       DEV_AUTH_ENABLED: "true",
+      NEXT_DIST_DIR: ".next-e2e",
     },
     timeout: 120 * 1000,
   },

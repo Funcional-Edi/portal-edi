@@ -7,7 +7,8 @@
     "node": ">=20 <21"
   },
   "scripts": {
-    "dev": "next dev -p 3002",
+    "dev": "node scripts/dev.mjs",
+    "dev:e2e": "next dev -p 3003",
     "codegraph:sync": "codegraph sync .",
     "codegraph:check": "codegraph status .",
     "build": "next build",
