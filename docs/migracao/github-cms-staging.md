@@ -17,7 +17,7 @@ Seleção automática em `core/db/adapters/index.ts`: se `GITHUB_REPO_OWNER`, `G
 GITHUB_REPO_OWNER=Funcional-Edi
 GITHUB_REPO_NAME=portal-edi-content    # repo só com content/ + data/ (ou monorepo)
 GITHUB_TOKEN=ghp_...                   # fine-grained: Contents read (write na Fase 3+ remota)
-GITHUB_CONTENT_REF=edi-14338           # opcional; branch/tag/SHA do conteúdo
+GITHUB_CONTENT_REF=homolog              # opcional; branch/tag/SHA do conteúdo
 # CONTENT_ROOT=/app                    # opcional; paths relativos ao root do CMS no repo
 ```
 
@@ -25,6 +25,30 @@ Quando `GITHUB_CONTENT_REF` não é informado, o portal usa
 `VERCEL_GIT_COMMIT_REF` em previews da Vercel. Isso mantém o código e o CMS na
 mesma branch do deploy. Em produção, informe explicitamente a branch, tag ou
 SHA correspondente ao conteúdo publicado quando o repositório CMS for separado.
+
+## Deploy na Vercel apontando para homolog
+
+Quando o portal e o CMS estiverem em repositórios diferentes, configure no
+ambiente do deploy:
+
+1. O código deve ser publicado a partir da branch `homolog`.
+2. `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME` e `GITHUB_TOKEN` devem apontar para
+   o repositório de conteúdo.
+3. `GITHUB_CONTENT_REF` deve ser `homolog` — ou outra branch, tag ou SHA que
+   exista no repositório CMS e contenha o conteúdo esperado.
+4. Depois de alterar as variáveis, faça um novo deploy para a configuração ser
+   aplicada; o cache anterior não deve ser usado como evidência de conteúdo
+   atualizado.
+5. Valide `/docs/canal-autorizador` e confirme que as seções e tabelas exibidas
+   correspondem à mesma referência do CMS, e não à `main`.
+
+Se `GITHUB_CONTENT_REF` ficar vazio, previews da Vercel usam
+`VERCEL_GIT_COMMIT_REF` automaticamente. Essa alternativa só é segura quando a
+branch do código também existe no repositório CMS.
+
+Sintoma de referência incorreta: a interface usa componentes novos, mas mostra
+seções ou quantidade de tabelas de uma versão antiga. Nesse caso, confira a
+referência do CMS nas variáveis do ambiente e gere um novo deploy.
 
 ## Layout esperado no repo CMS
 
