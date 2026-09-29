@@ -17,8 +17,14 @@ Seleção automática em `core/db/adapters/index.ts`: se `GITHUB_REPO_OWNER`, `G
 GITHUB_REPO_OWNER=Funcional-Edi
 GITHUB_REPO_NAME=portal-edi-content    # repo só com content/ + data/ (ou monorepo)
 GITHUB_TOKEN=ghp_...                   # fine-grained: Contents read (write na Fase 3+ remota)
+GITHUB_CONTENT_REF=edi-14338           # opcional; branch/tag/SHA do conteúdo
 # CONTENT_ROOT=/app                    # opcional; paths relativos ao root do CMS no repo
 ```
+
+Quando `GITHUB_CONTENT_REF` não é informado, o portal usa
+`VERCEL_GIT_COMMIT_REF` em previews da Vercel. Isso mantém o código e o CMS na
+mesma branch do deploy. Em produção, informe explicitamente a branch, tag ou
+SHA correspondente ao conteúdo publicado quando o repositório CMS for separado.
 
 ## Layout esperado no repo CMS
 

@@ -19,16 +19,17 @@ function normalizePath(relativePath: string): string {
   return relativePath.replace(/^\/+/, "");
 }
 
-function getGithubConfig(): { owner: string; repo: string; token: string } {
+function getGithubConfig(): { owner: string; repo: string; token: string; ref?: string } {
   const owner = process.env.GITHUB_REPO_OWNER?.trim();
   const repo = process.env.GITHUB_REPO_NAME?.trim();
   const token = process.env.GITHUB_TOKEN?.trim();
+  const ref = process.env.GITHUB_CONTENT_REF?.trim() || process.env.VERCEL_GIT_COMMIT_REF?.trim();
 
   if (!owner || !repo || !token) {
     throw new Error("GitHub CMS não configurado: faltam GITHUB_REPO_OWNER/NAME/TOKEN.");
   }
 
-  return { owner, repo, token };
+  return { owner, repo, token, ref: ref || undefined };
 }
 
 function getOctokitClient(): Octokit {
@@ -39,11 +40,12 @@ function getOctokitClient(): Octokit {
 
 async function getGithubContent(path: string): Promise<GithubContentResponse | null> {
   try {
-    const { owner, repo } = getGithubConfig();
+    const { owner, repo, ref } = getGithubConfig();
     const response = await getOctokitClient().repos.getContent({
       owner,
       repo,
       path: normalizePath(path),
+      ...(ref ? { ref } : {}),
     });
 
     return response.data as GithubContentResponse;

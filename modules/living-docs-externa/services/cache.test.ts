@@ -38,6 +38,7 @@ describe("living-docs cache tags", () => {
     vi.stubEnv("GITHUB_REPO_OWNER", "edi");
     vi.stubEnv("GITHUB_REPO_NAME", "content");
     vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "commit-a");
+    vi.stubEnv("GITHUB_CONTENT_REF", "ref-a");
   });
 
   afterEach(() => vi.unstubAllEnvs());
@@ -53,7 +54,7 @@ describe("living-docs cache tags", () => {
 
     expect(unstableCacheMock).toHaveBeenCalledWith(
       expect.any(Function),
-      ["living-docs:v2", "edi", "content", "commit-a", "list-published-manuals", "github"],
+      ["living-docs:v2", "edi", "content", "commit-a", "ref-a", "list-published-manuals", "github"],
       { tags: ["living-docs:projects"], revalidate: 60 }
     );
   });
@@ -72,7 +73,7 @@ describe("living-docs cache tags", () => {
 
     expect(unstableCacheMock).toHaveBeenCalledWith(
       expect.any(Function),
-      ["living-docs:v2", "edi", "content", "commit-a", "get-published-manual", "github", "demo"],
+      ["living-docs:v2", "edi", "content", "commit-a", "ref-a", "get-published-manual", "github", "demo"],
       { tags: ["living-docs:project:demo"], revalidate: 60 }
     );
   });
@@ -92,7 +93,7 @@ describe("living-docs cache tags", () => {
 
     expect(unstableCacheMock).toHaveBeenCalledWith(
       expect.any(Function),
-      ["living-docs:v2", "edi", "content", "commit-a", "get-published-manual-sections", "github", "demo"],
+      ["living-docs:v2", "edi", "content", "commit-a", "ref-a", "get-published-manual-sections", "github", "demo"],
       { tags: ["living-docs:project:demo"], revalidate: 60 }
     );
   });
@@ -130,10 +131,11 @@ describe("living-docs cache tags", () => {
     await listPublishedManuals();
     vi.stubEnv("GITHUB_REPO_NAME", "other-content");
     vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "commit-b");
+    vi.stubEnv("GITHUB_CONTENT_REF", "ref-b");
     await listPublishedManuals();
     expect(unstableCacheMock).toHaveBeenLastCalledWith(
       expect.any(Function),
-      ["living-docs:v2", "edi", "other-content", "commit-b", "list-published-manuals", "github"],
+      ["living-docs:v2", "edi", "other-content", "commit-b", "ref-b", "list-published-manuals", "github"],
       { tags: ["living-docs:projects"], revalidate: 60 }
     );
   });
