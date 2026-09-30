@@ -100,6 +100,31 @@ test("Credenciado apresenta estrutura inicial sem simular documentação", async
   await expect(page.getByText("Jornada do anexo de receita", { exact: true })).toHaveCount(0);
 });
 
+test("Canal Autorizador exibe os dois fluxos no índice de fluxogramas", async ({ page }) => {
+  await login(page);
+  const nav = page.getByRole("navigation", { name: "Produtos EDI" });
+
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await nav.getByRole("button", { name: "Fluxograma Completo", exact: true }).click();
+
+  const content = page.getByRole("region", { name: "Conteúdo da documentação" });
+  const distributorFlow = content.getByRole("link", {
+    name: /Canal Autorizador — Fluxo 1 — Retorno Envio pelo Distribuidor/,
+  });
+  const automaticFlow = content.getByRole("link", {
+    name: /Canal Autorizador — Fluxo 2 — Retorno Automático/,
+  });
+
+  await expect(distributorFlow).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador?fluxo=retorno-distribuidor",
+  );
+  await expect(automaticFlow).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador?fluxo=retorno-automatico",
+  );
+});
+
 test("mobile navigation preserves context without horizontal overflow", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
@@ -129,7 +154,7 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).toContainText("Contexto");
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Roteiro de Integração");
-  await expect(page.locator("#contexto")).toBeVisible();
+  await expect(page.locator("#section-contexto")).toBeVisible();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
   await expect(page.locator("#tabelas-referencia")).toBeHidden();
   await expect(page.locator("#roteiro-integracao")).toBeHidden();
@@ -138,9 +163,9 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).toContainText("Jornada da Integração");
   await expect(index).toContainText("Tabelas de referência");
   await expect(index).not.toContainText("Contexto");
-  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeVisible();
-  await expect(page.locator("#tabelas-referencia")).toBeVisible();
+  await expect(page.locator("#tabelas-referencia")).toHaveCount(0);
   await expect(page.locator("#roteiro-integracao")).toBeHidden();
   const journeyItems = await index.locator("ul > li > a").allTextContents();
   expect(journeyItems[0].trim()).toBe("Jornada da Integração");
@@ -155,7 +180,7 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index.getByRole("link", { name: /1\. Autenticar/ })).toHaveClass(/ml-8/);
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Tabelas de referência");
-  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
   await expect(page.locator("#tabelas-referencia")).toBeHidden();
   await expect(page.locator("#roteiro-integracao")).toBeVisible();
@@ -256,6 +281,6 @@ test("long Markdown code examples stay within the page width", async ({ page }) 
   await login(page);
   await page.goto("/docs/canal-autorizador");
 
-  await expect(page.locator("#section-visao-geral pre")).toBeVisible();
+  await expect(page.locator("#section-seguranca-e-ferramentas pre").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

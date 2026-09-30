@@ -55,6 +55,31 @@ describe("documentation navigation", () => {
     ]);
   });
 
+  it("expands multiple flows without changing the single-flow link", () => {
+    const view = resolveDocumentationNavigation(
+      DOCUMENTATION_CONFIGURATION,
+      manuals,
+      { role: "client" },
+      new Map(),
+      flowSlugs,
+      new Map([[
+        "canal-autorizador",
+        [
+          { id: "retorno-distribuidor", title: "Fluxo 1 — Retorno Envio pelo Distribuidor" },
+          { id: "retorno-automatico", title: "Fluxo 2 — Retorno Automático" },
+        ],
+      ]]),
+    );
+    const links = view.products.find((p) => p.id === "trade")!.actions
+      .find((action) => action.id === "fluxograma-geral")!.links;
+
+    expect(links.slice(0, 2).map((link) => link.href)).toEqual([
+      "/fluxogramas/canal-autorizador?fluxo=retorno-distribuidor",
+      "/fluxogramas/canal-autorizador?fluxo=retorno-automatico",
+    ]);
+    expect(links[2]?.href).toBe("/fluxogramas/wholesaler");
+  });
+
   it("only offers request tests to admins and GraphQL manuals", () => {
     expect(resolve().products.every((p) => p.actions.every((a) => a.id !== "teste-de-requisicao"))).toBe(true);
     const admin = resolve(undefined, manuals.map((manual) => manual.slug === "wholesaler" ? { ...manual, protocol: "rest" } : manual), "admin");

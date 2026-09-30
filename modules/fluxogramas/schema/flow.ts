@@ -36,11 +36,25 @@ export const integrationFlowSchema = z.object({
   updatedAt: z.string().datetime().optional(),
 });
 
+export const integrationFlowEntrySchema = integrationFlowSchema.extend({
+  id: z.string().min(1).max(64),
+});
+
+export const integrationFlowDocumentSchema = z.union([
+  integrationFlowSchema,
+  z.object({
+    version: z.literal(1),
+    flows: z.array(integrationFlowEntrySchema).min(1),
+  }),
+]);
+
 export type FlowNodeType = z.infer<typeof flowNodeTypeSchema>;
 export type FlowOperationRef = z.infer<typeof flowOperationRefSchema>;
 export type FlowNode = z.infer<typeof flowNodeSchema>;
 export type FlowEdge = z.infer<typeof flowEdgeSchema>;
 export type IntegrationFlow = z.infer<typeof integrationFlowSchema>;
+export type IntegrationFlowEntry = z.infer<typeof integrationFlowEntrySchema>;
+export type IntegrationFlowDocument = z.infer<typeof integrationFlowDocumentSchema>;
 
 /** Entrada de gravação — `updatedAt` é definido pelo service. */
 export const saveIntegrationFlowInputSchema = integrationFlowSchema.omit({
@@ -48,3 +62,10 @@ export const saveIntegrationFlowInputSchema = integrationFlowSchema.omit({
 });
 
 export type SaveIntegrationFlowInput = z.infer<typeof saveIntegrationFlowInputSchema>;
+
+export function normalizeIntegrationFlowDocument(
+  document: IntegrationFlowDocument
+): IntegrationFlowEntry[] {
+  if ("flows" in document) return document.flows;
+  return [{ id: "default", ...document }];
+}

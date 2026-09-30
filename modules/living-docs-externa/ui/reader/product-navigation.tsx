@@ -66,10 +66,8 @@ function availableFlowAreas(product: DocumentationProductView, link: Documentati
   });
 }
 
-function individualFlowchartHref(product: DocumentationProductView, link: DocumentationLinkView) {
-  return product.actions
-    .find((action) => action.id === "fluxograma-geral")
-    ?.links.find((item) => item.id === link.id)?.href ?? null;
+function individualFlowchartHref(link: DocumentationLinkView) {
+  return link.projectSlug ? `/fluxogramas/${link.projectSlug}` : null;
 }
 
 function tocDesktopIndent(depth?: number): string {
@@ -116,7 +114,7 @@ function contextualTocItems({
   }
 
   if (areaId === "roteiro-integracao") {
-    const flowchartHref = individualFlowchartHref(product, link);
+    const flowchartHref = individualFlowchartHref(link);
     return [
       ...items.filter((item) => item.href === "#roteiro-integracao"),
       ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),

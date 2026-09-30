@@ -24,7 +24,8 @@ export class SaveFlowError extends Error {
 
 export async function saveProjectFlow(
   slug: string,
-  input: unknown
+  input: unknown,
+  flowId = "default"
 ): Promise<IntegrationFlow> {
   const config = await getProjectConfigRef(slug);
   if (!config) {
@@ -48,7 +49,7 @@ export async function saveProjectFlow(
   };
 
   const validated = integrationFlowSchema.parse(flow);
-  await persistFlow(slug, validated);
+  await persistFlow(slug, validated, flowId);
   return validated;
 }
 

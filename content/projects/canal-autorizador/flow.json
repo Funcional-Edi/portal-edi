@@ -1,7 +1,11 @@
 {
   "version": 1,
-  "title": "Fluxo Canal Autorizador",
-  "description": "Ciclo de vida do Transfer Order: autenticação, pré-pedido, retorno opcional, cancelamento, nota fiscal e ajustes pós-faturamento (substituição ou devolução).",
+  "flows": [
+    {
+  "id": "retorno-automatico",
+  "version": 1,
+  "title": "Fluxo 2 — Retorno Automático",
+  "description": "Retorno gerado automaticamente após a criação do pedido, com faturamento total, parcial ou cancelamento.",
   "nodes": [
     { "id": "start", "type": "start", "label": "Pedido recebido", "position": { "x": 260, "y": 0 } },
     {
@@ -81,4 +85,79 @@
     { "id": "e17", "source": "createGroupedInvoiceDevolution", "target": "end" }
   ],
   "updatedAt": "2026-09-11T18:17:00.000Z"
+    },
+    {
+      "id": "retorno-distribuidor",
+      "version": 1,
+      "title": "Fluxo 1 — Retorno Envio pelo Distribuidor",
+      "description": "Cenário em que o distribuidor envia o retorno do pedido antes do faturamento.",
+      "nodes": [
+        { "id": "start", "type": "start", "label": "Venda realizada", "position": { "x": 260, "y": 0 } },
+        {
+          "id": "createGroupedOrder",
+          "type": "operation",
+          "label": "Enviar pedido",
+          "position": { "x": 260, "y": 90 },
+          "operationRef": { "kind": "mutation", "name": "createGroupedOrder" }
+        },
+        { "id": "decisionRules", "type": "decision", "label": "Regras de negócio válidas?", "position": { "x": 260, "y": 180 } },
+        { "id": "endRejected", "type": "end", "label": "Pedido rejeitado", "position": { "x": 520, "y": 270 } },
+        {
+          "id": "groupedOrder",
+          "type": "operation",
+          "label": "Consultar status do pedido",
+          "position": { "x": 260, "y": 270 },
+          "operationRef": { "kind": "query", "name": "groupedOrder" }
+        },
+        { "id": "decisionResponse", "type": "decision", "label": "Enviar retorno?", "position": { "x": 260, "y": 360 } },
+        {
+          "id": "createGroupedResponse",
+          "type": "operation",
+          "label": "Enviar retorno",
+          "position": { "x": 80, "y": 450 },
+          "operationRef": { "kind": "mutation", "name": "createGroupedResponse" }
+        },
+        { "id": "decisionCancel", "type": "decision", "label": "Cancelar pedido?", "position": { "x": 80, "y": 540 } },
+        {
+          "id": "createGroupedCancellation",
+          "type": "operation",
+          "label": "Cancelar pedido",
+          "position": { "x": 0, "y": 630 },
+          "operationRef": { "kind": "mutation", "name": "createGroupedCancellation" }
+        },
+        { "id": "endCancelled", "type": "end", "label": "Pedido cancelado", "position": { "x": 0, "y": 720 } },
+        {
+          "id": "createGroupedInvoice",
+          "type": "operation",
+          "label": "Enviar nota fiscal",
+          "position": { "x": 260, "y": 540 },
+          "operationRef": { "kind": "mutation", "name": "createGroupedInvoice" }
+        },
+        {
+          "id": "groupedInvoices",
+          "type": "operation",
+          "label": "Consultar ressarcimento",
+          "position": { "x": 260, "y": 630 },
+          "operationRef": { "kind": "query", "name": "groupedInvoices" }
+        },
+        { "id": "end", "type": "end", "label": "Fluxo concluído", "position": { "x": 260, "y": 720 } }
+      ],
+      "edges": [
+        { "id": "e1", "source": "start", "target": "createGroupedOrder" },
+        { "id": "e2", "source": "createGroupedOrder", "target": "decisionRules" },
+        { "id": "e3", "source": "decisionRules", "target": "endRejected", "label": "Não" },
+        { "id": "e4", "source": "decisionRules", "target": "groupedOrder", "label": "Sim" },
+        { "id": "e5", "source": "groupedOrder", "target": "decisionResponse" },
+        { "id": "e6", "source": "decisionResponse", "target": "createGroupedResponse", "label": "Sim" },
+        { "id": "e7", "source": "decisionResponse", "target": "createGroupedInvoice", "label": "Não" },
+        { "id": "e8", "source": "createGroupedResponse", "target": "decisionCancel" },
+        { "id": "e9", "source": "decisionCancel", "target": "createGroupedCancellation", "label": "Sim" },
+        { "id": "e10", "source": "createGroupedCancellation", "target": "endCancelled" },
+        { "id": "e11", "source": "decisionCancel", "target": "createGroupedInvoice", "label": "Não" },
+        { "id": "e12", "source": "createGroupedInvoice", "target": "groupedInvoices" },
+        { "id": "e13", "source": "groupedInvoices", "target": "end" }
+      ],
+      "updatedAt": "2026-09-30T00:00:00.000Z"
+    }
+  ]
 }

@@ -3,13 +3,18 @@ export {
   flowNodeSchema,
   flowNodeTypeSchema,
   flowOperationRefSchema,
+  integrationFlowDocumentSchema,
+  integrationFlowEntrySchema,
   integrationFlowSchema,
+  normalizeIntegrationFlowDocument,
   saveIntegrationFlowInputSchema,
   type FlowEdge,
   type FlowNode,
   type FlowNodeType,
   type FlowOperationRef,
   type IntegrationFlow,
+  type IntegrationFlowDocument,
+  type IntegrationFlowEntry,
   type SaveIntegrationFlowInput,
 } from "@/modules/fluxogramas/schema/flow";
 

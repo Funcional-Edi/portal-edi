@@ -24,11 +24,12 @@ import type { FlowNodeType } from "@/modules/fluxogramas/schema";
 
 interface FlowEditorProps {
   slug: string;
+  flowId?: string;
   initialFlow: IntegrationFlow;
   manual: ManualRef | null;
 }
 
-export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
+export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProps) {
   const initialGraph = useMemo(() => integrationFlowToGraph(initialFlow), [initialFlow]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
@@ -37,6 +38,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
   const [status, setStatus] = useState<string | null>(null);
   const [mermaid, setMermaid] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const flowQuery = flowId ? `?fluxo=${encodeURIComponent(flowId)}` : "";
 
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -83,7 +85,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
     setSaving(true);
     setStatus(null);
     try {
-      const response = await fetch(`/api/fluxogramas/${slug}`, {
+      const response = await fetch(`/api/fluxogramas/${slug}${flowQuery}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload()),
@@ -104,7 +106,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
   const exportMermaid = async () => {
     setStatus(null);
     try {
-      const response = await fetch(`/api/fluxogramas/${slug}/mermaid`, {
+      const response = await fetch(`/api/fluxogramas/${slug}/mermaid${flowQuery}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload()),

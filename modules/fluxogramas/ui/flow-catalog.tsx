@@ -21,7 +21,7 @@ export function FlowCatalog({ flows }: FlowCatalogProps) {
       {flows.map((flow) => (
         <li key={flow.slug}>
           <Link
-            href={`/fluxogramas/${flow.slug}`}
+            href={`/fluxogramas/${flow.slug}?fluxo=${encodeURIComponent(flow.flowId)}`}
             className="block rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-600 hover:shadow-md"
           >
             <p className="text-sm font-medium text-brand-700">{flow.flowTitle}</p>
