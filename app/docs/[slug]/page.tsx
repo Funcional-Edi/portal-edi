@@ -29,7 +29,7 @@ export default async function DocsGuidePage({ params }: DocsGuidePageProps) {
   if (!project) notFound();
 
   return (
-    <ManualShellWithNav slug={slug} project={project} sections={sections} flowAvailable={hasFlow}>
+    <ManualShellWithNav slug={slug} project={project} sections={sections} flowAvailable={flows.length > 0}>
       <ManualRoteiro
         project={project}
         sections={sections}

@@ -1,6 +1,5 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
-import type { IntegrationFlowEntry } from "@/modules/fluxogramas/schema";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { MarkdownBody } from "@/core/ui/markdown-body";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
@@ -17,10 +16,6 @@ function formatUpdatedAt(iso: string): string {
     month: "short",
     year: "numeric",
   });
-}
-
-function roteiroScenarioId(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
 function roteiroScenarioId(value: string): string {
@@ -64,7 +59,7 @@ interface ManualRoteiroProps {
   /** Ausente = visão do distribuidor (somente leitura). */
   editor?: ManualRoteiroEditorSlots;
   /** Link para fluxograma quando `flow.json` existe. */
-  flowLinks?: Array<Pick<IntegrationFlowEntry, "id" | "title" | "description"> & { href: string }>;
+  flowLinks?: Array<{ id: string; title: string; description?: string; href: string }>;
   /** Link para referência GraphQL quando schema sincronizado. */
   schemaReferenceHref?: string;
   /** Playground executa contra gateway real — só perfil admin. */
@@ -84,6 +79,7 @@ export function ManualRoteiro({
   const documentationSections = sections.filter((section) => section.id !== "fluxo-do-pedido");
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
+  const flowHref = flowLinks[0]?.href;
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
 

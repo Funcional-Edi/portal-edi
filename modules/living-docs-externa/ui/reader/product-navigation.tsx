@@ -231,7 +231,7 @@ type CredenciadoStructureItem = {
 const CREDENCIADO_STRUCTURE = [
   { label: "Visão Geral", areaId: "visao-geral" },
   { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
-  { label: "Cenários de Testes e Validações", areaId: "roteiro-integracao" },
+  { label: "Cenários de Testes e Validações", areaId: "jornada-integracao" },
   { label: "Fluxo de Cadastro" },
   { label: "Fluxo Opt-in" },
   { label: "Fluxo de Venda" },

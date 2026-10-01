@@ -10,7 +10,7 @@ import { attachProjectsToProducts } from "@/modules/living-docs-externa/services
 import { loadDocumentationConfiguration } from "@/modules/living-docs-externa/services/manage-catalog-products";
 import { listProjects } from "@/modules/living-docs-externa/services/list-projects";
 import { listPublishedManuals } from "@/modules/living-docs-externa/services/list-published-manuals";
-import { getIntegrationFlows } from "@/modules/fluxogramas/repository/flow-repository";
+import { getIntegrationFlows } from "@/modules/fluxogramas/public";
 
 async function listProjectSlugsWithFlow(): Promise<string[]> {
   const slugs = await listContentSubdirs(CONTENT_PATHS.projectsPrefix);

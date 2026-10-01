@@ -17,7 +17,7 @@ import type {
 import { getPublishedManualSections } from "@/modules/living-docs-externa/services/get-published-manual-sections";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { getPublishedOperationSchemaDetail } from "@/modules/living-docs-externa/services/get-published-schema";
-import { getIntegrationFlows } from "@/modules/fluxogramas/repository/flow-repository";
+import { getIntegrationFlows } from "@/modules/fluxogramas/public";
 
 interface BuildManualNavOptions {
   kind?: string;

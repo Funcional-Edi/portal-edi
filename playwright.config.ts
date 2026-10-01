@@ -4,6 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
 const browserChannel = process.env.PLAYWRIGHT_BROWSER_CHANNEL || "msedge";
 const e2ePort = process.env.E2E_PORT?.match(/^\d+$/)?.[0] || "3003";
 const e2eUrl = `http://localhost:${e2ePort}`;
+const e2eDistDir = `.next-e2e-${e2ePort}-${process.pid}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -24,10 +25,10 @@ export default defineConfig({
     reuseExistingServer: false,
     env: {
       NODE_ENV: "development",
+      NEXT_DIST_DIR: e2eDistDir,
       AUTH_SECRET: "dev-auth-secret-e2e",
       AUTH_URL: e2eUrl,
       DEV_AUTH_ENABLED: "true",
-      NEXT_DIST_DIR: ".next-e2e",
     },
     timeout: 120 * 1000,
   },
