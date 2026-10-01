@@ -385,7 +385,7 @@ export function ManualRoteiro({
       </section>
 
       <section id="versao-subproduto" data-documentation-area="documentacao" className="mt-10 scroll-mt-24">
-          <h2 className="text-lg font-semibold">Versão da integração</h2>
+          <h2 className="text-lg font-semibold">Histórico de Alterações</h2>
           {manual.manualVersion ? (
             <p className="mt-1 text-sm text-slate-600">
               Versão atual: <span className="font-medium text-slate-900">{manual.manualVersion}</span>

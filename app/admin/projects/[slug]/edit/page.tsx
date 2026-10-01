@@ -70,7 +70,7 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
     ...(project.manual.homologationValidations?.length
       ? [{ href: "#roteiro-validacoes", label: "Validações" }]
       : []),
-    { href: "#versao-subproduto", label: "Versão da integração" },
+    { href: "#versao-subproduto", label: "Histórico de Alterações" },
   ];
 
   return (
