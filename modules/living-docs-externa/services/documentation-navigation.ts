@@ -87,12 +87,11 @@ export function resolveDocumentationNavigation(
           && module.status === "published" && action.status === "published" && manual;
         // Routes are explicitly configured, and must belong to the published manual.
         const base = manual && module.route === `/docs/${manual.slug}` ? module.route : null;
-        let href: string | null = null;
-        if (available && base) {
-          if (action.destination === "documentation") href = base;
-          if (action.destination === "guide") {
-            const anchor = action.id === "jornada-integracao" ? "jornada-integracao" : "roteiro-integracao";
-            href = `${base}#${anchor}`;
+          let href: string | null = null;
+          if (available && base) {
+            if (action.destination === "documentation") href = base;
+            if (action.destination === "guide") {
+              href = `${base}#jornada-integracao`;
           }
           if (action.destination === "flowchart" && flowSlugs.has(manual.slug)) href = `/fluxogramas/${manual.slug}`;
           if (action.destination === "request-test" && audience.role === "admin" && manual.protocol === "graphql") {
@@ -176,8 +175,7 @@ export function documentationRouteSelection(
           const operationKind = pathname.startsWith(`${manual}/operations/`)
             ? pathname.slice(`${manual}/operations/`.length).split("/")[0]
             : null;
-          const actionId = hash === "#jornada-integracao" ? "jornada-integracao"
-            : hash === "#roteiro-integracao" ? "roteiro-integracao"
+          const actionId = hash === "#jornada-integracao" || hash === "#roteiro-integracao" ? "jornada-integracao"
             : pathname.startsWith(`${manual}/playground`) ? "teste-de-requisicao"
               : operationKind === "query" ? "queries"
                 : operationKind === "mutation" ? "mutations"

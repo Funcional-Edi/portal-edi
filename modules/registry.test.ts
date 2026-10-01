@@ -11,13 +11,14 @@ describe("registro de módulos do portal", () => {
     expect(ids).toContain("graphql-reference");
     expect(ids).toContain("homologacao");
     expect(ids).toContain("compliance");
+    expect(ids).toContain("faq");
   });
 
   it("é idempotente — registrar duas vezes não duplica nem quebra", () => {
     registerAllModules();
     const segunda = registerAllModules();
 
-    expect(segunda).toHaveLength(7);
+    expect(segunda).toHaveLength(8);
   });
 
   it("sinaliza homologação como bloqueada por exigir banco transacional", () => {
@@ -42,6 +43,7 @@ describe("registro de módulos do portal", () => {
     expect(ids).not.toContain("living-docs-externa");
     expect(ids).not.toContain("manuais-internos");
     expect(ids).not.toContain("fluxogramas");
+    expect(ids).not.toContain("faq");
   });
 
   it("todo módulo declara rota base, público e nível de acesso", () => {

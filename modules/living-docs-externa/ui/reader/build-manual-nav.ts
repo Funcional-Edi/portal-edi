@@ -27,6 +27,7 @@ interface BuildManualNavOptions {
   project?: Project;
   /** Quando a page já carregou seções (roteiro), evita reler `sections/*.md`. */
   sections?: ManualSection[];
+  flowAvailable?: boolean;
 }
 
 export interface ManualNavData {
@@ -38,7 +39,7 @@ export async function buildManualNav(
   slug: string,
   options: BuildManualNavOptions = {},
 ): Promise<ManualNavData | null> {
-  const { kind, name, playground, project: projectInput, sections: sectionsInput } =
+  const { kind, name, playground, project: projectInput, sections: sectionsInput, flowAvailable } =
     options;
 
   const project = projectInput ?? (await getPublishedManual(slug));

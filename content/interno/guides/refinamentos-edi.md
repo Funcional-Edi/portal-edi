@@ -630,3 +630,85 @@ existente do portal.
 **Refinamento em validação.** Nenhuma implementação desta issue deve ser
 considerada concluída antes da aprovação deste registro e da conferência visual
 no portal.
+
+## EDI-14334 — Portal de FAQ de integração
+
+### Objetivo
+
+Criar uma área de FAQ no Portal EDI para responder dúvidas frequentes de
+integração, combinando orientações genéricas com dúvidas específicas dos
+produtos. A FAQ deve ajudar o fornecedor a identificar o próximo passo sem
+substituir a documentação técnica, a jornada ou o roteiro de cada produto.
+
+### Problema que a FAQ resolve
+
+Hoje uma dúvida pode exigir a leitura de várias partes do portal ou depender de
+uma orientação informal do time. Isso dificulta o início da integração, aumenta
+as solicitações repetidas e não deixa claro quando a pessoa deve consultar a
+documentação ou pedir apoio.
+
+A FAQ funciona como uma camada de orientação rápida: responde dúvidas pontuais,
+direciona para a documentação quando a resposta depender de um fluxo ou regra
+específica e não inventa endpoints, credenciais, e-mails ou regras não
+validadas.
+
+### Experiência esperada do fornecedor
+
+1. Encontra um atalho claro para **FAQ** na navegação global e na entrada do
+   portal.
+2. Pesquisa por texto ou filtra por categoria.
+3. Consulta perguntas expansíveis, com resposta curta e links relacionados.
+4. Identifica quando o conteúdo é geral ou relacionado a um produto.
+5. Quando necessário, reúne produto, fluxo, ambiente, data e horário,
+   identificador da requisição, resultado esperado, resultado recebido e uma
+   mensagem de erro sanitizada antes de pedir apoio.
+
+### Organização e publicação do conteúdo
+
+O conteúdo inicial cobre dúvidas genéricas — primeiros passos, produto,
+subproduto, fluxo, homologação, produção, validação e erros — e dúvidas
+específicas do Canal Autorizador e Credenciado.
+
+Na primeira versão, ele permanece versionado no projeto, sem banco de dados:
+
+- um índice JSON com categorias, perguntas, ordem, status e links;
+- um Markdown por resposta;
+- status `draft`, `review` e `published`;
+- somente perguntas `published` aparecem para o fornecedor;
+- links internos apontam apenas para rotas reais do portal.
+
+### Navegação, segurança e apoio
+
+A FAQ é uma área própria, acessível pela navegação global e pela página inicial.
+A busca considera título, categoria e texto da resposta; o filtro separa dúvidas
+gerais das relacionadas a produtos. A interface deve permanecer acessível em
+desktop e mobile, com foco visível e textos compreensíveis sem depender apenas
+de ícones ou cores.
+
+O contato oficial e o fluxo de SAC não são definidos nesta issue. Enquanto não
+houver validação da equipe responsável, a FAQ mantém orientação neutra e não
+expõe tokens, senhas, dados pessoais, credenciais ou exemplos de acesso real.
+
+### Manutenção futura versionada
+
+CRUD administrativo, autosave, salvamento direto no GitHub e publicação
+automática ficam fora desta etapa. Quando forem implementados, exigirão SSO,
+autorização explícita de colaboradores EDI, revisão por outro colaborador e
+trilha de auditoria com autor, data, status e Pull Request.
+
+### Critérios de aceite
+
+- Há um modelo claro de perguntas genéricas e específicas de produto.
+- O fornecedor entende quando usar a FAQ e quando seguir para a documentação.
+- Navegação global, atalho inicial, busca, filtro e links relacionados existem.
+- O conteúdo é versionado em Markdown/JSON e respeita o status de publicação.
+- Rascunhos e itens em revisão não são exibidos ao fornecedor.
+- Contato oficial e fluxo de SAC permanecem pendentes de validação, sem valores
+  inventados.
+- CRUD, autosave e Pull Request automatizado continuam como etapa futura.
+
+### Diretriz para o desenvolvimento
+
+Implementar somente a leitura da FAQ, reutilizando os padrões existentes de
+módulos, navegação e conteúdo versionado. Não criar banco de dados, CRUD,
+autosave, integração de SAC, e-mail fixo ou publicação automática nesta fase.

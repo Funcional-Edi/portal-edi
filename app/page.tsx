@@ -4,6 +4,7 @@ import { Suspense, type ReactNode } from "react";
 import {
   ArrowRight,
   BookOpen,
+  CircleHelp,
   ClipboardCheck,
   Code2,
   FileText,
@@ -33,6 +34,7 @@ const MODULE_ICONS: Record<string, LucideIcon> = {
   homologacao: ClipboardCheck,
   "assistente-ia": Sparkles,
   compliance: ShieldCheck,
+  faq: CircleHelp,
 };
 
 function PortalIntroduction({ children }: { children?: ReactNode }) {
@@ -92,7 +94,10 @@ export default async function HomePage() {
   const plannedModules = isAdmin ? accessibleModules.filter((module) => module.status !== "active") : [];
   const allowedNav = activeModules.flatMap((module) => module.nav ?? [])
     .filter((item) => !item.access || canAccessLevel(role, item.access));
-  const uniqueNav = allowedNav.filter((item, index, list) => list.findIndex((entry) => entry.href === item.href) === index);
+  const uniqueNav = ["/docs", "/faq", "/compliance"].flatMap((href) => {
+    const item = allowedNav.find((entry) => entry.href === href);
+    return item ? [item] : [];
+  });
   const docsEntry = uniqueNav.find((item) => item.href === "/docs");
 
   return (

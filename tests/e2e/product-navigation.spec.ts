@@ -156,8 +156,6 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).not.toContainText("Roteiro de Integração");
   await expect(page.locator("#section-contexto")).toBeVisible();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
-  await expect(page.locator("#tabelas-referencia")).toBeHidden();
-  await expect(page.locator("#roteiro-integracao")).toBeHidden();
 
   await productNav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(index).toContainText("Jornada da Integração");
@@ -190,7 +188,7 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
 test("contextual index remains available in mobile navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
-  await page.goto("/docs/canal-autorizador#roteiro-integracao");
+  await page.goto("/docs/canal-autorizador#jornada-integracao");
 
   const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
   await expect(page.locator("footer")).toContainText("Funcional Health Tech");

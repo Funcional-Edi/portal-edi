@@ -34,12 +34,12 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
 
   await products.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(
-    index.getByRole("link", { name: /1\. Obter token do gateway/ }),
+    index.getByRole("link", { name: /1\. Obter token do gateway/ }).first(),
   ).toHaveClass(/ml-4/);
 
   await page
     .locator("#jornada-integracao")
-    .getByRole("link", { name: /1\. Obter token do gateway/ })
+    .getByRole("link", { name: /1\. Obter token do gateway/ }).first()
     .click();
 
   await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");

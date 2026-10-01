@@ -21,6 +21,7 @@ export function cachePublishedContent<T>(
       process.env.GITHUB_REPO_OWNER?.trim() ?? "",
       process.env.GITHUB_REPO_NAME?.trim() ?? "",
       process.env.VERCEL_GIT_COMMIT_SHA ?? "",
+      process.env.GITHUB_CONTENT_REF?.trim() ?? process.env.VERCEL_GIT_COMMIT_REF?.trim() ?? "",
       ...keyParts,
     ],
     { ...options, revalidate: 60 }

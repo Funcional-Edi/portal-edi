@@ -31,7 +31,7 @@ function product(
   order: number,
   description: string,
   modules: DocumentationModule[],
-  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos"],
+  actionIds: readonly string[] = ["visao-geral", "fluxograma-geral", "jornada-integracao", "fluxos"],
 ): DocumentationProduct {
   return {
     id, label, order, description, modules,
@@ -55,7 +55,7 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
     {
       ...product("movimentacao-de-vidas", "Movimentação de Vidas", 2, "Integração de cadastros de beneficiários e colaboradores, com processamento assíncrono e acompanhamento por status ou webhook.", [
         moduleItem("movimentacao-de-vidas", "Movimentação de Vidas", 1, "movimentacao-de-vidas"),
-      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {
@@ -64,7 +64,7 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
         moduleItem("im", "IM", 4, "im"),
-      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {

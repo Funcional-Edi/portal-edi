@@ -48,4 +48,18 @@ export function internoGuidePath(slug: string): string {
   return `${INTERN_CONTENT_PATHS.guidesPrefix}/${slug}.md`;
 }
 
+/** FAQ publicado do portal (índice versionado + respostas Markdown). */
+export const FAQ_CONTENT_PATHS = {
+  root: "content/faq",
+  answersPrefix: "content/faq/answers",
+} as const;
+
+export function faqIndexPath(): string {
+  return `${FAQ_CONTENT_PATHS.root}/index.json`;
+}
+
+export function faqAnswerPath(slug: string): string {
+  return `${FAQ_CONTENT_PATHS.answersPrefix}/${slug}.md`;
+}
+
 export type ContentBackend = "local" | "github";

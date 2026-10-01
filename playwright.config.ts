@@ -27,6 +27,7 @@ export default defineConfig({
       AUTH_SECRET: "dev-auth-secret-e2e",
       AUTH_URL: e2eUrl,
       DEV_AUTH_ENABLED: "true",
+      NEXT_DIST_DIR: ".next-e2e",
     },
     timeout: 120 * 1000,
   },

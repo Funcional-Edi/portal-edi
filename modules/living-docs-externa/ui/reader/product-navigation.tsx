@@ -39,14 +39,14 @@ const FLOW_AREAS = [
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
+type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "teste-de-requisicao";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
   if (areaId === "documentacao") {
     return product.actions.find((action) => action.id === "visao-geral")?.links.find((item) => item.id === link.id)?.href;
   }
-  if (areaId === "jornada-integracao" || areaId === "roteiro-integracao") {
+  if (areaId === "jornada-integracao") {
     return product.actions.find((action) => action.id === areaId)?.links.find((item) => item.id === link.id)?.href;
   }
   if (areaId === "teste-de-requisicao") {
@@ -58,7 +58,7 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
   return FLOW_AREAS.filter((area) => {
-    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "roteiro-integracao" || area.id === "teste-de-requisicao") {
+    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
@@ -108,6 +108,7 @@ function contextualTocItems({
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
+      ...items.filter((item) => item.href === "#fluxograma-individual"),
       ...items.filter((item) => item.href.includes("/operations/")),
     ];
   }
@@ -470,9 +471,9 @@ export function ProductNavigation({
                       <Link
                         key={area.id}
                         href={href}
-                        replace={area.id === "jornada-integracao" || area.id === "roteiro-integracao"}
+                        replace={area.id === "jornada-integracao"}
                         aria-current={area.id === selectedAreaId ? "page" : undefined}
-                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : area.id === "roteiro-integracao" ? "#roteiro-integracao" : "")}
+                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : "")}
                         className={className}
                       >
                         {content}
@@ -503,7 +504,7 @@ export function ProductNavigation({
                 </div>
                 <div className="space-y-1.5">
                   {product.actions
-                    .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "roteiro-integracao" && action.id !== "teste-de-requisicao")
+                    .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "teste-de-requisicao")
                     .filter((action) => product.id !== "credenciado" || (action.id !== "visao-geral" && action.id !== "fluxograma-geral"))
                     .map((action) => (
                       <button

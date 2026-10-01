@@ -23,6 +23,10 @@ function roteiroScenarioId(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+function roteiroScenarioId(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 /** Ícone por tipo de operação — ajuda a escanear o roteiro visualmente. */
 function OperationKindIcon({ kind }: { kind: ManualOperation["kind"] }) {
   if (kind === "query") return <Search className="h-4 w-4" aria-hidden="true" />;
@@ -206,6 +210,7 @@ export function ManualRoteiro({
       ) : null}
 
       <section id="jornada-integracao" data-documentation-area="jornada-integracao" className="scroll-mt-24">
+        <span id="roteiro-integracao" aria-hidden="true" />
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">Jornada da Integração</h2>
@@ -213,6 +218,20 @@ export function ManualRoteiro({
               Siga as etapas na ordem para entender o processo completo. Cada operação leva à
               próxima decisão da integração e abre o detalhamento técnico correspondente.
             </p>
+            {flowHref ?? editor?.flowHref ? (
+              <div id="fluxograma-individual" className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4">
+                <h3 className="font-semibold text-brand-950">Fluxograma individual</h3>
+                <p className="mt-1 text-sm leading-relaxed text-brand-800">
+                  Consulte a sequência visual deste subproduto antes de seguir para as operações.
+                </p>
+                <Link
+                  href={flowHref ?? editor!.flowHref!}
+                  className="mt-3 inline-flex items-center rounded-md border border-brand-300 bg-white px-3 py-1.5 text-sm font-medium text-brand-800 hover:bg-brand-100"
+                >
+                  Abrir fluxograma individual
+                </Link>
+              </div>
+            ) : null}
           </div>
           {editor?.operationsToolbar}
         </div>

@@ -397,6 +397,7 @@
       "kind": "query",
       "name": "groupedOrder",
       "order": 3,
+      "referenceTableIds": ["order-status", "product-reason-query"],
       "title": "3. Consultar um pedido",
       "description": "Consulta, pelo id do pedido na Funcional, todos os dados do pedido: produtos, retorno, notas, cancelamentos e devoluções.",
       "prerequisites": ["createGroupedOrder"],
