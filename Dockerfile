@@ -1,13 +1,13 @@
-# Portal de Integração — imagem de produção/homolog (Node 20, porta 3002)
+# Portal de Integração — imagem de produção/homolog (Node 24, porta 3002)
 # Build: docker build -t portal-integracao .
 # Run:   docker run -p 3002:3002 --env-file .env.local portal-integracao
 
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -15,7 +15,7 @@ ENV AUTH_SECRET=build-placeholder-not-used-at-runtime
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3002

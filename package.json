@@ -4,7 +4,7 @@
   "private": true,
   "description": "Portal de Integração modular do time EDI/Tecnologia — documentação viva, homologação e automações com IA.",
   "engines": {
-    "node": ">=20 <21"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",

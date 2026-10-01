@@ -4,7 +4,7 @@ Guia mínimo para subir o portal em ambiente de homologação.
 
 ## Pré-requisitos
 
-- Node **20.x** ou Docker
+- Node **24.x** ou Docker
 - Variáveis em `.env.local` (copie de `.env.example`)
 
 | Variável | Obrigatória | Para quê |
@@ -29,6 +29,13 @@ npm ci
 npm run build
 npm run start    # porta 3002
 ```
+
+### Vercel
+
+O `package.json` fixa o runtime em Node **24.x**. No projeto Vercel, mantenha também
+**Settings → Build and Deployment → Node.js Version** em **24.x** para alinhar a
+configuração do projeto aos builds desta branch. Depois de alterar a versão, gere um
+novo deploy da branch `edi-14321`; um deploy existente não muda retroativamente.
 
 ## Docker
 
