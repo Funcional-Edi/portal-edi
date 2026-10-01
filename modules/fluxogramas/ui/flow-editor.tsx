@@ -2,6 +2,7 @@
 
 import {
   addEdge,
+  MarkerType,
   useEdgesState,
   useNodesState,
   type Connection,
@@ -11,6 +12,10 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { IntegrationFlow } from "@/modules/fluxogramas/schema";
 import type { ManualRef } from "@/modules/fluxogramas/schema/project-ref";
+import {
+  FLOW_LAYOUT_DEFAULTS,
+  nextLinearNodePosition,
+} from "@/modules/fluxogramas/config/flow-layout";
 import {
   FLOW_NODE_TYPE_LABELS,
 } from "@/modules/fluxogramas/ui/flow-node-types";
@@ -47,6 +52,11 @@ export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProp
           {
             ...connection,
             id: createNodeId("edge"),
+            type: FLOW_LAYOUT_DEFAULTS.edgeType,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: FLOW_LAYOUT_DEFAULTS.edgeColor,
+            },
           },
           current
         )
@@ -57,11 +67,10 @@ export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProp
 
   const addNode = (type: FlowNodeType) => {
     const id = createNodeId(type);
-    const y = 80 + nodes.length * 72;
     const newNode: Node = {
       id,
       type,
-      position: { x: 180, y },
+      position: nextLinearNodePosition(nodes),
       data: {
         label: FLOW_NODE_TYPE_LABELS[type],
         operationRef:
@@ -78,6 +87,8 @@ export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProp
       version: 1,
       title,
       description: description.trim() || undefined,
+      lanes: initialFlow.lanes,
+      annotations: initialFlow.annotations,
       updatedAt: initialFlow.updatedAt,
     });
 
@@ -160,6 +171,8 @@ export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProp
       <FlowCanvas
         nodes={nodes}
         edges={edges}
+        lanes={initialFlow.lanes}
+        annotations={initialFlow.annotations}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

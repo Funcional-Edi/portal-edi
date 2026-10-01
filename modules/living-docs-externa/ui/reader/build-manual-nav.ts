@@ -17,6 +17,7 @@ import type {
 import { getPublishedManualSections } from "@/modules/living-docs-externa/services/get-published-manual-sections";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { getPublishedOperationSchemaDetail } from "@/modules/living-docs-externa/services/get-published-schema";
+import { getIntegrationFlows } from "@/modules/fluxogramas/repository/flow-repository";
 
 interface BuildManualNavOptions {
   kind?: string;
@@ -104,13 +105,25 @@ export async function buildManualNav(
     return { sidebarGroups, tocItems };
   }
 
-  const sections = sectionsInput ?? (await getPublishedManualSections(slug));
+  const [loadedSections, flows] = await Promise.all([
+    sectionsInput ?? getPublishedManualSections(slug),
+    getIntegrationFlows(slug),
+  ]);
+  const sections = loadedSections.filter((section) => section.id !== "fluxo-do-pedido");
   const tocItems: ManualTocItem[] = [];
   tocItems.push(...sections.map((section) => ({
     href: `#section-${section.id}`,
     label: section.title,
     depth: 1,
   })));
+  if (flows.length > 0) {
+    tocItems.push({ href: "#fluxogramas", label: "Fluxogramas", depth: 1 });
+    tocItems.push(...flows.map((flow) => ({
+      href: `/fluxogramas/${slug}?fluxo=${encodeURIComponent(flow.id)}`,
+      label: flow.title,
+      depth: 2,
+    })));
+  }
   tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
   tocItems.push(
     ...operations.flatMap((op) => {
@@ -127,27 +140,18 @@ export async function buildManualNav(
       ];
     })
   );
-  tocItems.push({ href: "#roteiro-integracao", label: "Roteiro de Integração" });
+  tocItems.push({ href: "#roteiro-integracao", label: "Cenários de Testes e Validações" });
   if (project.manual.homologationFlows?.length) {
-    tocItems.push({ href: "#roteiro-cenarios", label: "Cenários de testes", depth: 1 });
     tocItems.push(...project.manual.homologationFlows.map((flow) => ({
       href: `#roteiro-cenario-${flow.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
       label: flow.title,
-      depth: 2,
+      depth: 1,
     })));
   }
   if (project.manual.homologationValidations?.length) {
     tocItems.push({ href: "#roteiro-validacoes", label: "Validações", depth: 1 });
   }
-  if (operations.length > 0) {
-    tocItems.push({ href: "#roteiro-detalhamento", label: "Detalhamento por fluxo", depth: 1 });
-    tocItems.push(...operations.map((op) => ({
-      href: `#roteiro-fluxo-${op.kind}-${encodeURIComponent(op.name)}`,
-      label: op.title ?? op.name,
-      depth: 2,
-    })));
-  }
-  tocItems.push({ href: "#versao-subproduto", label: "Versão da integração" });
+  tocItems.push({ href: "#versao-subproduto", label: "Histórico de Alterações" });
 
   return {
     sidebarGroups,

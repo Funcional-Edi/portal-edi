@@ -1,5 +1,7 @@
 export {
   flowEdgeSchema,
+  flowAnnotationSchema,
+  flowLaneSchema,
   flowNodeSchema,
   flowNodeTypeSchema,
   flowOperationRefSchema,
@@ -9,6 +11,8 @@ export {
   normalizeIntegrationFlowDocument,
   saveIntegrationFlowInputSchema,
   type FlowEdge,
+  type FlowAnnotation,
+  type FlowLane,
   type FlowNode,
   type FlowNodeType,
   type FlowOperationRef,

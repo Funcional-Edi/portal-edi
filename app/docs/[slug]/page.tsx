@@ -9,7 +9,7 @@ import {
 } from "@/modules/living-docs-externa/services/get-published-schema";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 import { getPublishedManualSections } from "@/modules/living-docs-externa/services/get-published-manual-sections";
-import { integrationFlowExists } from "@/modules/fluxogramas/repository/flow-repository";
+import { getIntegrationFlows } from "@/modules/fluxogramas/repository/flow-repository";
 
 interface DocsGuidePageProps {
   params: Promise<{ slug: string }>;
@@ -20,10 +20,10 @@ export default async function DocsGuidePage({ params }: DocsGuidePageProps) {
   const session = await auth();
   const canUsePlayground = Boolean(session?.user?.role && isAdminRole(session.user.role));
 
-  const [project, sections, hasFlow, hasSchema] = await Promise.all([
+  const [project, sections, flows, hasSchema] = await Promise.all([
     getPublishedManual(slug),
     getPublishedManualSections(slug),
-    integrationFlowExists(slug),
+    getIntegrationFlows(slug),
     hasPublishedSchemaSnapshot(slug),
   ]);
   if (!project) notFound();
@@ -33,7 +33,12 @@ export default async function DocsGuidePage({ params }: DocsGuidePageProps) {
       <ManualRoteiro
         project={project}
         sections={sections}
-        flowHref={hasFlow ? `/fluxogramas/${slug}` : undefined}
+        flowLinks={flows.map((flow) => ({
+          id: flow.id,
+          title: flow.title,
+          description: flow.description,
+          href: `/fluxogramas/${slug}?fluxo=${encodeURIComponent(flow.id)}`,
+        }))}
         schemaReferenceHref={hasSchema ? schemaReferenceHref(slug) : undefined}
         canUsePlayground={canUsePlayground}
       />

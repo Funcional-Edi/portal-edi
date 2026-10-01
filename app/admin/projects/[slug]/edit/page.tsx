@@ -60,9 +60,12 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
       depth: 1,
     })),
     { href: "#jornada-integracao", label: "Jornada da Integração" },
-    { href: "#roteiro-integracao", label: "Roteiro de Integração" },
+    { href: "#roteiro-integracao", label: "Cenários de Testes e Validações" },
     ...(project.manual.homologationFlows?.length
-      ? [{ href: "#roteiro-cenarios", label: "Cenários de testes" }]
+      ? project.manual.homologationFlows.map((flow) => ({
+        href: `#roteiro-cenario-${flow.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
+        label: flow.title,
+      }))
       : []),
     ...(project.manual.homologationValidations?.length
       ? [{ href: "#roteiro-validacoes", label: "Validações" }]

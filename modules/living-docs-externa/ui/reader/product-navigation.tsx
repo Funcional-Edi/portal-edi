@@ -32,7 +32,7 @@ const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visibl
 const FLOW_AREAS = [
   { id: "documentacao", label: "Documentação", icon: FileText },
   { id: "jornada-integracao", label: "Jornada da Integração", icon: Route },
-  { id: "roteiro-integracao", label: "Roteiro de Integração", icon: BookOpen },
+  { id: "roteiro-integracao", label: "Cenários de Testes e Validações", icon: BookOpen },
   { id: "queries", label: "Queries", icon: Code2 },
   { id: "mutations", label: "Mutations", icon: Code2 },
   { id: "metodos", label: "Métodos", icon: Code2 },
@@ -64,10 +64,6 @@ function availableFlowAreas(product: DocumentationProductView, link: Documentati
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
     return operations.some((operation) => operation.kind === kind);
   });
-}
-
-function individualFlowchartHref(link: DocumentationLinkView) {
-  return link.projectSlug ? `/fluxogramas/${link.projectSlug}` : null;
 }
 
 function tocDesktopIndent(depth?: number): string {
@@ -103,7 +99,10 @@ function contextualTocItems({
   }
 
   if (areaId === "documentacao") {
-    return items.filter((item) => item.href.startsWith("#section-") || item.href === "#versao-subproduto");
+    return items.filter((item) => item.href.startsWith("#section-")
+      || item.href === "#fluxogramas"
+      || item.href.startsWith("/fluxogramas/")
+      || item.href === "#versao-subproduto");
   }
 
   if (areaId === "jornada-integracao") {
@@ -114,15 +113,10 @@ function contextualTocItems({
   }
 
   if (areaId === "roteiro-integracao") {
-    const flowchartHref = individualFlowchartHref(link);
     return [
       ...items.filter((item) => item.href === "#roteiro-integracao"),
-      ...(flowchartHref ? [{ href: flowchartHref, label: "Fluxograma Individual", depth: 1 }] : []),
-      ...items.filter((item) => item.href === "#roteiro-cenarios"
-        || item.href.startsWith("#roteiro-cenario-")
-        || item.href === "#roteiro-validacoes"
-        || item.href === "#roteiro-detalhamento"
-        || item.href.startsWith("#roteiro-fluxo-")),
+      ...items.filter((item) => item.href.startsWith("#roteiro-cenario-")
+        || item.href === "#roteiro-validacoes"),
     ];
   }
 
@@ -236,7 +230,7 @@ type CredenciadoStructureItem = {
 const CREDENCIADO_STRUCTURE = [
   { label: "Visão Geral", areaId: "visao-geral" },
   { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
-  { label: "Roteiro de Integração", areaId: "roteiro-integracao" },
+  { label: "Cenários de Testes e Validações", areaId: "roteiro-integracao" },
   { label: "Fluxo de Cadastro" },
   { label: "Fluxo Opt-in" },
   { label: "Fluxo de Venda" },

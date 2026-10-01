@@ -73,7 +73,13 @@ export default async function AdminFlowPage({ params, searchParams }: AdminFlowP
       ) : null}
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">
-        <FlowEditor slug={slug} flowId={selectedFlowId} initialFlow={initialFlow} manual={manual} />
+        <FlowEditor
+          key={selectedFlowId}
+          slug={slug}
+          flowId={selectedFlowId}
+          initialFlow={initialFlow}
+          manual={manual}
+        />
       </div>
     </AdminShell>
   );

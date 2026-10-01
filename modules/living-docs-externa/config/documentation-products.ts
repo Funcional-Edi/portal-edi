@@ -10,7 +10,7 @@ const actions: readonly DocumentationAction[] = [
   { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
   { id: "fluxograma-geral", label: "Fluxograma Completo", order: 2, enabled: true, visible: true, status: "published", destination: "flowchart", linkModules: true },
   { id: "jornada-integracao", label: "Jornada da Integração", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
-  { id: "roteiro-integracao", label: "Roteiro de Integração", order: 4, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "roteiro-integracao", label: "Cenários de Testes e Validações", order: 4, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
   { id: "fluxos", label: "Fluxos", order: 5, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
   { id: "teste-de-requisicao", label: "Teste de Requisição", order: 6, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
 ];

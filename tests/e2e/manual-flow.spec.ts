@@ -45,22 +45,22 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
   await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
   await expect(page.getByText("mutation createToken", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Consulte o Roteiro de Integração" })).toBeVisible();
-  const integrationGuide = page.getByRole("link", { name: "Ver o Roteiro de Integração" });
+  await expect(page.getByRole("heading", { name: "Consulte a Jornada da Integração" })).toBeVisible();
+  const integrationGuide = page.getByRole("link", { name: "Ver a Jornada da Integração" });
   await expect(integrationGuide).toHaveAttribute(
     "href",
-    "/docs/im#roteiro-integracao",
+    "/docs/im#jornada-integracao",
   );
   await integrationGuide.click();
-  await expect(page).toHaveURL("/docs/im#roteiro-integracao");
+  await expect(page).toHaveURL("/docs/im#jornada-integracao");
   await expect(
     page.getByRole("navigation", { name: "Produtos EDI" }).getByRole("link", {
-      name: "Roteiro de Integração",
+      name: "Jornada da Integração",
       exact: true,
     }),
   ).toHaveAttribute("aria-current", "page");
-  await expect(page.getByRole("heading", { name: "Detalhamento por fluxo" })).toBeVisible();
-  await expect(page.getByText("Pré-requisitos", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Jornada da Integração" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "1. Obter token do gateway", exact: true })).toBeVisible();
 });
 
 test("/manual redireciona para /docs", async ({ page }) => {

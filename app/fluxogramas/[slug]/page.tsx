@@ -23,8 +23,8 @@ export default async function FlowDetailPage({ params, searchParams }: FlowDetai
     if (!config) notFound();
 
     return (
-      <FlowShell subtitle={`Fluxograma — ${config.name}`} documentationHref={`/docs/${slug}`}>
-        <FlowViewer flow={flow} projectName={config.name} documentationHref={`/docs/${slug}`} />
+      <FlowShell subtitle={`Fluxograma — ${config.name}`} documentationHref={`/docs/${slug}#fluxogramas`}>
+        <FlowViewer flow={flow} projectName={config.name} documentationHref={`/docs/${slug}#fluxogramas`} />
       </FlowShell>
     );
   } catch (error) {
