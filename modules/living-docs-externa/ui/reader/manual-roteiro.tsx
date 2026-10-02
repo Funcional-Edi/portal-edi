@@ -41,8 +41,6 @@ export interface ManualRoteiroEditorSlots {
   renderSectionActions?: (section: ManualSection) => ReactNode;
   /** Controles no card da operação (abrir slide-over, remover). */
   renderOperationActions?: (operation: ManualOperation) => ReactNode;
-  /** Link para fluxograma (modo admin). */
-  flowHref?: string;
   /** Substitui o link de playground no cabeçalho. */
   headerActions?: ReactNode;
   /** Faixa acima do manual (status, checklist de qualidade). */
@@ -58,7 +56,7 @@ interface ManualRoteiroProps {
   sections: ManualSection[];
   /** Ausente = visão do distribuidor (somente leitura). */
   editor?: ManualRoteiroEditorSlots;
-  /** Link para fluxograma quando `flow.json` existe. */
+  /** Links dos fluxogramas publicados na seção Documentação. */
   flowLinks?: Array<{ id: string; title: string; description?: string; href: string }>;
   /** Link para referência GraphQL quando schema sincronizado. */
   schemaReferenceHref?: string;
@@ -79,7 +77,6 @@ export function ManualRoteiro({
   const documentationSections = sections.filter((section) => section.id !== "fluxo-do-pedido");
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
-  const flowHref = flowLinks[0]?.href;
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
 
@@ -185,28 +182,45 @@ export function ManualRoteiro({
             operações e resultados esperados da integração.
           </p>
           <ul className="mt-4 grid gap-3 md:grid-cols-2">
-            {flowLinks.map((flow) => (
-              <li key={flow.id}>
-                <Link
-                  href={flow.href}
-                  className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:bg-brand-50"
-                >
-                  <h3 className="font-semibold text-slate-900">{flow.title}</h3>
-                  {flow.description ? (
-                    <p className="mt-1 text-sm leading-relaxed text-slate-600">{flow.description}</p>
-                  ) : null}
-                  <span className="mt-3 block text-sm font-medium text-brand-700">
-                    Ver explicação e fluxograma →
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {flowLinks.map((flow) => {
+              const details = manual.flowDetails?.find((item) => item.flowId === flow.id);
+              return (
+                <li key={flow.id}>
+                  <Link
+                    href={flow.href}
+                    className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:bg-brand-50"
+                  >
+                    <h3 className="font-semibold text-slate-900">{flow.title}</h3>
+                    {flow.description ? (
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">{flow.description}</p>
+                    ) : null}
+                    {details ? (
+                      <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-600">
+                        {details.requiredOperations.map((operation) => (
+                          <li key={operation.name}>
+                            <code className="font-medium text-slate-800">{operation.name}</code>
+                            <span>: {operation.description}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    <span className="mt-3 block text-sm font-medium text-brand-700">
+                      Ver explicação e fluxograma →
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
+          {manual.flowSelectionNote ? (
+            <p className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900">
+              <strong>Importante:</strong> {manual.flowSelectionNote}
+            </p>
+          ) : null}
         </section>
       ) : null}
 
       <section id="jornada-integracao" data-documentation-area="jornada-integracao" className="scroll-mt-24">
-        <span id="roteiro-integracao" aria-hidden="true" />
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">Jornada da Integração</h2>
@@ -214,20 +228,6 @@ export function ManualRoteiro({
               Siga as etapas na ordem para entender o processo completo. Cada operação leva à
               próxima decisão da integração e abre o detalhamento técnico correspondente.
             </p>
-            {flowHref ?? editor?.flowHref ? (
-              <div id="fluxograma-individual" className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4">
-                <h3 className="font-semibold text-brand-950">Fluxograma individual</h3>
-                <p className="mt-1 text-sm leading-relaxed text-brand-800">
-                  Consulte a sequência visual deste subproduto antes de seguir para as operações.
-                </p>
-                <Link
-                  href={flowHref ?? editor!.flowHref!}
-                  className="mt-3 inline-flex items-center rounded-md border border-brand-300 bg-white px-3 py-1.5 text-sm font-medium text-brand-800 hover:bg-brand-100"
-                >
-                  Abrir fluxograma individual
-                </Link>
-              </div>
-            ) : null}
           </div>
           {editor?.operationsToolbar}
         </div>

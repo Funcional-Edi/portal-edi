@@ -218,6 +218,47 @@
       ]
     }
   ],
+  "flowDetails": [
+    {
+      "flowId": "retorno-distribuidor",
+      "requiredOperations": [
+        {
+          "name": "createGroupedOrder",
+          "description": "Registra o pré-pedido no Canal Autorizador para validação e processamento."
+        },
+        {
+          "name": "createGroupedResponse",
+          "description": "Informa o resultado do processamento do pedido, como aprovação ou rejeição."
+        },
+        {
+          "name": "createGroupedCancellation",
+          "description": "Solicita o cancelamento total ou parcial de um pedido previamente enviado, quando necessário."
+        },
+        {
+          "name": "createGroupedInvoice",
+          "description": "Vincula e disponibiliza as informações da nota fiscal referente ao pedido faturado."
+        }
+      ]
+    },
+    {
+      "flowId": "retorno-automatico",
+      "requiredOperations": [
+        {
+          "name": "createGroupedOrder",
+          "description": "Registra o pré-pedido no Canal Autorizador para validação e processamento. Após a criação do pedido no portal da indústria, o sistema gera automaticamente o retorno com as informações enviadas."
+        },
+        {
+          "name": "createGroupedCancellation",
+          "description": "Solicita o cancelamento total ou parcial de um pedido previamente enviado, quando necessário."
+        },
+        {
+          "name": "createGroupedInvoice",
+          "description": "Vincula e disponibiliza as informações da nota fiscal referente ao pedido faturado."
+        }
+      ]
+    }
+  ],
+  "flowSelectionNote": "O distribuidor deve avaliar qual fluxo melhor se adequa à sua operação. Se optar pelo Fluxo 2 (Order/retorno automático), comunique a pessoa responsável pelo EDI que acompanha a integração para que seja realizada a alteração sistêmica.",
   "homologationFlows": [
     {
       "title": "Fluxo 1 — Retorno enviado pelo Distribuidor",
@@ -358,6 +399,8 @@
     "Envie createGroupedInvoice em até 48 horas.",
     "Envie o cancelamento somente após o retorno e antes do envio da nota fiscal.",
     "Acompanhe o processamento de toda requisição enviada por meio das consultas de status.",
+    "Todo pedido enviado precisa receber um retorno e deve ser acompanhado para não permanecer pendente.",
+    "Todos os produtos do pré-pedido precisam receber retorno. Para os que não forem faturados, envie cancelamento específico; o ciclo só termina quando todos os produtos tiverem retorno, cancelamento ou nota fiscal.",
     "Utilize groupedOrder ou groupedOrders para acompanhar os pedidos enviados pelo Canal Autorizador."
   ],
   "operations": [

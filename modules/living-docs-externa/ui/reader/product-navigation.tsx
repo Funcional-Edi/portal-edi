@@ -32,14 +32,14 @@ const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visibl
 const FLOW_AREAS = [
   { id: "documentacao", label: "Documentação", icon: FileText },
   { id: "jornada-integracao", label: "Jornada da Integração", icon: Route },
-  { id: "roteiro-integracao", label: "Cenários de Testes e Validações", icon: BookOpen },
+  { id: "roteiro-integracao", label: "Cenário de Teste", icon: BookOpen },
   { id: "queries", label: "Queries", icon: Code2 },
   { id: "mutations", label: "Mutations", icon: Code2 },
   { id: "metodos", label: "Métodos", icon: Code2 },
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "teste-de-requisicao";
+type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
@@ -47,6 +47,9 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
     return product.actions.find((action) => action.id === "visao-geral")?.links.find((item) => item.id === link.id)?.href;
   }
   if (areaId === "jornada-integracao") {
+    return product.actions.find((action) => action.id === areaId)?.links.find((item) => item.id === link.id)?.href;
+  }
+  if (areaId === "roteiro-integracao") {
     return product.actions.find((action) => action.id === areaId)?.links.find((item) => item.id === link.id)?.href;
   }
   if (areaId === "teste-de-requisicao") {
@@ -58,7 +61,7 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
   return FLOW_AREAS.filter((area) => {
-    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "teste-de-requisicao") {
+    if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "roteiro-integracao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
     const kind = area.id === "queries" ? "query" : area.id === "mutations" ? "mutation" : "rest";
@@ -108,7 +111,6 @@ function contextualTocItems({
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
-      ...items.filter((item) => item.href === "#fluxograma-individual"),
       ...items.filter((item) => item.href.includes("/operations/")),
     ];
   }
@@ -336,10 +338,12 @@ function FlowPanel({
 export function ProductNavigation({
   navigation,
   tocItems = [],
+  hasTestScenarios = false,
   children,
 }: {
   navigation: DocumentationNavigationView;
   tocItems?: { href: string; label: string; depth?: number }[];
+  hasTestScenarios?: boolean;
   children?: ReactNode;
 }) {
   const pathname = usePathname();
@@ -396,7 +400,9 @@ export function ProductNavigation({
     : flows;
   const selectedFlow = flows.find((link) => link.id === selectedFlowId) ?? null;
   const productArea = product?.actions.find((action) => action.id === selectedAreaId);
-  const flowAreas = product && selectedFlow ? availableFlowAreas(product, selectedFlow) : [];
+  const flowAreas = product && selectedFlow
+    ? availableFlowAreas(product, selectedFlow).filter((area) => area.id !== "roteiro-integracao" || hasTestScenarios)
+    : [];
   const showRouteContent = children != null
     && activeProductId === selectedProductId
     && activeModuleId === selectedFlowId
@@ -473,7 +479,7 @@ export function ProductNavigation({
                         href={href}
                         replace={area.id === "jornada-integracao"}
                         aria-current={area.id === selectedAreaId ? "page" : undefined}
-                        onClick={() => setLocationHash(area.id === "jornada-integracao" ? "#jornada-integracao" : "")}
+                        onClick={() => setLocationHash(area.id === "jornada-integracao" || area.id === "roteiro-integracao" ? `#${area.id}` : "")}
                         className={className}
                       >
                         {content}
@@ -505,6 +511,7 @@ export function ProductNavigation({
                 <div className="space-y-1.5">
                   {product.actions
                     .filter((action) => action.id !== "fluxos" && action.id !== "jornada-integracao" && action.id !== "teste-de-requisicao")
+                    .filter((action) => action.id !== "roteiro-integracao" || hasTestScenarios)
                     .filter((action) => product.id !== "credenciado" || (action.id !== "visao-geral" && action.id !== "fluxograma-geral"))
                     .map((action) => (
                       <button

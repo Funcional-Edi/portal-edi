@@ -63,6 +63,46 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
   await expect(page.getByRole("link", { name: "1. Obter token do gateway", exact: true })).toBeVisible();
 });
 
+test("CA mostra atalho para cenários e detalhes por fluxo", async ({ page }) => {
+  await loginAsDevUser(page);
+  await page.goto("/docs/canal-autorizador");
+  await expect(page.locator("section#jornada-integracao #fluxograma-individual")).toHaveCount(0);
+
+  const products = page.getByRole("navigation", { name: "Produtos EDI" });
+  await products.getByRole("link", { name: "Cenário de Teste", exact: true }).click();
+
+  const scenarios = page.locator("section#roteiro-integracao");
+  await expect(scenarios).toHaveCount(1);
+  await expect(scenarios.locator("h5")).toHaveCount(15);
+  await expect(scenarios.locator("h5").first()).toHaveText("Pedido totalmente faturado");
+  await expect(scenarios.locator("h5").first()).toBeVisible();
+  await expect(page).toHaveURL(/#roteiro-integracao$/);
+  await expect(scenarios.getByRole("heading", { name: "Pedido totalmente faturado" }).first()).toBeVisible();
+  await expect(scenarios.getByText(/Todos os produtos do pré-pedido precisam receber retorno/)).toBeVisible();
+
+  await products.getByRole("link", { name: "Documentação", exact: true }).click();
+  const flows = page.locator("#fluxogramas");
+  await expect(flows.getByText("createGroupedResponse", { exact: true })).toBeVisible();
+  await expect(flows.getByText(/comunique a pessoa responsável pelo EDI/)).toBeVisible();
+});
+
+test("atalho de cenários continua disponível no teste de requisição", async ({ page }) => {
+  await loginAsDevAdmin(page);
+  await page.goto("/docs/canal-autorizador");
+
+  const products = page.getByRole("navigation", { name: "Produtos EDI" });
+  await products.getByRole("link", { name: "Teste de Requisição", exact: true }).click();
+  await expect(page).toHaveURL(/\/playground/);
+
+  const scenarioLink = products.getByRole("link", { name: "Cenário de Teste", exact: true });
+  await expect(scenarioLink).toBeVisible();
+  await scenarioLink.click();
+  await expect(page).toHaveURL("/docs/canal-autorizador#roteiro-integracao");
+  await expect(
+    page.locator("section#roteiro-integracao").getByRole("heading", { name: "Pedido totalmente faturado" }).first(),
+  ).toBeVisible();
+});
+
 test("/manual redireciona para /docs", async ({ page }) => {
   await loginAsDevUser(page);
 

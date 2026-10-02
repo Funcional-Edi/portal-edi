@@ -36,8 +36,10 @@ async function validateProject(slug: string): Promise<string[]> {
 
   if (!config.published) return errors;
 
-  if (!config.graphqlUrl) {
-    errors.push(`${slug}: projeto publicado sem graphqlUrl em config.json.`);
+  const endpoint = config.protocol === "rest" ? config.apiBaseUrl : config.graphqlUrl;
+  if (!endpoint) {
+    const field = config.protocol === "rest" ? "apiBaseUrl" : "graphqlUrl";
+    errors.push(`${slug}: projeto publicado sem ${field} em config.json.`);
   }
   if (manual.operations.length === 0) {
     errors.push(`${slug}: projeto publicado sem operações em manual.json.`);
@@ -76,7 +78,7 @@ async function main() {
   }
 
   console.log(
-    `[validate-published-projects] OK: ${slugs.length} projeto(s) validados, publicados com graphqlUrl e operações.`
+    `[validate-published-projects] OK: ${slugs.length} projeto(s) validados, publicados com endpoint e operações.`
   );
 }
 

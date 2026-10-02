@@ -10,7 +10,7 @@ const actions: readonly DocumentationAction[] = [
   { id: "visao-geral", label: "Visão geral", order: 1, enabled: true, visible: true, status: "published", destination: "documentation", linkModules: true },
   { id: "fluxograma-geral", label: "Fluxograma Completo", order: 2, enabled: true, visible: true, status: "published", destination: "flowchart", linkModules: true },
   { id: "jornada-integracao", label: "Jornada da Integração", order: 3, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
-  { id: "roteiro-integracao", label: "Cenários de Testes e Validações", order: 4, enabled: true, visible: true, status: "published", destination: "guide", linkModules: true },
+  { id: "roteiro-integracao", label: "Cenário de Teste", order: 4, enabled: true, visible: true, status: "published", destination: "test-scenarios", linkModules: true },
   { id: "fluxos", label: "Fluxos", order: 5, enabled: true, visible: true, status: "published", destination: null, linkModules: true },
   { id: "teste-de-requisicao", label: "Teste de Requisição", order: 6, enabled: true, visible: true, status: "published", destination: "request-test", access: { roles: ["admin"] }, linkModules: true },
 ];
@@ -64,7 +64,7 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
         moduleItem("im", "IM", 4, "im"),
-      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "fluxos", "teste-de-requisicao"]),
+      ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },
     {

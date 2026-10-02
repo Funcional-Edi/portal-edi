@@ -91,6 +91,20 @@ export const integrationManualSchema = z.object({
       })
     )
     .optional(),
+  flowDetails: z
+    .array(
+      z.object({
+        flowId: z.string().min(1),
+        requiredOperations: z.array(
+          z.object({
+            name: z.string().min(1),
+            description: z.string().min(1),
+          })
+        ).min(1),
+      })
+    )
+    .optional(),
+  flowSelectionNote: z.string().min(1).optional(),
   homologationFlows: z
     .array(
       z.object({

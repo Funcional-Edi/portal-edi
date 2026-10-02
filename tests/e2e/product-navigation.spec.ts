@@ -47,11 +47,13 @@ test("one vertical navbar changes from products to product and integration conte
   await journey.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
   await expect(journey).toHaveAttribute("aria-current", "page");
-  const integrationGuide = nav.getByRole("link", { name: "Cenários de Testes e Validações", exact: true });
+  const integrationGuide = nav.getByRole("link", { name: "Cenário de Teste", exact: true });
   await integrationGuide.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#roteiro-integracao");
   await expect(integrationGuide).toHaveAttribute("aria-current", "page");
 
+  await page.goBack();
+  await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
   await page.goBack();
   await expect(page).toHaveURL("/docs?produto=trade");
   await nav.getByRole("link", { name: /^Wholesaler/ }).click();
@@ -169,8 +171,8 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   expect(journeyItems[0].trim()).toBe("Jornada da Integração");
   expect(journeyItems[journeyItems.length - 1].trim()).toBe("Tabelas de referência");
 
-  await productNav.getByRole("link", { name: "Cenários de Testes e Validações", exact: true }).click();
-  await expect(index).toContainText("Cenários de Testes e Validações");
+  await productNav.getByRole("link", { name: "Cenário de Teste", exact: true }).click();
+  await expect(index).toContainText("Cenário de Teste");
   await expect(index.getByRole("link", { name: "Fluxo 1 — Retorno enviado pelo Distribuidor" })).toBeVisible();
   await expect(index.getByRole("link", { name: "Fluxo 2 — Retorno Automático" })).toBeVisible();
   await expect(index).not.toContainText("Jornada da Integração");
@@ -182,7 +184,7 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
 
   await productNav.getByRole("button", { name: "Queries", exact: true }).click();
   await expect(index.locator('a[href^="/docs/canal-autorizador/operations/query/"]')).not.toHaveCount(0);
-  await expect(index).not.toContainText("Cenários de Testes e Validações");
+  await expect(index).not.toContainText("Cenário de Teste");
 });
 
 test("contextual index remains available in mobile navigation", async ({ page }) => {
@@ -194,8 +196,9 @@ test("contextual index remains available in mobile navigation", async ({ page })
   await expect(page.locator("footer")).toContainText("Funcional Health Tech");
   await expect(quickNavigation).toBeVisible();
   await expect(quickNavigation).toHaveClass(/docs-quick-nav/);
-  await expect(quickNavigation.getByRole("link", { name: "Cenários de Testes e Validações", exact: true })).toBeVisible();
-  await expect(quickNavigation).not.toContainText("Tabelas de referência");
+
+  await page.getByRole("button", { name: "Mostrar produtos" }).click();
+  await expect(page.getByRole("navigation", { name: "Produtos EDI" }).getByRole("link", { name: "Cenário de Teste", exact: true })).toBeVisible();
 });
 
 test("quick navigation can be dragged horizontally", async ({ page }) => {

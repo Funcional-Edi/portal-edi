@@ -1,4 +1,9 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
+
+import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 
 import {
   createManualOperationInputSchema,
@@ -76,6 +81,22 @@ describe("createManualOperationInputSchema", () => {
 });
 
 describe("integrationManualSchema", () => {
+  it("carrega os cenários de homologação do projeto publicado", async () => {
+    const project = await getProject("canal-autorizador");
+
+    expect(project?.manual.homologationFlows?.flatMap((flow) => flow.scenarios)).not.toHaveLength(0);
+  });
+
+  it("preserva os cenários de homologação publicados do Canal Autorizador", () => {
+    const raw = JSON.parse(readFileSync(resolve(process.cwd(), "content/projects/canal-autorizador/manual.json"), "utf8")) as unknown;
+    const result = integrationManualSchema.safeParse(raw);
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.homologationFlows?.flatMap((flow) => flow.scenarios)).not.toHaveLength(0);
+    }
+  });
+
   it("aceita tabelas por operação e cenários de homologação", () => {
     const result = integrationManualSchema.safeParse({
       version: 1,

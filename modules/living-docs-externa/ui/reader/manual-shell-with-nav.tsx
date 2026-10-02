@@ -40,7 +40,15 @@ export async function ManualShellWithNav({
 
   return (
     <ManualShell
-      productNavigation={<ProductNavigation navigation={navigation} tocItems={nav.tocItems}>{children}</ProductNavigation>}
+      productNavigation={
+        <ProductNavigation
+          navigation={navigation}
+          tocItems={nav.tocItems}
+          hasTestScenarios={nav.hasTestScenarios}
+        >
+          {children}
+        </ProductNavigation>
+      }
       navItems={DOCS_NAV_ITEMS.map((item) => ({
         ...item,
         active: item.href === DOCS_NAV_ITEMS[0].href,

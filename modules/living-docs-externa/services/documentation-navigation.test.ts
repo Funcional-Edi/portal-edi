@@ -123,7 +123,7 @@ describe("documentation navigation", () => {
     expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
     expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
     expect(documentationRouteSelection(view, "/docs/im", "#jornada-integracao")?.actionId).toBe("jornada-integracao");
-    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("jornada-integracao");
+    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-integracao");
     expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
     expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
   });

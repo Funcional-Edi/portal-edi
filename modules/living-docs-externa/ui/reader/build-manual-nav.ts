@@ -33,6 +33,7 @@ interface BuildManualNavOptions {
 export interface ManualNavData {
   sidebarGroups: ManualNavGroup[];
   tocItems: ManualTocItem[];
+  hasTestScenarios: boolean;
 }
 
 export async function buildManualNav(
@@ -44,6 +45,9 @@ export async function buildManualNav(
 
   const project = projectInput ?? (await getPublishedManual(slug));
   if (!project) return null;
+  const hasTestScenarios = Boolean(
+    project.manual.homologationFlows?.length || project.manual.homologationValidations?.length
+  );
 
   const basePath = docsGuideHref(slug);
   const session = await auth();
@@ -56,6 +60,9 @@ export async function buildManualNav(
       items: [
         { href: DOCS_HOME_HREF, label: "Documentação" },
         { href: `${basePath}#jornada-integracao`, label: "Jornada da Integração", active: !playground && (!kind || !name) },
+        ...(!kind && !playground && hasTestScenarios
+          ? [{ href: `${basePath}#roteiro-integracao`, label: "Cenário de Teste" }]
+          : []),
         ...(canUseRequestTest ? [{ href: docsPlaygroundHref(slug), label: "Teste de Requisição", active: !!playground }] : []),
       ],
     },
@@ -73,7 +80,7 @@ export async function buildManualNav(
   ];
 
   if (playground) {
-    return { sidebarGroups, tocItems: [] };
+    return { sidebarGroups, tocItems: [], hasTestScenarios };
   }
 
   const kindResult = kind ? manualOperationKindSchema.safeParse(kind) : null;
@@ -103,7 +110,7 @@ export async function buildManualNav(
     }
     if (operation?.exampleQuery)
       tocItems.push({ href: "#exemplo-graphql", label: "Exemplo GraphQL" });
-    return { sidebarGroups, tocItems };
+    return { sidebarGroups, tocItems, hasTestScenarios };
   }
 
   const [loadedSections, flows] = await Promise.all([
@@ -141,7 +148,9 @@ export async function buildManualNav(
       ];
     })
   );
-  tocItems.push({ href: "#roteiro-integracao", label: "Cenários de Testes e Validações" });
+  if (hasTestScenarios) {
+    tocItems.push({ href: "#roteiro-integracao", label: "Cenário de Teste" });
+  }
   if (project.manual.homologationFlows?.length) {
     tocItems.push(...project.manual.homologationFlows.map((flow) => ({
       href: `#roteiro-cenario-${flow.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
@@ -157,5 +166,6 @@ export async function buildManualNav(
   return {
     sidebarGroups,
     tocItems,
+    hasTestScenarios,
   };
 }
