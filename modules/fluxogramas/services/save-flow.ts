@@ -9,6 +9,7 @@ import {
   type IntegrationFlow,
   type SaveIntegrationFlowInput,
 } from "@/modules/fluxogramas/schema";
+import { FLOW_LAYOUT_DEFAULTS } from "@/modules/fluxogramas/config/flow-layout";
 import { validateIntegrationFlow } from "@/modules/fluxogramas/services/flow-validation";
 
 export class SaveFlowError extends Error {
@@ -24,7 +25,8 @@ export class SaveFlowError extends Error {
 
 export async function saveProjectFlow(
   slug: string,
-  input: unknown
+  input: unknown,
+  flowId = "default"
 ): Promise<IntegrationFlow> {
   const config = await getProjectConfigRef(slug);
   if (!config) {
@@ -48,7 +50,7 @@ export async function saveProjectFlow(
   };
 
   const validated = integrationFlowSchema.parse(flow);
-  await persistFlow(slug, validated);
+  await persistFlow(slug, validated, flowId);
   return validated;
 }
 
@@ -62,13 +64,13 @@ export function createEmptyFlow(title: string): SaveIntegrationFlowInput {
         id: "start",
         type: "start",
         label: "Início",
-        position: { x: 120, y: 40 },
+        position: { ...FLOW_LAYOUT_DEFAULTS.startPosition },
       },
       {
         id: "end",
         type: "end",
         label: "Fim",
-        position: { x: 120, y: 280 },
+        position: { ...FLOW_LAYOUT_DEFAULTS.endPosition },
       },
     ],
     edges: [{ id: "e-start-end", source: "start", target: "end" }],

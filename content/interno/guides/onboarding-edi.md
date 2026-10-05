@@ -29,6 +29,7 @@ internas de família em títulos da documentação geral.
 - **Queries e mutations:** cada operação orienta o leitor a consultar o Roteiro
   de Integração antes de executar a chamada.
 - **Fluxograma:** `/fluxogramas/{slug}` apresenta o fluxo completo publicado.
+  A construção e a revisão seguem o [Padrão de fluxogramas](./padrao-fluxogramas.md).
 - **Teste de requisição:** fica disponível para o perfil administrativo no
   playground do subproduto.
 - **Navegação:** o retorno de um subproduto usa “Voltar aos produtos”, há
@@ -98,6 +99,7 @@ integração do detalhamento técnico:
 | Manual curado | `content/projects/{slug}/manual.json` |
 | Seções Markdown | `content/projects/{slug}/sections/*.md` |
 | Fluxograma | `content/projects/{slug}/flow.json` |
+| Padrão de fluxogramas | `content/interno/guides/padrao-fluxogramas.md` |
 | Schema de introspecção | `data/projects/{slug}/schema.json` |
 | Credenciais do gateway | `data/projects/{slug}/credentials.enc` (gitignored) |
 | Guia interno | `content/interno/guides/{slug}.md` |

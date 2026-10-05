@@ -6,9 +6,12 @@ export const DOCS_HOME_HREF = "/docs";
 
 export const DOCS_API_HREF = "/docs/api";
 
+export const FAQ_HREF = "/faq";
+
 export const DOCS_NAV_ITEMS = [
   { href: DOCS_HOME_HREF, label: "Documentação" },
   { href: DOCS_API_HREF, label: "Referência GraphQL" },
+  { href: FAQ_HREF, label: "FAQ" },
 ] as const;
 
 export function docsFamilyHref(family: ProductFamily): string {
@@ -17,6 +20,10 @@ export function docsFamilyHref(family: ProductFamily): string {
 
 export function docsGuideHref(slug: string): string {
   return `${DOCS_HOME_HREF}/${slug}`;
+}
+
+export function schemaTypeHref(slug: string, typeName: string): string {
+  return `${DOCS_API_HREF}/${slug}/types/${encodeURIComponent(typeName)}`;
 }
 
 export function docsPlaygroundHref(slug: string, query?: string): string {

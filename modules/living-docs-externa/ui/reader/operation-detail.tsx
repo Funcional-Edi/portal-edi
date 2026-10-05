@@ -1,11 +1,10 @@
-import type { ManualOperation } from "@/modules/living-docs-externa/schema";
-import {
-  DOCS_HOME_HREF,
-  docsGuideHref,
-  docsPlaygroundHref,
-} from "@/modules/living-docs-externa/services/docs-routes";
+import type {
+  ManualOperation,
+  ManualReferenceTable,
+} from "@/modules/living-docs-externa/schema";
+import { DOCS_HOME_HREF, docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
-import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
+import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
@@ -18,6 +17,8 @@ interface OperationDetailProps {
   schemaFieldHref?: string;
   /** Campos de requisição/resposta extraídos do schema GraphQL (equivalente ao PDF). */
   schemaDetail?: OperationSchemaDetail | null;
+  /** Tabelas usadas diretamente pelos campos desta operação. */
+  referenceTables?: ManualReferenceTable[];
   /** Playground executa contra gateway real — só perfil admin, e só faz sentido em GraphQL. */
   canUsePlayground?: boolean;
 }
@@ -29,6 +30,7 @@ export function OperationDetail({
   gatewayConnected = false,
   schemaFieldHref,
   schemaDetail,
+  referenceTables = [],
   canUsePlayground = false,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
@@ -71,95 +73,28 @@ export function OperationDetail({
         </div>
       </header>
 
-      {operation.description ? (
-        <section id="descricao" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Descrição
-          </h2>
-          <p className="text-slate-700">{operation.description}</p>
-        </section>
-      ) : null}
-
-      {operation.businessNotes && operation.businessNotes.length > 0 ? (
-        <section id="regras-negocio" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Regras de negócio
-          </h2>
-          <ul className="list-disc space-y-1 pl-5 text-slate-700">
-            {operation.businessNotes.map((note, index) => (
-              <li key={index}>{note}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {!isRest && schemaDetail ? (
-        <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} />
-      ) : null}
-
-      {isRest ? (
-        <section id="endpoint-rest" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Endpoint</h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>
-              {operation.method} {operation.path}
-            </code>
-          </pre>
-          {operation.exampleBody ? (
-            <>
-              <h3 className="mt-4 mb-2 text-sm font-semibold uppercase text-slate-500">
-                Corpo de exemplo
-              </h3>
-              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-                <code>{operation.exampleBody}</code>
-              </pre>
-            </>
-          ) : null}
-          <p className="mt-3 text-sm text-slate-600">
-            Esta API é <span className="font-medium">REST</span> — o Teste de Requisição não está disponível para este protocolo.
-            Use um cliente HTTP (Insomnia, Postman, curl) enviando o token JWT no header{" "}
-            <code>Authorization: Bearer &lt;token&gt;</code>.
-          </p>
-        </section>
-      ) : operation.exampleQuery ? (
-        <section id="exemplo-graphql" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Exemplo GraphQL
-          </h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{operation.exampleQuery}</code>
-          </pre>
-          {canUsePlayground ? (
-            <Link
-              href={docsPlaygroundHref(slug, operation.exampleQuery)}
-              className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-            >
-              Teste de Requisição
-            </Link>
-          ) : (
-            <p className="mt-3 text-sm text-slate-600">
-              O Teste de Requisição executa contra o gateway real e está disponível apenas para perfil{" "}
-              <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao
-              time de integração.
-            </p>
-          )}
-        </section>
-      ) : null}
+      <OperationDocumentation
+        slug={slug}
+        operation={operation}
+        schemaDetail={schemaDetail}
+        referenceTables={referenceTables}
+        canUsePlayground={canUsePlayground}
+      />
 
       {!isRest ? (
         <section className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4">
           <h2 className="text-sm font-semibold text-brand-900">
-            Consulte o Roteiro de Integração
+            Consulte a Jornada da Integração
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-brand-800">
             Queries e mutations precisam ser analisadas dentro do processo completo de uso.
-            Consulte o roteiro para conferir pré-requisitos, ordem das etapas, decisões de continuidade e validações do subproduto.
+            Consulte a Jornada para conferir pré-requisitos, ordem das etapas e decisões de continuidade do subproduto.
           </p>
           <Link
-            href={`${docsGuideHref(slug)}#roteiro-integracao`}
+            href={`${docsGuideHref(slug)}#jornada-integracao`}
             className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
           >
-            Ver o Roteiro de Integração
+            Ver a Jornada da Integração
           </Link>
         </section>
       ) : null}

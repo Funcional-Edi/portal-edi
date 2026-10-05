@@ -15,6 +15,7 @@ interface ManualShellWithNavProps {
   /** Dados já carregados pela page — evita I/O duplicado no shell. */
   project?: Project;
   sections?: ManualSection[];
+  flowAvailable?: boolean;
   children: ReactNode;
 }
 
@@ -25,10 +26,11 @@ export async function ManualShellWithNav({
   playground,
   project,
   sections,
+  flowAvailable,
   children,
 }: ManualShellWithNavProps) {
   const [nav, navigation] = await Promise.all([
-    buildManualNav(slug, { kind, name, playground, project, sections }),
+    buildManualNav(slug, { kind, name, playground, project, sections, flowAvailable }),
     getDocumentationNavigation(),
   ]);
 
@@ -38,7 +40,15 @@ export async function ManualShellWithNav({
 
   return (
     <ManualShell
-      productNavigation={<ProductNavigation navigation={navigation} tocItems={nav.tocItems}>{children}</ProductNavigation>}
+      productNavigation={
+        <ProductNavigation
+          navigation={navigation}
+          tocItems={nav.tocItems}
+          hasTestScenarios={nav.hasTestScenarios}
+        >
+          {children}
+        </ProductNavigation>
+      }
       navItems={DOCS_NAV_ITEMS.map((item) => ({
         ...item,
         active: item.href === DOCS_NAV_ITEMS[0].href,

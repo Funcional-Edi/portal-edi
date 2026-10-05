@@ -10,6 +10,7 @@ import { attachProjectsToProducts } from "@/modules/living-docs-externa/services
 import { loadDocumentationConfiguration } from "@/modules/living-docs-externa/services/manage-catalog-products";
 import { listProjects } from "@/modules/living-docs-externa/services/list-projects";
 import { listPublishedManuals } from "@/modules/living-docs-externa/services/list-published-manuals";
+import { getIntegrationFlows } from "@/modules/fluxogramas/public";
 
 async function listProjectSlugsWithFlow(): Promise<string[]> {
   const slugs = await listContentSubdirs(CONTENT_PATHS.projectsPrefix);
@@ -43,9 +44,12 @@ export const getDocumentationNavigation = cache(async () => {
       .filter((entry): entry is [string, NonNullable<(typeof entry)[1]>] => entry[1] !== null)
       .map(([slug, project]) => [slug, project.manual.operations] as const),
   );
+  const flowEntriesBySlug = new Map(
+    await Promise.all(flowSlugs.map(async (slug) => [slug, await getIntegrationFlows(slug)] as const)),
+  );
 
   return resolveDocumentationNavigation(attachProjectsToProducts(configuration, projects), manuals, {
     role: session?.user?.role,
     userId: session?.user?.id,
-  }, operationsBySlug, new Set(flowSlugs));
+  }, operationsBySlug, new Set(flowSlugs), flowEntriesBySlug);
 });

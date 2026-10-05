@@ -17,7 +17,7 @@ export class GetFlowError extends Error {
 
 export async function getProjectFlow(
   slug: string,
-  options: { requirePublished?: boolean } = {}
+  options: { requirePublished?: boolean; flowId?: string } = {}
 ): Promise<IntegrationFlow> {
   const config = await getProjectConfigRef(slug);
   if (!config) {
@@ -28,7 +28,7 @@ export async function getProjectFlow(
     throw new GetFlowError("NOT_PUBLISHED", "Fluxo não publicado.");
   }
 
-  const flow = await getIntegrationFlow(slug);
+  const flow = await getIntegrationFlow(slug, options.flowId);
   if (!flow) {
     throw new GetFlowError("FLOW_NOT_FOUND", "Fluxo não encontrado para este projeto.");
   }

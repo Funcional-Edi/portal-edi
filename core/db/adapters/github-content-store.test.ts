@@ -53,6 +53,8 @@ describe("github-content-store", () => {
       GITHUB_TOKEN: "token-123",
       GITHUB_WRITE_TOKEN: "write-token-456",
     };
+    delete process.env.GITHUB_CONTENT_REF;
+    delete process.env.VERCEL_GIT_COMMIT_REF;
     getContentMock.mockReset();
     Object.values(gitMock).forEach((m) => m.mockReset());
   });
@@ -91,6 +93,41 @@ describe("github-content-store", () => {
 
     getContentMock.mockRejectedValueOnce(new Error("404"));
     expect(await readGithubText("content/projects/demo/sections/intro.md")).toBeNull();
+  });
+
+  it("usa a referência do conteúdo configurada no deploy", async () => {
+    process.env.GITHUB_CONTENT_REF = "edi-14338";
+    getContentMock.mockResolvedValueOnce({
+      data: {
+        type: "file",
+        encoding: "base64",
+        content: toBase64("# Contexto"),
+      },
+    });
+
+    await readGithubText("content/projects/canal-autorizador/sections/contexto.md");
+
+    expect(getContentMock).toHaveBeenCalledWith({
+      owner: "acme",
+      repo: "cms",
+      path: "content/projects/canal-autorizador/sections/contexto.md",
+      ref: "edi-14338",
+    });
+  });
+
+  it("usa a branch do preview Vercel quando não há referência explícita", async () => {
+    process.env.VERCEL_GIT_COMMIT_REF = "edi-14338";
+    getContentMock.mockResolvedValueOnce({
+      data: {
+        type: "file",
+        encoding: "base64",
+        content: toBase64("# Contexto"),
+      },
+    });
+
+    await readGithubText("content/projects/canal-autorizador/sections/contexto.md");
+
+    expect(getContentMock).toHaveBeenCalledWith(expect.objectContaining({ ref: "edi-14338" }));
   });
 
   it("lista subpastas e arquivos de diretório remoto", async () => {

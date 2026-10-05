@@ -36,8 +36,8 @@ test("one vertical navbar changes from products to product and integration conte
   await expect(nav.getByRole("link", { name: "Voltar aos produtos", exact: true })).toHaveAttribute("href", "/docs");
   const documentation = nav.getByRole("link", { name: "Documentação", exact: true }).last();
   await expect(documentation).toHaveAttribute("href", "/docs/canal-autorizador");
-  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: "Métodos", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("link", { name: "Teste de Requisição", exact: true })).toHaveCount(0);
   await expect(page).toHaveURL("/docs/canal-autorizador");
@@ -47,11 +47,13 @@ test("one vertical navbar changes from products to product and integration conte
   await journey.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
   await expect(journey).toHaveAttribute("aria-current", "page");
-  const integrationGuide = nav.getByRole("link", { name: "Roteiro de Integração", exact: true });
+  const integrationGuide = nav.getByRole("link", { name: "Cenário de Teste", exact: true });
   await integrationGuide.click();
   await expect(page).toHaveURL("/docs/canal-autorizador#roteiro-integracao");
   await expect(integrationGuide).toHaveAttribute("aria-current", "page");
 
+  await page.goBack();
+  await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
   await page.goBack();
   await expect(page).toHaveURL("/docs?produto=trade");
   await nav.getByRole("link", { name: /^Wholesaler/ }).click();
@@ -86,7 +88,7 @@ test("Credenciado apresenta estrutura inicial sem simular documentação", async
   await expect(page.getByRole("heading", { name: "Estrutura do Credenciado", exact: true })).toHaveCount(0);
   await expect(nav.getByText("Estrutura do Credenciado", { exact: true })).toBeVisible();
   await expect(nav.getByRole("button", { name: "Visão Geral", exact: true })).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Roteiro de Integração", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Cenários de Testes e Validações", exact: true })).toBeVisible();
   await expect(nav.getByText("Fluxo de Cadastro", { exact: true })).toBeVisible();
   await expect(nav.getByText("Fluxo PBM no Caixa", { exact: true })).toBeVisible();
   await expect(nav.getByText("SUBPRODUTOS", { exact: true })).toHaveCount(0);
@@ -94,6 +96,31 @@ test("Credenciado apresenta estrutura inicial sem simular documentação", async
   await expect(nav.getByText("Associar o produto ao cadastro do beneficiário", { exact: true })).toHaveCount(0);
   await expect(nav.getByText("Versão do subproduto", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Jornada do anexo de receita", { exact: true })).toHaveCount(0);
+});
+
+test("Canal Autorizador exibe os dois fluxos no índice de fluxogramas", async ({ page }) => {
+  await login(page);
+  const nav = page.getByRole("navigation", { name: "Produtos EDI" });
+
+  await nav.getByRole("link", { name: "Trade", exact: true }).click();
+  await nav.getByRole("button", { name: "Fluxograma Completo", exact: true }).click();
+
+  const content = page.getByRole("region", { name: "Conteúdo da documentação" });
+  const distributorFlow = content.getByRole("link", {
+    name: /Canal Autorizador — Fluxo 1 — Retorno enviado pelo Distribuidor/,
+  });
+  const automaticFlow = content.getByRole("link", {
+    name: /Canal Autorizador — Fluxo 2 — Retorno Automático/,
+  });
+
+  await expect(distributorFlow).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador?fluxo=retorno-distribuidor",
+  );
+  await expect(automaticFlow).toHaveAttribute(
+    "href",
+    "/fluxogramas/canal-autorizador?fluxo=retorno-automatico",
+  );
 });
 
 test("mobile navigation preserves context without horizontal overflow", async ({ page }, testInfo) => {
@@ -125,57 +152,57 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).toContainText("Contexto");
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Roteiro de Integração");
-  await expect(page.locator("#contexto")).toBeVisible();
+  const businessRulesLink = index.getByRole("link", { name: "Regras de Negócios", exact: true });
+  await expect(businessRulesLink).toHaveAttribute("href", "#section-regras-de-negocios");
+  const indexLabels = (await index.locator("a").allTextContents()).map((label) => label.trim());
+  expect(indexLabels.indexOf("Regras de Negócios")).toBeGreaterThan(
+    indexLabels.indexOf("Fluxo 2 — Retorno Automático"),
+  );
+  const businessRules = page.locator("#section-regras-de-negocios");
+  await expect(businessRules).toContainText("Documentar as regras de negócios que devem ser seguidas pelo distribuidor.");
+  await expect(businessRules).toContainText("industry_abbreviation");
+  await expect(businessRules).toContainText("a causa mais comum de pedidos duplicados e inconsistências de status");
+  await expect(page.locator("#section-contexto")).toBeVisible();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
-  await expect(page.locator("#tabelas-referencia")).toBeHidden();
-  await expect(page.locator("#roteiro-integracao")).toBeHidden();
 
   await productNav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(index).toContainText("Jornada da Integração");
-  await expect(index).toContainText("Tabelas de referência");
+  await expect(index).toContainText("etapas expansíveis");
   await expect(index).not.toContainText("Contexto");
-  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeVisible();
-  await expect(page.locator("#tabelas-referencia")).toBeVisible();
+  await expect(page.locator("#tabelas-referencia")).toHaveCount(0);
   await expect(page.locator("#roteiro-integracao")).toBeHidden();
   const journeyItems = await index.locator("ul > li > a").allTextContents();
-  expect(journeyItems[0].trim()).toBe("Jornada da Integração");
-  expect(journeyItems[journeyItems.length - 1].trim()).toBe("Tabelas de referência");
+  expect(journeyItems[0].trim()).toBe("Jornada da Integração (etapas expansíveis)");
+  await expect(index.getByRole("link", { name: "1. Autenticar (obter token)" }))
+    .toHaveAttribute("href", "#jornada-operacao-1");
 
-  await productNav.getByRole("link", { name: "Roteiro de Integração", exact: true }).click();
-  await expect(index).toContainText("Roteiro de Integração");
-  await expect(index.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
-    "href",
-    "/fluxogramas/canal-autorizador",
-  );
-  await expect(index.getByRole("link", { name: /1\. Autenticar/ })).toHaveClass(/ml-8/);
+  await productNav.getByRole("link", { name: "Cenário de Teste", exact: true }).click();
+  await expect(index).toContainText("Cenário de Teste");
+  await expect(index.getByRole("link", { name: "Fluxo 1 — Retorno enviado pelo Distribuidor" })).toBeVisible();
+  await expect(index.getByRole("link", { name: "Fluxo 2 — Retorno Automático" })).toBeVisible();
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Tabelas de referência");
-  await expect(page.locator("#contexto")).toBeHidden();
+  await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
   await expect(page.locator("#tabelas-referencia")).toBeHidden();
   await expect(page.locator("#roteiro-integracao")).toBeVisible();
 
-  await productNav.getByRole("button", { name: "Queries", exact: true }).click();
-  await expect(index.locator('a[href^="/docs/canal-autorizador/operations/query/"]')).not.toHaveCount(0);
-  await expect(index).not.toContainText("Roteiro de Integração");
 });
 
 test("contextual index remains available in mobile navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page);
-  await page.goto("/docs/canal-autorizador#roteiro-integracao");
+  await page.goto("/docs/canal-autorizador#jornada-integracao");
 
   const quickNavigation = page.getByRole("navigation", { name: "Navegação rápida" });
   await expect(page.locator("footer")).toContainText("Funcional Health Tech");
   await expect(quickNavigation).toBeVisible();
   await expect(quickNavigation).toHaveClass(/docs-quick-nav/);
-  await expect(quickNavigation.getByRole("link", { name: "Roteiro de Integração", exact: true })).toBeVisible();
-  await expect(quickNavigation.getByRole("link", { name: "Fluxograma Individual", exact: true })).toHaveAttribute(
-    "href",
-    "/fluxogramas/canal-autorizador",
-  );
-  await expect(quickNavigation).not.toContainText("Tabelas de referência");
+
+  await page.getByRole("button", { name: "Mostrar produtos" }).click();
+  await expect(page.getByRole("navigation", { name: "Produtos EDI" }).getByRole("link", { name: "Cenário de Teste", exact: true })).toBeVisible();
 });
 
 test("quick navigation can be dragged horizontally", async ({ page }) => {
@@ -252,6 +279,6 @@ test("long Markdown code examples stay within the page width", async ({ page }) 
   await login(page);
   await page.goto("/docs/canal-autorizador");
 
-  await expect(page.locator("#section-visao-geral pre")).toBeVisible();
+  await expect(page.locator("#section-seguranca-e-ferramentas pre").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

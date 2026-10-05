@@ -30,7 +30,7 @@ describe("documentation navigation", () => {
     expect(view.products.find((p) => p.id === "trade")?.status).toBe("no-documentation");
   });
 
-  it("exposes a complete flowchart at every product root and integration guides per subproduct", () => {
+  it("exposes a complete flowchart and one integration journey per subproduct", () => {
     const view = resolve();
     expect(view.products.every((product) => product.actions[1]?.label === "Fluxograma Completo")).toBe(true);
     const tradeFlow = view.products.find((product) => product.id === "trade")!.actions
@@ -53,6 +53,33 @@ describe("documentation navigation", () => {
       null,
       null,
     ]);
+    expect(view.products.find((product) => product.id === "trade")!.actions
+      .filter((action) => action.id === "jornada-integracao")).toHaveLength(1);
+  });
+
+  it("expands multiple flows without changing the single-flow link", () => {
+    const view = resolveDocumentationNavigation(
+      DOCUMENTATION_CONFIGURATION,
+      manuals,
+      { role: "client" },
+      new Map(),
+      flowSlugs,
+      new Map([[
+        "canal-autorizador",
+        [
+          { id: "retorno-distribuidor", title: "Fluxo 1 — Retorno Envio pelo Distribuidor" },
+          { id: "retorno-automatico", title: "Fluxo 2 — Retorno Automático" },
+        ],
+      ]]),
+    );
+    const links = view.products.find((p) => p.id === "trade")!.actions
+      .find((action) => action.id === "fluxograma-geral")!.links;
+
+    expect(links.slice(0, 2).map((link) => link.href)).toEqual([
+      "/fluxogramas/canal-autorizador?fluxo=retorno-distribuidor",
+      "/fluxogramas/canal-autorizador?fluxo=retorno-automatico",
+    ]);
+    expect(links[2]?.href).toBe("/fluxogramas/wholesaler");
   });
 
   it("only offers request tests to admins and GraphQL manuals", () => {

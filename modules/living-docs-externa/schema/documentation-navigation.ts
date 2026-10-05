@@ -38,7 +38,7 @@ export interface DocumentationModule extends DocumentationItem {
 }
 
 export interface DocumentationAction extends DocumentationItem {
-  destination: "documentation" | "guide" | "flowchart" | "request-test" | null;
+  destination: "documentation" | "guide" | "test-scenarios" | "flowchart" | "request-test" | null;
   linkModules?: boolean;
 }
 

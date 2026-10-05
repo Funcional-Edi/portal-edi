@@ -4,7 +4,7 @@ Guia mínimo para subir o portal em ambiente de homologação.
 
 ## Pré-requisitos
 
-- Node **20.x** ou Docker
+- Node **24.x** ou Docker
 - Variáveis em `.env.local` (copie de `.env.example`)
 
 | Variável | Obrigatória | Para quê |
@@ -13,6 +13,7 @@ Guia mínimo para subir o portal em ambiente de homologação.
 | `AUTH_URL` | Sim | URL pública do portal (ex.: `https://portal-homolog...`) |
 | `FUNCIONAL_SSO_GRAPHQL_URL` | Sim (homolog) | Login SSO distribuidor/admin |
 | `GITHUB_REPO_*` + `GITHUB_TOKEN` | Opcional | CMS remoto (senão usa `content/` local na imagem) |
+| `GITHUB_CONTENT_REF` | Recomendável com CMS remoto | Branch/tag/SHA do conteúdo usado pelo deploy |
 
 ## RBAC (Fase B)
 
@@ -33,6 +34,13 @@ npm run build
 npm run start    # porta 3002
 ```
 
+### Vercel
+
+O `package.json` fixa o runtime em Node **24.x**. No projeto Vercel, mantenha também
+**Settings → Build and Deployment → Node.js Version** em **24.x** para alinhar a
+configuração do projeto aos builds desta branch. Depois de alterar a versão, gere um
+novo deploy da branch `edi-14321`; um deploy existente não muda retroativamente.
+
 ## Docker
 
 ```bash
@@ -52,6 +60,12 @@ npm run smoke:homolog
 Checklist manual SSO: [`fase-5-smoke-sso-homolog.md`](./fase-5-smoke-sso-homolog.md).
 
 CMS GitHub em staging: [`github-cms-staging.md`](./github-cms-staging.md).
+
+Com CMS remoto, publique o código e o conteúdo na mesma referência. Para
+homolog, use `GITHUB_CONTENT_REF=homolog` quando essa branch existir no
+repositório CMS. Após alterar a variável na Vercel, faça novo deploy e valide a
+página do Canal Autorizador; sem a referência explícita, um preview pode ler a
+`main` do CMS e misturar conteúdo antigo com código novo.
 
 ## Health check
 

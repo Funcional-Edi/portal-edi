@@ -79,7 +79,7 @@ function FieldTable({
                         href={manualHref}
                         className="text-sm font-medium text-brand-700 hover:underline"
                       >
-                        Ver no roteiro
+                        Ver na Jornada
                       </Link>
                     ) : (
                       <span className="text-xs text-slate-500" title="Existe no gateway, mas não foi curado no manual">

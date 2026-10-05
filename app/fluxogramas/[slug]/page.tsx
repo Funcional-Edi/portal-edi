@@ -7,22 +7,24 @@ import { FlowViewer } from "@/modules/fluxogramas/ui/flow-viewer";
 
 interface FlowDetailPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ fluxo?: string }>;
 }
 
-export default async function FlowDetailPage({ params }: FlowDetailPageProps) {
+export default async function FlowDetailPage({ params, searchParams }: FlowDetailPageProps) {
   const { slug } = await params;
+  const { fluxo: flowId } = await searchParams;
 
   try {
     const [flow, config] = await Promise.all([
-      getProjectFlow(slug, { requirePublished: true }),
+      getProjectFlow(slug, { requirePublished: true, flowId }),
       getProjectConfigRef(slug),
     ]);
 
     if (!config) notFound();
 
     return (
-      <FlowShell subtitle={`Fluxograma — ${config.name}`} documentationHref={`/docs/${slug}`}>
-        <FlowViewer flow={flow} projectName={config.name} documentationHref={`/docs/${slug}`} />
+      <FlowShell subtitle={`Fluxograma — ${config.name}`} documentationHref={`/docs/${slug}#fluxogramas`}>
+        <FlowViewer flow={flow} projectName={config.name} documentationHref={`/docs/${slug}#fluxogramas`} />
       </FlowShell>
     );
   } catch (error) {

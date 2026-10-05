@@ -1,0 +1,77 @@
+{
+  "items": [
+    {
+      "slug": "por-onde-comecar",
+      "question": "Por onde começo a integração?",
+      "category": "Geral",
+      "order": 10,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Documentação de produtos", "href": "/docs" },
+        { "label": "Referência GraphQL", "href": "/docs/api" }
+      ]
+    },
+    {
+      "slug": "produto-subproduto-e-fluxo",
+      "question": "Como identifico o produto, o subproduto e o fluxo que devo consultar?",
+      "category": "Geral",
+      "order": 20,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Escolher um produto", "href": "/docs" }
+      ]
+    },
+    {
+      "slug": "homologacao-e-producao",
+      "question": "Qual é a diferença entre homologação e produção?",
+      "category": "Geral",
+      "order": 30,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Roteiros da documentação", "href": "/docs" }
+      ]
+    },
+    {
+      "slug": "validar-requisicao",
+      "question": "Como valido uma requisição durante a integração?",
+      "category": "Geral",
+      "order": 40,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Documentação de produtos", "href": "/docs" }
+      ]
+    },
+    {
+      "slug": "erros-e-resultados-graphql",
+      "question": "Onde analiso erros e resultados de uma chamada GraphQL?",
+      "category": "Geral",
+      "order": 50,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Referência GraphQL", "href": "/docs/api" }
+      ]
+    },
+    {
+      "slug": "canal-autorizador",
+      "question": "O que devo consultar para integrar o Canal Autorizador?",
+      "category": "Canal Autorizador",
+      "order": 60,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Documentação do Canal Autorizador", "href": "/docs/canal-autorizador" },
+        { "label": "Fluxograma do Canal Autorizador", "href": "/fluxogramas/canal-autorizador" },
+        { "label": "Referência GraphQL", "href": "/docs/api/canal-autorizador" }
+      ]
+    },
+    {
+      "slug": "credenciado",
+      "question": "Onde encontro a estrutura do produto Credenciado?",
+      "category": "Credenciado",
+      "order": 70,
+      "status": "published",
+      "relatedLinks": [
+        { "label": "Estrutura do Credenciado", "href": "/docs?produto=credenciado" }
+      ]
+    }
+  ]
+}

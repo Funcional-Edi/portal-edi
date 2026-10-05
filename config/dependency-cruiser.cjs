@@ -46,10 +46,26 @@ module.exports = {
         "A comunicação entre contextos é por eventos (core/events). " +
         "Exceção: modules/registry.ts, que só faz o wiring central.",
       severity: "error",
-      from: { path: "^modules/([^/]+)/" },
+      from: {
+        path: "^modules/([^/]+)/",
+        pathNot: "^modules/living-docs-externa/(?:services/get-documentation-navigation|ui/reader/build-manual-nav)\\.ts$",
+      },
       to: {
         path: "^modules/([^/]+)/",
         pathNot: "^modules/$1/",
+      },
+    },
+    {
+      name: "integracao-documentacao-fluxogramas-publica",
+      comment:
+        "Somente os dois serviços de navegação podem consumir a API pública de fluxogramas.",
+      severity: "error",
+      from: {
+        path: "^modules/living-docs-externa/(?:services/get-documentation-navigation|ui/reader/build-manual-nav)\\.ts$",
+      },
+      to: {
+        path: "^modules/([^/]+)/",
+        pathNot: "^modules/(?:living-docs-externa/|fluxogramas/public\\.ts$)",
       },
     },
     {

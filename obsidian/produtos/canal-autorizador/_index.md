@@ -186,21 +186,6 @@ Transfer Order: informa às indústrias (OLs) os pedidos faturados pelos distrib
 | 604 | Produto bloqueado pela logística |
 | 704 | Produto não cadastrado na promoção |
 
-### Parâmetros de validação (General Header)
-
-| Parâmetro | Tipo | Descrição |
-| --- | --- | --- |
-| statusCode | Integer | 0 = requisição válida; diferente de 0 = código de erro de validação, descrito em statusMessage |
-| statusMessage | String | Descrição referente ao código de retorno |
-
-### Limite de requisições — Rate limit (Response Header)
-
-| Parâmetro | Descrição |
-| --- | --- |
-| X-RateLimit-Limit | Limite de requisições por minuto (atualmente 3000 requisições/min) |
-| X-RateLimit-Remaining | Número de requisições restantes no momento |
-| Retry-After | Tempo em segundos para o envio da próxima requisição |
-
 ## Histórico de versão
 
 - **1.0** (2018-04-24) — Equipe EDI: Especificação inicial do layout.

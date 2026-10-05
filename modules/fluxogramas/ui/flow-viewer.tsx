@@ -24,7 +24,7 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
         <h1 className="mt-1 text-3xl font-bold tracking-tight">{flow.title}</h1>
         <p className="mt-1 text-lg text-slate-700">{projectName}</p>
         {flow.description ? (
-          <p className="mt-3 text-slate-600">{flow.description}</p>
+          <p className="mt-3 whitespace-pre-line text-slate-600">{flow.description}</p>
         ) : null}
         <Link
           href={documentationHref}
@@ -35,7 +35,13 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
         </Link>
       </header>
 
-      <FlowCanvas nodes={graph.nodes} edges={graph.edges} readOnly />
+      <FlowCanvas
+        nodes={graph.nodes}
+        edges={graph.edges}
+        lanes={flow.lanes}
+        annotations={flow.annotations}
+        readOnly
+      />
     </article>
   );
 }

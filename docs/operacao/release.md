@@ -50,6 +50,10 @@ Observacao: o E2E usa Playwright com Microsoft Edge. Se o ambiente local nao
 tiver o navegador instalado, instale com `npx playwright install msedge` ou
 registre no PR que o E2E local nao foi executado por limitacao de ambiente.
 
+O portal local usa a porta `3002`; o E2E inicia uma instância isolada na porta
+`3003` (ou na porta definida por `E2E_PORT`) e usa um diretório Next exclusivo
+por execução. Não interrompa o portal local para executar os testes.
+
 Para deploy/homologacao, apos a aplicacao estar rodando no ambiente correto,
 rode:
 

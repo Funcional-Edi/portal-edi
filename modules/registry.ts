@@ -14,6 +14,7 @@ import { homologacaoModule } from "@/modules/homologacao/module";
 import { assistenteIaModule } from "@/modules/assistente-ia/module";
 import { graphqlReferenceModule } from "@/modules/graphql-reference/module";
 import { complianceModule } from "@/modules/compliance/module";
+import { faqModule } from "@/modules/faq/module";
 
 const ALL_MODULES: PortalModule[] = [
   livingDocsExternaModule,
@@ -23,6 +24,7 @@ const ALL_MODULES: PortalModule[] = [
   homologacaoModule,
   assistenteIaModule,
   complianceModule,
+  faqModule,
 ];
 
 /** Retorna uma cópia dos módulos conhecidos. */

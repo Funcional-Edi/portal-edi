@@ -73,7 +73,7 @@ padrão. Não mover sem motivo forte.
 | `middleware.ts` | Middleware Next (auth, headers) | Não (ou `src/` se adotar layout src) |
 | `.env.example` | Template de variáveis de ambiente | Não (convenção Next) |
 | `.gitignore` | Arquivos ignorados pelo Git | Não |
-| `.nvmrc` | Versão do Node (20.x) | Não |
+| `.nvmrc` | Versão do Node (24.x) | Não |
 | `README.md` | Entrada do repositório | Não |
 | `.eslintrc.json` | Regras ESLint (`next/core-web-vitals`) | Possível, com migração flat config |
 | `postcss.config.js` | Pipeline CSS (Tailwind + Autoprefixer) | Possível, com ajuste no Next |

@@ -41,3 +41,21 @@ Regras:
 Não seja preguiçoso(a) em relação a: entender o problema (leia por completo e trace o fluxo real antes de escolher um degrau — um diff pequeno que você não entende é só preguiça disfarçada de eficiência), validação de entrada em fronteiras de confiança, tratamento de erros que previne perda de dados, segurança, acessibilidade, a calibração que hardware real exige (a plataforma nunca é o ideal da especificação — um relógio deriva, um sensor lê errado), qualquer coisa explicitamente pedida. Código preguiçoso sem sua verificação está inacabado: lógica não trivial deixa UMA verificação executável (um assert de demo/self-check ou um arquivo de teste pequeno; sem frameworks, sem fixtures). One-liners triviais não precisam de teste.
 
 Fonte: [AGENTS.md do Ponytail](https://github.com/DietrichGebert/ponytail)
+
+## Fluxo automático de validação
+
+- Alterações em `app/`, componentes, rotas, estilos, `content/` exibido no portal ou configuração de navegação exigem `npm run test:e2e` além de typecheck e lint.
+- Alterações apenas de regras isoladas podem usar `npm run test` como validação unitária; isso não substitui o E2E quando o fluxo passa pela interface.
+- Depois de alterações estruturais ou de configuração, executar `npm run codegraph:sync` e confirmar com `npm run codegraph:check`.
+- Não considerar a validação concluída informando apenas testes unitários quando houver impacto visual ou de navegação.
+
+## Validação do portal
+
+- Use `npm run dev` para o portal local em `http://localhost:3002`.
+- Use `npm run test:e2e` para a validação visual e de navegação. O Playwright inicia
+  uma instância isolada em `http://localhost:3003` por padrão; altere somente com
+  `E2E_PORT` quando houver outra execução de teste.
+- O E2E define um `NEXT_DIST_DIR` exclusivo por execução. Nunca reutilize `.next`
+  do portal local nem interrompa a porta `3002` para validar testes.
+- Alterações em rotas, componentes, estilos, navegação ou conteúdo exibido exigem
+  `npm run typecheck`, `npm run lint` e `npm run test:e2e`.

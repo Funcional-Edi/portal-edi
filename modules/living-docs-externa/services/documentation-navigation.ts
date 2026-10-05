@@ -75,28 +75,25 @@ export function resolveDocumentationNavigation(
   audience: DocumentationAudience,
   operationsBySlug: ReadonlyMap<string, readonly ManualOperation[]> = new Map(),
   flowSlugs: ReadonlySet<string> = new Set(),
+  flowEntriesBySlug: ReadonlyMap<string, readonly { id: string; title: string }[]> = new Map(),
 ): DocumentationNavigationView {
   const published = new Map(manuals.filter((manual) => manual.published).map((manual) => [manual.slug, manual]));
   const products = ordered(config.products, audience).filter((product) => product.enabled).map((product) => {
     const modules = ordered(product.modules, audience);
-    const actions = ordered(product.actions, audience).map((action) => ({
-      id: action.id,
-      label: action.label,
-      tag: action.tag,
-      status: action.status,
-      links: action.linkModules ? modules.map((module): DocumentationLinkView => {
+    const actions = ordered(product.actions, audience).map((action) => {
+      const links = action.linkModules ? modules.map((module): DocumentationLinkView => {
         const manual = module.projectSlug ? published.get(module.projectSlug) : undefined;
         const available = module.enabled && action.enabled
           && module.status === "published" && action.status === "published" && manual;
         // Routes are explicitly configured, and must belong to the published manual.
         const base = manual && module.route === `/docs/${manual.slug}` ? module.route : null;
-        let href: string | null = null;
-        if (available && base) {
-          if (action.destination === "documentation") href = base;
-          if (action.destination === "guide") {
-            const anchor = action.id === "jornada-integracao" ? "jornada-integracao" : "roteiro-integracao";
-            href = `${base}#${anchor}`;
-          }
+          let href: string | null = null;
+          if (available && base) {
+            if (action.destination === "documentation") href = base;
+            if (action.destination === "guide") {
+              href = `${base}#jornada-integracao`;
+            }
+          if (action.destination === "test-scenarios") href = `${base}#roteiro-integracao`;
           if (action.destination === "flowchart" && flowSlugs.has(manual.slug)) href = `/fluxogramas/${manual.slug}`;
           if (action.destination === "request-test" && audience.role === "admin" && manual.protocol === "graphql") {
             href = docsPlaygroundHref(manual.slug);
@@ -119,14 +116,27 @@ export function resolveDocumentationNavigation(
                 method: operation.method,
                 href: docsOperationHref(manual.slug, operation.kind, operation.name),
               }))
-            : [],
+          : [],
           status: href || (action.destination === null && available) ? "published" : !module.enabled || !action.enabled
             ? "unavailable" : module.status === "development" || action.status === "development"
               ? "development" : module.status === "unavailable" || action.status === "unavailable" || manual
                 ? "unavailable" : "no-documentation",
         };
-      }) : [],
-    }));
+      }) : [];
+      const expandedLinks = action.destination === "flowchart"
+        ? links.flatMap((link) => {
+          const flows = link.projectSlug ? flowEntriesBySlug.get(link.projectSlug) : undefined;
+          if (!link.href || !flows || flows.length < 2) return [link];
+          return flows.map((flow) => ({
+            ...link,
+            id: `${link.id}:${flow.id}`,
+            label: `${link.label} — ${flow.title}`,
+            href: `/fluxogramas/${link.projectSlug}?fluxo=${encodeURIComponent(flow.id)}`,
+          }));
+        })
+        : links;
+      return { id: action.id, label: action.label, tag: action.tag, status: action.status, links: expandedLinks };
+    });
     return {
       id: product.id,
       label: product.label,
@@ -166,8 +176,8 @@ export function documentationRouteSelection(
           const operationKind = pathname.startsWith(`${manual}/operations/`)
             ? pathname.slice(`${manual}/operations/`.length).split("/")[0]
             : null;
-          const actionId = hash === "#jornada-integracao" ? "jornada-integracao"
-            : hash === "#roteiro-integracao" ? "roteiro-integracao"
+          const actionId = hash === "#roteiro-integracao" ? "roteiro-integracao"
+            : hash === "#jornada-integracao" ? "jornada-integracao"
             : pathname.startsWith(`${manual}/playground`) ? "teste-de-requisicao"
               : operationKind === "query" ? "queries"
                 : operationKind === "mutation" ? "mutations"

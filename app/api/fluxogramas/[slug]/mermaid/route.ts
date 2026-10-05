@@ -48,10 +48,11 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   const { slug } = await params;
+  const flowId = new URL(_request.url).searchParams.get("fluxo") ?? undefined;
   const isAdmin = isAdminRole(session.user.role);
 
   try {
-    const flow = await getProjectFlow(slug, { requirePublished: !isAdmin });
+    const flow = await getProjectFlow(slug, { requirePublished: !isAdmin, flowId });
     return NextResponse.json({ mermaid: exportFlowToMermaid(flow) });
   } catch (error) {
     if (error instanceof GetFlowError) {

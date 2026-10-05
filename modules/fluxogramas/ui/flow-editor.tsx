@@ -2,6 +2,7 @@
 
 import {
   addEdge,
+  MarkerType,
   useEdgesState,
   useNodesState,
   type Connection,
@@ -11,6 +12,10 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { IntegrationFlow } from "@/modules/fluxogramas/schema";
 import type { ManualRef } from "@/modules/fluxogramas/schema/project-ref";
+import {
+  FLOW_LAYOUT_DEFAULTS,
+  nextLinearNodePosition,
+} from "@/modules/fluxogramas/config/flow-layout";
 import {
   FLOW_NODE_TYPE_LABELS,
 } from "@/modules/fluxogramas/ui/flow-node-types";
@@ -24,11 +29,12 @@ import type { FlowNodeType } from "@/modules/fluxogramas/schema";
 
 interface FlowEditorProps {
   slug: string;
+  flowId?: string;
   initialFlow: IntegrationFlow;
   manual: ManualRef | null;
 }
 
-export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
+export function FlowEditor({ slug, flowId, initialFlow, manual }: FlowEditorProps) {
   const initialGraph = useMemo(() => integrationFlowToGraph(initialFlow), [initialFlow]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
@@ -37,6 +43,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
   const [status, setStatus] = useState<string | null>(null);
   const [mermaid, setMermaid] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const flowQuery = flowId ? `?fluxo=${encodeURIComponent(flowId)}` : "";
 
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -45,6 +52,11 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
           {
             ...connection,
             id: createNodeId("edge"),
+            type: FLOW_LAYOUT_DEFAULTS.edgeType,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: FLOW_LAYOUT_DEFAULTS.edgeColor,
+            },
           },
           current
         )
@@ -55,11 +67,10 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
 
   const addNode = (type: FlowNodeType) => {
     const id = createNodeId(type);
-    const y = 80 + nodes.length * 72;
     const newNode: Node = {
       id,
       type,
-      position: { x: 180, y },
+      position: nextLinearNodePosition(nodes),
       data: {
         label: FLOW_NODE_TYPE_LABELS[type],
         operationRef:
@@ -76,6 +87,8 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
       version: 1,
       title,
       description: description.trim() || undefined,
+      lanes: initialFlow.lanes,
+      annotations: initialFlow.annotations,
       updatedAt: initialFlow.updatedAt,
     });
 
@@ -83,7 +96,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
     setSaving(true);
     setStatus(null);
     try {
-      const response = await fetch(`/api/fluxogramas/${slug}`, {
+      const response = await fetch(`/api/fluxogramas/${slug}${flowQuery}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload()),
@@ -104,7 +117,7 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
   const exportMermaid = async () => {
     setStatus(null);
     try {
-      const response = await fetch(`/api/fluxogramas/${slug}/mermaid`, {
+      const response = await fetch(`/api/fluxogramas/${slug}/mermaid${flowQuery}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload()),
@@ -158,6 +171,8 @@ export function FlowEditor({ slug, initialFlow, manual }: FlowEditorProps) {
       <FlowCanvas
         nodes={nodes}
         edges={edges}
+        lanes={initialFlow.lanes}
+        annotations={initialFlow.annotations}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
