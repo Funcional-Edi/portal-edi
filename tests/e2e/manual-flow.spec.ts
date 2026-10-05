@@ -37,12 +37,17 @@ test("produto na navbar para manual e operacao (IM)", async ({ page }) => {
     index.getByRole("link", { name: /1\. Obter token do gateway/ }).first(),
   ).toHaveClass(/ml-4/);
 
-  await page
-    .locator("#jornada-integracao")
-    .getByRole("link", { name: /1\. Obter token do gateway/ }).first()
-    .click();
+  const firstStepLink = index.getByRole("link", { name: /1\. Obter token do gateway/ }).first();
+  await expect(firstStepLink).toHaveAttribute("href", "#jornada-operacao-1");
+  await firstStepLink.click();
+  await expect(page).toHaveURL("/docs/im#jornada-operacao-1");
 
-  await expect(page).toHaveURL("/docs/im/operations/mutation/createToken");
+  const firstStep = page.locator("#jornada-operacao-1");
+  await firstStep.locator("summary").click();
+  await expect(firstStep.getByText("mutation createToken", { exact: false })).toBeVisible();
+  await expect(page).toHaveURL("/docs/im#jornada-operacao-1");
+
+  await page.goto("/docs/im/operations/mutation/createToken");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
   await expect(page.getByText("mutation createToken", { exact: false })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Consulte a Jornada da Integração" })).toBeVisible();
@@ -84,6 +89,18 @@ test("CA mostra atalho para cenários e detalhes por fluxo", async ({ page }) =>
   const flows = page.locator("#fluxogramas");
   await expect(flows.getByText("createGroupedResponse", { exact: true })).toBeVisible();
   await expect(flows.getByText(/comunique a pessoa responsável pelo EDI/)).toBeVisible();
+
+  await page.goto("/docs/canal-autorizador#jornada-integracao");
+  const orderStep = page.locator("#jornada-operacao-2");
+  await expect(orderStep.locator("summary").first()).toContainText("Criar pré-pedido");
+  await orderStep.locator("summary").first().click();
+  await expect(orderStep.getByRole("heading", { name: "Pré-requisitos" })).toBeVisible();
+  await expect(orderStep.getByRole("heading", { name: "Observação" })).toBeVisible();
+  await expect(orderStep.getByRole("heading", { name: "Campos da requisição" })).toBeVisible();
+  await expect(orderStep.getByRole("heading", { name: "Tabelas de referência" })).toBeVisible();
+  await expect(orderStep.getByRole("heading", { name: "Exemplo GraphQL" })).toBeVisible();
+  await expect(orderStep.getByText(/industry_abbreviation só é obrigatório/)).toBeVisible();
+  await expect(page).toHaveURL("/docs/canal-autorizador#jornada-integracao");
 });
 
 test("atalho de cenários continua disponível no teste de requisição", async ({ page }) => {

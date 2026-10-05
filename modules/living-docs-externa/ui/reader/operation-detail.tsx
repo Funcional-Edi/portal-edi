@@ -2,13 +2,9 @@ import type {
   ManualOperation,
   ManualReferenceTable,
 } from "@/modules/living-docs-externa/schema";
-import {
-  DOCS_HOME_HREF,
-  docsGuideHref,
-  docsPlaygroundHref,
-} from "@/modules/living-docs-externa/services/docs-routes";
+import { DOCS_HOME_HREF, docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
-import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
+import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import Link from "next/link";
 
@@ -77,128 +73,13 @@ export function OperationDetail({
         </div>
       </header>
 
-      {operation.description ? (
-        <section id="descricao" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Descrição
-          </h2>
-          <p className="text-slate-700">{operation.description}</p>
-        </section>
-      ) : null}
-
-      {operation.businessNotes && operation.businessNotes.length > 0 ? (
-        <section id="regras-negocio" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Regras de negócio
-          </h2>
-          <ul className="list-disc space-y-1 pl-5 text-slate-700">
-            {operation.businessNotes.map((note, index) => (
-              <li key={index}>{note}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {!isRest && schemaDetail ? (
-        <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} />
-      ) : null}
-
-      {referenceTables.length > 0 ? (
-        <section id="tabelas-referencia" className="mb-6 scroll-mt-24">
-          <h2 className="mb-3 text-sm font-semibold uppercase text-slate-500">
-            Tabelas de referência
-          </h2>
-          <div className="space-y-3">
-            {referenceTables.map((table, index) => (
-              <details
-                key={table.id}
-                className="group rounded-lg border border-slate-200 bg-white [&_summary::-webkit-details-marker]:hidden"
-                open={index === 0}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
-                  <span className="font-medium text-slate-800">{table.title}</span>
-                  <span className="text-xs text-slate-500">
-                    {table.rows.length} {table.rows.length === 1 ? "linha" : "linhas"}
-                  </span>
-                </summary>
-                <div className="overflow-x-auto border-t border-slate-100">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50">
-                      <tr>
-                        {table.columns.map((column) => (
-                          <th key={column} className="px-3 py-2 text-left font-medium text-slate-700">
-                            {column}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="border-t border-slate-100">
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} className="px-3 py-2 text-slate-600">
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {isRest ? (
-        <section id="endpoint-rest" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Endpoint</h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>
-              {operation.method} {operation.path}
-            </code>
-          </pre>
-          {operation.exampleBody ? (
-            <>
-              <h3 className="mt-4 mb-2 text-sm font-semibold uppercase text-slate-500">
-                Corpo de exemplo
-              </h3>
-              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-                <code>{operation.exampleBody}</code>
-              </pre>
-            </>
-          ) : null}
-          <p className="mt-3 text-sm text-slate-600">
-            Esta API é <span className="font-medium">REST</span> — o Teste de Requisição não está disponível para este protocolo.
-            Use um cliente HTTP (Insomnia, Postman, curl) enviando o token JWT no header{" "}
-            <code>Authorization: Bearer &lt;token&gt;</code>.
-          </p>
-        </section>
-      ) : operation.exampleQuery ? (
-        <section id="exemplo-graphql" className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
-            Exemplo GraphQL
-          </h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{operation.exampleQuery}</code>
-          </pre>
-          {canUsePlayground ? (
-            <Link
-              href={docsPlaygroundHref(slug, operation.exampleQuery)}
-              className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
-            >
-              Teste de Requisição
-            </Link>
-          ) : (
-            <p className="mt-3 text-sm text-slate-600">
-              O Teste de Requisição executa contra o gateway real e está disponível apenas para perfil{" "}
-              <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao
-              time de integração.
-            </p>
-          )}
-        </section>
-      ) : null}
+      <OperationDocumentation
+        slug={slug}
+        operation={operation}
+        schemaDetail={schemaDetail}
+        referenceTables={referenceTables}
+        canUsePlayground={canUsePlayground}
+      />
 
       {!isRest ? (
         <section className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4">

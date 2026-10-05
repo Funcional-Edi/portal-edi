@@ -7,11 +7,12 @@ import type {
   SchemaInputTypeSection,
   SchemaTypeNameRef,
 } from "@/modules/living-docs-externa/services/schema-reference";
-import { schemaTypeHref } from "@/modules/living-docs-externa/services/get-published-schema";
+import { schemaTypeHref } from "@/modules/living-docs-externa/services/docs-routes";
 
 interface OperationSchemaFieldsProps {
   slug: string;
   schemaDetail: OperationSchemaDetail;
+  idPrefix?: string;
 }
 
 function TypeCell({ slug, typeRef }: { slug: string; typeRef: SchemaTypeNameRef }) {
@@ -99,17 +100,18 @@ function InputTypeSection({
   );
 }
 
-export function OperationSchemaFields({ slug, schemaDetail }: OperationSchemaFieldsProps) {
+export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "" }: OperationSchemaFieldsProps) {
   const hasRequest =
     schemaDetail.requestArgs.length > 0 || schemaDetail.requestInputTypes.length > 0;
   const hasResponse = schemaDetail.responseFields.length > 0;
+  const sectionId = (id: string) => idPrefix ? `${idPrefix}-${id}` : id;
 
   if (!hasRequest && !hasResponse) return null;
 
   return (
     <>
       {hasRequest ? (
-        <section id="campos-requisicao" className="mb-6 scroll-mt-24">
+        <section id={sectionId("campos-requisicao")} className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Campos da requisição
           </h2>
@@ -123,7 +125,7 @@ export function OperationSchemaFields({ slug, schemaDetail }: OperationSchemaFie
       ) : null}
 
       {hasResponse ? (
-        <section id="campos-resposta" className="mb-6 scroll-mt-24">
+        <section id={sectionId("campos-resposta")} className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Campos da resposta
             {schemaDetail.responseTypeName ? (
