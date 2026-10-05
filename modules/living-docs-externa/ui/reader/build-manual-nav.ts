@@ -117,7 +117,10 @@ export async function buildManualNav(
     sectionsInput ?? getPublishedManualSections(slug),
     getIntegrationFlows(slug),
   ]);
-  const sections = loadedSections.filter((section) => section.id !== "fluxo-do-pedido");
+  const businessRulesSection = loadedSections.find((section) => section.id === "regras-de-negocios");
+  const sections = loadedSections.filter(
+    (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
+  );
   const tocItems: ManualTocItem[] = [];
   tocItems.push(...sections.map((section) => ({
     href: `#section-${section.id}`,
@@ -131,6 +134,13 @@ export async function buildManualNav(
       label: flow.title,
       depth: 2,
     })));
+  }
+  if (businessRulesSection) {
+    tocItems.push({
+      href: "#section-regras-de-negocios",
+      label: businessRulesSection.title,
+      depth: 1,
+    });
   }
   tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
   tocItems.push(

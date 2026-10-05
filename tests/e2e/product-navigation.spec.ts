@@ -156,6 +156,16 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(index).toContainText("Contexto");
   await expect(index).not.toContainText("Jornada da Integração");
   await expect(index).not.toContainText("Roteiro de Integração");
+  const businessRulesLink = index.getByRole("link", { name: "Regras de Negócios", exact: true });
+  await expect(businessRulesLink).toHaveAttribute("href", "#section-regras-de-negocios");
+  const indexLabels = (await index.locator("a").allTextContents()).map((label) => label.trim());
+  expect(indexLabels.indexOf("Regras de Negócios")).toBeGreaterThan(
+    indexLabels.indexOf("Fluxo 2 — Retorno Automático"),
+  );
+  const businessRules = page.locator("#section-regras-de-negocios");
+  await expect(businessRules).toContainText("Documentar as regras de negócios que devem ser seguidas pelo distribuidor.");
+  await expect(businessRules).toContainText("industry_abbreviation");
+  await expect(businessRules).toContainText("a causa mais comum de pedidos duplicados e inconsistências de status");
   await expect(page.locator("#section-contexto")).toBeVisible();
   await expect(page.locator("#jornada-integracao")).toBeHidden();
 
