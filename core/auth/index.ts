@@ -2,8 +2,8 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/core/auth/config";
 
 /**
- * Instância única do Auth.js. Exporta handlers (rota), auth (server/middleware),
- * signIn/signOut. Ponto estável para todos os módulos.
+ * Instância do Auth.js no servidor. Exporta handlers (rota), auth, signIn/signOut.
+ * O middleware usa `edge-config`, sem a lista de acessos.
  */
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
 

@@ -97,6 +97,12 @@ Nunca "conserte" apagando a assertion.
 O `24` do `nvm install 24` vira uma versão completa (aqui, `24.21.0`).
 `24.11.0` não existe nesta máquina.
 
+## `node:fs/promises` no middleware
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| Tela "Build Error" ao abrir `localhost:3002`: `Reading from "node:fs/promises" is not handled` | O middleware importava o login completo, e o login lia a lista de acessos no disco | O middleware usa `core/auth/edge-config.ts`, que só lê o JWT. A lista continua em `core/auth/config.ts`, no servidor |
+
 ## Git travado
 
 | Sintoma | Solução |

@@ -1,6 +1,7 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 
-import { auth } from "@/core/auth";
+import { edgeAuthConfig } from "@/core/auth/edge-config";
 import {
   canAccessPath,
   getForbiddenRedirectPath,
@@ -9,6 +10,7 @@ import {
 } from "@/core/auth/module-access";
 import { registerAllModules } from "@/modules/registry";
 
+const { auth } = NextAuth(edgeAuthConfig);
 const modules = registerAllModules();
 
 /**
