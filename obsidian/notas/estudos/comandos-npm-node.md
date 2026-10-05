@@ -3,15 +3,28 @@
 **Node.js** = roda JavaScript/TypeScript fora do navegador.
 **npm** = gerenciador de pacotes do Node (instala bibliotecas, roda scripts).
 
-Este projeto exige **Node 20.x** (`engines` no `package.json`).
+A branch atual ainda declara Node **20.x** no `package.json`. A homolog na internet já declara **24.x**.
 
 ## Conferir a instalação
 
 | Comando | Para que serve |
 | --- | --- |
-| `node -v` | Versão do Node (deve começar com `v20.`) |
-| `npm -v` | Versão do npm |
+| `node -v` | Versão do Node ativa neste terminal |
+| `npm.cmd -v` | Versão do npm (no PowerShell use `npm.cmd`) |
+| `nvm list` | Versões do Node já instaladas neste Windows |
 | `npm ls --depth=0` | Lista as dependências diretas instaladas |
+
+A homolog já pede Node **24**. Nesta máquina a instalada é a **24.21.0**.
+O número depois do ponto muda: use o que `nvm list` mostrar, não um exemplo.
+
+```powershell
+nvm install 24
+nvm list
+nvm use 24.21.0
+```
+
+`nvm install` baixa. `nvm use` ativa. Depois feche o terminal e abra outro
+antes de `node -v`.
 
 ## Instalar dependências
 

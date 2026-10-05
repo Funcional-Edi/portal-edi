@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { getEffectivePermissionsSource } from "@/core/auth/permissions-loader";
+import { getPermissionsConfigSource } from "@/core/auth/permissions-config";
 import { env, getContentRoot, validateEnv } from "@/core/config/env";
 import {
   getContentBackend,
@@ -37,10 +37,10 @@ function runAutomatedChecks(): CheckResult[] {
   const activeModules = modules.filter((m) => m.status === "active");
   const blocked = listBlockedModules();
 
-  const imPublished = (() => {
+  const demoPublished = (() => {
     try {
       const raw = fs.readFileSync(
-        path.join(getContentRoot(), "content/projects/im/config.json"),
+        path.join(getContentRoot(), "content/projects/demo/config.json"),
         "utf8"
       );
       const config = JSON.parse(raw) as { published?: boolean };
@@ -74,7 +74,7 @@ function runAutomatedChecks(): CheckResult[] {
     check(
       "permissions",
       true,
-      `RBAC: ${getEffectivePermissionsSource()}`
+      `RBAC: ${getPermissionsConfigSource()}`
     ),
     check(
       "module-living-docs",
@@ -82,9 +82,9 @@ function runAutomatedChecks(): CheckResult[] {
       "living-docs-externa ativo"
     ),
     check(
-      "content-im",
-      fileExists("content/projects/im/config.json") && imPublished,
-      imPublished ? "Projeto IM publicado" : "IM ausente ou não publicado"
+      "content-demo",
+      fileExists("content/projects/demo/config.json") && demoPublished,
+      demoPublished ? "Projeto demo publicado" : "Demo ausente ou não publicado"
     ),
     check(
       "blocked-modules-documented",

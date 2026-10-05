@@ -1,7 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { getPermissionsConfig } from "@/core/auth/permissions-config";
+import { loadAccessList } from "@/core/auth/access-list";
 import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
 import { resolveRole, type UserRole } from "@/core/auth/roles";
 import { isSsoLoginConfigured, validateSsoCredentials } from "@/core/auth/sso";
@@ -28,7 +28,7 @@ if (isSsoLoginConfigured()) {
           id: user.id,
           email: user.email,
           name: user.name ?? user.email.split("@")[0],
-          role: resolveRole(user.email, getPermissionsConfig()),
+          role: resolveRole(user.email, await loadAccessList()),
         };
       },
     })
@@ -54,7 +54,7 @@ if (env.isDevAuthEnabled) {
           id: email,
           email,
           name: email.split("@")[0],
-          role: resolveRole(email, getPermissionsConfig()),
+          role: resolveRole(email, await loadAccessList()),
         };
       },    })
   );
@@ -73,9 +73,9 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.email = user.email ?? token.email;
-        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email, getPermissionsConfig());
+        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email, await loadAccessList());
       } else if (token.email && !token.role) {
-        token.role = resolveRole(token.email as string, getPermissionsConfig());
+        token.role = resolveRole(token.email as string, await loadAccessList());
       }
       return token;
     },

@@ -93,7 +93,8 @@ gh pr checks      # ver se o CI passou
 
 | Comando | Para que serve |
 | --- | --- |
-| `git fetch` | Baixa novidades do GitHub **sem** mexer nos seus arquivos |
+| `git fetch origin` | Baixa as branches do GitHub (`origin/main`, `origin/homolog`) sem mexer nos seus arquivos |
+| `git rebase origin/main` | Recoloca os commits da sua branch em cima da `main` baixada. Não altera a `main` nem a branch de outra pessoa |
 | `git pull` | Baixa **e** aplica na sua branch atual |
 | `git pull origin main` | Traz o que mudou na `main` para a branch atual |
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { auth, isAdminRole } from "@/core/auth";
 import { getProject } from "@/modules/living-docs-externa/repository/project-repository";
 import { listManualSections } from "@/modules/living-docs-externa/repository/section-repository";
 import { evaluateManualQuality } from "@/modules/living-docs-externa/services/manual-quality";
@@ -20,7 +21,7 @@ interface EditManualPageProps {
  *
  * Usa o shell do leitor (`ManualShell`) e lê direto do repositório — sem o gate
  * de `published` dos services de leitura — porque o admin precisa editar
- * rascunho. O acesso admin é garantido pelo `middleware.ts`.
+ * rascunho. O acesso de staff (admin ou editor EDI) é garantido pelo `middleware.ts`.
  */
 export default async function EditManualPage({ params }: EditManualPageProps) {
   const { slug } = await params;
@@ -28,7 +29,8 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const sections = await listManualSections(slug);
+  const [sections, session] = await Promise.all([listManualSections(slug), auth()]);
+  const canPublish = Boolean(session?.user?.role && isAdminRole(session.user.role));
   const report = evaluateManualQuality({
     config: project.config,
     manual: project.manual,
@@ -76,7 +78,7 @@ export default async function EditManualPage({ params }: EditManualPageProps) {
         </Link>
       }
     >
-      <ManualEditor project={project} sections={sections} report={report} />
+      <ManualEditor project={project} sections={sections} report={report} canPublish={canPublish} />
     </ManualShell>
   );
 }

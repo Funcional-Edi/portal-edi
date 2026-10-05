@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portal EDI — duas versões</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #526174;
+      --line: #d5deea;
+      --bg: #eef3f9;
+      --card: #fff;
+      --manual: #0b7d6b;
+      --manual-soft: #e5f6f2;
+      --interna: #6346d6;
+      --interna-soft: #f1edff;
+      --editor: #1d64d8;
+      --admin: #c26a08;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 18px/1.45 "Segoe UI", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(820px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0 72px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .lead {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .trio, .pair {
+      display: grid;
+      gap: 16px;
+    }
+
+    .trio { grid-template-columns: 1fr 1fr 1fr; }
+    .pair { grid-template-columns: 1fr 1fr; }
+
+    .role {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-top: 8px solid var(--c);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .role.admin { --c: var(--admin); }
+    .role.editor { --c: var(--editor); }
+    .role.viewer { --c: var(--manual); }
+
+    .role h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--c);
+    }
+
+    .role p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .version {
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .version header {
+      padding: 16px 18px;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .manual header { background: var(--manual); }
+    .interna header { background: var(--interna); }
+
+    .version ul {
+      margin: 0;
+      padding: 16px 18px 18px 34px;
+    }
+
+    .version li { margin: 8px 0; }
+
+    .version .who {
+      margin: 0;
+      padding: 0 18px 16px;
+      font-weight: 700;
+    }
+
+    .manual .who { color: var(--manual); }
+    .interna .who { color: var(--interna); }
+
+    h2 {
+      margin: 40px 0 8px;
+      font-size: 22px;
+    }
+
+    .hint {
+      margin: 0 0 16px;
+      color: var(--muted);
+    }
+
+    ol.flow {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    ol.flow li {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 16px;
+    }
+
+    .n {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .editor .n { background: var(--editor); }
+    .admin .n { background: var(--admin); }
+    .manual .n { background: var(--manual); }
+    .interna .n { background: var(--interna); }
+
+    ol.flow strong { display: block; }
+    ol.flow span { color: var(--muted); }
+
+    .choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .choice a, .choice div {
+      display: block;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .choice .yes { background: var(--manual); }
+    .choice .no { background: var(--interna); }
+    .choice small { display: block; opacity: 0.9; font-size: 15px; margin-top: 4px; }
+
+    .gains {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .gain {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .gain strong { display: block; margin-bottom: 4px; }
+    .gain p { margin: 0; color: var(--muted); font-size: 16px; }
+
+    @media (max-width: 680px) {
+      .trio, .pair, .choice, .gains { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Quem entra e o que cada um vê</h1>
+    <p class="lead">Todo mundo entra pelo mesmo login. O papel depende de estar ou não na lista.</p>
+
+    <div class="trio">
+      <article class="role admin">
+        <h2>Admin master</h2>
+        <p>Acesso a tudo. Aprova, publica e escolhe a versão.</p>
+      </article>
+      <article class="role editor">
+        <h2>Editor EDI</h2>
+        <p>Acesso às edições. Altera e envia. Não publica.</p>
+      </article>
+      <article class="role viewer">
+        <h2>Visualizador</h2>
+        <p>Todo login do SSO que não está liberado como admin master nem como editor EDI. Vê só a versão do manual.</p>
+      </article>
+    </div>
+
+    <h2>Duas versões. O visualizador só vê uma.</h2>
+    <p class="hint">A versão do manual é o que muda o desenvolvimento do distribuidor. A versão interna fica só com o time EDI.</p>
+
+    <div class="pair">
+      <article class="version manual">
+        <header>Versão do manual</header>
+        <p class="who">Quem vê: o visualizador</p>
+        <ul>
+          <li>Requisição nova</li>
+          <li>Campo ou regra que muda a integração</li>
+          <li>O número da versão sobe, por exemplo de 1.2 para 1.3</li>
+        </ul>
+      </article>
+      <article class="version interna">
+        <header>Versão interna</header>
+        <p class="who">Quem vê: só o time EDI</p>
+        <ul>
+          <li>Correção de texto</li>
+          <li>Exemplo ou ajuste que não muda a integração</li>
+          <li>O número que o visualizador vê continua o mesmo</li>
+        </ul>
+      </article>
+    </div>
+
+    <h2>Como uma alteração chega lá</h2>
+    <p class="hint">Quatro passos. A escolha acontece só no final.</p>
+
+    <ol class="flow">
+      <li class="editor">
+        <span class="n">1</span>
+        <div>
+          <strong>O editor muda o conteúdo</strong>
+          <span>Manual, gateway, catálogo ou subproduto.</span>
+        </div>
+      </li>
+      <li class="editor">
+        <span class="n">2</span>
+        <div>
+          <strong>O visualizador ainda não vê</strong>
+          <span>A alteração fica guardada até o admin aprovar.</span>
+        </div>
+      </li>
+      <li class="admin">
+        <span class="n">3</span>
+        <div>
+          <strong>O admin aprova</strong>
+          <span>Quem enviou não aprova a própria alteração. Se devolver, o editor ajusta e envia de novo.</span>
+        </div>
+      </li>
+      <li class="admin">
+        <span class="n">4</span>
+        <div>
+          <strong>O admin responde uma pergunta</strong>
+          <span>Isso muda o desenvolvimento do distribuidor?</span>
+          <div class="choice">
+            <div class="yes">Sim → versão do manual<small>O visualizador passa a ver</small></div>
+            <div class="no">Não → versão interna<small>Só o time EDI vê</small></div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <h2>Versões anteriores ficam salvas</h2>
+    <p class="hint">Nada que já foi aprovado some. Restaurar não apaga o histórico: abre uma proposta nova e o admin aprova de novo.</p>
+
+    <ol class="flow">
+      <li class="manual">
+        <span class="n">1</span>
+        <div>
+          <strong>A versão do manual fica no histórico público</strong>
+          <span>O visualizador vê a data, o que mudou e o número. Não vê quem fez.</span>
+        </div>
+      </li>
+      <li class="interna">
+        <span class="n">2</span>
+        <div>
+          <strong>A versão interna fica só na área do EDI</strong>
+          <span>O visualizador não vê esse histórico.</span>
+        </div>
+      </li>
+      <li class="admin">
+        <span class="n">3</span>
+        <div>
+          <strong>O admin escolhe “Restaurar esta versão”</strong>
+          <span>Abre uma proposta na mesma fila e só vale depois da aprovação. O histórico antigo permanece e a restauração entra como uma linha nova. Se for do manual, o visualizador vê uma versão nova. Se for interna, o número dele não muda.</span>
+        </div>
+      </li>
+    </ol>
+
+    <h2>O que se ganha</h2>
+    <div class="gains">
+      <article class="gain">
+        <strong>Autonomia do time EDI</strong>
+        <p>O editor altera pela tela. Não depende de mudança de código nem de deploy.</p>
+      </article>
+      <article class="gain">
+        <strong>Nada muda direto</strong>
+        <p>Toda alteração espera o admin. Quem enviou não aprova a própria.</p>
+      </article>
+      <article class="gain">
+        <strong>O distribuidor vê só o que lhe impacta</strong>
+        <p>Versão interna não aparece para ele. Se a mudança mistura impacto e texto, vale a versão do manual.</p>
+      </article>
+      <article class="gain">
+        <strong>Dá para voltar</strong>
+        <p>No histórico, o admin escolhe “Restaurar esta versão”. Isso abre uma proposta na mesma fila e só vale depois da aprovação. O passado não é apagado: a restauração entra como uma linha nova.</p>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

@@ -7,7 +7,14 @@ import { authConfig } from "@/core/auth/config";
  */
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
 
-export { resolveRole, isAdminRole, type UserRole } from "@/core/auth/roles";
+export {
+  resolveRole,
+  isAdminRole,
+  isEditorRole,
+  isInternalStaffRole,
+  canEditContent,
+  type UserRole,
+} from "@/core/auth/roles";
 export {
   canAccessLevel,
   canAccessModule,

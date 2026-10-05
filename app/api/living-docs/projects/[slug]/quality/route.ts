@@ -1,15 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireContentEditor } from "@/core/auth/require-role";
 import { getManualQualityReport } from "@/modules/living-docs-externa/services/manual-quality";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    return null;
-  }
-  return session;
-}
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
@@ -17,7 +9,7 @@ interface RouteParams {
 
 /** Checklist de qualidade do manual — usado pelo editor antes de publicar. */
 export async function GET(_request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
+  const session = await requireContentEditor();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

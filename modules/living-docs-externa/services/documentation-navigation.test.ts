@@ -5,7 +5,7 @@ import type { ProjectSummary } from "@/modules/living-docs-externa/schema";
 import type { DocumentationConfiguration } from "@/modules/living-docs-externa/schema/documentation-navigation";
 import { attachProjectsToProducts, canViewDocumentation, documentationRouteSelection, resolveDocumentationNavigation } from "./documentation-navigation";
 
-const manuals: ProjectSummary[] = ["im", "canal-autorizador", "wholesaler"].map((slug) => ({
+const manuals: ProjectSummary[] = ["canal-autorizador", "wholesaler"].map((slug) => ({
   slug, name: slug, published: true, protocol: "graphql", environment: "homolog", updatedAt: "2026-09-16T00:00:00.000Z",
 }));
 const flowSlugs = new Set(manuals.map((manual) => manual.slug));
@@ -18,9 +18,9 @@ describe("documentation navigation", () => {
     expect(view.products.map((p) => p.label)).toEqual(["Credenciado", "Movimentação de Vidas", "Trade", "APS", "PBM"]);
     const trade = view.products.find((p) => p.id === "trade")!;
     expect(trade.actions[0].links.map((link) => link.href)).toEqual([
-      "/docs/canal-autorizador", "/docs/wholesaler", null, "/docs/im",
+      "/docs/canal-autorizador", "/docs/wholesaler", null, null,
     ]);
-    expect(trade.actions[0].links.at(-1)?.environment).toBe("homolog");
+    expect(trade.actions[0].links.find((link) => link.id === "wholesaler")?.environment).toBe("homolog");
     expect(view.products[0].actions[0].links.every((link) => !link.href && link.status === "no-documentation")).toBe(true);
   });
 
@@ -36,7 +36,7 @@ describe("documentation navigation", () => {
     const tradeFlow = view.products.find((product) => product.id === "trade")!.actions
       .find((action) => action.id === "fluxograma-geral")!;
     expect(tradeFlow.links.map((link) => link.href)).toEqual([
-      "/fluxogramas/canal-autorizador", "/fluxogramas/wholesaler", null, "/fluxogramas/im",
+      "/fluxogramas/canal-autorizador", "/fluxogramas/wholesaler", null, null,
     ]);
     const tradeJourney = view.products.find((product) => product.id === "trade")!.actions
       .find((action) => action.id === "jornada-integracao")!;
@@ -44,14 +44,14 @@ describe("documentation navigation", () => {
       "/docs/canal-autorizador#jornada-integracao",
       "/docs/wholesaler#jornada-integracao",
       null,
-      "/docs/im#jornada-integracao",
+      null,
     ]);
     expect(view.products.find((product) => product.id === "trade")!.actions
       .find((action) => action.id === "roteiro-integracao")!.links.map((link) => link.href)).toEqual([
       "/docs/canal-autorizador#roteiro-integracao",
       "/docs/wholesaler#roteiro-integracao",
       null,
-      "/docs/im#roteiro-integracao",
+      null,
     ]);
   });
 
@@ -59,7 +59,9 @@ describe("documentation navigation", () => {
     expect(resolve().products.every((p) => p.actions.every((a) => a.id !== "teste-de-requisicao"))).toBe(true);
     const admin = resolve(undefined, manuals.map((manual) => manual.slug === "wholesaler" ? { ...manual, protocol: "rest" } : manual), "admin");
     const request = admin.products.find((p) => p.id === "trade")!.actions.find((a) => a.id === "teste-de-requisicao")!;
-    expect(request.links.find((link) => link.id === "im")?.href).toBe("/docs/im/playground");
+    expect(request.links.find((link) => link.id === "canal-autorizador")?.href).toBe(
+      "/docs/canal-autorizador/playground"
+    );
     expect(request.links.find((link) => link.id === "wholesaler")?.href).toBeNull();
   });
 
@@ -71,13 +73,17 @@ describe("documentation navigation", () => {
         enabled: p.id !== "aps",
         order: -p.order,
         actions: p.actions.map((a) => ({ ...a, visible: a.id !== "roteiro-integracao" })),
-        modules: p.modules.map((m) => ({ ...m, access: m.id === "im" ? { organizationIds: ["org-a"] } : undefined })),
+        modules: p.modules.map((m) =>
+          m.id === "wholesaler" ? { ...m, access: { organizationIds: ["org-a"] } } : m
+        ),
       })),
     };
     const view = resolve(config);
     expect(view.products.map((p) => p.id)).toEqual(["pbm", "trade", "movimentacao-de-vidas", "credenciado"]);
     expect(view.products.flatMap((p) => p.actions).some((a) => a.id === "roteiro-integracao")).toBe(false);
-    expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).some((m) => m.id === "im")).toBe(false);
+    expect(view.products.flatMap((p) => p.actions.flatMap((a) => a.links)).some((m) => m.id === "wholesaler")).toBe(
+      false
+    );
     expect(DOCUMENTATION_CONFIGURATION.products[0].id).toBe("credenciado");
   });
 
@@ -99,13 +105,23 @@ describe("documentation navigation", () => {
 
   it("selects the product/module/action for deep links without prefix collisions", () => {
     const view = resolve(undefined, manuals, "admin");
-    expect(documentationRouteSelection(view, "/docs/im/operations/mutation/createToken")).toEqual({ productId: "trade", actionId: "mutations", moduleId: "im" });
-    expect(documentationRouteSelection(view, "/docs/im/playground")?.actionId).toBe("teste-de-requisicao");
-    expect(documentationRouteSelection(view, "/docs/im")?.actionId).toBe("documentacao");
-    expect(documentationRouteSelection(view, "/docs/im", "#jornada-integracao")?.actionId).toBe("jornada-integracao");
-    expect(documentationRouteSelection(view, "/docs/im", "#roteiro-integracao")?.actionId).toBe("roteiro-integracao");
-    expect(documentationRouteSelection(view, "/docs/api/im/types/Mutation")?.productId).toBe("trade");
-    expect(documentationRouteSelection(view, "/docs/im-extra")).toBeNull();
+    expect(documentationRouteSelection(view, "/docs/wholesaler/operations/mutation/createToken")).toEqual({
+      productId: "trade",
+      actionId: "mutations",
+      moduleId: "wholesaler",
+    });
+    expect(documentationRouteSelection(view, "/docs/wholesaler/playground")?.actionId).toBe(
+      "teste-de-requisicao"
+    );
+    expect(documentationRouteSelection(view, "/docs/wholesaler")?.actionId).toBe("documentacao");
+    expect(documentationRouteSelection(view, "/docs/wholesaler", "#jornada-integracao")?.actionId).toBe(
+      "jornada-integracao"
+    );
+    expect(documentationRouteSelection(view, "/docs/wholesaler", "#roteiro-integracao")?.actionId).toBe(
+      "roteiro-integracao"
+    );
+    expect(documentationRouteSelection(view, "/docs/api/wholesaler/types/Mutation")?.productId).toBe("trade");
+    expect(documentationRouteSelection(view, "/docs/wholesaler-extra")).toBeNull();
   });
 
   it("anexa um projeto novo ao produto escolhido sem duplicar modulo ja cadastrado", () => {

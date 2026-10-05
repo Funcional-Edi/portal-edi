@@ -107,14 +107,47 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
   },
   {
     id: "rbac-permissions-file",
-    title: "RBAC configurável (permissions.json)",
+    title: "RBAC configurável (PERMISSIONS_CONFIG_JSON)",
     category: "autorizacao",
     status: "ativo",
     description:
-      "Admins e clients definidos em data/permissions.json (gitignored) ou PERMISSIONS_CONFIG_JSON. O fallback local usa o administrador padrão; homolog/prod devem configurar a fonte externa.",
-    verification: "Copiar permissions.example.json → permissions.json no deploy.",
+      "O admin master grava admins e editores EDI em data/access/permissions.json pela tela /admin/acessos. O login lê esse arquivo; se ele ainda não existe, usa PERMISSIONS_CONFIG_JSON só para o primeiro admin. Editor só por e-mail exato. Quem não está na lista é cliente.",
+    verification: "Tela /admin/acessos (só admin) + login lê data/access/permissions.json antes da variável.",
     reference: "data/permissions.example.json",
     implementedAt: "2026-08-10",
+  },
+  {
+    id: "github-cms-write-allowlist",
+    title: "Escrita no GitHub CMS restrita por allowlist",
+    category: "integridade",
+    status: "ativo",
+    description:
+      "O adapter só grava em content/**, data/radar/** e data/access/permissions.json; data/projects/** (schema, credentials.enc), .github, core e app são recusados (PATH_FORBIDDEN) antes de qualquer chamada à API. Escrita usa commit atômico e GITHUB_WRITE_TOKEN server-side.",
+    verification: "npm test -- github-content-store (allowlist) + assertWritablePath",
+    reference: "core/db/adapters/github-content-error.ts",
+    implementedAt: "2026-09-30",
+  },
+  {
+    id: "rbac-editor-exact-email",
+    title: "Editor EDI só por e-mail exato",
+    category: "autorizacao",
+    status: "ativo",
+    description:
+      "O papel editor nunca casa por domínio: entradas com @ invalidam o schema e resolveRole compara e-mail exato. Mutações de conteúdo exigem canEditContent; publicação, gateway, playground e catálogo seguem admin-only.",
+    verification: "core/auth/roles.test.ts + core/auth/permissions-config.test.ts",
+    reference: "core/auth/roles.ts",
+    implementedAt: "2026-09-30",
+  },
+  {
+    id: "github-cms-no-write-main",
+    title: "Portal não grava direto em main/master",
+    category: "integridade",
+    status: "ativo",
+    description:
+      "Escrita remota exige branch explícita (BRANCH_REQUIRED) e recusa main/master (BRANCH_FORBIDDEN); updateRef usa force:false e non-fast-forward vira CONFLICT — nunca sobrescreve em silêncio.",
+    verification: "npm test -- github-content-store (branch main, CONFLICT)",
+    reference: "core/db/adapters/github-content-error.ts",
+    implementedAt: "2026-09-30",
   },
   {
     id: "middleware-rbac",

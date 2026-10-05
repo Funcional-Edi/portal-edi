@@ -27,6 +27,8 @@ interface ManualEditorProps {
   project: Project;
   sections: ManualSection[];
   report: ManualQualityReport;
+  /** Só admin publica; o editor EDI edita e aguarda o ok do admin. */
+  canPublish: boolean;
 }
 
 type Panel =
@@ -47,7 +49,7 @@ function operationKey(operation: ManualOperation): string {
  * de edição nos slots. Assim não existe "tela do admin" e "tela do distribuidor"
  * divergindo: há um layout só, com ou sem controles.
  */
-export function ManualEditor({ project, sections, report }: ManualEditorProps) {
+export function ManualEditor({ project, sections, report, canPublish }: ManualEditorProps) {
   const router = useRouter();
   const slug = project.config.slug;
 
@@ -127,11 +129,13 @@ export function ManualEditor({ project, sections, report }: ManualEditorProps) {
                     Você está editando exatamente a tela que o distribuidor vê.
                   </p>
                 </div>
-                <PublishToggle
-                  slug={slug}
-                  published={project.config.published}
-                  qualityReport={report}
-                />
+                {canPublish ? (
+                  <PublishToggle
+                    slug={slug}
+                    published={project.config.published}
+                    qualityReport={report}
+                  />
+                ) : null}
               </div>
 
               <QualityChecklist report={report} />

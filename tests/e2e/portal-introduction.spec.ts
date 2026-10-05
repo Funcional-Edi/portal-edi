@@ -62,7 +62,7 @@ test("client uses the shared portal and documentation without gaining privileged
   await expect(page).toHaveURL("/docs");
   await page.goto("/interno");
   await expect(page).toHaveURL("/docs");
-  const denied = await page.request.post("/api/living-docs/projects/im/graphql", { data: { query: "query { __typename }" } });
+  const denied = await page.request.post("/api/living-docs/projects/demo/graphql", { data: { query: "query { __typename }" } });
   expect(denied.status()).toBe(403);
 });
 
