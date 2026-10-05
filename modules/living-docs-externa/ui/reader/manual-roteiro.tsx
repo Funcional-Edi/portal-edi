@@ -1,10 +1,12 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
 import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
+import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { MarkdownBody } from "@/core/ui/markdown-body";
+import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
-import { ArrowRight, PencilLine, Search, Send } from "lucide-react";
+import { ChevronDown, PencilLine, Search, Send } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -62,6 +64,8 @@ interface ManualRoteiroProps {
   schemaReferenceHref?: string;
   /** Playground executa contra gateway real — só perfil admin. */
   canUsePlayground?: boolean;
+  /** Campos do schema publicados para exibição junto a cada etapa. */
+  schemaDetails?: Record<string, OperationSchemaDetail | null>;
 }
 
 export function ManualRoteiro({
@@ -71,6 +75,7 @@ export function ManualRoteiro({
   flowLinks = [],
   schemaReferenceHref,
   canUsePlayground = false,
+  schemaDetails = {},
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
@@ -235,8 +240,8 @@ export function ManualRoteiro({
           <div>
             <h2 className="text-lg font-semibold">Jornada da Integração</h2>
             <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
-              Siga as etapas na ordem para entender o processo completo. Cada operação leva à
-              próxima decisão da integração e abre o detalhamento técnico correspondente.
+              Siga as etapas na ordem e expanda cada uma para consultar observações, campos,
+              tabelas de referência e exemplos sem sair da Jornada.
             </p>
           </div>
           {editor?.operationsToolbar}
@@ -250,49 +255,53 @@ export function ManualRoteiro({
 
         <ol className="space-y-3">
           {operations.map((op, index) => {
-            const card = (
-              <>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase text-brand-700">
-                    <OperationKindIcon kind={op.kind} />
-                    {op.kind === "rest" ? op.method ?? "rest" : op.kind}
-                  </span>
-                  <h3 className="mt-1 font-semibold text-slate-900">
-                    {op.title ?? `${op.kind} ${op.name}`}
-                  </h3>
-                  {op.description ? (
-                    <p className="mt-1.5 text-sm text-slate-600 line-clamp-2">{op.description}</p>
-                  ) : null}
-                </div>
-              </>
+            const operationId = `jornada-operacao-${index + 1}`;
+            const referenceTables = (manual.referenceTables ?? []).filter((table) =>
+              op.referenceTableIds?.includes(table.id)
             );
 
             return (
               <li key={`${op.kind}-${op.name}`}>
-                {isEditing ? (
-                  <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    <div className="flex gap-3">{card}</div>
-                    {editor?.renderOperationActions ? (
-                      <div className="mt-3 border-t border-slate-100 pt-3">
-                        {editor.renderOperationActions(op)}
+                <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+                  <details id={operationId} className="group">
+                    <summary className="flex cursor-pointer list-none items-start gap-3 p-4 [&::-webkit-details-marker]:hidden">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase text-brand-700">
+                          <OperationKindIcon kind={op.kind} />
+                          {op.kind === "rest" ? op.method ?? "rest" : op.kind}
+                        </span>
+                        <h3 className="mt-1 font-semibold text-slate-900">
+                          {op.title ?? `${op.kind} ${op.name}`}
+                        </h3>
+                        {op.description ? (
+                          <p className="mt-1.5 text-sm text-slate-600 line-clamp-2">{op.description}</p>
+                        ) : null}
                       </div>
-                    ) : null}
-                  </div>
-                ) : (
-                  <Link
-                    href={docsOperationHref(config.slug, op.kind, op.name)}
-                    className="group flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:shadow-md"
-                  >
-                    {card}
-                    <ArrowRight
-                      className="mt-2 h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-brand-600"
-                      aria-hidden="true"
-                    />
-                  </Link>
-                )}
+                      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-brand-700">
+                        Detalhes técnicos
+                        <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" aria-hidden="true" />
+                      </span>
+                    </summary>
+                    <div className="border-t border-slate-100 p-4 sm:p-5">
+                      <OperationDocumentation
+                        slug={config.slug}
+                        operation={op}
+                        schemaDetail={schemaDetails[`${op.kind}:${op.name}`]}
+                        referenceTables={referenceTables}
+                        canUsePlayground={canUsePlayground}
+                        idPrefix={operationId}
+                      />
+                    </div>
+                  </details>
+                  {isEditing && editor?.renderOperationActions ? (
+                    <div className="border-t border-slate-100 px-4 py-3">
+                      {editor.renderOperationActions(op)}
+                    </div>
+                  ) : null}
+                </div>
               </li>
             );
           })}

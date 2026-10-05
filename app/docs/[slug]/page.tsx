@@ -4,6 +4,7 @@ import { auth, isAdminRole } from "@/core/auth";
 import { ManualRoteiro } from "@/modules/living-docs-externa/ui/reader/manual-roteiro";
 import { ManualShellWithNav } from "@/modules/living-docs-externa/ui/reader/manual-shell-with-nav";
 import {
+  getPublishedOperationSchemaDetail,
   hasPublishedSchemaSnapshot,
   schemaReferenceHref,
 } from "@/modules/living-docs-externa/services/get-published-schema";
@@ -28,6 +29,15 @@ export default async function DocsGuidePage({ params }: DocsGuidePageProps) {
   ]);
   if (!project) notFound();
 
+  const schemaDetails = hasSchema
+    ? Object.fromEntries(await Promise.all(project.manual.operations.map(async (operation) => {
+        const key = `${operation.kind}:${operation.name}`;
+        return operation.kind === "rest"
+          ? [key, null] as const
+          : [key, await getPublishedOperationSchemaDetail(slug, operation.kind, operation.name)] as const;
+      })))
+    : {};
+
   return (
     <ManualShellWithNav slug={slug} project={project} sections={sections} flowAvailable={flows.length > 0}>
       <ManualRoteiro
@@ -41,6 +51,7 @@ export default async function DocsGuidePage({ params }: DocsGuidePageProps) {
         }))}
         schemaReferenceHref={hasSchema ? schemaReferenceHref(slug) : undefined}
         canUsePlayground={canUsePlayground}
+        schemaDetails={schemaDetails}
       />
     </ManualShellWithNav>
   );

@@ -36,8 +36,8 @@ test("one vertical navbar changes from products to product and integration conte
   await expect(nav.getByRole("link", { name: "Voltar aos produtos", exact: true })).toHaveAttribute("href", "/docs");
   const documentation = nav.getByRole("link", { name: "Documentação", exact: true }).last();
   await expect(documentation).toHaveAttribute("href", "/docs/canal-autorizador");
-  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Queries", exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("button", { name: "Mutations", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: "Métodos", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("link", { name: "Teste de Requisição", exact: true })).toHaveCount(0);
   await expect(page).toHaveURL("/docs/canal-autorizador");
@@ -171,15 +171,16 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
 
   await productNav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
   await expect(index).toContainText("Jornada da Integração");
-  await expect(index).toContainText("Tabelas de referência");
+  await expect(index).toContainText("etapas expansíveis");
   await expect(index).not.toContainText("Contexto");
   await expect(page.locator("#section-contexto")).toBeHidden();
   await expect(page.locator("#jornada-integracao")).toBeVisible();
   await expect(page.locator("#tabelas-referencia")).toHaveCount(0);
   await expect(page.locator("#roteiro-integracao")).toBeHidden();
   const journeyItems = await index.locator("ul > li > a").allTextContents();
-  expect(journeyItems[0].trim()).toBe("Jornada da Integração");
-  expect(journeyItems[journeyItems.length - 1].trim()).toBe("Tabelas de referência");
+  expect(journeyItems[0].trim()).toBe("Jornada da Integração (etapas expansíveis)");
+  await expect(index.getByRole("link", { name: "1. Autenticar (obter token)" }))
+    .toHaveAttribute("href", "#jornada-operacao-1");
 
   await productNav.getByRole("link", { name: "Cenário de Teste", exact: true }).click();
   await expect(index).toContainText("Cenário de Teste");
@@ -192,9 +193,6 @@ test("contextual index follows the selected subproduct area", async ({ page }) =
   await expect(page.locator("#tabelas-referencia")).toBeHidden();
   await expect(page.locator("#roteiro-integracao")).toBeVisible();
 
-  await productNav.getByRole("button", { name: "Queries", exact: true }).click();
-  await expect(index.locator('a[href^="/docs/canal-autorizador/operations/query/"]')).not.toHaveCount(0);
-  await expect(index).not.toContainText("Cenário de Teste");
 });
 
 test("contextual index remains available in mobile navigation", async ({ page }) => {

@@ -22,6 +22,10 @@ export function docsGuideHref(slug: string): string {
   return `${DOCS_HOME_HREF}/${slug}`;
 }
 
+export function schemaTypeHref(slug: string, typeName: string): string {
+  return `${DOCS_API_HREF}/${slug}/types/${encodeURIComponent(typeName)}`;
+}
+
 export function docsPlaygroundHref(slug: string, query?: string): string {
   const base = `${docsGuideHref(slug)}/playground`;
   if (!query?.trim()) return base;

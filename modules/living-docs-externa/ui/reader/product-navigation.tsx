@@ -60,7 +60,10 @@ function flowAreaHref(product: DocumentationProductView, link: DocumentationLink
 
 function availableFlowAreas(product: DocumentationProductView, link: DocumentationLinkView) {
   const operations = link.operations ?? [];
+  const operationsInJourney = Boolean(flowAreaHref(product, link, "jornada-integracao"))
+    && operations.length > 0;
   return FLOW_AREAS.filter((area) => {
+    if (operationsInJourney && (area.id === "queries" || area.id === "mutations")) return false;
     if (area.id === "documentacao" || area.id === "jornada-integracao" || area.id === "roteiro-integracao" || area.id === "teste-de-requisicao") {
       return Boolean(flowAreaHref(product, link, area.id));
     }
@@ -111,7 +114,7 @@ function contextualTocItems({
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
-      ...items.filter((item) => item.href.includes("/operations/")),
+      ...items.filter((item) => item.href.startsWith("#jornada-operacao-")),
     ];
   }
 

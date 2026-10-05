@@ -89,8 +89,10 @@ export async function buildManualNav(
     const operation = operations.find((op) => op.kind === kindResult.data && op.name === name);
     const tocItems: ManualTocItem[] = [];
     if (operation?.description) tocItems.push({ href: "#descricao", label: "Descrição" });
+    if (operation?.authRequired !== undefined || operation?.prerequisites?.length)
+      tocItems.push({ href: "#pre-requisitos", label: "Pré-requisitos" });
     if (operation?.businessNotes?.length)
-      tocItems.push({ href: "#regras-negocio", label: "Regras de negócio" });
+      tocItems.push({ href: "#regras-negocio", label: "Observação" });
 
     const schemaDetail =
       kindResult.data === "rest"
@@ -142,22 +144,15 @@ export async function buildManualNav(
       depth: 1,
     });
   }
-  tocItems.push({ href: "#jornada-integracao", label: "Jornada da Integração" });
-  tocItems.push(
-    ...operations.flatMap((op) => {
-      const href = `${basePath}/operations/${op.kind}/${op.name}`;
-      return [
-        {
-          href,
-          label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
-          depth: 1,
-        },
-        ...(op.referenceTableIds?.length
-          ? [{ href: `${href}#tabelas-referencia`, label: "Tabelas de referência", depth: 2 }]
-          : []),
-      ];
-    })
-  );
+  tocItems.push({
+    href: "#jornada-integracao",
+    label: "Jornada da Integração (etapas expansíveis)",
+  });
+  tocItems.push(...operations.map((op, index) => ({
+    href: `#jornada-operacao-${index + 1}`,
+    label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,
+    depth: 1,
+  })));
   if (hasTestScenarios) {
     tocItems.push({ href: "#roteiro-integracao", label: "Cenário de Teste" });
   }

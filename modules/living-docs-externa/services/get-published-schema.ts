@@ -201,6 +201,4 @@ export function schemaFieldHref(
   return `/docs/api/${slug}#${kind}-${name}`;
 }
 
-export function schemaTypeHref(slug: string, typeName: string): string {
-  return `/docs/api/${slug}/types/${encodeURIComponent(typeName)}`;
-}
+export { schemaTypeHref } from "@/modules/living-docs-externa/services/docs-routes";
