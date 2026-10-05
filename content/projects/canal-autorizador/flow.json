@@ -36,7 +36,7 @@
         {
           "id": "receiveOrder",
           "type": "operation",
-          "label": "[FIDELIZE]\nRecebe o pedido via integração/API",
+          "label": "[FUNCIONAL]\nRecebe o pedido via integração/API",
           "position": {
             "x": 480,
             "y": 800
@@ -54,7 +54,7 @@
         {
           "id": "notAccepted",
           "type": "operation",
-          "label": "[FIDELIZE]\nRegistra que o pedido não foi aceito",
+          "label": "[FUNCIONAL]\nRegistra que o pedido não foi aceito",
           "position": {
             "x": 1180,
             "y": 1100
@@ -81,7 +81,7 @@
         {
           "id": "orderCreated",
           "type": "operation",
-          "label": "[FIDELIZE]\nCria o pedido no portal da indústria — TO",
+          "label": "[FUNCIONAL]\nCria o pedido no portal da indústria — TO",
           "position": {
             "x": 1180,
             "y": 890
@@ -126,7 +126,7 @@
         {
           "id": "processResponse",
           "type": "operation",
-          "label": "[FIDELIZE]\nProcessa a resposta no portal TO",
+          "label": "[FUNCIONAL]\nProcessa a resposta no portal TO",
           "position": {
             "x": 2820,
             "y": 800
@@ -153,7 +153,7 @@
         {
           "id": "processCancellation",
           "type": "operation",
-          "label": "[FIDELIZE]\nProcessa o cancelamento no portal TO",
+          "label": "[FUNCIONAL]\nProcessa o cancelamento no portal TO",
           "position": {
             "x": 2820,
             "y": 970
@@ -180,7 +180,7 @@
         {
           "id": "processInvoice",
           "type": "operation",
-          "label": "[FIDELIZE]\nProcessa a nota no portal TO",
+          "label": "[FUNCIONAL]\nProcessa a nota no portal TO",
           "position": {
             "x": 2820,
             "y": 1140
@@ -216,7 +216,7 @@
         {
           "id": "processReimbursement",
           "type": "operation",
-          "label": "[FIDELIZE]\nProcessa o ressarcimento no portal TO",
+          "label": "[FUNCIONAL]\nProcessa o ressarcimento no portal TO",
           "position": {
             "x": 4060,
             "y": 800
@@ -476,8 +476,8 @@
           "height": 720
         },
         {
-          "id": "fidelize",
-          "label": "FIDELIZE",
+          "id": "funcional",
+          "label": "FUNCIONAL",
           "position": {
             "x": 0,
             "y": 720

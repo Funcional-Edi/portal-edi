@@ -74,11 +74,29 @@ export function ManualRoteiro({
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
-  const documentationSections = sections.filter((section) => section.id !== "fluxo-do-pedido");
+  const businessRulesSection = sections.find((section) => section.id === "regras-de-negocios");
+  const documentationSections = sections.filter(
+    (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
+  );
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
+  const renderDocumentationSection = (section: ManualSection) => (
+    <div
+      key={section.id}
+      id={`section-${section.id}`}
+      className="rounded-lg border border-slate-200 bg-white p-5"
+    >
+      {editor?.renderSectionActions ? (
+        <div className="mb-3 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
+          <span className="font-mono text-xs text-slate-500">{section.id}.md</span>
+          {editor.renderSectionActions(section)}
+        </div>
+      ) : null}
+      {editor?.renderSectionBody?.(section) ?? <MarkdownBody source={section.body} />}
+    </div>
+  );
 
   return (
     <article>
@@ -156,21 +174,7 @@ export function ManualRoteiro({
             </p>
           ) : null}
 
-          {documentationSections.map((section) => (
-            <div
-              key={section.id}
-              id={`section-${section.id}`}
-              className="rounded-lg border border-slate-200 bg-white p-5"
-            >
-              {editor?.renderSectionActions ? (
-                <div className="mb-3 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
-                  <span className="font-mono text-xs text-slate-500">{section.id}.md</span>
-                  {editor.renderSectionActions(section)}
-                </div>
-              ) : null}
-              {editor?.renderSectionBody?.(section) ?? <MarkdownBody source={section.body} />}
-            </div>
-          ))}
+          {documentationSections.map(renderDocumentationSection)}
         </section>
       ) : null}
 
@@ -217,6 +221,12 @@ export function ManualRoteiro({
               <strong>Importante:</strong> {manual.flowSelectionNote}
             </p>
           ) : null}
+        </section>
+      ) : null}
+
+      {businessRulesSection ? (
+        <section data-documentation-area="documentacao" className="mt-10 scroll-mt-24">
+          {renderDocumentationSection(businessRulesSection)}
         </section>
       ) : null}
 
