@@ -76,30 +76,56 @@ test("one vertical navbar changes from products to product and integration conte
   await page.screenshot({ path: testInfo.outputPath("docs-contextual-desktop.png"), fullPage: true });
 });
 
-test("Credenciado apresenta estrutura inicial sem simular documentação", async ({ page }) => {
+test("Credenciado abre os quatro manuais de fluxo com cenários e alertas", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await login(page);
   const nav = page.getByRole("navigation", { name: "Produtos EDI" });
 
   const credenciado = nav.getByRole("link", { name: /^Credenciado/ });
-  await expect(credenciado).toContainText("Sem documentação");
   await expect(credenciado).toContainText("homolog");
   await credenciado.click();
   await expect(page).toHaveURL("/docs?produto=credenciado");
-  const content = page.getByRole("region", { name: "Conteúdo da documentação" });
-  await expect(content).toContainText("Sem documentação");
-  await expect(content).toContainText("homolog");
-  await expect(page.getByRole("heading", { name: "Estrutura do Credenciado", exact: true })).toHaveCount(0);
   await expect(nav.getByText("Estrutura do Credenciado", { exact: true })).toBeVisible();
   await expect(nav.getByRole("button", { name: "Visão Geral", exact: true })).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Cenários de Testes e Validações", exact: true })).toBeVisible();
-  await expect(nav.getByText("Fluxo de Cadastro", { exact: true })).toBeVisible();
-  await expect(nav.getByText("Fluxo PBM no Caixa", { exact: true })).toBeVisible();
-  await expect(nav.getByText("SUBPRODUTOS", { exact: true })).toHaveCount(0);
-  await expect(nav.getByText("teste-01", { exact: true })).toHaveCount(0);
-  await expect(nav.getByText("Associar o produto ao cadastro do beneficiário", { exact: true })).toHaveCount(0);
-  await expect(nav.getByText("Versão do subproduto", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("Jornada do anexo de receita", { exact: true })).toHaveCount(0);
+  await expect(nav.getByRole("button", { name: "Fluxograma Completo", exact: true })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Cenários de Testes e Validações", exact: true })).toHaveCount(0);
+
+  for (const slug of ["credenciado-cadastro", "credenciado-optin", "credenciado-venda", "credenciado-pbm-caixa"]) {
+    await expect(nav.locator(`a[href="/docs/${slug}"]`)).toBeVisible();
+  }
+
+  const flowExamples = [
+    ["credenciado-cadastro", "query Pharma_assessEligibility"],
+    ["credenciado-optin", "query Pharma_verifyOptIn"],
+    ["credenciado-venda", "query Pharma_checkPricesAndRules"],
+    ["credenciado-pbm-caixa", "query Pharma_checkPricesAndRules"],
+  ] as const;
+
+  for (const [slug, query] of flowExamples) {
+    await nav.locator(`a[href="/docs/${slug}"]`).click();
+    await expect(page).toHaveURL(`/docs/${slug}`);
+    const content = page.getByRole("region", { name: "Conteúdo da documentação" });
+    await expect(content.getByRole("heading", { name: "Histórico de Alterações", exact: true })).toHaveCount(1);
+    if (slug === "credenciado-cadastro") {
+      await expect(content.getByRole("note", { name: "Atenção máxima" })).toBeVisible();
+    }
+
+    await nav.getByRole("link", { name: "Jornada da Integração", exact: true }).click();
+    await expect(content.getByRole("heading", { name: "Jornada da Integração" })).toBeVisible();
+    const operation = content.locator("details#jornada-operacao-1");
+    await operation.locator("summary").first().click();
+    await expect(operation.locator("pre")).toContainText(query);
+    await expect(operation.locator("pre")).not.toContainText("...");
+
+    if (slug !== "credenciado-pbm-caixa") {
+      await content.getByRole("link", { name: "Voltar ao produto Credenciado" }).click();
+      await expect(page).toHaveURL("/docs?produto=credenciado");
+    }
+  }
+
+  await nav.getByRole("link", { name: "Cenário de Teste", exact: true }).click();
+  const content = page.getByRole("region", { name: "Conteúdo da documentação" });
+  await expect(content.getByRole("heading", { name: "Cenários de Testes e Validações" })).toBeVisible();
 });
 
 test("Canal Autorizador exibe os dois fluxos no índice de fluxogramas", async ({ page }) => {

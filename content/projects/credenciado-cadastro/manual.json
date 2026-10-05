@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "title": "Credenciado — Fluxo de Cadastro",
+  "productName": "Credenciado",
+  "homologationFlows": [
+    {
+      "title": "Cadastro e elegibilidade",
+      "scenarios": [
+        {
+          "title": "Beneficiário ainda não cadastrado",
+          "preconditions": [
+            "Dados sintéticos disponíveis em homologação.",
+            "CPF e EAN de teste válidos para a consulta."
+          ],
+          "operations": [
+            "Pharma_assessEligibility"
+          ],
+          "expectedResult": "A resposta informa se o produto pertence a um programa e apresenta a política necessária para o cadastro, sem presumir campos fixos.",
+          "evidence": [
+            "Requisição e resposta da avaliação com dados mascarados.",
+            "Campos dinâmicos apresentados conforme registrationPolicy."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o resultado e as evidências da homologação."
+        },
+        {
+          "title": "Beneficiário já cadastrado",
+          "preconditions": [
+            "Beneficiário de teste previamente cadastrado no programa.",
+            "Dados de teste liberados para homologação."
+          ],
+          "operations": [
+            "Pharma_assessEligibility"
+          ],
+          "expectedResult": "A resposta indica requiresBeneficiaryRegistration=false e a integração não repete a inscrição do beneficiário.",
+          "evidence": [
+            "Resposta da elegibilidade com o indicador de cadastro.",
+            "Registro do caminho seguido pela interface."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o comportamento para beneficiário existente."
+        },
+        {
+          "title": "Inscrição com campos obrigatórios da política",
+          "preconditions": [
+            "Avaliação indica requiresBeneficiaryRegistration=true.",
+            "Campos e opções obrigatórios retornados pela política estão disponíveis."
+          ],
+          "operations": [
+            "Pharma_assessEligibility",
+            "Pharma_signUpProgramBeneficiary"
+          ],
+          "expectedResult": "A inscrição envia apenas os campos permitidos e exigidos pela política e apresenta status, message e errors retornados.",
+          "evidence": [
+            "Política retornada e campos exibidos.",
+            "Requisição de inscrição e resposta, sem dados pessoais reais."
+          ],
+          "approval": "Equipe responsável pelo EDI aprova a aderência do formulário à política retornada."
+        },
+        {
+          "title": "Inscrição de dependente quando permitida",
+          "preconditions": [
+            "Beneficiário titular já inscrito.",
+            "Produto exige registro, programa permite dependentes e trabalha com pacientes."
+          ],
+          "operations": [
+            "Pharma_assessEligibility",
+            "Pharma_signUpProgramBeneficiaryDependent"
+          ],
+          "expectedResult": "A operação de dependente só é chamada quando as três condições da pré-condição forem atendidas.",
+          "evidence": [
+            "Política e elegibilidade usadas para decidir o caminho.",
+            "Resposta da operação de dependente com dados mascarados."
+          ],
+          "approval": "Equipe responsável pelo EDI valida o vínculo entre titular e dependente."
+        },
+        {
+          "title": "Inclusão de produto para beneficiário existente",
+          "preconditions": [
+            "Beneficiário de teste cadastrado.",
+            "Elegibilidade confirma que o produto pode ser associado."
+          ],
+          "operations": [
+            "Pharma_assessEligibility",
+            "Pharma_addProgramBeneficiaryToProduct"
+          ],
+          "expectedResult": "O produto é associado usando programCode e os dados retornados para o beneficiário; dependentID é usado somente quando aplicável.",
+          "evidence": [
+            "Identificadores de teste enviados, mascarados.",
+            "Resposta com status, message e errors."
+          ],
+          "approval": "Equipe responsável pelo EDI registra a confirmação da associação."
+        },
+        {
+          "title": "Validação de dados do prescritor",
+          "preconditions": [
+            "Dados de prescritor de teste aprovados para homologação."
+          ],
+          "operations": [
+            "Pharma_prescriber"
+          ],
+          "expectedResult": "A resposta de validação é apresentada sem converter ou presumir os campos de status e errors.",
+          "evidence": [
+            "Requisição com council, stateAbbr e registerNumber de teste.",
+            "Resposta status, message e errors."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o tratamento da resposta."
+        },
+        {
+          "title": "Produto ou programa não elegível",
+          "preconditions": [
+            "Cenário de teste não elegível disponibilizado em homologação."
+          ],
+          "operations": [
+            "Pharma_assessEligibility"
+          ],
+          "expectedResult": "A interface informa a inelegibilidade com base na resposta, sem iniciar inscrição indevida.",
+          "evidence": [
+            "Resposta de elegibilidade do cenário não elegível.",
+            "Registro de que nenhuma operação de inscrição foi enviada."
+          ],
+          "approval": "Equipe responsável pelo EDI valida o bloqueio do caminho de inscrição."
+        },
+        {
+          "title": "Erro de validação retornado pela API",
+          "preconditions": [
+            "Cenário controlado que produza erros de validação em homologação."
+          ],
+          "operations": [
+            "Pharma_signUpProgramBeneficiary"
+          ],
+          "expectedResult": "A integração apresenta status, message e errors sem descartar a causa nem expor dados sensíveis.",
+          "evidence": [
+            "Resposta de erro com valores sensíveis mascarados.",
+            "Captura da mensagem apresentada ao operador."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o tratamento esperado do erro."
+        }
+      ]
+    }
+  ],
+  "homologationValidations": [
+    "Respeitar HIDDEN, OPTIONAL e REQUIRED na apresentação e validação dos campos.",
+    "Respeitar allowDependents e dependentsLimit retornados pela política.",
+    "Enviar o programCode retornado pela avaliação e manter a origem autorizada.",
+    "Apresentar status, message e errors sem expor dados pessoais ou credenciais."
+  ],
+  "operations": [
+    {
+      "kind": "query",
+      "name": "Pharma_assessEligibility",
+      "order": 1,
+      "title": "Avaliar elegibilidade do beneficiário e produto",
+      "description": "Consulta CPF e EAN para identificar elegibilidade, programa associado, necessidade de cadastro e campos dinâmicos aplicáveis.",
+      "authRequired": true,
+      "prerequisites": [
+        "Obter o token pela documentação oficial de autenticação antes das chamadas do fluxo.",
+        "Disponibilizar CPF e EAN de teste liberados para homologação."
+      ],
+      "businessNotes": [
+        "Entrada principal: CPF e EAN. A resposta contém eligibilityAssessment e registrationPolicy.",
+        "eligibilityAssessment informa programCode, belongsToIndustryProgram, programDescription e productDescription.",
+        "registrationPolicy contém requisitos de beneficiário, dependente, prescrição, origens permitidas e campos cadastrais dinâmicos.",
+        "[OBSERVAÇÃO] Os campos de cadastro variam por programa e produto; use a política recebida, não um formulário estático comum.",
+        "[ATENÇÃO] requiresBeneficiaryRegistration=false indica que não se deve repetir a inscrição do beneficiário.",
+        "[COMENTÁRIO] Os grupos de campos dinâmicos e extraFormFields estão detalhados na seção de regras deste fluxo."
+      ],
+      "exampleQuery": "query Pharma_assessEligibility(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $productCode: String!,\n  $customerCode: String!\n) {\n  Pharma_assessEligibility(\n    origin: $origin, storeCode: $storeCode,\n    productCode: $productCode, customerCode: $customerCode\n  ) {\n    validationResult { status message errors { message } }\n    eligibilityAssessment { belongsToIndustryProgram programDescription programCode productDescription }\n    registrationPolicy { requiresBeneficiaryRegistration isRegistered allowedOrigins }\n    dependents { id name birth gender holder }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Pharma_signUpProgramBeneficiary",
+      "order": 2,
+      "title": "Inscrever beneficiário no programa e produto",
+      "description": "Operação agregadora para inscrever o beneficiário quando a política retornada pela avaliação exigir cadastro.",
+      "authRequired": true,
+      "prerequisites": [
+        "Concluir Pharma_assessEligibility.",
+        "Prosseguir somente quando requiresBeneficiaryRegistration=true."
+      ],
+      "businessNotes": [
+        "Entrada principal: programCode, origin, storeCode, customerCode, productCode, beneficiaryFields, medicalPrescriptionFields e extraFormFields.",
+        "Retorno: status, message e errors.",
+        "[ATENÇÃO] Envie somente os campos permitidos e exigidos pela registrationPolicy da avaliação."
+      ],
+      "exampleQuery": "mutation Pharma_signUpProgramBeneficiary(\n  $input: Pharma_RegisterBeneficiaryRequest!\n) {\n  Pharma_signUpProgramBeneficiary(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Pharma_signUpProgramBeneficiaryDependent",
+      "order": 3,
+      "title": "Inscrever dependente ou paciente",
+      "description": "Inscreve paciente ou dependente vinculado a um beneficiário titular.",
+      "authRequired": true,
+      "prerequisites": [
+        "Beneficiário já registrado no programa.",
+        "Produto exige registro.",
+        "Programa trabalha com pacientes e permite dependentes."
+      ],
+      "businessNotes": [
+        "Entrada principal: storeCode, programCode, origin, customerCode do titular, productCode, dependentFields e medicalPrescriptionFields.",
+        "Retorno: status, message e errors.",
+        "[ATENÇÃO MÁXIMA] Não execute esta etapa se qualquer uma das condições de pré-requisito não for atendida."
+      ],
+      "exampleQuery": "mutation Pharma_signUpProgramBeneficiaryDependent(\n  $input: Pharma_RegisterDependentRequest!\n) {\n  Pharma_signUpProgramBeneficiaryDependent(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Pharma_addProgramBeneficiaryToProduct",
+      "order": 4,
+      "title": "Associar produto ao beneficiário",
+      "description": "Inclui um produto no cadastro existente do beneficiário; dependentID pode indicar o paciente ou dependente correspondente.",
+      "authRequired": true,
+      "prerequisites": [
+        "Beneficiário existente e elegibilidade do produto confirmada."
+      ],
+      "businessNotes": [
+        "Entrada principal: origin, programCode, storeCode, customerCode, productCode, dependentID quando aplicável, medicalPrescriptionFields e extraFormFields.",
+        "Retorno: status, message e errors."
+      ],
+      "exampleQuery": "mutation Pharma_addProgramBeneficiaryToProduct(\n  $input: Pharma_RegisterProductRequest!\n) {\n  Pharma_addProgramBeneficiaryToProduct(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_prescriber",
+      "order": 5,
+      "title": "Validar dados do prescritor",
+      "description": "Consulta disponibilizada para apoiar interfaces que precisam validar o prescritor antes de operações dependentes de receita.",
+      "authRequired": true,
+      "businessNotes": [
+        "Entrada data: council, stateAbbr e registerNumber.",
+        "Retorno: status, message e errors.",
+        "[COMENTÁRIO] A referência consultada não torna obrigatórios os campos internos de data; validar exigências adicionais antes de aplicá-las."
+      ],
+      "exampleQuery": "query Pharma_prescriber($data: Pharma_PrescriberRegisterInput!) {\n  Pharma_prescriber(data: $data) {\n    status\n    message\n    errors { message }\n  }\n}"
+    }
+  ]
+}

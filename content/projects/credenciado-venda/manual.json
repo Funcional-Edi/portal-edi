@@ -1,0 +1,362 @@
+{
+  "version": 1,
+  "title": "Credenciado — Fluxo de Venda",
+  "productName": "Credenciado",
+  "homologationFlows": [
+    {
+      "title": "Pré-venda, confirmação e pós-venda",
+      "scenarios": [
+        {
+          "title": "Venda aprovada",
+          "preconditions": [
+            "Cliente, loja e produtos de teste liberados em homologação.",
+            "Pré-autorização válida e regras comerciais aplicáveis."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules",
+            "Sales_preAuthorizeSale",
+            "Sales_transaction",
+            "Sales_confirmPreAuthorizedSale"
+          ],
+          "expectedResult": "A venda é confirmada com os itens e quantidades previamente autorizados e a resposta final é apresentada.",
+          "evidence": [
+            "Respostas da simulação e pré-autorização com dados mascarados.",
+            "Consulta anterior à confirmação e resposta final."
+          ],
+          "approval": "Equipe responsável pelo EDI valida a sequência e as evidências da venda."
+        },
+        {
+          "title": "Item inválido ou rejeitado parcialmente",
+          "preconditions": [
+            "Cenário de teste com ao menos um item aprovado e outro recusado, se disponível."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules",
+            "Sales_preAuthorizeSale"
+          ],
+          "expectedResult": "A autorização não é tratada como totalmente aprovada; uma nova autorização é criada somente com os itens recusados.",
+          "evidence": [
+            "Status por item na resposta.",
+            "Nova requisição contendo exclusivamente os itens recusados."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o tratamento de itens aprovados e recusados."
+        },
+        {
+          "title": "Receita exigida com upload e vínculo",
+          "preconditions": [
+            "A resposta indica requiredUploadWithPrescription.",
+            "Arquivo de teste dentro do limite de tamanho e dados de receita aprovados."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules",
+            "Sales_preAuthorizeSale",
+            "Prescription_addPrescription",
+            "Prescription_bindPrescription",
+            "Sales_transaction"
+          ],
+          "expectedResult": "A receita é enviada e vinculada à transação antes da confirmação.",
+          "evidence": [
+            "Resposta que exige receita.",
+            "Confirmação do upload e do vínculo, sem compartilhar o arquivo ou dados reais."
+          ],
+          "approval": "Equipe responsável pelo EDI valida upload e vínculo da receita."
+        },
+        {
+          "title": "Pré-autorização expirada",
+          "preconditions": [
+            "Pré-autorização de teste fora do prazo de validade, se o ambiente permitir."
+          ],
+          "operations": [
+            "Sales_transaction",
+            "Sales_confirmPreAuthorizedSale"
+          ],
+          "expectedResult": "A venda expirada não é concluída e a mensagem retornada é apresentada sem simular sucesso.",
+          "evidence": [
+            "Data de criação mascarada e resposta da consulta.",
+            "Resposta da tentativa de confirmação."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o comportamento de expiração."
+        },
+        {
+          "title": "Consulta e confirmação fora do dia da pré-autorização",
+          "preconditions": [
+            "Pré-autorização de teste de data anterior disponível."
+          ],
+          "operations": [
+            "Sales_transaction",
+            "Sales_confirmPreAuthorizedSale"
+          ],
+          "expectedResult": "A consulta e a confirmação usam a data correspondente quando o processo ocorre em outro dia.",
+          "evidence": [
+            "Requisição com createdAt e/ou preAuthorizationDate conforme etapa.",
+            "Respostas com identificadores mascarados."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o comportamento entre datas."
+        },
+        {
+          "title": "Tentativa de confirmação duplicada",
+          "preconditions": [
+            "Venda de teste já confirmada uma vez."
+          ],
+          "operations": [
+            "Sales_confirmPreAuthorizedSale"
+          ],
+          "expectedResult": "A segunda chamada não gera nova venda e retorna a mensagem documentada de pré-autorização não encontrada.",
+          "evidence": [
+            "Primeira resposta de confirmação.",
+            "Resposta da repetição com status e mensagem."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma que a repetição não duplica a venda."
+        },
+        {
+          "title": "Atualização dos dados da nota fiscal",
+          "preconditions": [
+            "Autorização confirmada e dados fiscais de teste disponíveis."
+          ],
+          "operations": [
+            "Sales_updateInvoiceCode"
+          ],
+          "expectedResult": "A resposta apresenta status, statusCode e statusMessage da atualização fiscal.",
+          "evidence": [
+            "Requisição fiscal com dados mascarados.",
+            "Resposta da atualização."
+          ],
+          "approval": "Equipe responsável pelo EDI valida os campos exigidos pelo processo fiscal."
+        },
+        {
+          "title": "Carga diária de programas e origens permitidas",
+          "preconditions": [
+            "CNPJ e origem de loja de teste autorizados."
+          ],
+          "operations": [
+            "Pharma_discountPrograms"
+          ],
+          "expectedResult": "A carga apresenta programas e regras de produtos, incluindo allowedOrigins, limites de preço, descontos, bloqueio e necessidade de receita.",
+          "evidence": [
+            "Resposta da consulta com identificadores mascarados.",
+            "Registro da atualização diária e análise de allowedOrigins."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma atualização e uso da origem permitida."
+        },
+        {
+          "title": "Cancelamento de venda confirmada",
+          "preconditions": [
+            "Venda de teste confirmada e elegível para cancelamento."
+          ],
+          "operations": [
+            "Sales_cancel"
+          ],
+          "expectedResult": "A resposta do cancelamento apresenta status, statusCode, statusMessage e recibo quando retornado.",
+          "evidence": [
+            "Identificador de autorização mascarado.",
+            "Resposta do cancelamento."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o resultado do cancelamento."
+        },
+        {
+          "title": "Repetição de cancelamento",
+          "preconditions": [
+            "Transação de teste já cancelada."
+          ],
+          "operations": [
+            "Sales_cancel"
+          ],
+          "expectedResult": "A resposta preserva statusCode 103 e a mensagem Transacao ja cancelada, sem produzir um segundo cancelamento.",
+          "evidence": [
+            "Primeira resposta de cancelamento.",
+            "Resposta da tentativa repetida."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o tratamento idempotente esperado."
+        }
+      ]
+    }
+  ],
+  "homologationValidations": [
+    "Confirmar origem adequada: POINT_OF_SALES para ponto de venda e PARTNERS_ECOMMERCE para e-commerce.",
+    "Solicitar dailyDose quando requiredInformDailyDose indicar que é necessário.",
+    "Não adicionar produtos nem exceder quantidade pré-autorizada na confirmação.",
+    "Validar status e statusMessage; não repetir confirmação de venda concluída.",
+    "Atualizar diariamente programas e analisar allowedOrigins.",
+    "Para homologação, apresentar documentação do processo, evidência de ao menos uma venda e validação do layout do recibo gerencial."
+  ],
+  "operations": [
+    {
+      "kind": "query",
+      "name": "Pharma_checkPricesAndRules",
+      "order": 1,
+      "title": "Simular preços e regras",
+      "description": "Valida preços e regras comerciais antes da pré-autorização e retorna o resultado por produto e dados associados à receita.",
+      "authRequired": true,
+      "prerequisites": [
+        "Obter token pela documentação oficial de autenticação.",
+        "Preparar loja, cliente, origem e produtos de teste."
+      ],
+      "businessNotes": [
+        "Entrada: origin, storeCode, customerCode, products com ean, price e saleAmount; medicalPrescription pode conter quantity, date e prescriber.",
+        "Retorno descrito: aproved, createdAt, totais, descontos, produtos, status por produto, requiredUploadWithPrescription, dados da receita e dailyDose.",
+        "[ATENÇÃO] Solicite dailyDose quando requiredInformDailyDose indicar que a informação é necessária."
+      ],
+      "exampleQuery": "query Pharma_checkPricesAndRules(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Pharma_ItemArgs!]!\n) {\n  Pharma_checkPricesAndRules(\n    origin: $origin, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    aproved\n    createdAt\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    totalValueMaxConsumerPrice\n    totalValueWithPrescription\n    totalValueWithoutPrescription\n    totalDiscountAmount\n    products { transactionType ean description maximumConsumerPrice priceReceived funcionalPrice salePrice saleAmount status }\n    requiredUploadWithPrescription\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_preAuthorizeSale",
+      "order": 2,
+      "title": "Pré-autorizar venda",
+      "description": "Cria a autorização prévia para negociação; a venda só é concluída depois da operação de confirmação.",
+      "authRequired": true,
+      "prerequisites": [
+        "Concluir a simulação das regras e preços.",
+        "Usar channel PHARMA ou BENEFITS e a origem aprovada para o cenário."
+      ],
+      "businessNotes": [
+        "Entrada principal: channel, origin, customerCode, storeCode, products (ean, unitPrice, quantity e maxConsumerPrice opcional) e medicalPrescription.",
+        "Retorno descrito: createdAt, authorizationID, sequenceID, totais, status, códigos/mensagens, secondFactorAuthentication, status dos produtos e dados da receita.",
+        "[ATENÇÃO] Se houver itens aprovados e recusados, crie nova autorização somente com os itens recusados e preserve o authorizationID da autorização usada nas etapas seguintes."
+      ],
+      "exampleQuery": "mutation Sales_preAuthorizeSale(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Sales_ProductInput!]!\n) {\n  Sales_preAuthorizeSale(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    cardBalance\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n    receipt\n    secondFactorAuthentication\n    reimbursementValue\n    origin\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Prescription_addPrescription",
+      "order": 3,
+      "title": "Enviar arquivo da receita",
+      "description": "Envia a receita em multipart quando requiredUploadWithPrescription indicar que o arquivo é necessário.",
+      "authRequired": true,
+      "prerequisites": [
+        "Pré-autorização indica necessidade de receita.",
+        "Arquivo de teste aprovado para homologação."
+      ],
+      "businessNotes": [
+        "Multipart: operations, map e uploaded_file; o mapa vincula uploaded_file a variables.file.",
+        "[ATENÇÃO MÁXIMA] O arquivo de receita deve respeitar o limite de 2 MB definido no refinamento."
+      ],
+      "exampleQuery": "mutation Prescription_addPrescription(\n  $source: Prescription_PrescriptionSourceInput!,\n  $uploadInfo: Prescription_UploadInfo!\n) {\n  Prescription_addPrescription(source: $source, uploadInfo: $uploadInfo) {\n    id\n    uploadedAt\n    deletedAt\n    expiresAt\n    source\n    file\n    name\n    cardNumber\n    identity\n    status\n    storage\n    originalName\n    extension\n    prescriptionName\n    dateIssuance\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Prescription_bindPrescription",
+      "order": 4,
+      "title": "Vincular receita à transação",
+      "description": "Associa a receita enviada à transação de venda pré-autorizada.",
+      "authRequired": true,
+      "prerequisites": [
+        "Enviar a receita com Prescription_addPrescription.",
+        "Obter os identificadores da transação e da receita."
+      ],
+      "businessNotes": [
+        "Dados de transação citados: authorization, sequence e timestamp."
+      ],
+      "exampleQuery": "mutation Prescription_bindPrescription(\n  $prescriptionIDs: [ID!]!,\n  $transaction: Prescription_TransactionInput!\n) {\n  Prescription_bindPrescription(\n    prescriptionIDs: $prescriptionIDs, transaction: $transaction\n  )\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Sales_transaction",
+      "order": 5,
+      "title": "Consultar transação",
+      "description": "Consulta a pré-autorização e permite conferir transação, produtos, status e receita antes da confirmação.",
+      "authRequired": true,
+      "prerequisites": [
+        "Ter authorizationID da pré-autorização.",
+        "Informar createdAt quando a consulta não for do mesmo dia."
+      ],
+      "businessNotes": [
+        "Entrada descrita: storeCode, customerCode, authorizationID e createdAt quando necessário."
+      ],
+      "exampleQuery": "query Sales_transaction(\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String,\n  $authorizationID: ID!,\n  $createdAt: DateTime\n) {\n  Sales_transaction(\n    channel: $channel, storeCode: $storeCode, customerCode: $customerCode,\n    authorizationID: $authorizationID, createdAt: $createdAt\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_confirmPreAuthorizedSale",
+      "order": 6,
+      "title": "Confirmar autorização",
+      "description": "Finaliza uma venda pré-autorizada e retorna totais, status, produtos, reembolso e recibo.",
+      "authRequired": true,
+      "prerequisites": [
+        "Revisar Sales_transaction e concluir o vínculo da receita quando exigido."
+      ],
+      "businessNotes": [
+        "Entrada descrita: customerCode, origin, storeCode, authorizationID, preAuthorizationDate, invoiceCode/invoiceAuthProtocol opcionais e produtos.",
+        "Retorno descrito: totais, status, reimbursementValue, receipt, produtos e statusMessage quando houver erro.",
+        "[ATENÇÃO MÁXIMA] Não adicione produtos, não exceda quantidades e não confirme novamente uma venda concluída; a repetição pode retornar Pre-Autorizacao nao encontrada.",
+        "[OBSERVAÇÃO] Sem preAuthorizationDate, a referência limita a busca às pré-autorizações do mesmo dia."
+      ],
+      "exampleQuery": "mutation Sales_confirmPreAuthorizedSale(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $authorizationID: ID!,\n  $storeCode: String!,\n  $customerCode: String,\n  $invoiceCode: String,\n  $invoiceAuthProtocol: String,\n  $products: [Sales_ProductInput!]!,\n  $preAuthorizationDate: DateTime\n) {\n  Sales_confirmPreAuthorizedSale(\n    origin: $origin, channel: $channel, authorizationID: $authorizationID,\n    storeCode: $storeCode, customerCode: $customerCode,\n    invoiceCode: $invoiceCode, invoiceAuthProtocol: $invoiceAuthProtocol,\n    products: $products, preAuthorizationDate: $preAuthorizationDate\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    cardBalance\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n    receipt\n    secondFactorAuthentication\n    reimbursementValue\n    origin\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_displayProductDiscountRules",
+      "order": 7,
+      "title": "Consultar regras de desconto do produto",
+      "description": "Consulta regras e descontos aplicáveis ao produto e ao consumidor.",
+      "authRequired": true,
+      "businessNotes": [
+        "Entrada descrita: storeCode, productEan, customerCode, origin e detailed.",
+        "Retorno descrito: status, statusMessage, products, messages, nameProgram, priority e discounts.",
+        "[COMENTÁRIO] A descrição chama detailed de consulta resumida, mas não esclarece o significado de true e false; confirme antes de fixar o comportamento."
+      ],
+      "exampleQuery": "query Pharma_displayProductDiscountRules(\n  $storeCode: String!,\n  $productEan: String!,\n  $customerCode: String,\n  $origin: Pharma_AuthorizationOrigin,\n  $detailed: Boolean\n) {\n  Pharma_displayProductDiscountRules(\n    storeCode: $storeCode, productEan: $productEan,\n    customerCode: $customerCode, origin: $origin, detailed: $detailed\n  ) {\n    status\n    statusMessage\n    products { name package eans }\n    messages\n    nameProgram\n    priority\n    discounts { type category quantity originalAmount discountPercentage savedAmount amount }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Sales_customerMemberships",
+      "order": 8,
+      "title": "Consultar associações do beneficiário",
+      "description": "Consulta dados do cliente e programas associados; no fluxo PBM, apoia a validação dos programas vinculados ao CPF.",
+      "authRequired": true,
+      "businessNotes": [
+        "Entrada descrita: customerCode e channel opcional.",
+        "Retorno: customer (code e name) e memberships com id, name, type, description e salingMessage."
+      ],
+      "exampleQuery": "query Sales_customerMemberships(\n  $channel: Sales_TransactionTypeEnum,\n  $customerCode: String!\n) {\n  Sales_customerMemberships(channel: $channel, customerCode: $customerCode) {\n    customer { __typename }\n    memberships { __typename }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_updateInvoiceCode",
+      "order": 9,
+      "title": "Atualizar dados da nota fiscal",
+      "description": "Salva ou atualiza os dados fiscais da venda autorizada.",
+      "authRequired": true,
+      "prerequisites": [
+        "Autorização de venda e data da venda disponíveis."
+      ],
+      "businessNotes": [
+        "Entrada descrita: storeCode, invoiceCode, invoiceAuthProtocol, authorizationID e saleDate.",
+        "Retorno: status, statusCode e statusMessage.",
+        "[ATENÇÃO] invoiceCode e invoiceAuthProtocol são opcionais no schema consultado; confirme a exigência do processo fiscal antes de omiti-los."
+      ],
+      "exampleQuery": "mutation Sales_updateInvoiceCode(\n  $origin: Sales_AuthorizationOriginEnum,\n  $storeCode: String!,\n  $invoiceCode: String,\n  $invoiceAuthProtocol: String,\n  $authorizationID: ID!,\n  $saleDate: DateTime!\n) {\n  Sales_updateInvoiceCode(\n    origin: $origin, storeCode: $storeCode, invoiceCode: $invoiceCode,\n    invoiceAuthProtocol: $invoiceAuthProtocol,\n    authorizationID: $authorizationID, saleDate: $saleDate\n  ) {\n    status\n    statusCode\n    statusMessage\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_discountPrograms",
+      "order": 10,
+      "title": "Consultar programas e regras de produto",
+      "description": "Consulta programas e regras por loja para atualizar a carga de produtos e condições comerciais.",
+      "authRequired": true,
+      "businessNotes": [
+        "Entrada descrita: storeCode e origin opcional.",
+        "Retorno inclui programas, allowedOrigins e regras com produtos/EANs, maximumConsumerPrice, saleBaseDiscountPercentage, repositionBaseDiscountPercentage, blocked, requiresMedicalPrescription e witholdsMedicalPrescription.",
+        "[ATENÇÃO] Atualize a carga diariamente e confira allowedOrigins antes de usar uma regra para a origem da venda."
+      ],
+      "exampleQuery": "query Pharma_discountPrograms(\n  $storeCode: String!,\n  $origin: Pharma_AuthorizationOrigin\n) {\n  Pharma_discountPrograms(storeCode: $storeCode, origin: $origin) {\n    id\n    name\n    url\n    allowedOrigins\n    rules { __typename }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_cancel",
+      "order": 11,
+      "title": "Cancelar venda ou pré-autorização",
+      "description": "Cancela a venda confirmada; a fonte também prevê preAuthorizationID conforme o caso.",
+      "authRequired": true,
+      "prerequisites": [
+        "Identificar a venda ou pré-autorização e informar a data quando aplicável."
+      ],
+      "businessNotes": [
+        "Entrada descrita: channel, origin, customerCode, storeCode, authorizationID ou preAuthorizationID e createdAt quando necessário.",
+        "Retorno: createdAt, authorizationID, status, statusCode, statusMessage e receipt.",
+        "[ATENÇÃO MÁXIMA] Para repetição de cancelamento, preserve statusCode 103 e a mensagem Transacao ja cancelada; não trate como um novo cancelamento."
+      ],
+      "exampleQuery": "mutation Sales_cancel(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String,\n  $authorizationID: ID,\n  $preAuthorizationID: ID,\n  $createdAt: DateTime\n) {\n  Sales_cancel(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, authorizationID: $authorizationID,\n    preAuthorizationID: $preAuthorizationID, createdAt: $createdAt\n  ) {\n    createdAt\n    authorizationID\n    status\n    statusCode\n    statusMessage\n    receipt\n  }\n}"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import type {
   ManualOperation,
   ManualReferenceTable,
 } from "@/modules/living-docs-externa/schema";
+import { ImportanceNotice, type ImportanceTone } from "@/core/ui/importance-notice";
 import { docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
@@ -14,6 +15,28 @@ interface OperationDocumentationProps {
   referenceTables?: ManualReferenceTable[];
   canUsePlayground?: boolean;
   idPrefix?: string;
+  importanceNotices?: boolean;
+}
+
+function importanceNote(note: string): { tone: ImportanceTone; label: string; body: string } | null {
+  const match = note.match(/^\[(ATENÇÃO MÁXIMA|ATENÇÃO|OBSERVAÇÃO|COMENTÁRIO)\]\s*(.*)$/i);
+  if (!match) return null;
+  const key = match?.[1]?.toLocaleUpperCase("pt-BR");
+  const tone: ImportanceTone = key === "ATENÇÃO MÁXIMA"
+    ? "critical"
+    : key === "ATENÇÃO"
+      ? "attention"
+      : key === "COMENTÁRIO"
+        ? "comment"
+        : "observation";
+  const label = tone === "critical"
+    ? "Atenção máxima"
+    : tone === "attention"
+      ? "Atenção"
+      : tone === "comment"
+        ? "Comentário"
+        : "Observação";
+  return { tone, label, body: match?.[2] ?? note };
 }
 
 export function OperationDocumentation({
@@ -23,6 +46,7 @@ export function OperationDocumentation({
   referenceTables = [],
   canUsePlayground = false,
   idPrefix = "",
+  importanceNotices = false,
 }: OperationDocumentationProps) {
   const isRest = operation.kind === "rest";
   const sectionId = (id: string) => idPrefix ? `${idPrefix}-${id}` : id;
@@ -57,10 +81,31 @@ export function OperationDocumentation({
 
       {operation.businessNotes?.length ? (
         <section id={sectionId("regras-negocio")} className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Observação</h2>
-          <ul className="list-disc space-y-1 pl-5 text-slate-700">
-            {operation.businessNotes.map((note, index) => <li key={index}>{note}</li>)}
-          </ul>
+          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
+            {importanceNotices ? "Notas e alertas" : "Observação"}
+          </h2>
+          {importanceNotices ? (
+            <ul className="space-y-2">
+              {operation.businessNotes.map((note, index) => {
+                const item = importanceNote(note);
+                return (
+                  <li key={index}>
+                    {item ? (
+                      <ImportanceNotice tone={item.tone}>
+                        <strong>{item.label}:</strong> {item.body}
+                      </ImportanceNotice>
+                    ) : (
+                      <p className="text-slate-700">{note}</p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <ul className="list-disc space-y-1 pl-5 text-slate-700">
+              {operation.businessNotes.map((note, index) => <li key={index}>{note}</li>)}
+            </ul>
+          )}
         </section>
       ) : null}
 

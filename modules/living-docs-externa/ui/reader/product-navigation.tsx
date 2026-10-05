@@ -236,11 +236,6 @@ type CredenciadoStructureItem = {
 const CREDENCIADO_STRUCTURE = [
   { label: "Visão Geral", areaId: "visao-geral" },
   { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
-  { label: "Cenários de Testes e Validações", areaId: "jornada-integracao" },
-  { label: "Fluxo de Cadastro" },
-  { label: "Fluxo Opt-in" },
-  { label: "Fluxo de Venda" },
-  { label: "Fluxo PBM no Caixa" },
 ] satisfies readonly CredenciadoStructureItem[];
 
 function CredenciadoStructureItem({
@@ -398,9 +393,7 @@ export function ProductNavigation({
 
   const product = navigation.products.find((item) => item.id === selectedProductId);
   const flows = product?.actions.find((action) => action.id === "fluxos")?.links ?? [];
-  const visibleFlows = product?.id === "credenciado"
-    ? flows.filter((link) => !CREDENCIADO_STRUCTURE.some((item) => !item.areaId && item.label === link.label))
-    : flows;
+  const visibleFlows = flows;
   const selectedFlow = flows.find((link) => link.id === selectedFlowId) ?? null;
   const productArea = product?.actions.find((action) => action.id === selectedAreaId);
   const flowAreas = product && selectedFlow

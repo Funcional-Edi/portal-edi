@@ -99,7 +99,9 @@ export function ManualRoteiro({
           {editor.renderSectionActions(section)}
         </div>
       ) : null}
-      {editor?.renderSectionBody?.(section) ?? <MarkdownBody source={section.body} />}
+      {editor?.renderSectionBody?.(section) ?? (
+        <MarkdownBody source={section.body} importanceNotices={config.productId === "credenciado"} />
+      )}
     </div>
   );
 
@@ -293,6 +295,7 @@ export function ManualRoteiro({
                         referenceTables={referenceTables}
                         canUsePlayground={canUsePlayground}
                         idPrefix={operationId}
+                        importanceNotices={config.productId === "credenciado"}
                       />
                     </div>
                   </details>
@@ -311,8 +314,9 @@ export function ManualRoteiro({
       <section id="roteiro-integracao" data-documentation-area="roteiro-integracao" className="mt-10 scroll-mt-24">
         <h2 className="text-lg font-semibold">Cenários de Testes e Validações</h2>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
-          Valide os dois fluxos do Canal Autorizador em homologação, registrando as requisições,
-          respostas, decisões de negócio e evidências de cada cenário.
+          {config.productId === "credenciado"
+            ? "Valide os cenários deste fluxo em homologação, registrando as requisições, respostas, decisões de negócio e evidências."
+            : "Valide os dois fluxos do Canal Autorizador em homologação, registrando as requisições, respostas, decisões de negócio e evidências de cada cenário."}
         </p>
 
         {manual.homologationFlows?.length ? (

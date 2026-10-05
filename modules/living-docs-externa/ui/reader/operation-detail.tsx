@@ -21,6 +21,8 @@ interface OperationDetailProps {
   referenceTables?: ManualReferenceTable[];
   /** Playground executa contra gateway real — só perfil admin, e só faz sentido em GraphQL. */
   canUsePlayground?: boolean;
+  /** Aplica os rótulos visuais de importância usados pela documentação do Credenciado. */
+  importanceNotices?: boolean;
 }
 
 export function OperationDetail({
@@ -32,6 +34,7 @@ export function OperationDetail({
   schemaDetail,
   referenceTables = [],
   canUsePlayground = false,
+  importanceNotices = false,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
 
@@ -79,6 +82,7 @@ export function OperationDetail({
         schemaDetail={schemaDetail}
         referenceTables={referenceTables}
         canUsePlayground={canUsePlayground}
+        importanceNotices={importanceNotices}
       />
 
       {!isRest ? (

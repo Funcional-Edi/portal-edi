@@ -1,0 +1,247 @@
+{
+  "version": 1,
+  "title": "Credenciado — Fluxo PBM no Caixa",
+  "productName": "Credenciado",
+  "homologationFlows": [
+    {
+      "title": "Operação PBM no caixa",
+      "scenarios": [
+        {
+          "title": "Confirmar operação oficial de elegibilidade",
+          "preconditions": [
+            "A página de origem descreve a avaliação de CPF e EAN, mas não nomeia a operação.",
+            "Responsável pelo contrato/API disponível para validação."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules"
+          ],
+          "expectedResult": "O nome e o contrato da operação de elegibilidade são confirmados antes de serem tratados como etapa executável do PBM.",
+          "evidence": [
+            "Referência oficial da operação confirmada ou registro da pendência.",
+            "Validação documentada pelo responsável."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma a operação antes de fechar a homologação do fluxo."
+        },
+        {
+          "title": "Validar regras e pré-autorizar venda",
+          "preconditions": [
+            "Loja, cliente, produto, origem e dados de teste aprovados em homologação.",
+            "Elegibilidade confirmada conforme contrato validado."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules",
+            "Sales_preAuthorizeSale"
+          ],
+          "expectedResult": "A pré-autorização apresenta os itens e estados retornados e mantém authorizationID para a sequência do processo.",
+          "evidence": [
+            "Resposta das regras de preço.",
+            "Pré-autorização com status por item e identificadores mascarados."
+          ],
+          "approval": "Equipe responsável pelo EDI valida a sequência de regras e pré-autorização."
+        },
+        {
+          "title": "Confirmar venda total",
+          "preconditions": [
+            "Pré-autorização válida de teste e quantidades aprovadas."
+          ],
+          "operations": [
+            "Sales_confirmPreAuthorizedSale"
+          ],
+          "expectedResult": "A confirmação respeita os itens e quantidades pré-autorizados e apresenta status, totais, reimbursementValue e receipt quando retornados.",
+          "evidence": [
+            "Resposta da pré-autorização.",
+            "Resposta de confirmação e recibo de teste."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma a venda de teste e o layout do recibo gerencial."
+        },
+        {
+          "title": "Tratar venda parcial ou item recusado",
+          "preconditions": [
+            "Cenário parcial de teste disponível no ambiente."
+          ],
+          "operations": [
+            "Pharma_checkPricesAndRules",
+            "Sales_preAuthorizeSale"
+          ],
+          "expectedResult": "Os itens aprovados e recusados são distinguidos; uma nova autorização contém exclusivamente os itens recusados.",
+          "evidence": [
+            "Status por item e justificativas retornadas.",
+            "Nova autorização apenas dos itens recusados."
+          ],
+          "approval": "Equipe responsável pelo EDI aprova o tratamento de rejeições e nova autorização."
+        },
+        {
+          "title": "Atualizar nota fiscal da venda",
+          "preconditions": [
+            "Autorização de teste confirmada e dados fiscais sintéticos disponíveis."
+          ],
+          "operations": [
+            "Sales_updateInvoiceCode"
+          ],
+          "expectedResult": "A atualização retorna status, statusCode e statusMessage para a autorização correta.",
+          "evidence": [
+            "Requisição fiscal mascarada.",
+            "Resposta da atualização."
+          ],
+          "approval": "Equipe responsável pelo EDI valida os dados fiscais usados no processo."
+        },
+        {
+          "title": "Atualizar carga diária de programas",
+          "preconditions": [
+            "CNPJ e origem de teste autorizados."
+          ],
+          "operations": [
+            "Pharma_discountPrograms"
+          ],
+          "expectedResult": "A carga é atualizada e a integração analisa allowedOrigins, regras, EAN, limites de preço, bloqueio e receita.",
+          "evidence": [
+            "Resposta da consulta com dados mascarados.",
+            "Registro da atualização e da origem permitida."
+          ],
+          "approval": "Equipe responsável pelo EDI valida a atualização da carga e seus filtros."
+        },
+        {
+          "title": "Cancelar venda confirmada",
+          "preconditions": [
+            "Venda de teste confirmada e elegível para cancelamento."
+          ],
+          "operations": [
+            "Sales_cancel"
+          ],
+          "expectedResult": "O cancelamento apresenta status, código, mensagem e recibo quando retornados, sem alterar o identificador da transação.",
+          "evidence": [
+            "Identificador mascarado da autorização.",
+            "Resposta do cancelamento."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o resultado do cancelamento."
+        },
+        {
+          "title": "Repetir cancelamento já concluído",
+          "preconditions": [
+            "Transação de teste já cancelada."
+          ],
+          "operations": [
+            "Sales_cancel"
+          ],
+          "expectedResult": "O retorno mantém statusCode 103 e a mensagem Transacao ja cancelada.",
+          "evidence": [
+            "Resposta do cancelamento inicial.",
+            "Resposta da repetição."
+          ],
+          "approval": "Equipe responsável pelo EDI valida que a repetição não cria novo cancelamento."
+        }
+      ]
+    }
+  ],
+  "homologationValidations": [
+    "Não publicar o nome da operação de elegibilidade como confirmado até obter validação oficial.",
+    "Confirmar a origem aceita pelo PBM por ambiente e contrato; não inferir mapeamento de outra tabela.",
+    "Tratar venda total e parcial sem adicionar produtos nem exceder quantidades autorizadas.",
+    "Conferir status final, nota fiscal, programas carregados e itens recusados.",
+    "Preservar statusCode 103 e Transacao ja cancelada na repetição do cancelamento.",
+    "Concluir a homologação com evidências do processo, venda e recibo gerencial conforme roteiro oficial."
+  ],
+  "operations": [
+    {
+      "kind": "query",
+      "name": "Pharma_checkPricesAndRules",
+      "order": 1,
+      "title": "Validar regras e preços",
+      "description": "Simula preços e regras para os produtos informados antes da pré-autorização, incluindo resultados por item e exigências de receita.",
+      "authRequired": true,
+      "prerequisites": [
+        "Obter o token pela documentação oficial de autenticação.",
+        "Concluir a elegibilidade usando a operação oficial que vier a ser validada."
+      ],
+      "businessNotes": [
+        "Entrada descrita: origin, storeCode, customerCode, products (ean, price e saleAmount) e dados de receita quando aplicáveis.",
+        "Retorno descrito: aproved, createdAt, totais, descontos, produtos/status, requiredUploadWithPrescription, dados de receita e dailyDose.",
+        "[ATENÇÃO] Solicite dailyDose quando requiredInformDailyDose indicar que a informação é necessária."
+      ],
+      "exampleQuery": "query Pharma_checkPricesAndRules(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Pharma_ItemArgs!]!\n) {\n  Pharma_checkPricesAndRules(\n    origin: $origin, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    aproved\n    createdAt\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    totalValueMaxConsumerPrice\n    totalValueWithPrescription\n    totalValueWithoutPrescription\n    totalDiscountAmount\n    products { transactionType ean description maximumConsumerPrice priceReceived funcionalPrice salePrice saleAmount status }\n    requiredUploadWithPrescription\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_preAuthorizeSale",
+      "order": 2,
+      "title": "Pré-autorizar venda PBM",
+      "description": "Cria a autorização prévia para a venda no caixa, preservando os identificadores e os resultados de cada produto.",
+      "authRequired": true,
+      "prerequisites": [
+        "Validar preços e regras.",
+        "Usar channel, origin, cliente, loja e produtos aprovados para o cenário."
+      ],
+      "businessNotes": [
+        "Entrada descrita: channel, origin, customerCode, storeCode, produtos (ean, unitPrice, quantity, maxConsumerPrice opcional) e dados de prescritor quando aplicáveis.",
+        "Retorno descrito: createdAt, authorizationID, sequenceID, totais, status, códigos/mensagens, status dos produtos e dados de receita.",
+        "[ATENÇÃO] Em retorno parcial, autorize novamente apenas os itens recusados e preserve authorizationID para as etapas seguintes."
+      ],
+      "exampleQuery": "mutation Sales_preAuthorizeSale(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Sales_ProductInput!]!\n) {\n  Sales_preAuthorizeSale(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    cardBalance\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n    receipt\n    secondFactorAuthentication\n    reimbursementValue\n    origin\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_confirmPreAuthorizedSale",
+      "order": 3,
+      "title": "Confirmar venda PBM",
+      "description": "Finaliza a venda no caixa com os produtos e quantidades que foram previamente autorizados.",
+      "authRequired": true,
+      "prerequisites": [
+        "Revisar status e produtos da pré-autorização."
+      ],
+      "businessNotes": [
+        "Retorno descrito: totais, status, reimbursementValue, receipt, produtos e statusMessage quando houver erro.",
+        "[ATENÇÃO MÁXIMA] Não inclua produtos novos, não exceda quantidade autorizada e não repita confirmação concluída.",
+        "[OBSERVAÇÃO] A referência determina que status e statusMessage sejam verificados antes de considerar o processo finalizado."
+      ],
+      "exampleQuery": "mutation Sales_confirmPreAuthorizedSale(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $authorizationID: ID!,\n  $storeCode: String!,\n  $customerCode: String,\n  $invoiceCode: String,\n  $invoiceAuthProtocol: String,\n  $products: [Sales_ProductInput!]!,\n  $preAuthorizationDate: DateTime\n) {\n  Sales_confirmPreAuthorizedSale(\n    origin: $origin, channel: $channel, authorizationID: $authorizationID,\n    storeCode: $storeCode, customerCode: $customerCode,\n    invoiceCode: $invoiceCode, invoiceAuthProtocol: $invoiceAuthProtocol,\n    products: $products, preAuthorizationDate: $preAuthorizationDate\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    cardBalance\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n    receipt\n    secondFactorAuthentication\n    reimbursementValue\n    origin\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_updateInvoiceCode",
+      "order": 4,
+      "title": "Atualizar dados da nota fiscal",
+      "description": "Salva os dados fiscais da venda autorizada para o fluxo PBM.",
+      "authRequired": true,
+      "prerequisites": [
+        "Autorização de venda e saleDate disponíveis."
+      ],
+      "businessNotes": [
+        "Entrada descrita: storeCode, invoiceCode, invoiceAuthProtocol, authorizationID e saleDate.",
+        "Retorno: status, statusCode e statusMessage."
+      ],
+      "exampleQuery": "mutation Sales_updateInvoiceCode(\n  $origin: Sales_AuthorizationOriginEnum,\n  $storeCode: String!,\n  $invoiceCode: String,\n  $invoiceAuthProtocol: String,\n  $authorizationID: ID!,\n  $saleDate: DateTime!\n) {\n  Sales_updateInvoiceCode(\n    origin: $origin, storeCode: $storeCode, invoiceCode: $invoiceCode,\n    invoiceAuthProtocol: $invoiceAuthProtocol,\n    authorizationID: $authorizationID, saleDate: $saleDate\n  ) {\n    status\n    statusCode\n    statusMessage\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_discountPrograms",
+      "order": 5,
+      "title": "Consultar carga de programas PBM",
+      "description": "Consulta programas e regras de produto por loja para atualização diária do caixa.",
+      "authRequired": true,
+      "businessNotes": [
+        "Entrada descrita: storeCode e origin.",
+        "A resposta inclui allowedOrigins, regras, EANs, preço máximo, descontos, bloqueio e necessidade/retenção de receita.",
+        "[ATENÇÃO] Atualize a carga diariamente e use somente origens permitidas na resposta."
+      ],
+      "exampleQuery": "query Pharma_discountPrograms(\n  $storeCode: String!,\n  $origin: Pharma_AuthorizationOrigin\n) {\n  Pharma_discountPrograms(storeCode: $storeCode, origin: $origin) {\n    id\n    name\n    url\n    allowedOrigins\n    rules { __typename }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Sales_cancel",
+      "order": 6,
+      "title": "Cancelar venda PBM",
+      "description": "Cancela a autorização de venda usando os dados retornados na confirmação.",
+      "authRequired": true,
+      "prerequisites": [
+        "Transação identificada; enviar createdAt quando não for do mesmo dia."
+      ],
+      "businessNotes": [
+        "Entrada descrita: origin, channel, customerCode, storeCode, authorizationID e createdAt quando aplicável.",
+        "Retorno descrito: createdAt, authorizationID, status, statusCode, statusMessage e receipt.",
+        "[ATENÇÃO MÁXIMA] Para repetição, preserve statusCode 103 e Transacao ja cancelada; não trate como novo cancelamento.",
+        "[COMENTÁRIO] A fonte do PBM permite confirmar autorização antes do cancelamento; use os dados efetivamente retornados no ambiente."
+      ],
+      "exampleQuery": "mutation Sales_cancel(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String,\n  $authorizationID: ID,\n  $preAuthorizationID: ID,\n  $createdAt: DateTime\n) {\n  Sales_cancel(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, authorizationID: $authorizationID,\n    preAuthorizationID: $preAuthorizationID, createdAt: $createdAt\n  ) {\n    createdAt\n    authorizationID\n    status\n    statusCode\n    statusMessage\n    receipt\n  }\n}"
+    }
+  ]
+}

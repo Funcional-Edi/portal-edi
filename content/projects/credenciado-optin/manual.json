@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "title": "Credenciado — Fluxo Opt-in",
+  "productName": "Credenciado",
+  "referenceTables": [
+    {
+      "id": "origens-parceiro",
+      "title": "Origens listadas no material do fluxo",
+      "columns": [
+        "Origem informada",
+        "Enum GraphQL correspondente"
+      ],
+      "rows": [
+        [
+          "Ecommerce",
+          "Pendente de validação"
+        ],
+        [
+          "Mobile App",
+          "Pendente de validação"
+        ],
+        [
+          "Point of Sale",
+          "Pendente de validação"
+        ],
+        [
+          "Call Center",
+          "Pendente de validação"
+        ],
+        [
+          "Todas Marketplaces",
+          "Pendente de validação"
+        ],
+        [
+          "Mevo",
+          "Pendente de validação"
+        ],
+        [
+          "iFood",
+          "Pendente de validação"
+        ]
+      ]
+    }
+  ],
+  "homologationFlows": [
+    {
+      "title": "Termo enviado por SMS ou e-mail",
+      "scenarios": [
+        {
+          "title": "Aceite já realizado",
+          "preconditions": [
+            "Beneficiário de teste com aceite registrado em homologação."
+          ],
+          "operations": [
+            "Pharma_verifyOptIn"
+          ],
+          "expectedResult": "A consulta retorna o estado do aceite e sua obrigatoriedade; a interface não solicita novo aceite sem necessidade.",
+          "evidence": [
+            "Resposta com dados mascarados.",
+            "Estado apresentado na interface."
+          ],
+          "approval": "Equipe responsável pelo EDI valida a interpretação da resposta."
+        },
+        {
+          "title": "Aceite obrigatório ainda não realizado",
+          "preconditions": [
+            "Beneficiário de teste sem aceite, com cenário liberado em homologação."
+          ],
+          "operations": [
+            "Pharma_verifyOptIn",
+            "Pharma_sendOptInTerms"
+          ],
+          "expectedResult": "O fluxo solicita o aceite e envia o termo conforme o canal de contato aprovado.",
+          "evidence": [
+            "Resposta da verificação.",
+            "Resposta do envio do termo e canal utilizado."
+          ],
+          "approval": "Equipe responsável pelo EDI registra o envio e o resultado."
+        },
+        {
+          "title": "Envio do termo por e-mail ou SMS",
+          "preconditions": [
+            "Contato de teste liberado para recebimento.",
+            "Disponibilidade dos canais confirmada para o cenário."
+          ],
+          "operations": [
+            "Pharma_sendOptInTerms"
+          ],
+          "expectedResult": "A resposta apresenta Status e Mensagem e o destinatário recebe o link para leitura e aceite.",
+          "evidence": [
+            "Requisição mascarada.",
+            "Resposta da operação e evidência do recebimento sem expor dados pessoais."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma o comportamento do canal testado."
+        }
+      ]
+    },
+    {
+      "title": "Termo apresentado na tela do parceiro",
+      "scenarios": [
+        {
+          "title": "Exibição do termo integral antes do aceite",
+          "preconditions": [
+            "Beneficiário e produto de teste liberados para homologação."
+          ],
+          "operations": [
+            "Pharma_retrieveTextTermsOptIn"
+          ],
+          "expectedResult": "A interface apresenta o texto integral retornado antes de oferecer a confirmação.",
+          "evidence": [
+            "Texto e link retornados com dados pessoais mascarados.",
+            "Captura da tela com o termo apresentado."
+          ],
+          "approval": "Equipe responsável pelo EDI valida a apresentação do conteúdo."
+        },
+        {
+          "title": "Registro do aceite após leitura",
+          "preconditions": [
+            "Termo recuperado e apresentado ao beneficiário de teste."
+          ],
+          "operations": [
+            "Pharma_retrieveTextTermsOptIn",
+            "Pharma_insertOptIn"
+          ],
+          "expectedResult": "O aceite é enviado com o código de envio de termos e a resposta Status/Mensagem é apresentada.",
+          "evidence": [
+            "Código de envio e requisição mascarados.",
+            "Resposta do registro de aceite."
+          ],
+          "approval": "Equipe responsável pelo EDI confirma a associação entre termo consultado e aceite."
+        },
+        {
+          "title": "Tratamento de contato ausente ou resposta de erro",
+          "preconditions": [
+            "Cenário controlado sem canal de contato ou com retorno de erro, liberado em homologação."
+          ],
+          "operations": [
+            "Pharma_verifyOptIn",
+            "Pharma_sendOptInTerms"
+          ],
+          "expectedResult": "A interface apresenta o retorno sem presumir que flags textuais são Boolean nem descartar Status/Mensagem.",
+          "evidence": [
+            "Resposta com dados de contato mascarados.",
+            "Mensagem exibida e decisão de continuidade."
+          ],
+          "approval": "Equipe responsável pelo EDI registra os limites validados do contrato."
+        }
+      ]
+    }
+  ],
+  "homologationValidations": [
+    "Validar aceite já realizado e aceite obrigatório antes de encaminhar novo termo.",
+    "Cobrir envio por SMS/e-mail e confirmação em tela, conforme os canais liberados.",
+    "Validar ausência de contato e apresentar Status/Mensagem retornados.",
+    "Manter a tabela de origens separada até confirmar a correspondência com os enums da API."
+  ],
+  "operations": [
+    {
+      "kind": "query",
+      "name": "Pharma_verifyOptIn",
+      "order": 1,
+      "title": "Verificar consentimento Opt-in",
+      "description": "Consulta se o CPF aceitou os termos e se o consentimento é obrigatório durante atualização cadastral, autorização ou compra.",
+      "authRequired": true,
+      "prerequisites": [
+        "Obter token pela documentação oficial de autenticação.",
+        "Usar os identificadores e origem liberados para o cenário."
+      ],
+      "referenceTableIds": [
+        "origens-parceiro"
+      ],
+      "businessNotes": [
+        "Entrada descrita: EAN, CPF, CNPJ, Origem, CodCre e origin: POINT_OF_SALES.",
+        "Retorno descrito: OptInRealizado, OptInObrigatorio e Mensagem.",
+        "[ATENÇÃO] A referência GraphQL declara flags de resposta como String; valide os valores antes de tratá-los como Boolean.",
+        "[COMENTÁRIO] A correspondência entre as origens de negócio e os valores enum ainda precisa de confirmação oficial."
+      ],
+      "exampleQuery": "query Pharma_verifyOptIn(\n  $origin: Pharma_AuthorizationOrigin!,\n  $input: Pharma_OptInRequest!\n) {\n  Pharma_verifyOptIn(origin: $origin, input: $input) {\n    OptInRealizado\n    OptInObrigatorio\n    Mensagem\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Pharma_sendOptInTerms",
+      "order": 2,
+      "title": "Enviar termos de Opt-in",
+      "description": "Envia os termos por SMS e/ou e-mail; a mensagem contém o link para a página de aceite.",
+      "authRequired": true,
+      "prerequisites": [
+        "Verificar se o aceite é obrigatório e ainda não foi realizado.",
+        "Confirmar os contatos de teste autorizados."
+      ],
+      "referenceTableIds": [
+        "origens-parceiro"
+      ],
+      "businessNotes": [
+        "Entrada descrita: Ean, CPF, TelefoneCelular, Email, Origem e origin: POINT_OF_SALES.",
+        "Retorno descrito: Status e Mensagem.",
+        "[ATENÇÃO] A referência marca TelefoneCelular e Email como obrigatórios, embora a descrição diga SMS e/ou e-mail; confirme se ambos devem ser enviados.",
+        "[ATENÇÃO MÁXIMA] Não inclua telefone ou e-mail real em capturas de homologação; mascare os dados pessoais."
+      ],
+      "exampleQuery": "mutation Pharma_sendOptInTerms(\n  $origin: Pharma_AuthorizationOrigin!,\n  $input: Pharma_EnvioTermosOptInRequest!\n) {\n  Pharma_sendOptInTerms(origin: $origin, input: $input) {\n    Status\n    Mensagem\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "Pharma_retrieveTextTermsOptIn",
+      "order": 3,
+      "title": "Recuperar texto dos termos",
+      "description": "Recupera o termo integral para exibição na interface do parceiro, sem depender de envio por SMS ou e-mail.",
+      "authRequired": true,
+      "prerequisites": [
+        "Usar os identificadores e origem aprovados para o cenário."
+      ],
+      "referenceTableIds": [
+        "origens-parceiro"
+      ],
+      "businessNotes": [
+        "Entrada descrita: Ean, CPF, Origem e origin: POINT_OF_SALES.",
+        "Retorno descrito: CodigoEnvio, TextoTermos, LinkTermos, Status e Mensagem.",
+        "[ATENÇÃO] Apresente o conteúdo integral antes de registrar o aceite."
+      ],
+      "exampleQuery": "query Pharma_retrieveTextTermsOptIn(\n  $origin: Pharma_AuthorizationOrigin!,\n  $input: Pharma_TextoTermosOptInRequest!\n) {\n  Pharma_retrieveTextTermsOptIn(origin: $origin, input: $input) {\n    CodigoEnvio\n    TextoTermos\n    LinkTermos\n    Status\n    Mensagem\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "Pharma_insertOptIn",
+      "order": 4,
+      "title": "Registrar aceite de Opt-in",
+      "description": "Confirma o aceite do beneficiário após a leitura dos termos recuperados.",
+      "authRequired": true,
+      "prerequisites": [
+        "Concluir Pharma_retrieveTextTermsOptIn e apresentar o termo ao beneficiário."
+      ],
+      "referenceTableIds": [
+        "origens-parceiro"
+      ],
+      "businessNotes": [
+        "Entrada descrita: CodigoEnvioTermos, Origem e origin: POINT_OF_SALES.",
+        "Retorno descrito: Status e Mensagem.",
+        "[OBSERVAÇÃO] Preserve o código retornado na recuperação do termo para vincular a confirmação ao envio correto."
+      ],
+      "exampleQuery": "mutation Pharma_insertOptIn(\n  $origin: Pharma_AuthorizationOrigin!,\n  $input: Pharma_InserirOptInRequest!\n) {\n  Pharma_insertOptIn(origin: $origin, input: $input) {\n    Status\n    Mensagem\n  }\n}"
+    }
+  ]
+}
