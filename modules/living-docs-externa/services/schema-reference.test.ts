@@ -1,4 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import {
+  buildClientSchema,
+  getVariableValues,
+  Kind,
+  parse,
+  validate,
+} from "graphql";
 
 import type { ProjectSchemaSnapshot } from "@/modules/living-docs-externa/schema/introspection";
 import {
@@ -342,5 +351,80 @@ describe("buildOperationSchemaDetail", () => {
 
   it("retorna null para operação inexistente", () => {
     expect(buildOperationSchemaDetail(operationSnapshot, "mutation", "inexistente")).toBeNull();
+  });
+});
+
+describe("exemplos de requisição dos subprodutos Credenciado", () => {
+  it("cobrem as operações do schema e mostram valores válidos para todas as variáveis", () => {
+    for (const slug of [
+      "credenciado-cadastro",
+      "credenciado-optin",
+      "credenciado-pbm-caixa",
+      "credenciado-venda",
+    ]) {
+      const manual = JSON.parse(
+        readFileSync(join(process.cwd(), "content", "projects", slug, "manual.json"), "utf8")
+      );
+      const snapshot = JSON.parse(
+        readFileSync(join(process.cwd(), "data", "projects", slug, "schema.json"), "utf8")
+      );
+      const schema = buildClientSchema(snapshot.introspection);
+      const operationNames = manual.operations.map((operation: { name: string }) => operation.name).sort();
+      const schemaOperationNames = [
+        ...Object.keys(schema.getQueryType()?.getFields() ?? {}),
+        ...Object.keys(schema.getMutationType()?.getFields() ?? {}),
+      ].sort();
+
+      expect(operationNames, slug).toEqual(schemaOperationNames);
+
+      for (const operation of manual.operations) {
+        if (operation.name === "Prescription_addPrescription") {
+          const payloadText = operation.exampleQuery.match(/operations: (.+)\n\nmap:/s)?.[1];
+          expect(payloadText, operation.name).toBeTruthy();
+          if (!payloadText) throw new Error("Payload multipart ausente");
+          const payload = JSON.parse(payloadText);
+          const uploadDocument = parse(payload.query);
+          const uploadDefinition = uploadDocument.definitions.find(
+            (definition) => definition.kind === Kind.OPERATION_DEFINITION
+          );
+          const uploadVariables = uploadDefinition?.kind === Kind.OPERATION_DEFINITION
+            ? uploadDefinition.variableDefinitions?.map((definition) => definition.variable.name.value) ?? []
+            : [];
+
+          expect(payload.variables, operation.name).toEqual({ file: null });
+          expect(Object.keys(payload.variables), operation.name).toEqual(uploadVariables);
+          expect(operation.exampleQuery, operation.name).toContain("source: POINT_OF_SALES");
+          expect(operation.exampleQuery, operation.name).toContain("prescriptionName");
+          expect(operation.exampleQuery, operation.name).toContain("dateIssuance");
+          continue;
+        }
+
+        const document = parse(operation.exampleQuery);
+        expect(validate(schema, document).map((error) => error.message), operation.name).toEqual([]);
+        const definition = document.definitions.find(
+          (item) => item.kind === Kind.OPERATION_DEFINITION
+        );
+        expect(definition?.kind, operation.name).toBe(Kind.OPERATION_DEFINITION);
+        if (definition?.kind !== Kind.OPERATION_DEFINITION) continue;
+
+        const root = operation.kind === "query" ? schema.getQueryType() : schema.getMutationType();
+        const field = definition.selectionSet.selections.find((item) => item.kind === Kind.FIELD);
+        expect(field?.kind, operation.name).toBe(Kind.FIELD);
+        if (field?.kind !== Kind.FIELD) continue;
+        expect(
+          (field.arguments ?? []).map((argument) => argument.name.value).sort(),
+          operation.name
+        ).toEqual(root?.getFields()[operation.name].args.map((argument) => argument.name).sort());
+
+        const definitions = definition.variableDefinitions ?? [];
+        if (!definitions.length) continue;
+        expect(operation.exampleVariables, operation.name).toBeTruthy();
+        const variables = JSON.parse(operation.exampleVariables);
+        expect(Object.keys(variables).sort(), operation.name).toEqual(
+          definitions.map((item) => item.variable.name.value).sort()
+        );
+        expect(getVariableValues(schema, definitions, variables).errors, operation.name).toBeUndefined();
+      }
+    }
   });
 });

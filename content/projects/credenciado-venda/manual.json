@@ -205,7 +205,7 @@
         "pharma-status-item-response"
       ],
       "exampleQuery": "query Pharma_checkPricesAndRules(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Pharma_ItemArgs!]!\n) {\n  Pharma_checkPricesAndRules(\n    origin: $origin,\n    storeCode: $storeCode,\n    customerCode: $customerCode,\n    products: $products\n  ) {\n    aproved\n    createdAt\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    totalValueMaxConsumerPrice\n    totalValueWithPrescription\n    totalValueWithoutPrescription\n    totalDiscountAmount\n    products {\n      transactionType\n      ean\n      description\n      maximumConsumerPrice\n      priceReceived\n      funcionalPrice\n      salePrice\n      saleAmount\n      medicalPrescription {\n        quantity\n        date\n        prescriber {\n          council\n          stateAbbr\n          registerNumber\n        }\n        requiredInformDailyDose\n        dailyDose\n      }\n      status {\n        aproved\n        message\n      }\n    }\n    requiredUploadWithPrescription\n  }\n}",
-      "exampleVariables": "{\n  \"origin\": \"DTS\",\n  \"storeCode\": \"xyz789\",\n  \"customerCode\": \"xyz789\",\n  \"products\": [\n    {\n      \"ean\": \"abc123\",\n      \"price\": 123.45,\n      \"saleAmount\": 987\n    }\n  ]\n}"
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"storeCode\": \"00000000000010\",\n  \"customerCode\": \"00000000000\",\n  \"products\": [\n    {\n      \"ean\": \"7897337706742\",\n      \"price\": 45.0,\n      \"saleAmount\": 1,\n      \"medicalPrescription\": {\n        \"quantity\": 1,\n        \"date\": \"2026-10-06T12:00:00-03:00\",\n        \"prescriber\": {\n          \"council\": \"CRM\",\n          \"stateAbbr\": \"SP\",\n          \"registerNumber\": 12345\n        },\n        \"dailyDose\": 1.0\n      }\n    }\n  ]\n}"
     },
     {
       "kind": "mutation",
@@ -223,7 +223,7 @@
         "Retorno descrito: createdAt, authorizationID, sequenceID, totais, status, códigos/mensagens, secondFactorAuthentication, status dos produtos e dados da receita.",
         "[ATENÇÃO] Se houver itens aprovados e recusados, crie nova autorização somente com os itens recusados e preserve o authorizationID da autorização usada nas etapas seguintes."
       ],
-      "exampleQuery": "mutation preAuthorizeSale {\n  # Pré-autorização de venda\n  Sales_preAuthorizeSale(\n    # Canal PHARMA ou BENEFITS\n    channel: PHARMA\n    # Origem da chamada\n    origin: PARTNERS_ECOMMERCE\n    # Cartão ou CPF\n    customerCode: \"00000000000\"\n    # CNPJ da farmácia\n    storeCode: \"00000000000010\"\n    # Produtos\n    products: [\n      {\n        ean: \"7897337706742\" # JANUVIA\n        unitPrice: 45\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 45\n        # Quantidade do produto a ser pré-autorizada\n        quantity: 2000\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-14\"\n          quantity: 2\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n      {\n        ean: \"7896015523398\" # COMBODART\n        unitPrice: 120\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 120\n        quantity: 1\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-13\"\n          quantity: 1\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n    ]\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    status\n    statusCode\n    statusMessage\n    # Se exige um token gerado no app de celular\n    secondFactorAuthentication\n    products {\n      ean\n      description\n      maxConsumerPrice\n      unitPrice\n      quantity\n      status\n      statusCode\n      statusMessage\n      medicalPrescription {\n        date\n        quantity\n        dailyDose # quando necessário a declaração de acordo a validação de regra, é importante pedir o retorno para ser especificado no próximo passo que é a confirmação.\n        prescriber {\n          council\n          registerNumber\n          stateAbbr\n        }\n      }\n    }\n  }\n}"
+      "exampleQuery": "mutation preAuthorizeSale {\n  # Pré-autorização de venda\n  Sales_preAuthorizeSale(\n    # Canal PHARMA ou BENEFITS\n    channel: PHARMA\n    # Origem da chamada\n    origin: PARTNERS_ECOMMERCE\n    # Cartão ou CPF\n    customerCode: \"00000000000\"\n    # CNPJ da farmácia\n    storeCode: \"00000000000010\"\n    # Produtos\n    products: [\n      {\n        ean: \"7897337706742\" # JANUVIA\n        unitPrice: 45\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 45\n        # Quantidade do produto a ser pré-autorizada\n        quantity: 2000\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-14\"\n          quantity: 2\n          # Dose diária, quando informada na receita\n          dailydose: 1\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n      {\n        ean: \"7896015523398\" # COMBODART\n        unitPrice: 120\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 120\n        quantity: 1\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-13\"\n          quantity: 1\n          # Dose diária, quando informada na receita\n          dailydose: 1\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n    ]\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    status\n    statusCode\n    statusMessage\n    # Se exige um token gerado no app de celular\n    secondFactorAuthentication\n    products {\n      ean\n      description\n      maxConsumerPrice\n      unitPrice\n      quantity\n      status\n      statusCode\n      statusMessage\n      medicalPrescription {\n        date\n        quantity\n        dailyDose # quando necessário a declaração de acordo a validação de regra, é importante pedir o retorno para ser especificado no próximo passo que é a confirmação.\n        prescriber {\n          council\n          registerNumber\n          stateAbbr\n        }\n      }\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -241,7 +241,7 @@
         "A documentação identifica a operação como Prescription_addPrescription, mas o query dentro de operations usa Prescription_uploadPrescription.",
         "[ATENÇÃO MÁXIMA] O arquivo da receita deve ter no máximo 2 MB, conforme o Passo 4 da documentação oficial."
       ],
-      "exampleQuery": "Content-Type: multipart/form-data\n\noperations: {\"query\":\"mutation upload(\\n  $file: Prescription_Upload!\\n) {\\n  Prescription_uploadPrescription(\\n    file: $file\\n    uploadInfo: {\\n      cardNumber: \\\"NUMERO CARTÃO\\\"\\n      source: ORIGEM\\n      mime: \\\"image/jpg\\\"\\n    }\\n  ) {\\n    id\\n    uploadedAt\\n    deletedAt\\n    expiresAt\\n    source\\n    file\\n    name\\n    cardNumber\\n    identity\\n    status\\n    storage\\n    originalName\\n    extension\\n  }\\n}\",\"operationName\":\"upload\"}\n\nmap: {\"uploaded_file\":[\"variables.file\"]}\n\nuploaded_file: <arquivo da receita, até 2 MB>",
+      "exampleQuery": "Content-Type: multipart/form-data\n\noperations: {\"query\":\"mutation upload(\\n  $file: Prescription_Upload!\\n) {\\n  Prescription_uploadPrescription(\\n    file: $file\\n    uploadInfo: {\\n      cardNumber: \\\"CARTAO_TESTE_0001\\\"\\n      cpf: \\\"00000000000\\\"\\n      source: POINT_OF_SALES\\n      mime: \\\"image/jpeg\\\"\\n      prescriptionName: \\\"receita-teste.pdf\\\"\\n      dateIssuance: \\\"2026-10-06T12:00:00-03:00\\\"\\n    }\\n  ) {\\n    id\\n    uploadedAt\\n    deletedAt\\n    expiresAt\\n    source\\n    file\\n    name\\n    cardNumber\\n    identity\\n    status\\n    storage\\n    originalName\\n    extension\\n  }\\n}\",\"operationName\":\"upload\",\"variables\":{\"file\":null}}\n\nmap: {\"uploaded_file\":[\"variables.file\"]}\n\nuploaded_file: <arquivo de teste, até 2 MB>",
       "exampleResponse": "{\n  \"data\": {\n    \"Prescription_addPrescription\": {\n      \"id\": \"247\",\n      \"uploadedAt\": \"2022-01-16T20:03:04.604Z\",\n      \"name\": \"b4e2e460-ccf3-4e35-88ca-c2a15bc7cd82\",\n      \"cardNumber\": \"00000000000\",\n      \"identity\": \"00000000000\"\n    }\n  }\n}"
     },
     {
@@ -249,6 +249,7 @@
       "name": "Prescription_bindPrescription",
       "order": 4,
       "title": "Vincular receita à transação",
+      "exampleVariables": "{\n  \"prescriptionIDs\": [\"PRESCRIPTION-001\"],\n  \"transaction\": {\n    \"authorization\": 123456,\n    \"sequence\": 1,\n    \"timestamp\": \"2026-10-06T12:00:00-03:00\"\n  }\n}",
       "description": "Associa a receita enviada à transação de venda pré-autorizada.",
       "authRequired": true,
       "prerequisites": [
@@ -265,6 +266,7 @@
       "name": "Sales_transaction",
       "order": 5,
       "title": "Consultar transação",
+      "exampleVariables": "{\n  \"channel\": \"PHARMA\",\n  \"storeCode\": \"00000000000010\",\n  \"customerCode\": \"00000000000\",\n  \"authorizationID\": \"123456789\",\n  \"createdAt\": null\n}",
       "description": "Consulta a pré-autorização e permite conferir transação, produtos, status e receita antes da confirmação.",
       "authRequired": true,
       "prerequisites": [
@@ -281,6 +283,7 @@
       "name": "Sales_confirmPreAuthorizedSale",
       "order": 6,
       "title": "Confirmar autorização",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"channel\": \"PHARMA\",\n  \"authorizationID\": \"123456789\",\n  \"storeCode\": \"00000000000010\",\n  \"customerCode\": null,\n  \"invoiceCode\": \"35261012345678000195550010000000011000000010\",\n  \"invoiceAuthProtocol\": \"135260000000000\",\n  \"products\": [\n    {\n      \"ean\": \"7897337706742\",\n      \"unitPrice\": 45.0,\n      \"maxConsumerPrice\": 45.0,\n      \"quantity\": 1,\n      \"medicalPrescription\": {\n        \"date\": \"2026-10-06\",\n        \"quantity\": 1,\n        \"dailydose\": 1.0,\n        \"prescriber\": {\n          \"council\": \"CRO\",\n          \"registerNumber\": 12345,\n          \"stateAbbr\": \"SP\"\n        },\n        \"usage\": \"CONTINUAL\"\n      }\n    }\n  ],\n  \"preAuthorizationDate\": \"2026-10-06T11:45:00-03:00\"\n}",
       "description": "Finaliza uma venda pré-autorizada e retorna totais, status, produtos, reembolso e recibo.",
       "authRequired": true,
       "prerequisites": [
@@ -299,6 +302,7 @@
       "name": "Pharma_displayProductDiscountRules",
       "order": 7,
       "title": "Consultar regras de desconto do produto",
+      "exampleVariables": "{\n  \"storeCode\": \"00000000000010\",\n  \"productEan\": \"7897572004405\",\n  \"customerCode\": \"00000000000\",\n  \"origin\": \"POINT_OF_SALES\",\n  \"detailed\": false\n}",
       "description": "Consulta regras e descontos aplicáveis ao produto e ao consumidor.",
       "authRequired": true,
       "businessNotes": [
@@ -313,6 +317,7 @@
       "name": "Sales_customerMemberships",
       "order": 8,
       "title": "Consultar associações do beneficiário",
+      "exampleVariables": "{\n  \"channel\": \"PHARMA\",\n  \"customerCode\": \"00000000000\"\n}",
       "description": "Consulta dados do cliente e programas associados; no fluxo PBM, apoia a validação dos programas vinculados ao CPF.",
       "authRequired": true,
       "businessNotes": [
@@ -326,6 +331,7 @@
       "name": "Sales_updateInvoiceCode",
       "order": 9,
       "title": "Atualizar dados da nota fiscal",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"storeCode\": \"00000000000010\",\n  \"invoiceCode\": \"35261012345678000195550010000000011000000010\",\n  \"invoiceAuthProtocol\": \"135260000000000\",\n  \"authorizationID\": \"123456789\",\n  \"saleDate\": \"2026-10-06T12:00:00-03:00\"\n}",
       "description": "Salva ou atualiza os dados fiscais da venda autorizada.",
       "authRequired": true,
       "prerequisites": [
@@ -343,6 +349,7 @@
       "name": "Pharma_discountPrograms",
       "order": 10,
       "title": "Consultar programas e regras de produto",
+      "exampleVariables": "{\n  \"storeCode\": \"00000000000010\",\n  \"origin\": \"POINT_OF_SALES\"\n}",
       "description": "Consulta programas e regras por loja para atualizar a carga de produtos e condições comerciais.",
       "authRequired": true,
       "businessNotes": [
@@ -357,6 +364,7 @@
       "name": "Sales_cancel",
       "order": 11,
       "title": "Cancelar venda ou pré-autorização",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"channel\": \"PHARMA\",\n  \"storeCode\": \"00000000000010\",\n  \"customerCode\": \"00000000000\",\n  \"authorizationID\": \"123456789\",\n  \"preAuthorizationID\": null,\n  \"createdAt\": null\n}",
       "description": "Cancela a venda confirmada; a fonte também prevê preAuthorizationID conforme o caso.",
       "authRequired": true,
       "prerequisites": [

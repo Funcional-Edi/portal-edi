@@ -4,10 +4,10 @@
   "referenceTables": [
     {
       "id": "origens-parceiro",
-      "title": "Origens listadas no material do fluxo",
+      "title": "Origens e códigos listados no material do fluxo",
       "columns": [
         "Origem informada",
-        "Enum GraphQL correspondente"
+        "Valor ou validação pendente"
       ],
       "rows": [
         [
@@ -37,6 +37,10 @@
         [
           "iFood",
           "Pendente de validação"
+        ],
+        [
+          "input.Origem (Float!)",
+          "Exemplo 1.0; código numérico pendente de confirmação"
         ]
       ]
     }
@@ -159,6 +163,7 @@
       "name": "Pharma_verifyOptIn",
       "order": 1,
       "title": "Verificar consentimento Opt-in",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"input\": {\n    \"EAN\": \"7897572004405\",\n    \"CPF\": \"00000000000\",\n    \"CNPJ\": \"00000000000010\",\n    \"Origem\": 1.0,\n    \"CodCre\": 12345\n  }\n}",
       "description": "Consulta se o CPF aceitou os termos e se o consentimento é obrigatório durante atualização cadastral, autorização ou compra.",
       "authRequired": true,
       "prerequisites": [
@@ -181,6 +186,7 @@
       "name": "Pharma_sendOptInTerms",
       "order": 2,
       "title": "Enviar termos de Opt-in",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"input\": {\n    \"Ean\": \"7897572004405\",\n    \"CPF\": \"00000000000\",\n    \"TelefoneCelular\": \"11999990000\",\n    \"Email\": \"exemplo@dominio.com.br\",\n    \"Origem\": 1.0\n  }\n}",
       "description": "Envia os termos por SMS e/ou e-mail; a mensagem contém o link para a página de aceite.",
       "authRequired": true,
       "prerequisites": [
@@ -203,6 +209,7 @@
       "name": "Pharma_retrieveTextTermsOptIn",
       "order": 3,
       "title": "Recuperar texto dos termos",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"input\": {\n    \"Ean\": \"7897572004405\",\n    \"CPF\": \"00000000000\",\n    \"Origem\": 1.0\n  }\n}",
       "description": "Recupera o termo integral para exibição na interface do parceiro, sem depender de envio por SMS ou e-mail.",
       "authRequired": true,
       "prerequisites": [
@@ -223,6 +230,7 @@
       "name": "Pharma_insertOptIn",
       "order": 4,
       "title": "Registrar aceite de Opt-in",
+      "exampleVariables": "{\n  \"origin\": \"POINT_OF_SALES\",\n  \"input\": {\n    \"CodigoEnvioTermos\": \"CODIGO-RETORNADO-NA-ETAPA-ANTERIOR\",\n    \"Origem\": 1.0\n  }\n}",
       "description": "Confirma o aceite do beneficiário após a leitura dos termos recuperados.",
       "authRequired": true,
       "prerequisites": [
