@@ -103,6 +103,12 @@ O `24` do `nvm install 24` vira uma versão completa (aqui, `24.21.0`).
 | --- | --- | --- |
 | Tela "Build Error" ao abrir `localhost:3002`: `Reading from "node:fs/promises" is not handled` | O middleware importava o login completo, e o login lia a lista de acessos no disco | O middleware usa `core/auth/edge-config.ts`, que só lê o JWT. A lista continua em `core/auth/config.ts`, no servidor |
 
+## Teste do GitHub leu a branch errada
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| `lê com ref (branch ou SHA) quando informado` espera `ref: "edi-1"` e a chamada sai sem branch | `getGithubContent` recebia a branch e, na linha seguinte, criava outra variável com o mesmo nome a partir da configuração | A branch da chamada vale primeiro; a da configuração só entra quando a chamada não informa nenhuma |
+
 ## Git travado
 
 | Sintoma | Solução |
