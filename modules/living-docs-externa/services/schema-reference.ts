@@ -363,17 +363,57 @@ function mapObjectFieldsToSchemaFieldRows(
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function mapNestedObjectFieldsToSchemaFieldRows(
+  types: IntrospectionType[],
+  typeName: string,
+  prefix = "",
+  ancestors = new Set([typeName])
+): SchemaFieldRow[] {
+  const type = findTypeByName(types, typeName);
+  if (type?.kind !== "OBJECT" || !type.fields?.length) return [];
+
+  return type.fields.flatMap((field) => {
+    const name = `${prefix}${field.name}`;
+    const row: SchemaFieldRow = {
+      name,
+      type: toTypeNameRef(field.type),
+      required: isRequiredGraphQLType(field.type),
+      description: field.description ?? undefined,
+    };
+    const childName = resolveNamedType(field.type);
+    const childType = childName ? findTypeByName(types, childName) : null;
+    if (childType?.kind !== "OBJECT" || !childName || ancestors.has(childName)) {
+      return [row];
+    }
+
+    const childPrefix = `${name}${row.type.formatted.includes("[") ? "[]" : ""}.`;
+    return [
+      row,
+      ...mapNestedObjectFieldsToSchemaFieldRows(
+        types,
+        childName,
+        childPrefix,
+        new Set([...ancestors, childName])
+      ),
+    ];
+  }).sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function collectReferencedInputTypes(
   types: IntrospectionType[],
-  args: IntrospectionArg[] | null | undefined
+  args: IntrospectionArg[] | null | undefined,
+  includeNestedTypes = false
 ): SchemaInputTypeSection[] {
   if (!args?.length) return [];
 
   const seen = new Set<string>();
   const sections: SchemaInputTypeSection[] = [];
+  const pending = args
+    .map((arg) => resolveNamedType(arg.type))
+    .filter((name): name is string => Boolean(name));
 
-  for (const arg of args) {
-    const named = resolveNamedType(arg.type);
+  for (let index = 0; index < pending.length; index += 1) {
+    const named = pending[index];
     if (!named || seen.has(named)) continue;
 
     const type = findTypeByName(types, named);
@@ -385,6 +425,13 @@ function collectReferencedInputTypes(
       description: type.description ?? undefined,
       fields: mapInputFieldsToSchemaFieldRows(type.inputFields),
     });
+
+    if (includeNestedTypes) {
+      for (const field of type.inputFields) {
+        const childName = resolveNamedType(field.type);
+        if (childName && !seen.has(childName)) pending.push(childName);
+      }
+    }
   }
 
   return sections.sort((a, b) => a.typeName.localeCompare(b.typeName));
@@ -397,7 +444,8 @@ function collectReferencedInputTypes(
 export function buildOperationSchemaDetail(
   snapshot: ProjectSchemaSnapshot,
   kind: "query" | "mutation",
-  operationName: string
+  operationName: string,
+  options: { includeNestedFields?: boolean } = {}
 ): OperationSchemaDetail | null {
   const schema = snapshot.introspection.__schema;
   const types = (schema.types ?? []) as IntrospectionType[];
@@ -414,7 +462,9 @@ export function buildOperationSchemaDetail(
   if (responseTypeName) {
     const responseType = findTypeByName(types, responseTypeName);
     if (responseType?.kind === "OBJECT" && responseType.fields?.length) {
-      responseFields = mapObjectFieldsToSchemaFieldRows(responseType.fields);
+      responseFields = options.includeNestedFields
+        ? mapNestedObjectFieldsToSchemaFieldRows(types, responseTypeName)
+        : mapObjectFieldsToSchemaFieldRows(responseType.fields);
     }
   }
 
@@ -423,7 +473,11 @@ export function buildOperationSchemaDetail(
     kind,
     description: operationField.description ?? undefined,
     requestArgs: mapArgsToSchemaFieldRows(operationField.args),
-    requestInputTypes: collectReferencedInputTypes(types, operationField.args),
+    requestInputTypes: collectReferencedInputTypes(
+      types,
+      operationField.args,
+      options.includeNestedFields
+    ),
     responseTypeName,
     responseFields,
   };

@@ -21,6 +21,8 @@ export const manualOperationShapeSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   exampleQuery: z.string().optional(),
+  exampleVariables: z.string().optional(),
+  exampleResponse: z.string().optional(),
   /** Só para `kind: "rest"` — método HTTP do endpoint. */
   method: restMethodSchema.optional(),
   /** Só para `kind: "rest"` — caminho do endpoint (ex.: `/wsAutorizacao/service.asmx/Autoriza`). */

@@ -242,7 +242,17 @@ describe("buildOperationSchemaDetail", () => {
                   ofType: { kind: "SCALAR", name: "String" },
                 },
               },
+              {
+                name: "user",
+                args: [],
+                type: { kind: "OBJECT", name: "User" },
+              },
             ],
+          },
+          {
+            kind: "OBJECT",
+            name: "User",
+            fields: [{ name: "name", args: [], type: { kind: "SCALAR", name: "String" } }],
           },
           {
             kind: "INPUT_OBJECT",
@@ -257,7 +267,16 @@ describe("buildOperationSchemaDetail", () => {
                   ofType: { kind: "SCALAR", name: "String" },
                 },
               },
+              {
+                name: "details",
+                type: { kind: "INPUT_OBJECT", name: "ProductDetails" },
+              },
             ],
+          },
+          {
+            kind: "INPUT_OBJECT",
+            name: "ProductDetails",
+            inputFields: [{ name: "quantity", type: { kind: "SCALAR", name: "Int" } }],
           },
           {
             kind: "OBJECT",
@@ -277,7 +296,7 @@ describe("buildOperationSchemaDetail", () => {
     expect(detail?.requestArgs.map((row) => row.name)).toEqual(["login", "password"]);
     expect(detail?.requestArgs[0]?.required).toBe(true);
     expect(detail?.responseTypeName).toBe("TokenPayload");
-    expect(detail?.responseFields.map((row) => row.name)).toEqual(["token"]);
+    expect(detail?.responseFields.map((row) => row.name)).toEqual(["token", "user"]);
     expect(isRequiredGraphQLType({ kind: "NON_NULL", ofType: { kind: "SCALAR", name: "String" } })).toBe(
       true
     );
@@ -292,7 +311,33 @@ describe("buildOperationSchemaDetail", () => {
 
     expect(detail?.requestInputTypes).toHaveLength(1);
     expect(detail?.requestInputTypes[0]?.typeName).toBe("ProductInput");
-    expect(detail?.requestInputTypes[0]?.fields.map((row) => row.name)).toEqual(["ean"]);
+    expect(detail?.requestInputTypes[0]?.fields.map((row) => row.name)).toEqual([
+      "details",
+      "ean",
+    ]);
+  });
+
+  it("expande tipos aninhados de requisição e campos de resposta", () => {
+    const detail = buildOperationSchemaDetail(
+      operationSnapshot,
+      "mutation",
+      "createGroupedOrder",
+      { includeNestedFields: true }
+    );
+
+    expect(detail?.requestInputTypes.map((section) => section.typeName)).toEqual([
+      "ProductDetails",
+      "ProductInput",
+    ]);
+    expect(detail?.requestInputTypes[0]?.fields.map((row) => row.name)).toEqual(["quantity"]);
+
+    const token = buildOperationSchemaDetail(
+      operationSnapshot,
+      "mutation",
+      "createToken",
+      { includeNestedFields: true }
+    );
+    expect(token?.responseFields.map((row) => row.name)).toEqual(["token", "user", "user.name"]);
   });
 
   it("retorna null para operação inexistente", () => {

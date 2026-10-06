@@ -38,6 +38,8 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
   const [title, setTitle] = useState(operation?.title ?? "");
   const [description, setDescription] = useState(operation?.description ?? "");
   const [exampleQuery, setExampleQuery] = useState(operation?.exampleQuery ?? "");
+  const [exampleVariables, setExampleVariables] = useState(operation?.exampleVariables ?? "");
+  const [exampleResponse, setExampleResponse] = useState(operation?.exampleResponse ?? "");
   const [method, setMethod] = useState<RestMethod>(operation?.method ?? "GET");
   const [path, setPath] = useState(operation?.path ?? "");
   const [exampleBody, setExampleBody] = useState(operation?.exampleBody ?? "");
@@ -63,6 +65,7 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
       prerequisites: linesToList(prerequisites),
       businessNotes: linesToList(businessNotes),
       relatedSections: csvToList(relatedSections),
+      referenceTableIds: operation?.referenceTableIds,
     };
 
     const effectiveKind = mode === "create" ? kind : operation?.kind;
@@ -72,6 +75,8 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
       payload.exampleBody = exampleBody.trim() || undefined;
     } else {
       payload.exampleQuery = exampleQuery.trim() || undefined;
+      payload.exampleVariables = exampleVariables.trim() || undefined;
+      payload.exampleResponse = exampleResponse.trim() || undefined;
     }
 
     const url =
@@ -239,18 +244,46 @@ export function OperationForm({ slug, mode, operation, onDone, onCancel }: Opera
           </div>
         </>
       ) : (
-        <div>
-          <label htmlFor="exampleQuery" className="block text-sm font-medium text-slate-700">
-            Exemplo GraphQL
-          </label>
-          <textarea
-            id="exampleQuery"
-            rows={5}
-            value={exampleQuery}
-            onChange={(event) => setExampleQuery(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
-          />
-        </div>
+        <>
+          <div>
+            <label htmlFor="exampleQuery" className="block text-sm font-medium text-slate-700">
+              Requisição GraphQL
+            </label>
+            <textarea
+              id="exampleQuery"
+              rows={8}
+              value={exampleQuery}
+              onChange={(event) => setExampleQuery(event.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="exampleVariables" className="block text-sm font-medium text-slate-700">
+                Variáveis de requisição (JSON)
+              </label>
+              <textarea
+                id="exampleVariables"
+                rows={8}
+                value={exampleVariables}
+                onChange={(event) => setExampleVariables(event.target.value)}
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+              />
+            </div>
+            <div>
+              <label htmlFor="exampleResponse" className="block text-sm font-medium text-slate-700">
+                Exemplo de resposta (JSON)
+              </label>
+              <textarea
+                id="exampleResponse"
+                rows={8}
+                value={exampleResponse}
+                onChange={(event) => setExampleResponse(event.target.value)}
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm"
+              />
+            </div>
+          </div>
+        </>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">

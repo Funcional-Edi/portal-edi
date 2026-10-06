@@ -114,8 +114,17 @@ test("Credenciado abre os quatro manuais de fluxo com cenários e alertas", asyn
     await expect(content.getByRole("heading", { name: "Jornada da Integração" })).toBeVisible();
     const operation = content.locator("details#jornada-operacao-1");
     await operation.locator("summary").first().click();
-    await expect(operation.locator("pre")).toContainText(query);
-    await expect(operation.locator("pre")).not.toContainText("...");
+    const requestExample = operation.locator("pre").first();
+    await expect(requestExample).toContainText(query);
+    await expect(requestExample).not.toContainText("...");
+    await expect(
+      operation.getByRole("heading", { name: "Exemplo de resposta (JSON)" })
+    ).toHaveCount(0);
+    if (slug === "credenciado-venda") {
+      await expect(operation.getByRole("heading", { name: "Requisição GraphQL" })).toBeVisible();
+      await expect(operation.getByRole("heading", { name: "Variáveis da requisição (JSON)" })).toBeVisible();
+      await expect(operation).toContainText("Pharma_AuthorizationItem!");
+    }
 
     if (slug !== "credenciado-pbm-caixa") {
       await content.getByRole("link", { name: "Voltar ao produto Credenciado" }).click();

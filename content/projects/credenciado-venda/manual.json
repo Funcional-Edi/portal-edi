@@ -1,7 +1,6 @@
 {
   "version": 1,
-  "title": "Credenciado — Fluxo de Venda",
-  "productName": "Credenciado",
+  "title": "Autorização e confirmação",
   "homologationFlows": [
     {
       "title": "Pré-venda, confirmação e pós-venda",
@@ -194,9 +193,19 @@
       "businessNotes": [
         "Entrada: origin, storeCode, customerCode, products com ean, price e saleAmount; medicalPrescription pode conter quantity, date e prescriber.",
         "Retorno descrito: aproved, createdAt, totais, descontos, produtos, status por produto, requiredUploadWithPrescription, dados da receita e dailyDose.",
-        "[ATENÇÃO] Solicite dailyDose quando requiredInformDailyDose indicar que a informação é necessária."
+        "[ATENÇÃO] Solicite dailyDose quando requiredInformDailyDose indicar que a informação é necessária.",
+        "[COMENTÁRIO] Variáveis e resposta são exemplos ilustrativos baseados nos exemplos e tipos da referência oficial; use dados fornecidos para homologação."
       ],
-      "exampleQuery": "query Pharma_checkPricesAndRules(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Pharma_ItemArgs!]!\n) {\n  Pharma_checkPricesAndRules(\n    origin: $origin, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    aproved\n    createdAt\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    totalValueMaxConsumerPrice\n    totalValueWithPrescription\n    totalValueWithoutPrescription\n    totalDiscountAmount\n    products { transactionType ean description maximumConsumerPrice priceReceived funcionalPrice salePrice saleAmount status }\n    requiredUploadWithPrescription\n  }\n}"
+      "referenceTableIds": [
+        "pharma-prescription-input",
+        "pharma-prescriber-input",
+        "pharma-authorization-item-response",
+        "pharma-prescription-response",
+        "pharma-prescriber-response",
+        "pharma-status-item-response"
+      ],
+      "exampleQuery": "query Pharma_checkPricesAndRules(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Pharma_ItemArgs!]!\n) {\n  Pharma_checkPricesAndRules(\n    origin: $origin,\n    storeCode: $storeCode,\n    customerCode: $customerCode,\n    products: $products\n  ) {\n    aproved\n    createdAt\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    totalValueMaxConsumerPrice\n    totalValueWithPrescription\n    totalValueWithoutPrescription\n    totalDiscountAmount\n    products {\n      transactionType\n      ean\n      description\n      maximumConsumerPrice\n      priceReceived\n      funcionalPrice\n      salePrice\n      saleAmount\n      medicalPrescription {\n        quantity\n        date\n        prescriber {\n          council\n          stateAbbr\n          registerNumber\n        }\n        requiredInformDailyDose\n        dailyDose\n      }\n      status {\n        aproved\n        message\n      }\n    }\n    requiredUploadWithPrescription\n  }\n}",
+      "exampleVariables": "{\n  \"origin\": \"DTS\",\n  \"storeCode\": \"xyz789\",\n  \"customerCode\": \"xyz789\",\n  \"products\": [\n    {\n      \"ean\": \"abc123\",\n      \"price\": 123.45,\n      \"saleAmount\": 987\n    }\n  ]\n}"
     },
     {
       "kind": "mutation",
@@ -214,7 +223,7 @@
         "Retorno descrito: createdAt, authorizationID, sequenceID, totais, status, códigos/mensagens, secondFactorAuthentication, status dos produtos e dados da receita.",
         "[ATENÇÃO] Se houver itens aprovados e recusados, crie nova autorização somente com os itens recusados e preserve o authorizationID da autorização usada nas etapas seguintes."
       ],
-      "exampleQuery": "mutation Sales_preAuthorizeSale(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String!,\n  $products: [Sales_ProductInput!]!\n) {\n  Sales_preAuthorizeSale(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, products: $products\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    cardBalance\n    products { ean description maxConsumerPrice unitPrice quantity status statusCode statusMessage reimbursementValue }\n    status\n    statusCode\n    statusMessage\n    receipt\n    secondFactorAuthentication\n    reimbursementValue\n    origin\n  }\n}"
+      "exampleQuery": "mutation preAuthorizeSale {\n  # Pré-autorização de venda\n  Sales_preAuthorizeSale(\n    # Canal PHARMA ou BENEFITS\n    channel: PHARMA\n    # Origem da chamada\n    origin: PARTNERS_ECOMMERCE\n    # Cartão ou CPF\n    customerCode: \"00000000000\"\n    # CNPJ da farmácia\n    storeCode: \"00000000000010\"\n    # Produtos\n    products: [\n      {\n        ean: \"7897337706742\" # JANUVIA\n        unitPrice: 45\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 45\n        # Quantidade do produto a ser pré-autorizada\n        quantity: 2000\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-14\"\n          quantity: 2\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n      {\n        ean: \"7896015523398\" # COMBODART\n        unitPrice: 120\n        # Opcional - PMC do produto, praticado pelo estabelecimento.\n        maxConsumerPrice: 120\n        quantity: 1\n        # Receita Médica\n        medicalPrescription: {\n          date: \"2022-01-13\"\n          quantity: 1\n          usage: CONTINUAL # uso contínuo\n          # Prescritor (Médico, Dentista)\n          prescriber: { council: CRO, registerNumber: 12345, stateAbbr: \"SP\" }\n        }\n      }\n    ]\n  ) {\n    createdAt\n    authorizationID\n    sequenceID\n    totalValue\n    moneyPaidValue\n    cardPaidValue\n    status\n    statusCode\n    statusMessage\n    # Se exige um token gerado no app de celular\n    secondFactorAuthentication\n    products {\n      ean\n      description\n      maxConsumerPrice\n      unitPrice\n      quantity\n      status\n      statusCode\n      statusMessage\n      medicalPrescription {\n        date\n        quantity\n        dailyDose # quando necessário a declaração de acordo a validação de regra, é importante pedir o retorno para ser especificado no próximo passo que é a confirmação.\n        prescriber {\n          council\n          registerNumber\n          stateAbbr\n        }\n      }\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -229,9 +238,11 @@
       ],
       "businessNotes": [
         "Multipart: operations, map e uploaded_file; o mapa vincula uploaded_file a variables.file.",
-        "[ATENÇÃO MÁXIMA] O arquivo de receita deve respeitar o limite de 2 MB definido no refinamento."
+        "A documentação identifica a operação como Prescription_addPrescription, mas o query dentro de operations usa Prescription_uploadPrescription.",
+        "[ATENÇÃO MÁXIMA] O arquivo da receita deve ter no máximo 2 MB, conforme o Passo 4 da documentação oficial."
       ],
-      "exampleQuery": "mutation Prescription_addPrescription(\n  $source: Prescription_PrescriptionSourceInput!,\n  $uploadInfo: Prescription_UploadInfo!\n) {\n  Prescription_addPrescription(source: $source, uploadInfo: $uploadInfo) {\n    id\n    uploadedAt\n    deletedAt\n    expiresAt\n    source\n    file\n    name\n    cardNumber\n    identity\n    status\n    storage\n    originalName\n    extension\n    prescriptionName\n    dateIssuance\n  }\n}"
+      "exampleQuery": "Content-Type: multipart/form-data\n\noperations: {\"query\":\"mutation upload(\\n  $file: Prescription_Upload!\\n) {\\n  Prescription_uploadPrescription(\\n    file: $file\\n    uploadInfo: {\\n      cardNumber: \\\"NUMERO CARTÃO\\\"\\n      source: ORIGEM\\n      mime: \\\"image/jpg\\\"\\n    }\\n  ) {\\n    id\\n    uploadedAt\\n    deletedAt\\n    expiresAt\\n    source\\n    file\\n    name\\n    cardNumber\\n    identity\\n    status\\n    storage\\n    originalName\\n    extension\\n  }\\n}\",\"operationName\":\"upload\"}\n\nmap: {\"uploaded_file\":[\"variables.file\"]}\n\nuploaded_file: <arquivo da receita, até 2 MB>",
+      "exampleResponse": "{\n  \"data\": {\n    \"Prescription_addPrescription\": {\n      \"id\": \"247\",\n      \"uploadedAt\": \"2022-01-16T20:03:04.604Z\",\n      \"name\": \"b4e2e460-ccf3-4e35-88ca-c2a15bc7cd82\",\n      \"cardNumber\": \"00000000000\",\n      \"identity\": \"00000000000\"\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -357,6 +368,242 @@
         "[ATENÇÃO MÁXIMA] Para repetição de cancelamento, preserve statusCode 103 e a mensagem Transacao ja cancelada; não trate como um novo cancelamento."
       ],
       "exampleQuery": "mutation Sales_cancel(\n  $origin: Sales_AuthorizationOriginEnum,\n  $channel: Sales_TransactionTypeEnum,\n  $storeCode: String!,\n  $customerCode: String,\n  $authorizationID: ID,\n  $preAuthorizationID: ID,\n  $createdAt: DateTime\n) {\n  Sales_cancel(\n    origin: $origin, channel: $channel, storeCode: $storeCode,\n    customerCode: $customerCode, authorizationID: $authorizationID,\n    preAuthorizationID: $preAuthorizationID, createdAt: $createdAt\n  ) {\n    createdAt\n    authorizationID\n    status\n    statusCode\n    statusMessage\n    receipt\n  }\n}"
+    }
+  ],
+  "referenceTables": [
+    {
+      "id": "pharma-prescription-input",
+      "title": "Requisição — tipo Pharma_PrescriptionInput",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "quantity",
+          "Int",
+          "Não",
+          "Quantidade receitada do produto."
+        ],
+        [
+          "date",
+          "DateTime",
+          "Não",
+          "Data da receita."
+        ],
+        [
+          "prescriber",
+          "Pharma_PrescriberRegisterInput",
+          "Não",
+          "Dados do registro profissional do prescritor."
+        ],
+        [
+          "dailyDose",
+          "Float",
+          "Não",
+          "Dose diária do produto."
+        ]
+      ]
+    },
+    {
+      "id": "pharma-prescriber-input",
+      "title": "Requisição — tipo Pharma_PrescriberRegisterInput",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "council",
+          "Pharma_Councils",
+          "Não",
+          "Órgão emissor do registro."
+        ],
+        [
+          "stateAbbr",
+          "String",
+          "Não",
+          "Sigla do estado emissor do registro."
+        ],
+        [
+          "registerNumber",
+          "Int",
+          "Não",
+          "Número do registro profissional."
+        ]
+      ]
+    },
+    {
+      "id": "pharma-authorization-item-response",
+      "title": "Resposta — tipo Pharma_AuthorizationItem",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "transactionType",
+          "Pharma_TransactionType!",
+          "Sim",
+          "Tipo de programa."
+        ],
+        [
+          "ean",
+          "String!",
+          "Sim",
+          "EAN do produto."
+        ],
+        [
+          "description",
+          "String",
+          "Não",
+          "Nome do produto."
+        ],
+        [
+          "maximumConsumerPrice",
+          "Float!",
+          "Sim",
+          "Preço máximo para o consumidor."
+        ],
+        [
+          "priceReceived",
+          "Float!",
+          "Sim",
+          "Preço recebido."
+        ],
+        [
+          "funcionalPrice",
+          "Float!",
+          "Sim",
+          "Preço da Funcional."
+        ],
+        [
+          "salePrice",
+          "Float!",
+          "Sim",
+          "Preço utilizado na venda."
+        ],
+        [
+          "saleAmount",
+          "Int!",
+          "Sim",
+          "Quantidade vendida."
+        ],
+        [
+          "medicalPrescription",
+          "Pharma_Prescription!",
+          "Sim",
+          "Dados da receita relacionados ao item."
+        ],
+        [
+          "status",
+          "Pharma_StatusItem!",
+          "Sim",
+          "Status da venda deste item."
+        ]
+      ]
+    },
+    {
+      "id": "pharma-prescription-response",
+      "title": "Resposta — tipo Pharma_Prescription",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "quantity",
+          "Int",
+          "Não",
+          "Quantidade receitada do produto."
+        ],
+        [
+          "date",
+          "DateTime",
+          "Não",
+          "Data da receita."
+        ],
+        [
+          "prescriber",
+          "Pharma_PrescriberRegister",
+          "Não",
+          "Dados do registro profissional do prescritor."
+        ],
+        [
+          "requiredInformDailyDose",
+          "Boolean",
+          "Não",
+          "Indica se o beneficiário deve informar dose diária."
+        ],
+        [
+          "dailyDose",
+          "Float",
+          "Não",
+          "Dose diária do produto."
+        ]
+      ]
+    },
+    {
+      "id": "pharma-prescriber-response",
+      "title": "Resposta — tipo Pharma_PrescriberRegister",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "council",
+          "Pharma_Councils",
+          "Não",
+          "Órgão emissor do registro."
+        ],
+        [
+          "stateAbbr",
+          "String",
+          "Não",
+          "Sigla do estado emissor do registro."
+        ],
+        [
+          "registerNumber",
+          "Int",
+          "Não",
+          "Número do registro profissional."
+        ]
+      ]
+    },
+    {
+      "id": "pharma-status-item-response",
+      "title": "Resposta — tipo Pharma_StatusItem",
+      "columns": [
+        "Campo",
+        "Tipo",
+        "Obrigatório",
+        "Descrição"
+      ],
+      "rows": [
+        [
+          "aproved",
+          "Boolean!",
+          "Sim",
+          "Indica se o item foi aprovado (grafia usada pela API)."
+        ],
+        [
+          "message",
+          "String!",
+          "Sim",
+          "Mensagem associada ao status do item."
+        ]
+      ]
     }
   ]
 }

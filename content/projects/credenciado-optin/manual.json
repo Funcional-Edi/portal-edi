@@ -1,7 +1,6 @@
 {
   "version": 1,
-  "title": "Credenciado — Fluxo Opt-in",
-  "productName": "Credenciado",
+  "title": "Consentimento do beneficiário",
   "referenceTables": [
     {
       "id": "origens-parceiro",

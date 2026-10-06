@@ -1,7 +1,6 @@
 {
   "version": 1,
-  "title": "Credenciado — Fluxo de Cadastro",
-  "productName": "Credenciado",
+  "title": "Beneficiários e produtos",
   "homologationFlows": [
     {
       "title": "Cadastro e elegibilidade",
@@ -163,7 +162,7 @@
         "[ATENÇÃO] requiresBeneficiaryRegistration=false indica que não se deve repetir a inscrição do beneficiário.",
         "[COMENTÁRIO] Os grupos de campos dinâmicos e extraFormFields estão detalhados na seção de regras deste fluxo."
       ],
-      "exampleQuery": "query Pharma_assessEligibility(\n  $origin: Pharma_AuthorizationOrigin!,\n  $storeCode: String!,\n  $productCode: String!,\n  $customerCode: String!\n) {\n  Pharma_assessEligibility(\n    origin: $origin, storeCode: $storeCode,\n    productCode: $productCode, customerCode: $customerCode\n  ) {\n    validationResult { status message errors { message } }\n    eligibilityAssessment { belongsToIndustryProgram programDescription programCode productDescription }\n    registrationPolicy { requiresBeneficiaryRegistration isRegistered allowedOrigins }\n    dependents { id name birth gender holder }\n  }\n}"
+      "exampleQuery": "query Pharma_assessEligibility {\n  Pharma_assessEligibility(\n    # Origem da solicitação\n    origin: POINT_OF_SALES\n    # CNPJ da farmácia\n    storeCode: \"0000000000010\"\n    # EAN do produto do programa\n    productCode: \"7897572004405\"\n    # CPF do consumidor (substitua pelo dado de homologação autorizado)\n    customerCode: \"00000000000\"\n  ) {\n    validationResult {\n      status\n      message\n      errors {\n        message\n      }\n    }\n    eligibilityAssessment {\n      programCode\n      belongsToIndustryProgram\n      programDescription\n      productDescription\n    }\n    registrationPolicy {\n      allowDependents\n      dependentsLimit\n      requiresBeneficiaryRegistration\n      requiresMedicalPrescriptionRegistration\n      requiresAtLeastOneContactMedium\n      requiresMedicalPrescriber\n      isRegistered\n      originPermitedRegister\n      urlRegisterSite\n      beneficiaryFields {\n        field\n        label\n        type\n        description\n        display\n        entity\n        defaultValue\n        options {\n          text\n          value\n        }\n      }\n      dependentFields {\n        field\n        label\n        type\n        description\n        display\n        entity\n        defaultValue\n        options {\n          text\n          value\n        }\n      }\n      medicalPrescriptionFields {\n        field\n        label\n        type\n        description\n        display\n        entity\n        defaultValue\n        options {\n          text\n          value\n        }\n      }\n      extraFields {\n        field\n        label\n        type\n        description\n        display\n        entity\n        defaultValue\n        options {\n          text\n          value\n        }\n      }\n      extraFormFields {\n        QuestionCode\n        ParentQuestionCode\n        ProgramCode\n        ProductName\n        DisplayTitle\n        MultipleChoice\n        Mandatory\n        DisplayOrder\n        QuestionHint\n        ControlType\n        QuestionTypeFlag\n        Answers {\n          AnswerCode\n          DisplayTitle\n          AllowsTypedValue\n          MaxTypedValueSize\n          TypedValue\n          DisplayOrder\n          RelatedQuestions {\n            QuestionCode\n            ParentQuestionCode\n            ProgramCode\n            ProductName\n            DisplayTitle\n            MultipleChoice\n            Mandatory\n            DisplayOrder\n            QuestionHint\n            ControlType\n            QuestionTypeFlag\n            Answers {\n              AnswerCode\n              DisplayTitle\n              AllowsTypedValue\n              MaxTypedValueSize\n              TypedValue\n              DisplayOrder\n            }\n          }\n        }\n      }\n      allowedOrigins\n    }\n    dependents {\n      id\n      name\n      birth\n      gender\n      holder\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -181,7 +180,7 @@
         "Retorno: status, message e errors.",
         "[ATENÇÃO] Envie somente os campos permitidos e exigidos pela registrationPolicy da avaliação."
       ],
-      "exampleQuery": "mutation Pharma_signUpProgramBeneficiary(\n  $input: Pharma_RegisterBeneficiaryRequest!\n) {\n  Pharma_signUpProgramBeneficiary(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+      "exampleQuery": "mutation Pharma_signUpProgramBeneficiary {\n  Pharma_signUpProgramBeneficiary(\n    input: {\n      # Use o programCode retornado por Pharma_assessEligibility\n      programCode: \"100\"\n      origin: POINT_OF_SALES\n      storeCode: \"00000000000010\"\n      customerCode: \"00000000000\"\n      productCode: \"7897572004405\"\n      beneficiaryFields: [\n        { text: \"Nome\", value: \"Fulano Beltrano Ciclano\" }\n        { text: \"Nascimento\", value: \"1989-03-07 12:00:00\" }\n        { text: \"Sexo\", value: \"M\" }\n        { text: \"Email\", value: \"exemplo@dominio.com.br\" }\n        { text: \"Telefone\", value: \"1133334444\" }\n        { text: \"TelefoneCelular\", value: \"11999990000\" }\n        { text: \"CEP\", value: \"20261905\" }\n        { text: \"Endereco\", value: \"Rua Jatoba\" }\n        { text: \"Numero\", value: \"02\" }\n        { text: \"Bairro\", value: \"Leblon\" }\n        { text: \"Cidade\", value: \"Rio de Janeiro\" }\n        { text: \"UF\", value: \"RJ\" }\n      ]\n      medicalPrescriptionFields: [\n        { text: \"NumeroRegistroConselho\", value: \"6055\" }\n        { text: \"UF\", value: \"SC\" }\n        { text: \"TipoConselho\", value: \"0\" }\n      ]\n      extraFormFields: [\n        { QuestionCode: 99, AnswerCode: 960, QuestionTypeFlag: 1, TypedValue: \"\" }\n        { QuestionCode: 103, AnswerCode: 963, QuestionTypeFlag: 1, TypedValue: \"\" }\n        { QuestionCode: 104, AnswerCode: 965, QuestionTypeFlag: 1, TypedValue: \"Nome digitado\" }\n        { QuestionCode: 105, AnswerCode: 966, QuestionTypeFlag: 1, TypedValue: \"011123456789\" }\n        { QuestionCode: 84, AnswerCode: 942, QuestionTypeFlag: 2, TypedValue: \"\" }\n      ]\n    }\n  ) {\n    status\n    message\n    errors {\n      message\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -200,7 +199,7 @@
         "Retorno: status, message e errors.",
         "[ATENÇÃO MÁXIMA] Não execute esta etapa se qualquer uma das condições de pré-requisito não for atendida."
       ],
-      "exampleQuery": "mutation Pharma_signUpProgramBeneficiaryDependent(\n  $input: Pharma_RegisterDependentRequest!\n) {\n  Pharma_signUpProgramBeneficiaryDependent(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+      "exampleQuery": "mutation Pharma_signUpProgramBeneficiaryDependent {\n  Pharma_signUpProgramBeneficiaryDependent(\n    input: {\n      storeCode: \"00000000000010\"\n      # Use o programCode retornado por Pharma_assessEligibility\n      programCode: \"8\"\n      origin: POINT_OF_SALES\n      customerCode: \"00000000000\"\n      productCode: \"7897337707435\"\n      dependentFields: [\n        { text: \"Nome\", value: \"Beltrano Ciclano Junior\" }\n        { text: \"Nascimento\", value: \"1999-03-07 12:00:00\" }\n        { text: \"Sexo\", value: \"M\" }\n        { text: \"Email\", value: \"exemplo@dominio.com.br\" }\n        { text: \"Telefone\", value: \"1133334444\" }\n        { text: \"TelefoneCelular\", value: \"11999990000\" }\n        { text: \"CEP\", value: \"20261905\" }\n        { text: \"Endereco\", value: \"Rua Jatoba\" }\n        { text: \"Numero\", value: \"02\" }\n        { text: \"Bairro\", value: \"Leblon\" }\n        { text: \"Cidade\", value: \"Rio de Janeiro\" }\n        { text: \"UF\", value: \"RJ\" }\n      ]\n      medicalPrescriptionFields: [\n        { text: \"NumeroRegistroConselho\", value: \"6055\" }\n        { text: \"UF\", value: \"SC\" }\n        { text: \"TipoConselho\", value: \"0\" }\n      ]\n    }\n  ) {\n    status\n    message\n    errors {\n      message\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -216,7 +215,7 @@
         "Entrada principal: origin, programCode, storeCode, customerCode, productCode, dependentID quando aplicável, medicalPrescriptionFields e extraFormFields.",
         "Retorno: status, message e errors."
       ],
-      "exampleQuery": "mutation Pharma_addProgramBeneficiaryToProduct(\n  $input: Pharma_RegisterProductRequest!\n) {\n  Pharma_addProgramBeneficiaryToProduct(input: $input) {\n    status\n    message\n    errors { message }\n  }\n}"
+      "exampleQuery": "mutation Pharma_addProgramBeneficiaryToProduct {\n  Pharma_addProgramBeneficiaryToProduct(\n    input: {\n      origin: POINT_OF_SALES\n      # Use o programCode retornado por Pharma_assessEligibility\n      programCode: \"8\"\n      storeCode: \"00000000000010\"\n      customerCode: \"00000000000\"\n      productCode: \"7896269900150\"\n      # Preencha com o ID retornado em dependents; null associa ao titular\n      dependentID: null\n      medicalPrescriptionFields: [\n        { text: \"NumeroRegistroConselho\", value: \"6055\" }\n        { text: \"UF\", value: \"SC\" }\n        { text: \"TipoConselho\", value: \"0\" }\n      ]\n      extraFormFields: [\n        { QuestionCode: 96, AnswerCode: 956, QuestionTypeFlag: 2, TypedValue: \"\" }\n      ]\n    }\n  ) {\n    status\n    message\n    errors {\n      message\n    }\n  }\n}"
     },
     {
       "kind": "query",
@@ -230,7 +229,7 @@
         "Retorno: status, message e errors.",
         "[COMENTÁRIO] A referência consultada não torna obrigatórios os campos internos de data; validar exigências adicionais antes de aplicá-las."
       ],
-      "exampleQuery": "query Pharma_prescriber($data: Pharma_PrescriberRegisterInput!) {\n  Pharma_prescriber(data: $data) {\n    status\n    message\n    errors { message }\n  }\n}"
+      "exampleQuery": "query Pharma_prescriber {\n  Pharma_prescriber(\n    data: {\n      council: CRM\n      stateAbbr: \"SP\"\n      registerNumber: 999999\n    }\n  ) {\n    status\n    message\n    errors {\n      message\n    }\n  }\n}"
     }
   ]
 }

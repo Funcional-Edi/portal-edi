@@ -18,12 +18,12 @@ interface OperationSchemaFieldsProps {
 function TypeCell({ slug, typeRef }: { slug: string; typeRef: SchemaTypeNameRef }) {
   const { namedType, formatted } = typeRef;
   if (!namedType || namedType.startsWith("__")) {
-    return <span className="font-mono text-brand-800">{formatted}</span>;
+    return <span className="break-words font-mono text-brand-800">{formatted}</span>;
   }
   return (
     <Link
       href={schemaTypeHref(slug, namedType)}
-      className="font-mono text-brand-700 hover:underline"
+      className="break-words font-mono text-brand-700 hover:underline"
     >
       {formatted}
     </Link>
@@ -43,7 +43,13 @@ function SchemaFieldsTable({
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table className="min-w-full text-sm">
+      <table className="w-full min-w-[64rem] table-fixed text-sm">
+        <colgroup>
+          <col className="w-[22%]" />
+          <col className="w-[26%]" />
+          <col className="w-[12%]" />
+          <col className="w-[40%]" />
+        </colgroup>
         <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
           <tr>
             <th className="px-4 py-2.5">Campo</th>
@@ -55,7 +61,7 @@ function SchemaFieldsTable({
         <tbody>
           {rows.map((row) => (
             <tr key={row.name} className="border-t border-slate-100 align-top">
-              <td className="px-4 py-3 font-mono text-brand-800">{row.name}</td>
+              <td className="break-words px-4 py-3 font-mono text-brand-800">{row.name}</td>
               <td className="px-4 py-3">
                 <TypeCell slug={slug} typeRef={row.type} />
               </td>

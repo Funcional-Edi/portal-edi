@@ -49,6 +49,8 @@ export function OperationDocumentation({
   importanceNotices = false,
 }: OperationDocumentationProps) {
   const isRest = operation.kind === "rest";
+  const isPrescriptionMultipartUpload =
+    slug === "credenciado-venda" && operation.name === "Prescription_addPrescription";
   const sectionId = (id: string) => idPrefix ? `${idPrefix}-${id}` : id;
 
   return (
@@ -178,12 +180,40 @@ export function OperationDocumentation({
           </p>
         </section>
       ) : operation.exampleQuery ? (
-        <section id={sectionId("exemplo-graphql")} className="mb-6 scroll-mt-24">
-          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Exemplo GraphQL</h2>
+        <section
+          id={sectionId(isPrescriptionMultipartUpload ? "estrutura-multipart" : "exemplo-graphql")}
+          className="mb-6 scroll-mt-24"
+        >
+          <div className="mb-2 flex items-center gap-2">
+            <h2 className={`text-sm font-semibold uppercase ${operation.exampleVariables ? "text-brand-700" : "text-slate-500"}`}>
+              {isPrescriptionMultipartUpload
+                ? "Estrutura multipart/form-data"
+                : operation.exampleVariables ? "Requisição GraphQL" : "Exemplo GraphQL"}
+            </h2>
+            {operation.exampleVariables ? (
+              <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-brand-700">
+                Envio
+              </span>
+            ) : null}
+          </div>
           <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
             <code>{operation.exampleQuery}</code>
           </pre>
-          {canUsePlayground ? (
+          {operation.exampleVariables ? (
+            <>
+              <h3 className="mb-2 mt-4 text-sm font-semibold uppercase text-slate-500">
+                Variáveis da requisição (JSON)
+              </h3>
+              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
+                <code>{operation.exampleVariables}</code>
+              </pre>
+            </>
+          ) : null}
+          {isPrescriptionMultipartUpload ? (
+            <p className="mt-3 text-sm text-slate-600">
+              Este envio contém um arquivo e deve ser montado como multipart/form-data; não o execute no Playground GraphQL.
+            </p>
+          ) : canUsePlayground ? (
             <Link
               href={docsPlaygroundHref(slug, operation.exampleQuery)}
               className="mt-3 inline-flex items-center rounded-md border border-brand-700 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
@@ -196,6 +226,17 @@ export function OperationDocumentation({
               <span className="font-medium">admin</span>. Copie o exemplo acima ou peça acesso ao time de integração.
             </p>
           )}
+        </section>
+      ) : null}
+
+      {operation.exampleResponse ? (
+        <section id={sectionId("exemplo-resposta")} className="mb-6 scroll-mt-24">
+          <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
+            Exemplo de resposta (JSON)
+          </h2>
+          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
+            <code>{operation.exampleResponse}</code>
+          </pre>
         </section>
       ) : null}
     </>

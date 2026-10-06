@@ -142,7 +142,9 @@ async function loadPublishedOperationSchemaDetail(
   const snapshot = await readProjectSchemaSnapshot(slug);
   if (!snapshot) return null;
 
-  return buildOperationSchemaDetail(snapshot, kind, operationName);
+  return buildOperationSchemaDetail(snapshot, kind, operationName, {
+    includeNestedFields: slug.startsWith("credenciado-"),
+  });
 }
 
 async function loadPublishedOperationSchemaDetailCached(

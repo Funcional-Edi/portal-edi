@@ -85,6 +85,7 @@ export function ManualRoteiro({
   );
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
+  const hasGatewayAuthentication = config.productId === "credenciado";
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
   const renderDocumentationSection = (section: ManualSection) => (
@@ -256,6 +257,75 @@ export function ManualRoteiro({
         ) : null}
 
         <ol className="space-y-3">
+          {hasGatewayAuthentication ? (
+            <li id="jornada-autenticacao-token">
+              <div className="rounded-lg border border-brand-200 bg-brand-50/50 p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-white">
+                    1
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brand-800">
+                      Etapa inicial · Autenticação obrigatória
+                    </p>
+                    <h3 className="mt-1 font-semibold text-slate-900">
+                      Gerar token do Gateway com <code className="font-mono">createToken</code>
+                    </h3>
+                    <p className="mt-1.5 text-sm text-slate-700">
+                      Antes das operações do fluxo, gere um token com as credenciais fornecidas
+                      pelo time de EDI. O token deve ser enviado em todas as requisições.
+                    </p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-semibold uppercase text-slate-500">Requisição</p>
+                        <pre className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100">
+                          <code>{`mutation {
+  createToken(
+    login: "<usuario>"
+    password: "<senha>"
+  ) {
+    token
+  }
+}`}</code>
+                        </pre>
+                        <p className="mt-3 text-xs font-semibold uppercase text-slate-500">Resposta</p>
+                        <pre className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100">
+                          <code>{`{
+  "data": {
+    "createToken": {
+      "token": "<token>"
+    }
+  }
+}`}</code>
+                        </pre>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase text-slate-500">
+                          Header das requisições
+                        </p>
+                        <p className="mt-1 rounded-md bg-white px-3 py-2 font-mono text-sm text-brand-800">
+                          Authorization: Bearer &lt;token&gt;
+                        </p>
+                        <p className="mt-2 text-sm text-slate-700">
+                          O mesmo token pode ser reutilizado em várias chamadas, inclusive em
+                          diferentes fluxos de venda. A validade padrão é de 24 horas; se expirar,
+                          a API retornará um erro e será necessário gerar outro token.
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href="https://developer.funcionalmais.com/docs/gateway-credenciados/autenticacao#autentica%C3%A7%C3%A3o"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline"
+                    >
+                      Consultar documentação oficial de autenticação →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ) : null}
           {operations.map((op, index) => {
             const operationId = `jornada-operacao-${index + 1}`;
             const referenceTables = (manual.referenceTables ?? []).filter((table) =>
@@ -268,7 +338,7 @@ export function ManualRoteiro({
                   <details id={operationId} className="group">
                     <summary className="flex cursor-pointer list-none items-start gap-3 p-4 [&::-webkit-details-marker]:hidden">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
-                        {index + 1}
+                        {index + (hasGatewayAuthentication ? 2 : 1)}
                       </span>
                       <div className="min-w-0 flex-1">
                         <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase text-brand-700">
