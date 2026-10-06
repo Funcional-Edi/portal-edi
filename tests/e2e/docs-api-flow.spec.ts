@@ -95,6 +95,28 @@ test("tabela de resposta da Jornada mantém colunas legíveis", async ({ page })
   await expect(responseTable).toHaveCSS("min-width", "1024px");
 });
 
+test("copia requisição GraphQL e variáveis na Jornada", async ({ page }) => {
+  await loginAsDevUser(page);
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/docs/credenciado-venda#jornada-integracao");
+
+  const operation = page.locator("#jornada-operacao-1");
+  await operation.locator("summary").click();
+  const requestSection = operation.locator("#jornada-operacao-1-exemplo-graphql");
+  const copyButtons = requestSection.locator("button");
+  await expect(copyButtons).toHaveCount(2);
+
+  const query = await requestSection.locator("pre code").first().textContent();
+  await copyButtons.first().click();
+  await expect(copyButtons.first()).toHaveAttribute("aria-label", "Copiado");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(query);
+
+  const variables = await requestSection.locator("pre code").nth(1).textContent();
+  await copyButtons.nth(1).click();
+  await expect(copyButtons.nth(1)).toHaveAttribute("aria-label", "Copiado");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(variables);
+});
+
 test("jornadas Credenciado começam pela autenticação do Gateway", async ({ page }) => {
   await loginAsDevUser(page);
 

@@ -3,6 +3,7 @@ import type {
   ManualReferenceTable,
 } from "@/modules/living-docs-externa/schema";
 import { ImportanceNotice, type ImportanceTone } from "@/core/ui/importance-notice";
+import { CopyableCode } from "@/core/ui/copyable-code";
 import { docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { OperationSchemaFields } from "@/modules/living-docs-externa/ui/reader/operation-schema-fields";
@@ -162,15 +163,17 @@ export function OperationDocumentation({
       {isRest ? (
         <section id={sectionId("endpoint-rest")} className="mb-6 scroll-mt-24">
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">Endpoint</h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{operation.method} {operation.path}</code>
-          </pre>
+          <CopyableCode
+            code={`${operation.method} ${operation.path}`}
+            className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+          />
           {operation.exampleBody ? (
             <>
               <h3 className="mb-2 mt-4 text-sm font-semibold uppercase text-slate-500">Corpo de exemplo</h3>
-              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-                <code>{operation.exampleBody}</code>
-              </pre>
+              <CopyableCode
+                code={operation.exampleBody}
+                className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+              />
             </>
           ) : null}
           <p className="mt-3 text-sm text-slate-600">
@@ -196,17 +199,19 @@ export function OperationDocumentation({
               </span>
             ) : null}
           </div>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{operation.exampleQuery}</code>
-          </pre>
+          <CopyableCode
+            code={operation.exampleQuery}
+            className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+          />
           {operation.exampleVariables ? (
             <>
               <h3 className="mb-2 mt-4 text-sm font-semibold uppercase text-slate-500">
                 Variáveis da requisição (JSON)
               </h3>
-              <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-                <code>{operation.exampleVariables}</code>
-              </pre>
+              <CopyableCode
+                code={operation.exampleVariables}
+                className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+              />
             </>
           ) : null}
           {isPrescriptionMultipartUpload ? (
@@ -234,9 +239,10 @@ export function OperationDocumentation({
           <h2 className="mb-2 text-sm font-semibold uppercase text-slate-500">
             Exemplo de resposta (JSON)
           </h2>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{operation.exampleResponse}</code>
-          </pre>
+          <CopyableCode
+            code={operation.exampleResponse}
+            className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+          />
         </section>
       ) : null}
     </>

@@ -3,6 +3,7 @@ import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { MarkdownBody } from "@/core/ui/markdown-body";
+import { CopyableCode } from "@/core/ui/copyable-code";
 import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
@@ -278,26 +279,28 @@ export function ManualRoteiro({
                     <div className="mt-3 grid gap-3 md:grid-cols-2">
                       <div>
                         <p className="text-xs font-semibold uppercase text-slate-500">Requisição</p>
-                        <pre className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100">
-                          <code>{`mutation {
+                        <CopyableCode
+                          className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100"
+                          code={`mutation {
   createToken(
     login: "<usuario>"
     password: "<senha>"
   ) {
     token
   }
-}`}</code>
-                        </pre>
+}`}
+                        />
                         <p className="mt-3 text-xs font-semibold uppercase text-slate-500">Resposta</p>
-                        <pre className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100">
-                          <code>{`{
+                        <CopyableCode
+                          className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100"
+                          code={`{
   "data": {
     "createToken": {
       "token": "<token>"
     }
   }
-}`}</code>
-                        </pre>
+}`}
+                        />
                       </div>
                       <div>
                         <p className="text-xs font-semibold uppercase text-slate-500">
