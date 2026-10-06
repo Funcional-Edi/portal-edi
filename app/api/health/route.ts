@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/core/auth";
 import { isAdminRole } from "@/core/auth/roles";
-import { getEffectivePermissionsSource } from "@/core/auth/permissions-loader";
+import { getPermissionsConfigSource } from "@/core/auth/permissions-config";
 import { validateEnv } from "@/core/config/env";
 import { runProductionSecurityChecks } from "@/core/security/production-checks";
 import {
@@ -46,7 +46,7 @@ export async function GET() {
       githubConfigured: isGitHubContentConfigured(),
     },
     rbac: {
-      permissionsSource: getEffectivePermissionsSource(),
+      permissionsSource: getPermissionsConfigSource(),
     },
     productionSecurity: runProductionSecurityChecks(),
     modules: modules.map((m) => ({

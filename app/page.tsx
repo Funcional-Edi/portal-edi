@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { auth } from "@/core/auth";
+import { auth, isInternalStaffRole } from "@/core/auth";
 import { canAccessLevel, canAccessModule } from "@/core/auth/module-access";
 import { env } from "@/core/config/env";
 import { AppShell } from "@/core/ui/app-shell";
@@ -88,7 +88,7 @@ export default async function HomePage() {
   if (!session?.user) return <LoginShell />;
 
   const role = session.user.role ?? "client";
-  const isAdmin = role === "admin";
+  const isAdmin = isInternalStaffRole(role);
   const accessibleModules = registerAllModules().filter((module) => canAccessModule(role, module));
   const activeModules = accessibleModules.filter((module) => module.status === "active");
   const plannedModules = isAdmin ? accessibleModules.filter((module) => module.status !== "active") : [];

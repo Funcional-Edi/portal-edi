@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireAdmin } from "@/core/auth/require-role";
 import { validateMutationOrigin } from "@/core/security/request-origin";
 import { ConnectGatewayError, connectGateway } from "@/modules/living-docs-externa/services/connect-gateway";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    return null;
-  }
-  return session;
-}
 
 const STATUS_BY_ERROR_CODE: Record<ConnectGatewayError["code"], number> = {
   VALIDATION: 400,

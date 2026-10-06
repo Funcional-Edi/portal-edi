@@ -7,7 +7,7 @@ import path from "node:path";
  * resultado na mesma estrutura de tela.
  *
  * O teste cria um projeto descartável para não sujar o conteúdo real
- * (`content/projects/im`, `wholesaler`) — a pasta é apagada no fim.
+ * (`content/projects/demo`, `wholesaler`) — a pasta é apagada no fim.
  */
 const SLUG = "e2e-editor";
 const PROJECT_DIR = path.join(process.cwd(), "content", "projects", SLUG);

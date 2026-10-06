@@ -1,18 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireContentEditor } from "@/core/auth/require-role";
 import {
   ManageOperationError,
   addManualOperation,
 } from "@/modules/living-docs-externa/services/manage-manual-operations";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    return null;
-  }
-  return session;
-}
 
 const STATUS_BY_ERROR_CODE: Record<ManageOperationError["code"], number> = {
   VALIDATION: 400,
@@ -26,7 +18,7 @@ interface RouteParams {
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
+  const session = await requireContentEditor();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

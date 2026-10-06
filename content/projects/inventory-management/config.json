@@ -1,0 +1,13 @@
+{
+  "slug": "inventory-management",
+  "name": "Inventory Management",
+  "description": "IM (Inventory Management)",
+  "productId": "trade",
+  "protocol": "graphql",
+  "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
+  "gatewaySlug": "inventory-management",
+  "published": false,
+  "manualStatus": "draft",
+  "createdAt": "2026-09-25T18:44:44.083Z",
+  "updatedAt": "2026-09-25T18:44:49.467Z"
+}

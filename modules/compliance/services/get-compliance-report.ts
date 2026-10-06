@@ -1,4 +1,4 @@
-import { getEffectivePermissionsSource } from "@/core/auth/permissions-loader";
+import { getPermissionsConfigSource } from "@/core/auth/permissions-config";
 import { getRedisRestConfig } from "@/core/auth/redis-rest";
 import { env, validateEnv } from "@/core/config/env";
 import { runProductionSecurityChecks } from "@/core/security/production-checks";
@@ -37,7 +37,7 @@ export interface ComplianceReport {
 
 export function getComplianceReport(): ComplianceReport {
   const envProblems = validateEnv();
-  const permissionsSource = getEffectivePermissionsSource();
+  const permissionsSource = getPermissionsConfigSource();
   const productionChecks = runProductionSecurityChecks();
 
   const runtimeChecks: ComplianceRuntimeCheck[] = [
@@ -54,7 +54,7 @@ export function getComplianceReport(): ComplianceReport {
       ok: !env.isProduction || permissionsSource !== "default",
       detail:
         permissionsSource === "default"
-          ? "RBAC usando defaults — configure permissions.json ou PERMISSIONS_CONFIG_JSON."
+          ? "RBAC usando defaults — configure PERMISSIONS_CONFIG_JSON."
           : `RBAC carregado de: ${permissionsSource}.`,
     },
     {

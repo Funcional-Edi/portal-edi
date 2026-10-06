@@ -1,19 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireContentEditor } from "@/core/auth/require-role";
 import {
   ManageSectionError,
   addManualSection,
   listDraftManualSections,
 } from "@/modules/living-docs-externa/services/manage-manual-sections";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    return null;
-  }
-  return session;
-}
 
 const STATUS_BY_ERROR_CODE: Record<ManageSectionError["code"], number> = {
   VALIDATION: 400,
@@ -37,7 +29,7 @@ interface RouteParams {
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
+  const session = await requireContentEditor();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -53,7 +45,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
+  const session = await requireContentEditor();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

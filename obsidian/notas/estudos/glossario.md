@@ -63,6 +63,8 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Remote / origin** | Repositório no servidor. `origin` = o padrão (GitHub) |
 | **Upstream** | Branch remota vinculada à sua local (`push -u`) |
 | **PR / Pull Request** | Pedido de revisão para juntar sua branch na `main` |
+| **Fetch** | Baixar o histórico do GitHub sem alterar a pasta de trabalho |
+| **Rebase** | Reaplicar seus commits em cima de outra branch, como se você tivesse começado depois dela |
 | **Merge** | Juntar duas linhas do tempo |
 | **Conflito** | Mesma linha mudou nos dois lados — você decide qual fica |
 | **Stash** | Gaveta temporária para trabalho pela metade |
@@ -102,6 +104,14 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **React Flow** | Biblioteca `@xyflow/react` para canvas de nós/arestas no browser |
 | **Mermaid** | Linguagem texto → diagrama; export do fluxo via `exportFlowToMermaid` |
 | **Família de produto** | Agrupamento visual (EDI Pharma, EDI Varejo) no catálogo/admin — metadata em `config.json`, não muda rota nem credenciais |
+| **Editorial workflow** | Padrão de CMS git-backed (Decap, Sveltia, Tina): salvar na tela cria branch + PR; aprovar = merge. O PR **é** a fila de aprovação, sem banco |
+| **Fila de aprovação** | Tela prevista em `/admin/fila`: lista de alterações de conteúdo esperando o aval da qualidade — projeção dos PRs com label `conteudo:*` |
+| **Git Data API** | API do GitHub que monta blob → tree → commit → ref. Permite gravar vários arquivos em **um commit só** (a Contents API grava um por vez) |
+| **Versão do manual** | `manualVersion` semântico em `manual.json`, incrementado no merge; `versionHistory[]` guarda data, autor e resumo de cada aprovação |
+| **Radar de requisições** | Verificação semanal do gateway de cada subproduto: compara queries/mutations atuais com as já conhecidas e registra as novas, sem publicar nada. Plano em `docs/arquitetura/plano-branches-fila-e-radar.md` |
+| **Lista conhecida (baseline)** | Conjunto de requisições que o EDI já tinha quando o Radar começou. Só o que não está nela vira "nova" |
+| **Versão interna** | Registro de alteração que não impacta o distribuidor (texto, layout). Não muda o número do manual e só o EDI vê |
+| **`portal-state`** | Branch do GitHub prevista para guardar estado operacional (Radar, destinatários) sem banco e sem passar pela fila de conteúdo |
 | **Protocolo REST vs GraphQL no portal** | `config.protocol` (`"graphql"` \| `"rest"`) define como um projeto é lido: GraphQL usa `graphqlUrl`, playground e `exampleQuery`; REST usa `apiBaseUrl`, sem playground, e cada operação (`kind: "rest"`) tem `method`/`path`/`exampleBody` em vez de query. Toda a cadeia (schema, quality gate, exports, UI, admin) faz esse branch — ver `modules/living-docs-externa/schema/manual.ts` e `project.ts` |
 
 ## Segurança

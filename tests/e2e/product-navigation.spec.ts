@@ -28,7 +28,7 @@ test("one vertical navbar changes from products to product and integration conte
   await expect(nav.getByRole("link", { name: "Produtos", exact: true })).toBeVisible();
   await expect(nav.getByRole("link", { name: /^Canal Autorizador/ })).toHaveAttribute("href", "/docs/canal-autorizador");
   await expect(nav.getByRole("link", { name: /^Wholesaler/ })).toHaveAttribute("href", "/docs/wholesaler");
-  await expect(nav.getByRole("link", { name: /^IM/ })).toHaveAttribute("href", "/docs/im");
+  await expect(nav.getByRole("button", { name: /^Inventory Management/ })).toBeDisabled();
   await expect(nav.getByRole("button", { name: /^EDI Redes/ })).toBeDisabled();
 
   await nav.getByRole("link", { name: /^Canal Autorizador/ }).click();
@@ -61,10 +61,6 @@ test("one vertical navbar changes from products to product and integration conte
   await nav.getByRole("link", { name: "Voltar aos produtos", exact: true }).click();
   await expect(page).toHaveURL("/docs");
   await nav.getByRole("link", { name: "Trade", exact: true }).click();
-  await expect(page).toHaveURL("/docs?produto=trade");
-  await nav.getByRole("link", { name: /^IM/ }).click();
-  await expect(page).toHaveURL("/docs/im");
-  await page.goBack();
   await expect(page).toHaveURL("/docs?produto=trade");
   await nav.getByRole("link", { name: "Produtos", exact: true }).click();
   await expect(page).toHaveURL("/docs");
@@ -240,9 +236,9 @@ test("admins can reach the existing request test from a selected flow", async ({
   await nav.getByRole("link", { name: "Trade", exact: true }).click();
   await nav.getByRole("link", { name: /^IM/ }).click();
   const requestTest = nav.getByRole("link", { name: "Teste de Requisição", exact: true });
-  await expect(requestTest).toHaveAttribute("href", "/docs/im/playground");
+  await expect(requestTest).toHaveAttribute("href", "/docs/wholesaler/playground");
   await requestTest.click();
-  await expect(page).toHaveURL("/docs/im/playground");
+  await expect(page).toHaveURL("/docs/wholesaler/playground");
 });
 
 test("published product shows the complete flowchart and homologation manual", async ({ page }) => {

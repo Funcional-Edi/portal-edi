@@ -28,6 +28,8 @@ import {
 } from "@/modules/living-docs-externa/services/get-published-schema";
 
 const publishedWithoutSchemaSlug = "published-without-schema";
+/** Projeto publicado de exemplo no repositório (substitui o antigo `im` de teste). */
+const schemaFixtureSlug = "wholesaler";
 
 async function createPublishedProjectWithoutSchema(root: string): Promise<void> {
   const projectRoot = path.join(root, "content", "projects", publishedWithoutSchemaSlug);
@@ -98,13 +100,10 @@ describe("get-published-schema services", () => {
 
   it("lista catálogo com flag hasSchema para projetos publicados", async () => {
     const catalog = await listPublishedSchemaCatalog();
-    const im = catalog.find((entry) => entry.slug === "im");
     const demo = catalog.find((entry) => entry.slug === "demo");
-    const wholesaler = catalog.find((entry) => entry.slug === "wholesaler");
+    const wholesaler = catalog.find((entry) => entry.slug === schemaFixtureSlug);
     const withoutSchema = catalog.find((entry) => entry.slug === publishedWithoutSchemaSlug);
 
-    expect(im?.hasSchema).toBe(true);
-    expect(im?.queryFieldCount).toBe(2);
     expect(demo?.hasSchema).toBe(true);
     expect(wholesaler?.hasSchema).toBe(true);
     expect(wholesaler?.typeCount).toBeGreaterThan(0);
@@ -112,15 +111,15 @@ describe("get-published-schema services", () => {
   });
 
   it("hasPublishedSchemaSnapshot retorna true/false conforme snapshot", async () => {
-    expect(await hasPublishedSchemaSnapshot("im")).toBe(true);
-    expect(await hasPublishedSchemaSnapshot("wholesaler")).toBe(true);
+    expect(await hasPublishedSchemaSnapshot(schemaFixtureSlug)).toBe(true);
+    expect(await hasPublishedSchemaSnapshot("demo")).toBe(true);
     expect(await hasPublishedSchemaSnapshot(publishedWithoutSchemaSlug)).toBe(false);
   });
 
   it("retorna referência publicada com snapshot e visão derivada", async () => {
-    const result = await getPublishedSchemaReference("im");
+    const result = await getPublishedSchemaReference(schemaFixtureSlug);
     expect(result).not.toBeNull();
-    expect(result?.project.config.slug).toBe("im");
+    expect(result?.project.config.slug).toBe(schemaFixtureSlug);
     expect(result?.reference.mutations.map((m) => m.name)).toContain("createToken");
   });
 
@@ -167,7 +166,7 @@ describe("get-published-schema services", () => {
   });
 
   it("retorna detalhe de tipo publicado com campos e args", async () => {
-    const result = await getPublishedSchemaTypeDetail("im", "Mutation");
+    const result = await getPublishedSchemaTypeDetail(schemaFixtureSlug, "Mutation");
     expect(result).not.toBeNull();
     expect(result?.typeDetail.name).toBe("Mutation");
     expect(result?.typeDetail.fields?.some((f) => f.name === "createToken")).toBe(true);
@@ -177,7 +176,7 @@ describe("get-published-schema services", () => {
   });
 
   it("retorna null para tipo inexistente ou produto sem schema", async () => {
-    expect(await getPublishedSchemaTypeDetail("im", "TipoInexistente")).toBeNull();
+    expect(await getPublishedSchemaTypeDetail(schemaFixtureSlug, "TipoInexistente")).toBeNull();
     expect(await getPublishedSchemaTypeDetail(publishedWithoutSchemaSlug, "Query")).toBeNull();
     expect(await getPublishedSchemaTypeDetail("nao-existe", "Query")).toBeNull();
   });

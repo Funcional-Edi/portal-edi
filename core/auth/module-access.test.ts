@@ -128,3 +128,15 @@ describe("isSafeCallbackUrl", () => {
     expect(isSafeCallbackUrl("https://evil.com")).toBe(false);
   });
 });
+
+describe("staff interno (admin e editor EDI)", () => {
+  it("acessa /admin e módulos admin; client não", () => {
+    for (const role of ["admin", "editor"] as const) {
+      expect(canAccessPath(role, "/admin/projects", TEST_MODULES)).toBe(true);
+      expect(canAccessModule(role, internoModule)).toBe(true);
+      expect(resolvePostLoginPath(role, null, TEST_MODULES)).toBe("/");
+    }
+    expect(canAccessPath("client", "/admin/projects", TEST_MODULES)).toBe(false);
+    expect(resolvePostLoginPath("client", null, TEST_MODULES)).toBe("/docs");
+  });
+});
