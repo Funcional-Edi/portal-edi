@@ -55,12 +55,13 @@ async function getGithubContent(
   ref?: string
 ): Promise<GithubContentResponse | null> {
   try {
-    const { owner, repo, ref } = getGithubConfig();
+    const config = getGithubConfig();
+    const contentRef = ref || config.ref;
     const response = await getOctokitClient().repos.getContent({
-      owner,
-      repo,
+      owner: config.owner,
+      repo: config.repo,
       path: normalizePath(path),
-      ...(ref ? { ref } : {}),
+      ...(contentRef ? { ref: contentRef } : {}),
     });
 
     return response.data as GithubContentResponse;
