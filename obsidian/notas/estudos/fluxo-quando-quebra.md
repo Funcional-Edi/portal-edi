@@ -88,10 +88,32 @@ Nunca "conserte" apagando a assertion.
 2. `DEV_AUTH_ENABLED=true` (só em `NODE_ENV=development`)?
 3. Bateu no limite? São **10 tentativas / 15 min** (ADR-0007) — espere ou reinicie o server.
 
+## `nvm use` — version not installed
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| `activation error: Version not installed` | O número digitado não é o que foi instalado | `nvm list` e use o número exato, ex.: `nvm use 24.21.0` |
+
+O `24` do `nvm install 24` vira uma versão completa (aqui, `24.21.0`).
+`24.11.0` não existe nesta máquina.
+
+## `node:fs/promises` no middleware
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| Tela "Build Error" ao abrir `localhost:3002`: `Reading from "node:fs/promises" is not handled` | O middleware importava o login completo, e o login lia a lista de acessos no disco | O middleware usa `core/auth/edge-config.ts`, que só lê o JWT. A lista continua em `core/auth/config.ts`, no servidor |
+
+## Teste do GitHub leu a branch errada
+
+| Sintoma | Causa | Solução |
+| --- | --- | --- |
+| `lê com ref (branch ou SHA) quando informado` espera `ref: "edi-1"` e a chamada sai sem branch | `getGithubContent` recebia a branch e, na linha seguinte, criava outra variável com o mesmo nome a partir da configuração | A branch da chamada vale primeiro; a da configuração só entra quando a chamada não informa nenhuma |
+
 ## Git travado
 
 | Sintoma | Solução |
 | --- | --- |
+| `cannot rebase: You have unstaged changes` | Ainda há arquivo editado fora do commit. `git status` mostra qual. Guarde com `git stash -u`, rode o rebase e devolva com `git stash pop` |
 | Não consigo trocar de branch | `git stash` — ver [[fluxo-branches#Guardar trabalho pela metade (stash)]] |
 | `push` rejeitado | `git pull` e resolver, depois `git push` |
 | Conflito de merge | Abra o arquivo, escolha a versão, `git add .`, `git commit` |

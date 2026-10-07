@@ -6,7 +6,7 @@ Checklist para validar o fluxo distribuidor com SSO no ambiente homolog **após 
 
 - `FUNCIONAL_SSO_GRAPHQL_URL` apontando para homolog.
 - `AUTH_SECRET` e `AUTH_URL` configurados.
-- `data/permissions.json` com admins EDI (copie de `permissions.example.json`).
+- `PERMISSIONS_CONFIG_JSON` com admins e editores EDI (molde em `data/permissions.example.json`).
 - Projeto `im` publicado em `content/projects/im/config.json`.
 - Gateway homolog acessível (para playground — opcional no smoke inicial).
 
@@ -40,7 +40,7 @@ Esperado:
 
 ## Admin (EDI)
 
-1. Login SSO com e-mail listado em `data/permissions.json` → `admins`.
+1. Login SSO com e-mail listado em `PERMISSIONS_CONFIG_JSON` → `admins`.
 2. `/` mostra hub completo + módulos planejados.
 3. `/interno` — guias internos acessíveis.
 4. `/admin/projects` — CRUD e editor funcionam.

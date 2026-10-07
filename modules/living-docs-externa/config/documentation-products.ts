@@ -59,11 +59,11 @@ export const DOCUMENTATION_CONFIGURATION: DocumentationConfiguration = {
       status: "published",
     },
     {
-      ...product("trade", "Trade", 3, "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e IM. A estrutura também prevê EDI Redes, ainda sem documentação.", [
+      ...product("trade", "Trade", 3, "Integrações de pedidos e inventário: Canal Autorizador, Wholesaler e Inventory Management. A estrutura também prevê EDI Redes, ainda sem documentação.", [
         moduleItem("canal-autorizador", "Canal Autorizador", 1, "canal-autorizador"),
         moduleItem("wholesaler", "Wholesaler", 2, "wholesaler"),
         moduleItem("edi-redes", "EDI Redes", 3),
-        moduleItem("im", "IM", 4, "im"),
+        moduleItem("inventory-management", "Inventory Management", 4, "inventory-management"),
       ], ["visao-geral", "fluxograma-geral", "jornada-integracao", "roteiro-integracao", "fluxos", "teste-de-requisicao"]),
       status: "published",
     },

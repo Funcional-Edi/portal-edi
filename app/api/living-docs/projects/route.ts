@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireAdmin } from "@/core/auth/require-role";
 import {
   CreateProjectError,
   createProject,
@@ -9,14 +9,6 @@ import { linkProjectToCatalogProduct } from "@/modules/living-docs-externa/servi
 import { ConnectGatewayError, connectGateway } from "@/modules/living-docs-externa/services/connect-gateway";
 import { SyncSchemaError, syncSchema } from "@/modules/living-docs-externa/services/sync-schema";
 import { listProjects } from "@/modules/living-docs-externa/services/list-projects";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
-    return null;
-  }
-  return session;
-}
 
 export async function GET() {
   const session = await requireAdmin();

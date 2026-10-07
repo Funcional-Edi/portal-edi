@@ -3,7 +3,7 @@
  * core/ não importa modules/; quem chama registra os módulos antes (middleware, app).
  */
 
-import type { UserRole } from "@/core/auth/roles";
+import { isInternalStaffRole, type UserRole } from "@/core/auth/roles";
 import type { ModuleAccess, PortalModule } from "@/core/module-registry";
 
 const PUBLIC_PATHS = new Set(["/", "/login"]);
@@ -15,9 +15,9 @@ export function canAccessLevel(role: UserRole, access: ModuleAccess): boolean {
     case "any":
       return true;
     case "admin":
-      return role === "admin";
+      return isInternalStaffRole(role);
     case "client":
-      return role === "client" || role === "admin";
+      return role === "client" || isInternalStaffRole(role);
     default:
       return false;
   }
@@ -61,7 +61,7 @@ export function canAccessPath(
   if (isPublicPath(pathname)) return true;
 
   if (pathname.startsWith(ADMIN_PATH_PREFIX)) {
-    return role === "admin";
+    return role !== undefined && isInternalStaffRole(role);
   }
 
   const portalModule = findModuleForPath(pathname, modules);
@@ -89,10 +89,10 @@ export function resolvePostLoginPath(
   ) {
     return callbackUrl;
   }
-  return role === "admin" ? "/" : "/docs";
+  return role && isInternalStaffRole(role) ? "/" : "/docs";
 }
 
 /** Onde mandar quem não tem permissão na rota pedida. */
 export function getForbiddenRedirectPath(role: UserRole | undefined): string {
-  return role === "admin" ? "/" : "/docs";
+  return role && isInternalStaffRole(role) ? "/" : "/docs";
 }

@@ -1,0 +1,9 @@
+{
+  "id": "teste",
+  "name": "teste",
+  "description": "teste",
+  "order": 6,
+  "visible": true,
+  "status": "no-documentation",
+  "modules": []
+}

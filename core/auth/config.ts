@@ -1,7 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { getPermissionsConfig } from "@/core/auth/permissions-config";
+import { loadAccessList } from "@/core/auth/access-list";
+import { edgeAuthConfig } from "@/core/auth/edge-config";
 import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
 import { resolveRole, type UserRole } from "@/core/auth/roles";
 import { isSsoLoginConfigured, validateSsoCredentials } from "@/core/auth/sso";
@@ -28,7 +29,7 @@ if (isSsoLoginConfigured()) {
           id: user.id,
           email: user.email,
           name: user.name ?? user.email.split("@")[0],
-          role: resolveRole(user.email, getPermissionsConfig()),
+          role: resolveRole(user.email, await loadAccessList()),
         };
       },
     })
@@ -54,39 +55,26 @@ if (env.isDevAuthEnabled) {
           id: email,
           email,
           name: email.split("@")[0],
-          role: resolveRole(email, getPermissionsConfig()),
+          role: resolveRole(email, await loadAccessList()),
         };
       },    })
   );
 }
 
-const trustAuthHost =
-  process.env.AUTH_TRUST_HOST === "true" ||
-  process.env.VERCEL === "1" ||
-  process.env.NODE_ENV === "development";
-
 export const authConfig = {
+  ...edgeAuthConfig,
   providers,
-  session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
-  pages: { signIn: "/" },
   callbacks: {
+    ...edgeAuthConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.email = user.email ?? token.email;
-        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email, getPermissionsConfig());
+        token.role = (user as { role?: UserRole }).role ?? resolveRole(token.email, await loadAccessList());
       } else if (token.email && !token.role) {
-        token.role = resolveRole(token.email as string, getPermissionsConfig());
+        token.role = resolveRole(token.email as string, await loadAccessList());
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.role = (token.role as UserRole) ?? "client";
-        if (token.email) session.user.email = token.email as string;
-      }
-      return session;
-    },
   },
-  trustHost: trustAuthHost,
 } satisfies NextAuthConfig;
 

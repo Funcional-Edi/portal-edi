@@ -26,8 +26,9 @@ export async function SessionActions() {
     );
   }
 
-  const isAdmin = session.user.role === "admin";
-  const accessLabel = isAdmin ? "Administrador" : "Cliente";
+  const role = session.user.role;
+  const isAdmin = role !== "client";
+  const accessLabel = { admin: "Administrador", editor: "Editor EDI", client: "Cliente" }[role];
 
   return (
     <div className="flex items-center gap-2 text-sm sm:gap-3">

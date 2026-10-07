@@ -21,6 +21,10 @@ Um arquivo por dia em `diario/AAAA-MM-DD.md`, respondendo 4 perguntas:
 - [[2026-08-24|24/08/2026 — Retomada: análise geral + CI verde]]
 - [[2026-08-25|25/08/2026 — /docs/api referência GraphQL global]]
 - [[2026-08-31|31/08/2026 — Suporte REST (PSP) + reestruturação EDI Canais/PSP]]
+- [[2026-09-23|23/09/2026 — Branch EDI-14329, fetch e rebase sem mexer na homolog]]
+- [[2026-09-28|28/09/2026 — Estudo: fila de aprovação de conteúdo com PR como fila]]
+- [[2026-09-29|29/09/2026 — Plano de branches: fila, versões e Radar de requisições]]
+- [[2026-10-05|05/10/2026 — Ativar Node 24 com o número que o nvm instalou]]
 
 ## Template
 

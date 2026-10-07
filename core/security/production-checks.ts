@@ -3,7 +3,7 @@
  * Usado pelo health detalhado e pelo módulo de compliance.
  */
 
-import { getEffectivePermissionsSource } from "@/core/auth/permissions-loader";
+import { getPermissionsConfigSource } from "@/core/auth/permissions-config";
 import { getRedisRestConfig } from "@/core/auth/redis-rest";
 import { env } from "@/core/config/env";
 
@@ -20,13 +20,13 @@ export function runProductionSecurityChecks(): ProductionSecurityCheck[] {
 
   const checks: ProductionSecurityCheck[] = [];
 
-  const permissionsSource = getEffectivePermissionsSource();
+  const permissionsSource = getPermissionsConfigSource();
   checks.push({
     id: "rbac-configured",
     ok: permissionsSource !== "default",
     detail:
       permissionsSource === "default"
-        ? "RBAC usando defaults em código — configure data/permissions.json ou PERMISSIONS_CONFIG_JSON."
+        ? "RBAC usando defaults em código — configure PERMISSIONS_CONFIG_JSON."
         : `RBAC configurado via ${permissionsSource}.`,
   });
 

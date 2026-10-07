@@ -17,10 +17,14 @@ Guia mínimo para subir o portal em ambiente de homologação.
 
 ## RBAC (Fase B)
 
+O login lê os papéis **só** da variável `PERMISSIONS_CONFIG_JSON` (o middleware roda em edge e não lê arquivos).
+Use `data/permissions.example.json` como molde e cole o JSON numa linha só:
+
 ```bash
-cp data/permissions.example.json data/permissions.json
-# Edite admins/clients — arquivo é gitignored
+PERMISSIONS_CONFIG_JSON={"admins":["admin@empresa.com"],"editors":["operador@empresa.com"],"clients":["@distribuidor.com"],"defaultRole":"client"}
 ```
+
+Mudança de papel exige novo login (o papel fica na sessão JWT por até 8h).
 
 ## Node direto
 
@@ -44,13 +48,7 @@ docker build -t portal-integracao .
 docker run -p 3002:3002 --env-file .env.local portal-integracao
 ```
 
-Monte `data/permissions.json` via volume se precisar alterar RBAC sem rebuild:
-
-```bash
-docker run -p 3002:3002 --env-file .env.local \
-  -v "$(pwd)/data/permissions.json:/app/data/permissions.json:ro" \
-  portal-integracao
-```
+Para alterar RBAC, edite `PERMISSIONS_CONFIG_JSON` no `--env-file` e reinicie o container.
 
 ## Smoke pós-deploy
 

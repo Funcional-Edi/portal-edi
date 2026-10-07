@@ -16,5 +16,6 @@ outra referencia a anterior como *Substituída por*).
 | [0008](./0008-next-15-react-19.md) | Next.js 15 + React 19 antes da primeira feature | Aceita |
 | [0009](./0009-content-cms-adapter.md) | Persistência `content`: filesystem local + GitHub CMS | Aceita |
 | [0010](./0010-ui-shell-compartilhado.md) | Shell de UI compartilhado em `core/ui` | Aceita |
+| [0011](./0011-fila-aprovacao-conteudo.md) | Fila de aprovação de conteúdo: o Pull Request é a fila | Proposta |
 
 > Template: [`_template.md`](./_template.md).

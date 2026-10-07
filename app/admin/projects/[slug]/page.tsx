@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { auth, isAdminRole } from "@/core/auth";
 import { AdminShell } from "@/modules/living-docs-externa/ui/admin/admin-shell";
 import { ConnectGatewayForm } from "@/modules/living-docs-externa/ui/admin/connect-gateway-form";
 import { ConnectApiForm } from "@/modules/living-docs-externa/ui/admin/connect-api-form";
@@ -23,10 +24,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const [qualityReport, catalogProduct] = await Promise.all([
+  const [qualityReport, catalogProduct, session] = await Promise.all([
     getManualQualityReport(slug),
     project.config.productId ? getCatalogProduct(project.config.productId) : Promise.resolve(null),
+    auth(),
   ]);
+  const isAdmin = Boolean(session?.user?.role && isAdminRole(session.user.role));
   const isGraphql = project.config.protocol !== "rest";
   const gatewayConnected = Boolean(
     isGraphql ? project.config.graphqlUrl : project.config.apiBaseUrl
@@ -67,11 +70,17 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <div>
             <dt className="text-xs font-semibold uppercase text-slate-500">Status</dt>
             <dd className="mt-1">
-              <PublishToggle
-                slug={project.config.slug}
-                published={project.config.published}
-                qualityReport={qualityReport ?? undefined}
-              />
+              {isAdmin ? (
+                <PublishToggle
+                  slug={project.config.slug}
+                  published={project.config.published}
+                  qualityReport={qualityReport ?? undefined}
+                />
+              ) : (
+                <span className="text-sm text-slate-900">
+                  {project.config.published ? "Publicado" : "Rascunho"}
+                </span>
+              )}
             </dd>
           </div>
           <div>
@@ -114,6 +123,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </dl>
       </div>
 
+      {isAdmin ? (
       <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">
           {isGraphql ? "Conectar gateway" : "Conectar API"}
@@ -134,6 +144,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           )}
         </div>
       </div>
+      ) : null}
 
       <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Exportar coleções</h2>

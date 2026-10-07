@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { auth, isAdminRole } from "@/core/auth";
+import { requireAdmin } from "@/core/auth/require-role";
 import {
   CatalogProductError,
   updateCatalogProduct,
 } from "@/modules/living-docs-externa/services/manage-catalog-products";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) return null;
-  return session;
-}
 
 interface RouteParams {
   params: Promise<{ id: string }>;
