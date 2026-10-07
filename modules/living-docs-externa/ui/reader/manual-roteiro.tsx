@@ -316,14 +316,6 @@ export function ManualRoteiro({
                         </p>
                       </div>
                     </div>
-                    <Link
-                      href="https://developer.funcionalmais.com/docs/gateway-credenciados/autenticacao#autentica%C3%A7%C3%A3o"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline"
-                    >
-                      Consultar documentação oficial de autenticação →
-                    </Link>
                   </div>
                 </div>
               </div>
@@ -472,8 +464,19 @@ export function ManualRoteiro({
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Validações
             </h3>
-            <ul className="mt-3 list-disc space-y-2 rounded-lg border border-slate-200 bg-white p-5 pl-10 text-sm leading-relaxed text-slate-700">
-              {manual.homologationValidations.map((validation) => <li key={validation}>{validation}</li>)}
+            <ul className={config.productId === "credenciado"
+              ? "mt-3 space-y-2 text-sm leading-relaxed"
+              : "mt-3 list-disc space-y-2 rounded-lg border border-slate-200 bg-white p-5 pl-10 text-sm leading-relaxed text-slate-700"}>
+              {manual.homologationValidations.map((validation) => (
+                <li
+                  key={validation}
+                  className={config.productId === "credenciado"
+                    ? "rounded-md border border-brand-200 border-l-4 border-l-brand-600 bg-brand-50 px-4 py-3 text-brand-900"
+                    : undefined}
+                >
+                  {validation}
+                </li>
+              ))}
             </ul>
           </section>
         ) : null}

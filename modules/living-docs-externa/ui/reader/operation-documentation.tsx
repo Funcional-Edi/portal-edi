@@ -72,12 +72,23 @@ export function OperationDocumentation({
             </p>
           ) : null}
           {operation.prerequisites?.length ? (
-            <p className="mt-1 text-slate-700">
-              Conclua antes:{" "}
-              {operation.prerequisites.map((name) => (
-                <code key={name} className="mr-1 font-mono text-brand-800">{name}</code>
-              ))}
-            </p>
+            importanceNotices ? (
+              <div className="mt-2">
+                <p className="text-slate-700">Antes de continuar, confira:</p>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-slate-700">
+                  {operation.prerequisites.map((prerequisite) => (
+                    <li key={prerequisite}>{prerequisite}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="mt-1 text-slate-700">
+                Conclua antes:{" "}
+                {operation.prerequisites.map((name) => (
+                  <code key={name} className="mr-1 font-mono text-brand-800">{name}</code>
+                ))}
+              </p>
+            )
           ) : null}
         </section>
       ) : null}

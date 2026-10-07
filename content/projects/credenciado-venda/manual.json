@@ -187,7 +187,7 @@
       "description": "Valida preços e regras comerciais antes da pré-autorização e retorna o resultado por produto e dados associados à receita.",
       "authRequired": true,
       "prerequisites": [
-        "Obter token pela documentação oficial de autenticação.",
+        "Gerar o token de autenticação antes das demais chamadas do fluxo.",
         "Preparar loja, cliente, origem e produtos de teste."
       ],
       "businessNotes": [

@@ -167,7 +167,7 @@
       "description": "Consulta se o CPF aceitou os termos e se o consentimento é obrigatório durante atualização cadastral, autorização ou compra.",
       "authRequired": true,
       "prerequisites": [
-        "Obter token pela documentação oficial de autenticação.",
+        "Gerar o token de autenticação antes das demais chamadas do fluxo.",
         "Usar os identificadores e origem liberados para o cenário."
       ],
       "referenceTableIds": [

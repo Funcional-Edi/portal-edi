@@ -151,7 +151,7 @@
       "description": "Consulta CPF e EAN para identificar elegibilidade, programa associado, necessidade de cadastro e campos dinâmicos aplicáveis.",
       "authRequired": true,
       "prerequisites": [
-        "Obter o token pela documentação oficial de autenticação antes das chamadas do fluxo.",
+        "Gerar o token de autenticação antes das demais chamadas do fluxo.",
         "Disponibilizar CPF e EAN de teste liberados para homologação."
       ],
       "businessNotes": [
@@ -172,8 +172,8 @@
       "description": "Operação agregadora para inscrever o beneficiário quando a política retornada pela avaliação exigir cadastro.",
       "authRequired": true,
       "prerequisites": [
-        "Concluir Pharma_assessEligibility.",
-        "Prosseguir somente quando requiresBeneficiaryRegistration=true."
+        "Conclua a avaliação de elegibilidade do beneficiário e do produto antes desta etapa.",
+        "Prossiga somente quando a resposta indicar requiresBeneficiaryRegistration como verdadeiro."
       ],
       "businessNotes": [
         "Entrada principal: programCode, origin, storeCode, customerCode, productCode, beneficiaryFields, medicalPrescriptionFields e extraFormFields.",
