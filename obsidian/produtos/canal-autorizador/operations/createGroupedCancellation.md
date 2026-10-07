@@ -23,7 +23,6 @@ Envia o cancelamento do pedido à Funcional, informando o id do pedido e cada pr
 ## Notas de negócio
 
 - A requisição deve conter apenas os produtos que devem ser cancelados — o cancelamento pode ser parcial ou total. Produtos que não serão cancelados não devem constar na requisição.
-- O cancelamento só pode ser enviado depois do envio do retorno e antes do faturamento (antes do envio da nota fiscal).
 
 ## Exemplo GraphQL
 

@@ -397,7 +397,6 @@
     "Quando houver vários produtos, a Funcional poderá rejeitar parcialmente o pedido por questões comerciais da indústria.",
     "Envie o percentual de desconto de acordo com o combinado com a indústria.",
     "Envie createGroupedInvoice em até 48 horas.",
-    "Envie o cancelamento somente após o retorno e antes do envio da nota fiscal.",
     "Acompanhe o processamento de toda requisição enviada por meio das consultas de status.",
     "Todo pedido enviado precisa receber um retorno e deve ser acompanhado para não permanecer pendente.",
     "Todos os produtos do pré-pedido precisam receber retorno. Para os que não forem faturados, envie cancelamento específico; o ciclo só termina quando todos os produtos tiverem retorno, cancelamento ou nota fiscal.",
@@ -492,8 +491,7 @@
       "description": "Envia o cancelamento do pedido à Funcional, informando o id do pedido e cada produto a cancelar.",
       "prerequisites": ["createGroupedResponse"],
       "businessNotes": [
-        "A requisição deve conter apenas os produtos que devem ser cancelados — o cancelamento pode ser parcial ou total. Produtos que não serão cancelados não devem constar na requisição.",
-        "O cancelamento só pode ser enviado depois do envio do retorno e antes do faturamento (antes do envio da nota fiscal)."
+        "A requisição deve conter apenas os produtos que devem ser cancelados — o cancelamento pode ser parcial ou total. Produtos que não serão cancelados não devem constar na requisição."
       ],
       "relatedSections": ["fluxo-do-pedido"],
       "exampleQuery": "mutation createGroupedCancellation {\n  createGroupedCancellation(\n    id: 587\n    products: [\n      { ean: \"5000456011624\" }\n      { ean: \"7891000460214\" }\n    ]\n  ) {\n    id\n    status\n  }\n}"
