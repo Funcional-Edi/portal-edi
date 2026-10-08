@@ -100,6 +100,7 @@ function FieldTable({
 export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
   const { project, snapshot, reference } = data;
   const operations = project.manual.operations;
+  const showSnapshotSource = !project.config.slug.startsWith("credenciado-");
 
   return (
     <article>
@@ -114,18 +115,22 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
       <header className="mb-8 border-b border-slate-200 pb-6">
         <p className="text-xs font-medium uppercase text-brand-700">Schema GraphQL</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">{project.config.name}</h1>
-        <p className="mt-2 font-mono text-sm text-slate-500 break-all">
-          {snapshot.source.graphqlUrl}
-        </p>
+        {showSnapshotSource ? (
+          <p className="mt-2 font-mono text-sm text-slate-500 break-all">
+            {snapshot.source.graphqlUrl}
+          </p>
+        ) : null}
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge tone="neutral">{reference.types.length} tipos</Badge>
           <Badge tone="neutral">{reference.queries.length} queries</Badge>
           <Badge tone="neutral">{reference.mutations.length} mutations</Badge>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
-          Sincronizado em {formatSyncedAt(snapshot.syncedAt)} · snapshot read-only (sem
-          introspection live)
-        </p>
+        {showSnapshotSource ? (
+          <p className="mt-3 text-xs text-slate-500">
+            Sincronizado em {formatSyncedAt(snapshot.syncedAt)} · snapshot read-only (sem
+            introspection live)
+          </p>
+        ) : null}
         <div className="mt-4">
           <Link
             href={docsGuideHref(project.config.slug)}

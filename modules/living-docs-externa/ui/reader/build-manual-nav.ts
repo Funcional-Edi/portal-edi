@@ -110,8 +110,14 @@ export async function buildManualNav(
     if (operation?.referenceTableIds?.length) {
       tocItems.push({ href: "#tabelas-referencia", label: "Tabelas de referência" });
     }
-    if (operation?.exampleQuery)
-      tocItems.push({ href: "#exemplo-graphql", label: "Exemplo GraphQL" });
+    if (operation?.exampleQuery) {
+      const isPrescriptionMultipartUpload =
+        slug === "credenciado-venda" && kind === "mutation" && name === "Prescription_addPrescription";
+      tocItems.push({
+        href: isPrescriptionMultipartUpload ? "#estrutura-multipart" : "#exemplo-graphql",
+        label: isPrescriptionMultipartUpload ? "Estrutura multipart/form-data" : "Exemplo GraphQL",
+      });
+    }
     return { sidebarGroups, tocItems, hasTestScenarios };
   }
 
@@ -148,6 +154,13 @@ export async function buildManualNav(
     href: "#jornada-integracao",
     label: "Jornada da Integração (etapas expansíveis)",
   });
+  if (project.config.productId === "credenciado") {
+    tocItems.push({
+      href: "#jornada-autenticacao-token",
+      label: "Autenticação do Gateway (token)",
+      depth: 1,
+    });
+  }
   tocItems.push(...operations.map((op, index) => ({
     href: `#jornada-operacao-${index + 1}`,
     label: op.title ?? `${op.kind.toUpperCase()} ${op.name}`,

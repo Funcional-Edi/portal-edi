@@ -1,0 +1,13 @@
+{
+  "slug": "credenciado-pbm-caixa",
+  "name": "Fluxo PBM no Caixa",
+  "description": "Elegibilidade, pré-autorização, confirmação, dados fiscais, carga de programas e cancelamento no caixa.",
+  "productId": "credenciado",
+  "environment": "homolog",
+  "protocol": "graphql",
+  "published": true,
+  "audience": "distribuidor",
+  "manualStatus": "needs-review",
+  "createdAt": "2026-10-05T12:00:00.000Z",
+  "updatedAt": "2026-10-05T12:00:00.000Z"
+}

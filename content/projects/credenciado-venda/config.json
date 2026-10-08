@@ -1,0 +1,13 @@
+{
+  "slug": "credenciado-venda",
+  "name": "Fluxo de Venda",
+  "description": "Pré-venda, pré-autorização, confirmação, informações fiscais e cancelamento de vendas Credenciado.",
+  "productId": "credenciado",
+  "environment": "homolog",
+  "protocol": "graphql",
+  "published": true,
+  "audience": "distribuidor",
+  "manualStatus": "needs-review",
+  "createdAt": "2026-10-05T12:00:00.000Z",
+  "updatedAt": "2026-10-05T12:00:00.000Z"
+}

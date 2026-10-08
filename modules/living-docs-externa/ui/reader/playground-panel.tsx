@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CopyableCode, CopyToClipboardButton } from "@/core/ui/copyable-code";
 
 /**
  * Painel do playground GraphQL (Fase 4.4, MVP). Duas textareas simples
@@ -66,12 +67,12 @@ export function PlaygroundPanel({ slug, initialQuery = "" }: PlaygroundPanelProp
   return (
     <div className="space-y-4">
       <div>
-        <label
-          htmlFor="playground-query"
-          className="mb-1 block text-xs font-semibold uppercase text-slate-500"
-        >
-          Query / Mutation
-        </label>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label htmlFor="playground-query" className="text-xs font-semibold uppercase text-slate-500">
+            Query / Mutation
+          </label>
+          <CopyToClipboardButton text={query} label="Copiar requisição" />
+        </div>
         <textarea
           id="playground-query"
           value={query}
@@ -84,12 +85,12 @@ export function PlaygroundPanel({ slug, initialQuery = "" }: PlaygroundPanelProp
       </div>
 
       <div>
-        <label
-          htmlFor="playground-variables"
-          className="mb-1 block text-xs font-semibold uppercase text-slate-500"
-        >
-          Variáveis (JSON, opcional)
-        </label>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label htmlFor="playground-variables" className="text-xs font-semibold uppercase text-slate-500">
+            Variáveis (JSON, opcional)
+          </label>
+          <CopyToClipboardButton text={variablesText} label="Copiar variáveis" />
+        </div>
         <textarea
           id="playground-variables"
           value={variablesText}
@@ -119,9 +120,10 @@ export function PlaygroundPanel({ slug, initialQuery = "" }: PlaygroundPanelProp
       {result ? (
         <div>
           <p className="mb-1 text-xs font-semibold uppercase text-slate-500">Resposta</p>
-          <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-            <code>{JSON.stringify(result, null, 2)}</code>
-          </pre>
+          <CopyableCode
+            code={JSON.stringify(result, null, 2)}
+            className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+          />
         </div>
       ) : null}
     </div>

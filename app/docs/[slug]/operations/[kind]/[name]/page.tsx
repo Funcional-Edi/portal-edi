@@ -61,6 +61,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
       schemaDetail={schemaDetail}
       referenceTables={referenceTables}
       canUsePlayground={canUsePlayground}
+      importanceNotices={project.config.productId === "credenciado"}
     />
   );
 }

@@ -3,6 +3,7 @@ import { sortOperations } from "@/modules/living-docs-externa/schema";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { MarkdownBody } from "@/core/ui/markdown-body";
+import { CopyableCode } from "@/core/ui/copyable-code";
 import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
@@ -85,6 +86,7 @@ export function ManualRoteiro({
   );
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
+  const hasGatewayAuthentication = config.productId === "credenciado";
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
   const renderDocumentationSection = (section: ManualSection) => (
@@ -99,7 +101,9 @@ export function ManualRoteiro({
           {editor.renderSectionActions(section)}
         </div>
       ) : null}
-      {editor?.renderSectionBody?.(section) ?? <MarkdownBody source={section.body} />}
+      {editor?.renderSectionBody?.(section) ?? (
+        <MarkdownBody source={section.body} importanceNotices={config.productId === "credenciado"} />
+      )}
     </div>
   );
 
@@ -254,6 +258,69 @@ export function ManualRoteiro({
         ) : null}
 
         <ol className="space-y-3">
+          {hasGatewayAuthentication ? (
+            <li id="jornada-autenticacao-token">
+              <div className="rounded-lg border border-brand-200 bg-brand-50/50 p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-white">
+                    1
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brand-800">
+                      Etapa inicial · Autenticação obrigatória
+                    </p>
+                    <h3 className="mt-1 font-semibold text-slate-900">
+                      Gerar token do Gateway com <code className="font-mono">createToken</code>
+                    </h3>
+                    <p className="mt-1.5 text-sm text-slate-700">
+                      Antes das operações do fluxo, gere um token com as credenciais fornecidas
+                      pelo time de EDI. O token deve ser enviado em todas as requisições.
+                    </p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-semibold uppercase text-slate-500">Requisição</p>
+                        <CopyableCode
+                          className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100"
+                          code={`mutation {
+  createToken(
+    login: "<usuario>"
+    password: "<senha>"
+  ) {
+    token
+  }
+}`}
+                        />
+                        <p className="mt-3 text-xs font-semibold uppercase text-slate-500">Resposta</p>
+                        <CopyableCode
+                          className="mt-1 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100"
+                          code={`{
+  "data": {
+    "createToken": {
+      "token": "<token>"
+    }
+  }
+}`}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase text-slate-500">
+                          Header das requisições
+                        </p>
+                        <p className="mt-1 rounded-md bg-white px-3 py-2 font-mono text-sm text-brand-800">
+                          Authorization: Bearer &lt;token&gt;
+                        </p>
+                        <p className="mt-2 text-sm text-slate-700">
+                          O mesmo token pode ser reutilizado em várias chamadas, inclusive em
+                          diferentes fluxos de venda. A validade padrão é de 24 horas; se expirar,
+                          a API retornará um erro e será necessário gerar outro token.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ) : null}
           {operations.map((op, index) => {
             const operationId = `jornada-operacao-${index + 1}`;
             const referenceTables = (manual.referenceTables ?? []).filter((table) =>
@@ -266,7 +333,7 @@ export function ManualRoteiro({
                   <details id={operationId} className="group">
                     <summary className="flex cursor-pointer list-none items-start gap-3 p-4 [&::-webkit-details-marker]:hidden">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
-                        {index + 1}
+                        {index + (hasGatewayAuthentication ? 2 : 1)}
                       </span>
                       <div className="min-w-0 flex-1">
                         <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase text-brand-700">
@@ -293,6 +360,7 @@ export function ManualRoteiro({
                         referenceTables={referenceTables}
                         canUsePlayground={canUsePlayground}
                         idPrefix={operationId}
+                        importanceNotices={config.productId === "credenciado"}
                       />
                     </div>
                   </details>
@@ -311,8 +379,9 @@ export function ManualRoteiro({
       <section id="roteiro-integracao" data-documentation-area="roteiro-integracao" className="mt-10 scroll-mt-24">
         <h2 className="text-lg font-semibold">Cenários de Testes e Validações</h2>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
-          Valide os dois fluxos do Canal Autorizador em homologação, registrando as requisições,
-          respostas, decisões de negócio e evidências de cada cenário.
+          {config.productId === "credenciado"
+            ? "Valide os cenários deste fluxo em homologação, registrando as requisições, respostas, decisões de negócio e evidências."
+            : "Valide os dois fluxos do Canal Autorizador em homologação, registrando as requisições, respostas, decisões de negócio e evidências de cada cenário."}
         </p>
 
         {manual.homologationFlows?.length ? (
@@ -395,8 +464,19 @@ export function ManualRoteiro({
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Validações
             </h3>
-            <ul className="mt-3 list-disc space-y-2 rounded-lg border border-slate-200 bg-white p-5 pl-10 text-sm leading-relaxed text-slate-700">
-              {manual.homologationValidations.map((validation) => <li key={validation}>{validation}</li>)}
+            <ul className={config.productId === "credenciado"
+              ? "mt-3 space-y-2 text-sm leading-relaxed"
+              : "mt-3 list-disc space-y-2 rounded-lg border border-slate-200 bg-white p-5 pl-10 text-sm leading-relaxed text-slate-700"}>
+              {manual.homologationValidations.map((validation) => (
+                <li
+                  key={validation}
+                  className={config.productId === "credenciado"
+                    ? "rounded-md border border-brand-200 border-l-4 border-l-brand-600 bg-brand-50 px-4 py-3 text-brand-900"
+                    : undefined}
+                >
+                  {validation}
+                </li>
+              ))}
             </ul>
           </section>
         ) : null}

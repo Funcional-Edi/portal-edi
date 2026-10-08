@@ -24,6 +24,7 @@ import type {
   DocumentationProductView,
 } from "@/modules/living-docs-externa/schema/documentation-navigation";
 import { documentationRouteSelection } from "@/modules/living-docs-externa/services/documentation-navigation";
+import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { DocumentationStatusBadge as StatusBadge } from "@/modules/living-docs-externa/ui/reader/documentation-status";
 import type { ManualTocItem } from "@/modules/living-docs-externa/ui/reader/manual-shell";
 
@@ -39,7 +40,7 @@ const FLOW_AREAS = [
   { id: "teste-de-requisicao", label: "Teste de Requisição", icon: ArrowRight },
 ] as const;
 
-type ProductAreaId = "visao-geral" | "fluxograma-geral" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
+type ProductAreaId = "visao-geral" | "fluxograma-geral" | "roteiro-homologacao" | "jornada-integracao" | "roteiro-integracao" | "teste-de-requisicao";
 type FlowAreaId = (typeof FLOW_AREAS)[number]["id"];
 
 function flowAreaHref(product: DocumentationProductView, link: DocumentationLinkView, areaId: FlowAreaId) {
@@ -114,6 +115,7 @@ function contextualTocItems({
   if (areaId === "jornada-integracao") {
     return [
       ...items.filter((item) => item.href === "#jornada-integracao"),
+      ...items.filter((item) => item.href === "#jornada-autenticacao-token"),
       ...items.filter((item) => item.href.startsWith("#jornada-operacao-")),
     ];
   }
@@ -236,11 +238,7 @@ type CredenciadoStructureItem = {
 const CREDENCIADO_STRUCTURE = [
   { label: "Visão Geral", areaId: "visao-geral" },
   { label: "Fluxograma Completo", areaId: "fluxograma-geral" },
-  { label: "Cenários de Testes e Validações", areaId: "jornada-integracao" },
-  { label: "Fluxo de Cadastro" },
-  { label: "Fluxo Opt-in" },
-  { label: "Fluxo de Venda" },
-  { label: "Fluxo PBM no Caixa" },
+  { label: "Roteiro de Homologação", areaId: "roteiro-homologacao" },
 ] satisfies readonly CredenciadoStructureItem[];
 
 function CredenciadoStructureItem({
@@ -338,6 +336,82 @@ function FlowPanel({
   );
 }
 
+function CredenciadoHomologationGuide({ links }: { links: DocumentationLinkView[] }) {
+  const manuals = links.filter((link) => link.projectSlug && link.status === "published");
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h4 className="text-lg font-semibold text-slate-900">Roteiro de Homologação</h4>
+          <Badge>Em preparação</Badge>
+        </div>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
+          Siga os cenários do subproduto integrado, registre os resultados no relatório de homologação
+          e encaminhe o documento preenchido ao responsável do time de EDI.
+        </p>
+      </div>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-4">
+        <h5 className="font-semibold text-slate-900">Passo a passo</h5>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+          <li>Abra o roteiro de teste correspondente ao seu subproduto e execute os cenários na ordem indicada.</li>
+          <li>Realize as chamadas no ambiente de homologação, respeitando pré-requisitos e autenticação.</li>
+          <li>Registre no relatório cada teste executado, o resultado obtido e as evidências solicitadas.</li>
+          <li>Envie o relatório preenchido ao contato de EDI responsável pela implantação.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="credenciado-homologation-flows">
+        <h5 id="credenciado-homologation-flows" className="font-semibold text-slate-900">
+          Cenários por subproduto
+        </h5>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          {manuals.map((link) => (
+            <li key={link.id}>
+              <Link
+                href={`${docsGuideHref(link.projectSlug!)}#roteiro-integracao`}
+                className={["block rounded-lg border border-slate-200 bg-white p-4 text-sm transition hover:border-brand-600 hover:bg-brand-50", focusClass].join(" ")}
+              >
+                <span className="font-medium text-slate-900">{link.label}</span>
+                <span className="mt-2 block text-brand-700">Abrir cenários de teste →</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="rounded-lg border border-dashed border-slate-300 bg-slate-100 p-4">
+        <h5 className="font-semibold text-slate-900">Relatório de homologação (DOCX)</h5>
+        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+          O modelo para download será disponibilizado após validação com o time de EDI.
+          Use-o para preencher os resultados e evidências de todos os cenários executados.
+        </p>
+        <button
+          type="button"
+          disabled
+          className="mt-3 cursor-not-allowed rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-500"
+        >
+          Documento em preparação
+        </button>
+      </section>
+
+      <section aria-labelledby="credenciado-homologation-contact" className="rounded-lg border border-brand-200 bg-brand-50 p-4">
+        <h5 id="credenciado-homologation-contact" className="font-semibold text-brand-900">
+          Contato do time de EDI
+        </h5>
+        <p className="mt-1 text-sm leading-relaxed text-brand-900">
+          Os dados de contato e o canal de envio serão informados após alinhamento com o time responsável.
+        </p>
+        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          <div><dt className="font-medium text-brand-900">Responsável</dt><dd className="text-brand-800">A definir</dd></div>
+          <div><dt className="font-medium text-brand-900">E-mail/canal para envio</dt><dd className="text-brand-800">A definir</dd></div>
+        </dl>
+      </section>
+    </div>
+  );
+}
+
 export function ProductNavigation({
   navigation,
   tocItems = [],
@@ -398,9 +472,7 @@ export function ProductNavigation({
 
   const product = navigation.products.find((item) => item.id === selectedProductId);
   const flows = product?.actions.find((action) => action.id === "fluxos")?.links ?? [];
-  const visibleFlows = product?.id === "credenciado"
-    ? flows.filter((link) => !CREDENCIADO_STRUCTURE.some((item) => !item.areaId && item.label === link.label))
-    : flows;
+  const visibleFlows = flows;
   const selectedFlow = flows.find((link) => link.id === selectedFlowId) ?? null;
   const productArea = product?.actions.find((action) => action.id === selectedAreaId);
   const flowAreas = product && selectedFlow
@@ -665,6 +737,8 @@ export function ProductNavigation({
                 <div className="mt-6">
                   {selectedAreaId === "fluxograma-geral" ? (
                     <FlowchartList links={productArea?.links ?? []} />
+                  ) : selectedAreaId === "roteiro-homologacao" && product.id === "credenciado" ? (
+                    <CredenciadoHomologationGuide links={visibleFlows} />
                   ) : productArea?.links.some((link) => link.href) ? (
                     <p className="text-sm text-slate-600">Selecione uma integração na navbar para acessar sua documentação.</p>
                   ) : (

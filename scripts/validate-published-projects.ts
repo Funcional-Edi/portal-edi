@@ -37,7 +37,7 @@ async function validateProject(slug: string): Promise<string[]> {
   if (!config.published) return errors;
 
   const endpoint = config.protocol === "rest" ? config.apiBaseUrl : config.graphqlUrl;
-  if (!endpoint) {
+  if (!endpoint && config.productId !== "credenciado") {
     const field = config.protocol === "rest" ? "apiBaseUrl" : "graphqlUrl";
     errors.push(`${slug}: projeto publicado sem ${field} em config.json.`);
   }
@@ -78,7 +78,7 @@ async function main() {
   }
 
   console.log(
-    `[validate-published-projects] OK: ${slugs.length} projeto(s) validados, publicados com endpoint e operações.`
+    `[validate-published-projects] OK: ${slugs.length} projeto(s) validados; projetos publicados têm operações e endpoint quando exigido pelo produto.`
   );
 }
 
