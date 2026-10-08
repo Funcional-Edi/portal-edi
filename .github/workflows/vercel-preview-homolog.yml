@@ -1,0 +1,23 @@
+name: Deploy Preview homolog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 13 * * 1,4"
+      timezone: "America/Sao_Paulo"
+
+jobs:
+  deploy-preview:
+    name: Acionar Deploy Hook da Vercel
+    runs-on: ubuntu-latest
+    permissions: {}
+
+    steps:
+      - name: Disparar deploy da branch homolog
+        env:
+          VERCEL_DEPLOY_HOOK_HOMOLOG: ${{ secrets.VERCEL_DEPLOY_HOOK_HOMOLOG }}
+        run: |
+          test -n "$VERCEL_DEPLOY_HOOK_HOMOLOG"
+          curl --fail --silent --show-error \
+            --request POST \
+            "$VERCEL_DEPLOY_HOOK_HOMOLOG"
