@@ -3,7 +3,7 @@ name: Deploy Preview homolog
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 13 * * 1,4"
+    - cron: "30 14 * * 1,4"
       timezone: "America/Sao_Paulo"
 
 jobs:
