@@ -22,9 +22,9 @@ function TypeCell({ slug, typeRef, returnTo }: { slug: string; typeRef: SchemaTy
     return <span className="break-words font-mono text-brand-800">{formatted}</span>;
   }
   return (
-    <Link
+      <Link
       href={schemaTypeHref(slug, namedType, returnTo)}
-      className="break-words font-mono text-brand-700 hover:underline"
+        className="break-words font-mono text-brand-700 hover:underline"
     >
       {formatted}
     </Link>

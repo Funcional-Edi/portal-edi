@@ -34,9 +34,9 @@ export function OperationDetail({
   schemaFieldHref,
   schemaDetail,
   referenceTables = [],
-  canUsePlayground = false,
-  importanceNotices = false,
-  returnTo,
+    canUsePlayground = false,
+    importanceNotices = false,
+    returnTo,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
 
@@ -83,10 +83,10 @@ export function OperationDetail({
         operation={operation}
         schemaDetail={schemaDetail}
         referenceTables={referenceTables}
-        canUsePlayground={canUsePlayground}
-        importanceNotices={importanceNotices}
-        returnTo={returnTo}
-      />
+          canUsePlayground={canUsePlayground}
+          importanceNotices={importanceNotices}
+          returnTo={returnTo}
+        />
 
       {!isRest ? (
         <section className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4">
