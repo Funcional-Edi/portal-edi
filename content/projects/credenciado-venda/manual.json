@@ -194,7 +194,7 @@
         "Entrada: origin, storeCode, customerCode, products com ean, price e saleAmount; medicalPrescription pode conter quantity, date e prescriber.",
         "Retorno descrito: aproved, createdAt, totais, descontos, produtos, status por produto, requiredUploadWithPrescription, dados da receita e dailyDose.",
         "[ATENÇÃO] Solicite dailyDose quando requiredInformDailyDose indicar que a informação é necessária.",
-        "[COMENTÁRIO] Variáveis e resposta são exemplos ilustrativos baseados nos exemplos e tipos da referência oficial; use dados fornecidos para homologação."
+         "[COMENTÁRIO] Variáveis e resposta são exemplos ilustrativos baseados nos exemplos e tipos apresentados nesta documentação; use dados fornecidos para homologação."
       ],
       "referenceTableIds": [
         "pharma-prescription-input",
@@ -239,7 +239,7 @@
       "businessNotes": [
         "Multipart: operations, map e uploaded_file; o mapa vincula uploaded_file a variables.file.",
         "A documentação identifica a operação como Prescription_addPrescription, mas o query dentro de operations usa Prescription_uploadPrescription.",
-        "[ATENÇÃO MÁXIMA] O arquivo da receita deve ter no máximo 2 MB, conforme o Passo 4 da documentação oficial."
+         "[ATENÇÃO MÁXIMA] O arquivo da receita deve ter no máximo 2 MB, conforme o Passo 4 desta documentação."
       ],
       "exampleQuery": "Content-Type: multipart/form-data\n\noperations: {\"query\":\"mutation upload(\\n  $file: Prescription_Upload!\\n) {\\n  Prescription_uploadPrescription(\\n    file: $file\\n    uploadInfo: {\\n      cardNumber: \\\"CARTAO_TESTE_0001\\\"\\n      cpf: \\\"00000000000\\\"\\n      source: POINT_OF_SALES\\n      mime: \\\"image/jpeg\\\"\\n      prescriptionName: \\\"receita-teste.pdf\\\"\\n      dateIssuance: \\\"2026-10-06T12:00:00-03:00\\\"\\n    }\\n  ) {\\n    id\\n    uploadedAt\\n    deletedAt\\n    expiresAt\\n    source\\n    file\\n    name\\n    cardNumber\\n    identity\\n    status\\n    storage\\n    originalName\\n    extension\\n  }\\n}\",\"operationName\":\"upload\",\"variables\":{\"file\":null}}\n\nmap: {\"uploaded_file\":[\"variables.file\"]}\n\nuploaded_file: <arquivo de teste, até 2 MB>",
       "exampleResponse": "{\n  \"data\": {\n    \"Prescription_addPrescription\": {\n      \"id\": \"247\",\n      \"uploadedAt\": \"2022-01-16T20:03:04.604Z\",\n      \"name\": \"b4e2e460-ccf3-4e35-88ca-c2a15bc7cd82\",\n      \"cardNumber\": \"00000000000\",\n      \"identity\": \"00000000000\"\n    }\n  }\n}"

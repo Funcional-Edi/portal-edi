@@ -6,6 +6,7 @@ import { MarkdownBody } from "@/core/ui/markdown-body";
 import { CopyableCode } from "@/core/ui/copyable-code";
 import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ProjectExportActions } from "@/modules/living-docs-externa/ui/shared/export-buttons";
+import { docsJourneyHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { Badge, environmentBadgeTone } from "@/core/ui/badge";
 import { ChevronDown, PencilLine, Search, Send } from "lucide-react";
 import Link from "next/link";
@@ -361,6 +362,7 @@ export function ManualRoteiro({
                         canUsePlayground={canUsePlayground}
                         idPrefix={operationId}
                         importanceNotices={config.productId === "credenciado"}
+                        returnTo={docsJourneyHref(config.slug, operationId)}
                       />
                     </div>
                   </details>

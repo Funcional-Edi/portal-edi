@@ -198,9 +198,11 @@ export function schemaReferenceHref(slug: string): string {
 export function schemaFieldHref(
   slug: string,
   kind: "query" | "mutation",
-  name: string
+  name: string,
+  returnTo?: string
 ): string {
-  return `/docs/api/${slug}#${kind}-${name}`;
+  const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : "";
+  return `/docs/api/${slug}${query}#${kind}-${name}`;
 }
 
 export { schemaTypeHref } from "@/modules/living-docs-externa/services/docs-routes";

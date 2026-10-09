@@ -17,6 +17,7 @@ interface OperationDocumentationProps {
   canUsePlayground?: boolean;
   idPrefix?: string;
   importanceNotices?: boolean;
+  returnTo?: string;
 }
 
 function importanceNote(note: string): { tone: ImportanceTone; label: string; body: string } | null {
@@ -48,6 +49,7 @@ export function OperationDocumentation({
   canUsePlayground = false,
   idPrefix = "",
   importanceNotices = false,
+  returnTo,
 }: OperationDocumentationProps) {
   const isRest = operation.kind === "rest";
   const isPrescriptionMultipartUpload =
@@ -124,7 +126,7 @@ export function OperationDocumentation({
       ) : null}
 
       {!isRest && schemaDetail ? (
-        <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} idPrefix={idPrefix} />
+        <OperationSchemaFields slug={slug} schemaDetail={schemaDetail} idPrefix={idPrefix} returnTo={returnTo} />
       ) : null}
 
       {referenceTables.length ? (

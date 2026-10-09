@@ -193,10 +193,7 @@ export function SchemaTypeDetailView({ data }: SchemaTypeDetailViewProps) {
           <p className="mt-3 text-sm text-slate-600">{typeDetail.description}</p>
         ) : null}
         <div className="mt-4">
-          <Link
-            href={`/docs/api/${slug}`}
-            className="text-sm font-medium text-brand-700 hover:underline"
-          >
+          <Link href={`/docs/api/${slug}`} className="text-sm font-medium text-brand-700 hover:underline">
             ← Voltar ao schema
           </Link>
         </div>

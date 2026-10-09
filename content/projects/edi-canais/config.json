@@ -1,7 +1,7 @@
 {
   "slug": "edi-canais",
   "name": "EDI Canais",
-  "description": "Integrações de canais de varejo (Gateway de Credenciado, Beneficiários, Busca de Preço e Benefício Farmácia) via um único gateway GraphQL. Migrado de developer.funcionalmais.com.",
+  "description": "Integrações de canais de varejo (Gateway de Credenciado, Beneficiários, Busca de Preço e Benefício Farmácia) via um único gateway GraphQL.",
   "family": "edi-varejo",
   "protocol": "graphql",
   "environment": "homolog",

@@ -27,11 +27,11 @@ test("catalogo docs/api para referencia de schema (demo)", async ({ page }) => {
   await expect(page.getByText("saveInventories")).toBeVisible();
 
   await page.getByRole("link", { name: "Ver na Jornada" }).first().click();
-  await expect(page).toHaveURL("/docs/demo/operations/mutation/createToken");
+  await expect(page).toHaveURL("/docs/demo/operations/mutation/createToken?returnTo=%2Fdocs%2Fdemo%23jornada-integracao");
   await expect(page.getByRole("heading", { name: "1. Obter token do gateway" })).toBeVisible();
 
   await page.getByRole("link", { name: "Ver na referência GraphQL" }).click();
-  await expect(page).toHaveURL("/docs/api/demo#mutation-createToken");
+  await expect(page).toHaveURL("/docs/api/demo?returnTo=%2Fdocs%2Fdemo%23jornada-integracao#mutation-createToken");
   await expect(page.getByText("createToken")).toBeVisible();
 });
 
@@ -40,7 +40,7 @@ test("drill-down de tipo na referencia GraphQL (wholesaler)", async ({ page }) =
 
   await page.goto("/docs/api/wholesaler");
   await page.getByRole("link", { name: "Mutation", exact: true }).click();
-  await expect(page).toHaveURL("/docs/api/wholesaler/types/Mutation");
+  await expect(page).toHaveURL("/docs/api/wholesaler/types/Mutation?returnTo=%2Fdocs%2Fwholesaler%23jornada-integracao");
   await expect(page.getByRole("heading", { name: "Mutation" })).toBeVisible();
   await expect(page.getByText("createToken")).toBeVisible();
   await expect(page.getByText("login", { exact: true })).toBeVisible();
@@ -145,7 +145,32 @@ test("jornadas Credenciado começam pela autenticação do Gateway", async ({ pa
   await expect(longType).toHaveCSS("overflow-wrap", "break-word");
 });
 
-test("upload da receita no Fluxo de Venda segue a estrutura multipart oficial", async ({ page }) => {
+  test("tipo GraphQL retorna para a mesma etapa da Jornada", async ({ page }) => {
+  await loginAsDevUser(page);
+  await page.goto("/docs/credenciado-cadastro#jornada-integracao");
+  await page.locator("#jornada-operacao-1 > summary").click();
+
+  await page.getByRole("link", { name: /Pharma_RegistrationPolicyExtraFieldOption/ }).first().click();
+  await expect(page).toHaveURL(
+    "/docs/api/credenciado-cadastro/types/Pharma_RegistrationPolicyExtraFieldOption?returnTo=%2Fdocs%2Fcredenciado-cadastro%23jornada-operacao-1"
+  );
+
+  const returnLink = page.locator('a[href="/docs/credenciado-cadastro#jornada-operacao-1"]');
+  await expect(returnLink).toHaveCount(1);
+  await expect(returnLink).toBeVisible();
+  await returnLink.click();
+    await expect(page).toHaveURL("/docs/credenciado-cadastro#jornada-operacao-1");
+  });
+
+  test("painel do fluxo retorna ao produto fora da referência GraphQL", async ({ page }) => {
+    await loginAsDevUser(page);
+    await page.goto("/docs/credenciado-venda#jornada-integracao");
+
+    const returnLink = page.getByRole("link", { name: "Voltar ao produto Credenciado" });
+    await expect(returnLink).toHaveAttribute("href", "/docs?produto=credenciado");
+  });
+
+  test("upload da receita no Fluxo de Venda segue a estrutura multipart oficial", async ({ page }) => {
   await loginAsDevUser(page);
   await page.goto("/docs/credenciado-venda#jornada-integracao");
 

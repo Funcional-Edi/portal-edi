@@ -13,16 +13,17 @@ interface OperationSchemaFieldsProps {
   slug: string;
   schemaDetail: OperationSchemaDetail;
   idPrefix?: string;
+  returnTo?: string;
 }
 
-function TypeCell({ slug, typeRef }: { slug: string; typeRef: SchemaTypeNameRef }) {
+function TypeCell({ slug, typeRef, returnTo }: { slug: string; typeRef: SchemaTypeNameRef; returnTo?: string }) {
   const { namedType, formatted } = typeRef;
   if (!namedType || namedType.startsWith("__")) {
     return <span className="break-words font-mono text-brand-800">{formatted}</span>;
   }
   return (
     <Link
-      href={schemaTypeHref(slug, namedType)}
+      href={schemaTypeHref(slug, namedType, returnTo)}
       className="break-words font-mono text-brand-700 hover:underline"
     >
       {formatted}
@@ -33,9 +34,11 @@ function TypeCell({ slug, typeRef }: { slug: string; typeRef: SchemaTypeNameRef 
 function SchemaFieldsTable({
   slug,
   rows,
+  returnTo,
 }: {
   slug: string;
   rows: SchemaFieldRow[];
+  returnTo?: string;
 }) {
   if (rows.length === 0) {
     return <p className="text-sm text-slate-600">Nenhum campo documentado neste bloco.</p>;
@@ -63,7 +66,7 @@ function SchemaFieldsTable({
             <tr key={row.name} className="border-t border-slate-100 align-top">
               <td className="break-words px-4 py-3 font-mono text-brand-800">{row.name}</td>
               <td className="px-4 py-3">
-                <TypeCell slug={slug} typeRef={row.type} />
+                <TypeCell slug={slug} typeRef={row.type} returnTo={returnTo} />
               </td>
               <td className="px-4 py-3">
                 {row.required ? (
@@ -89,9 +92,11 @@ function SchemaFieldsTable({
 function InputTypeSection({
   slug,
   section,
+  returnTo,
 }: {
   slug: string;
   section: SchemaInputTypeSection;
+  returnTo?: string;
 }) {
   return (
     <div className="mt-4">
@@ -101,12 +106,12 @@ function InputTypeSection({
       {section.description ? (
         <p className="mb-3 text-sm text-slate-600">{section.description}</p>
       ) : null}
-      <SchemaFieldsTable slug={slug} rows={section.fields} />
+      <SchemaFieldsTable slug={slug} rows={section.fields} returnTo={returnTo} />
     </div>
   );
 }
 
-export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "" }: OperationSchemaFieldsProps) {
+export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "", returnTo }: OperationSchemaFieldsProps) {
   const hasRequest =
     schemaDetail.requestArgs.length > 0 || schemaDetail.requestInputTypes.length > 0;
   const hasResponse = schemaDetail.responseFields.length > 0;
@@ -122,10 +127,10 @@ export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "" }: Ope
             Campos da requisição
           </h2>
           {schemaDetail.requestArgs.length > 0 ? (
-            <SchemaFieldsTable slug={slug} rows={schemaDetail.requestArgs} />
+            <SchemaFieldsTable slug={slug} rows={schemaDetail.requestArgs} returnTo={returnTo} />
           ) : null}
           {schemaDetail.requestInputTypes.map((section) => (
-            <InputTypeSection key={section.typeName} slug={slug} section={section} />
+            <InputTypeSection key={section.typeName} slug={slug} section={section} returnTo={returnTo} />
           ))}
         </section>
       ) : null}
@@ -139,7 +144,7 @@ export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "" }: Ope
                 {" "}
                 (
                 <Link
-                  href={schemaTypeHref(slug, schemaDetail.responseTypeName)}
+                  href={schemaTypeHref(slug, schemaDetail.responseTypeName, returnTo)}
                   className="font-mono normal-case text-brand-700 hover:underline"
                 >
                   {schemaDetail.responseTypeName}
@@ -148,7 +153,7 @@ export function OperationSchemaFields({ slug, schemaDetail, idPrefix = "" }: Ope
               </>
             ) : null}
           </h2>
-          <SchemaFieldsTable slug={slug} rows={schemaDetail.responseFields} />
+          <SchemaFieldsTable slug={slug} rows={schemaDetail.responseFields} returnTo={returnTo} />
         </section>
       ) : null}
     </>

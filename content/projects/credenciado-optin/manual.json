@@ -177,7 +177,7 @@
         "Entrada descrita: EAN, CPF, CNPJ, Origem, CodCre e origin: POINT_OF_SALES.",
         "Retorno descrito: OptInRealizado, OptInObrigatorio e Mensagem.",
         "[ATENÇÃO] A referência GraphQL declara flags de resposta como String; valide os valores antes de tratá-los como Boolean.",
-        "[COMENTÁRIO] A correspondência entre as origens de negócio e os valores enum ainda precisa de confirmação oficial."
+         "[COMENTÁRIO] A correspondência entre as origens de negócio e os valores enum ainda precisa de confirmação do responsável pelo processo."
       ],
       "exampleQuery": "query Pharma_verifyOptIn(\n  $origin: Pharma_AuthorizationOrigin!,\n  $input: Pharma_OptInRequest!\n) {\n  Pharma_verifyOptIn(origin: $origin, input: $input) {\n    OptInRealizado\n    OptInObrigatorio\n    Mensagem\n  }\n}"
     },

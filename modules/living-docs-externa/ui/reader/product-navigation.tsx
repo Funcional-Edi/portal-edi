@@ -24,7 +24,7 @@ import type {
   DocumentationProductView,
 } from "@/modules/living-docs-externa/schema/documentation-navigation";
 import { documentationRouteSelection } from "@/modules/living-docs-externa/services/documentation-navigation";
-import { docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
+import { docsGuideHref, docsReturnHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { DocumentationStatusBadge as StatusBadge } from "@/modules/living-docs-externa/ui/reader/documentation-status";
 import type { ManualTocItem } from "@/modules/living-docs-externa/ui/reader/manual-shell";
 
@@ -301,13 +301,20 @@ function FlowPanel({
   link,
   areaId,
   routeContent,
+  returnTo,
+  isReferenceContext,
 }: {
   product: DocumentationProductView;
   link: DocumentationLinkView;
   areaId: FlowAreaId;
   routeContent?: ReactNode;
+  returnTo?: string;
+  isReferenceContext: boolean;
 }) {
   const operations = link.operations ?? [];
+  const journeyHref = link.projectSlug && isReferenceContext
+    ? docsReturnHref(link.projectSlug, returnTo)
+    : `/docs?produto=${encodeURIComponent(product.id)}`;
 
   return (
     <div>
@@ -322,8 +329,8 @@ function FlowPanel({
           </nav>
           <h3 className="mt-2 text-xl font-semibold text-slate-900">{link.label}</h3>
         </div>
-        <Link href={`/docs?produto=${encodeURIComponent(product.id)}`} className={"inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline " + focusClass}>
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar ao produto {product.label}
+        <Link href={journeyHref} className={"inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline " + focusClass}>
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {link.projectSlug && isReferenceContext ? "Voltar para a etapa da Jornada de Integração" : `Voltar ao produto ${product.label}`}
         </Link>
       </div>
 
@@ -713,10 +720,12 @@ export function ProductNavigation({
             ) : selectedFlow ? (
               <FlowPanel
                 product={product}
-                link={selectedFlow}
-                areaId={(selectedAreaId as FlowAreaId) || "documentacao"}
-                routeContent={showRouteContent ? children : undefined}
-              />
+                  link={selectedFlow}
+                  areaId={(selectedAreaId as FlowAreaId) || "documentacao"}
+                  routeContent={showRouteContent ? children : undefined}
+                  returnTo={searchParams.get("returnTo") ?? undefined}
+                  isReferenceContext={pathname.startsWith("/docs/api/") || pathname.includes("/operations/")}
+                />
             ) : (
               <div>
                 <nav aria-label="Contexto atual" className="text-xs text-slate-500">

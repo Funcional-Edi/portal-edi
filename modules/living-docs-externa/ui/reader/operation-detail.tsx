@@ -2,7 +2,7 @@ import type {
   ManualOperation,
   ManualReferenceTable,
 } from "@/modules/living-docs-externa/schema";
-import { DOCS_HOME_HREF, docsGuideHref } from "@/modules/living-docs-externa/services/docs-routes";
+import { DOCS_HOME_HREF, docsGuideHref, docsJourneyHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { OperationDocumentation } from "@/modules/living-docs-externa/ui/reader/operation-documentation";
 import { ExportDownloadButton } from "@/modules/living-docs-externa/ui/shared/export-buttons";
@@ -23,6 +23,7 @@ interface OperationDetailProps {
   canUsePlayground?: boolean;
   /** Aplica os rótulos visuais de importância usados pela documentação do Credenciado. */
   importanceNotices?: boolean;
+  returnTo?: string;
 }
 
 export function OperationDetail({
@@ -35,6 +36,7 @@ export function OperationDetail({
   referenceTables = [],
   canUsePlayground = false,
   importanceNotices = false,
+  returnTo,
 }: OperationDetailProps) {
   const isRest = operation.kind === "rest";
 
@@ -83,6 +85,7 @@ export function OperationDetail({
         referenceTables={referenceTables}
         canUsePlayground={canUsePlayground}
         importanceNotices={importanceNotices}
+        returnTo={returnTo}
       />
 
       {!isRest ? (
@@ -95,7 +98,7 @@ export function OperationDetail({
             Consulte a Jornada para conferir pré-requisitos, ordem das etapas e decisões de continuidade do subproduto.
           </p>
           <Link
-            href={`${docsGuideHref(slug)}#jornada-integracao`}
+            href={docsJourneyHref(slug)}
             className="mt-3 inline-flex text-sm font-medium text-brand-800 underline hover:text-brand-950"
           >
             Ver a Jornada da Integração

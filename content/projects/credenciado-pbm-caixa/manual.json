@@ -6,7 +6,7 @@
       "title": "Operação PBM no caixa",
       "scenarios": [
         {
-          "title": "Confirmar operação oficial de elegibilidade",
+           "title": "Confirmar operação de elegibilidade",
           "preconditions": [
             "A página de origem descreve a avaliação de CPF e EAN, mas não nomeia a operação.",
             "Responsável pelo contrato/API disponível para validação."
@@ -16,7 +16,7 @@
           ],
           "expectedResult": "O nome e o contrato da operação de elegibilidade são confirmados antes de serem tratados como etapa executável do PBM.",
           "evidence": [
-            "Referência oficial da operação confirmada ou registro da pendência.",
+             "Referência da operação confirmada ou registro da pendência.",
             "Validação documentada pelo responsável."
           ],
           "approval": "Equipe responsável pelo EDI confirma a operação antes de fechar a homologação do fluxo."
@@ -133,12 +133,12 @@
     }
   ],
   "homologationValidations": [
-    "Não publicar o nome da operação de elegibilidade como confirmado até obter validação oficial.",
+     "Não publicar o nome da operação de elegibilidade como confirmado até obter a validação da operação.",
     "Confirmar a origem aceita pelo PBM por ambiente e contrato; não inferir mapeamento de outra tabela.",
     "Tratar venda total e parcial sem adicionar produtos nem exceder quantidades autorizadas.",
     "Conferir status final, nota fiscal, programas carregados e itens recusados.",
     "Preservar statusCode 103 e Transacao ja cancelada na repetição do cancelamento.",
-    "Concluir a homologação com evidências do processo, venda e recibo gerencial conforme roteiro oficial."
+     "Concluir a homologação com evidências do processo, venda e recibo gerencial conforme o roteiro de homologação."
   ],
   "operations": [
     {
@@ -150,7 +150,7 @@
       "authRequired": true,
       "prerequisites": [
         "Gerar o token de autenticação antes das demais chamadas do fluxo.",
-        "Concluir a elegibilidade usando a operação oficial que vier a ser validada."
+         "Concluir a elegibilidade usando a operação que vier a ser validada."
       ],
       "businessNotes": [
         "Entrada descrita: origin, storeCode, customerCode, products (ean, price e saleAmount) e dados de receita quando aplicáveis.",

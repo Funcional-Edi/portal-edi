@@ -11,14 +11,17 @@ import {
   hasPublishedSchemaSnapshot,
   schemaFieldHref,
 } from "@/modules/living-docs-externa/services/get-published-schema";
+import { docsReturnHref } from "@/modules/living-docs-externa/services/docs-routes";
 import { getPublishedManual } from "@/modules/living-docs-externa/services/get-published-manual";
 
 interface OperationPageProps {
   params: Promise<{ slug: string; kind: string; name: string }>;
+  searchParams: Promise<{ returnTo?: string | string[] }>;
 }
 
-export default async function OperationPage({ params }: OperationPageProps) {
+export default async function OperationPage({ params, searchParams }: OperationPageProps) {
   const { slug, kind, name } = await params;
+  const { returnTo: requestedReturnTo } = await searchParams;
   const kindResult = manualOperationKindSchema.safeParse(kind);
   if (!kindResult.success) notFound();
 
@@ -30,6 +33,7 @@ export default async function OperationPage({ params }: OperationPageProps) {
     hasPublishedSchemaSnapshot(slug),
   ]);
   if (!project) notFound();
+  const returnTo = docsReturnHref(slug, requestedReturnTo);
 
   const operation = findOperation(project.manual, kindResult.data, name);
   if (!operation) notFound();
@@ -55,13 +59,14 @@ export default async function OperationPage({ params }: OperationPageProps) {
       gatewayConnected={gatewayConnected}
       schemaFieldHref={
         hasSchema && kindForSchema !== "rest"
-          ? schemaFieldHref(slug, kindForSchema, name)
+          ? schemaFieldHref(slug, kindForSchema, name, returnTo)
           : undefined
       }
       schemaDetail={schemaDetail}
       referenceTables={referenceTables}
       canUsePlayground={canUsePlayground}
       importanceNotices={project.config.productId === "credenciado"}
+      returnTo={returnTo}
     />
   );
 }

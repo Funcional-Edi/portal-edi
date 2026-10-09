@@ -23,17 +23,19 @@ O conteúdo deve seguir a mesma lógica do Canal Autorizador:
 - uma fonte editável em Markdown, sem duplicar o mesmo conteúdo em áreas
   diferentes.
 
-## Fontes analisadas
+## Conteúdos disponíveis no portal
 
-| Conteúdo | Fonte |
+| Conteúdo | Rota no portal |
 |---|---|
-| Fluxo de Cadastro | [developer.funcionalmais.com/docs/gateway-credenciados/cadastro](https://developer.funcionalmais.com/docs/gateway-credenciados/cadastro) |
-| Fluxo Opt-in | [developer.funcionalmais.com/docs/gateway-credenciados/OptIn](https://developer.funcionalmais.com/docs/gateway-credenciados/OptIn) |
-| Fluxo de Venda | [developer.funcionalmais.com/docs/gateway-credenciados/fluxo-venda](https://developer.funcionalmais.com/docs/gateway-credenciados/fluxo-venda) |
-| Fluxo PBM no Caixa | [developer.funcionalmais.com/docs/gateway-credenciados/Fluxo-Pre-Venda-Caixa-PBM](https://developer.funcionalmais.com/docs/gateway-credenciados/Fluxo-Pre-Venda-Caixa-PBM) |
-| Roteiro de Homologação | [developer.funcionalmais.com/docs/gateway-credenciados/roteiro-homologacao](https://developer.funcionalmais.com/docs/gateway-credenciados/roteiro-homologacao) |
-| Referência GraphQL — queries, mutations e schema | [API Reference](https://developer.funcionalmais.com/api-ref/index.html#operation-sales_preauthorizesale-Mutations) |
-| Estrutura de navegação | Mapas mentais enviados para os fluxos de Cadastro, Opt-in, Venda e PBM no Caixa |
+| Fluxo de Cadastro | [`/docs/credenciado-cadastro`](/docs/credenciado-cadastro) |
+| Fluxo Opt-in | [`/docs/credenciado-optin`](/docs/credenciado-optin) |
+| Fluxo de Venda | [`/docs/credenciado-venda`](/docs/credenciado-venda) |
+| Fluxo PBM no Caixa | [`/docs/credenciado-pbm-caixa`](/docs/credenciado-pbm-caixa) |
+| Referência GraphQL — queries, mutations e schema | [`/docs/api`](/docs/api) |
+| Estrutura de navegação | Jornada e seções organizadas em cada produto |
+
+As rotas acima são a fonte de consulta do portal. Quando uma seção estiver
+pendente, a própria página deve registrar o que falta validar ou consolidar.
 
 ## Estrutura do produto
 
@@ -828,7 +830,7 @@ cancelamento antes dos cenários técnicos.
 
 #### Roteiro de homologação
 
-Disponibilizar o link para o roteiro oficial e a documentação de evidências. O
+Disponibilizar o link para o roteiro de homologação e a documentação de evidências. O
 roteiro deve permanecer como referência do processo de homologação, não como
 uma cópia da Jornada.
 
