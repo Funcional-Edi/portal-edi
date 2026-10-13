@@ -49,7 +49,7 @@
           "operations": [
             "Pharma_checkPricesAndRules",
             "Sales_preAuthorizeSale",
-            "Prescription_addPrescription",
+            "Prescription_uploadPrescription",
             "Prescription_bindPrescription",
             "Sales_transaction"
           ],
@@ -227,7 +227,7 @@
     },
     {
       "kind": "mutation",
-      "name": "Prescription_addPrescription",
+      "name": "Prescription_uploadPrescription",
       "order": 3,
       "title": "Enviar arquivo da receita",
       "description": "Envia a receita em multipart quando requiredUploadWithPrescription indicar que o arquivo é necessário.",
@@ -238,11 +238,11 @@
       ],
       "businessNotes": [
         "Multipart: operations, map e uploaded_file; o mapa vincula uploaded_file a variables.file.",
-        "A documentação identifica a operação como Prescription_addPrescription, mas o query dentro de operations usa Prescription_uploadPrescription.",
-        "[ATENÇÃO MÁXIMA] O arquivo da receita deve ter no máximo 2 MB, conforme o Passo 4 desta documentação."
+        "Aceitar somente JPEG, JPG, PNG ou PDF de até 2 MB; URL de receita não é aceita.",
+        "Preservar cada id retornado para o vínculo posterior da receita à pré-autorização."
       ],
       "exampleQuery": "Content-Type: multipart/form-data\n\noperations: {\"query\":\"mutation upload(\\n  $file: Prescription_Upload!\\n) {\\n  Prescription_uploadPrescription(\\n    file: $file\\n    uploadInfo: {\\n      cardNumber: \\\"CARTAO_TESTE_0001\\\"\\n      cpf: \\\"00000000000\\\"\\n      source: POINT_OF_SALES\\n      mime: \\\"image/jpeg\\\"\\n      prescriptionName: \\\"receita-teste.pdf\\\"\\n      dateIssuance: \\\"2026-10-06T12:00:00-03:00\\\"\\n    }\\n  ) {\\n    id\\n    uploadedAt\\n    deletedAt\\n    expiresAt\\n    source\\n    file\\n    name\\n    cardNumber\\n    identity\\n    status\\n    storage\\n    originalName\\n    extension\\n  }\\n}\",\"operationName\":\"upload\",\"variables\":{\"file\":null}}\n\nmap: {\"uploaded_file\":[\"variables.file\"]}\n\nuploaded_file: <arquivo de teste, até 2 MB>",
-      "exampleResponse": "{\n  \"data\": {\n    \"Prescription_addPrescription\": {\n      \"id\": \"247\",\n      \"uploadedAt\": \"2022-01-16T20:03:04.604Z\",\n      \"name\": \"b4e2e460-ccf3-4e35-88ca-c2a15bc7cd82\",\n      \"cardNumber\": \"00000000000\",\n      \"identity\": \"00000000000\"\n    }\n  }\n}"
+      "exampleResponse": "{\n  \"data\": {\n    \"Prescription_uploadPrescription\": {\n      \"id\": \"247\",\n      \"uploadedAt\": \"2022-01-16T20:03:04.604Z\",\n      \"name\": \"b4e2e460-ccf3-4e35-88ca-c2a15bc7cd82\",\n      \"cardNumber\": \"00000000000\",\n      \"identity\": \"00000000000\"\n    }\n  }\n}"
     },
     {
       "kind": "mutation",
@@ -253,11 +253,12 @@
       "description": "Associa a receita enviada à transação de venda pré-autorizada.",
       "authRequired": true,
       "prerequisites": [
-        "Enviar a receita com Prescription_addPrescription.",
+        "Enviar a receita com Prescription_uploadPrescription.",
         "Obter os identificadores da transação e da receita."
       ],
       "businessNotes": [
-        "Dados de transação citados: authorization, sequence e timestamp."
+        "Mapeamento confirmado: authorizationID para authorization, sequenceID para sequence e createdAt para timestamp.",
+        "Enviar todos os ids retornados no upload em prescriptionIDs quando houver mais de uma receita."
       ],
       "exampleQuery": "mutation Prescription_bindPrescription(\n  $prescriptionIDs: [ID!]!,\n  $transaction: Prescription_TransactionInput!\n) {\n  Prescription_bindPrescription(\n    prescriptionIDs: $prescriptionIDs, transaction: $transaction\n  )\n}"
     },
