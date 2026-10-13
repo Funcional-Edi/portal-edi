@@ -53,7 +53,7 @@ export function OperationDocumentation({
 }: OperationDocumentationProps) {
   const isRest = operation.kind === "rest";
   const isPrescriptionMultipartUpload =
-    slug === "credenciado-venda" && operation.name === "Prescription_addPrescription";
+    slug === "credenciado-venda" && operation.name === "Prescription_uploadPrescription";
   const sectionId = (id: string) => idPrefix ? `${idPrefix}-${id}` : id;
 
   return (

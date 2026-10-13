@@ -106,10 +106,27 @@ function contextualTocItems({
   }
 
   if (areaId === "documentacao") {
-    return items.filter((item) => item.href.startsWith("#section-")
+    const relevant = items.filter((item) => item.href.startsWith("#section-")
       || item.href === "#fluxogramas"
       || item.href.startsWith("/fluxogramas/")
       || item.href === "#versao-subproduto");
+    const markdownFlowchartHref = relevant.find(
+      (item) => item.href.startsWith("#section-") && item.href.endsWith("fluxogramas"),
+    )?.href;
+    if (!markdownFlowchartHref) return relevant;
+
+    const flowLinks = relevant.filter((item) => item.href.startsWith("/fluxogramas/"));
+    const compact = relevant.filter(
+      (item) => item.href !== "#fluxogramas" && !item.href.startsWith("/fluxogramas/"),
+    );
+    const flowchartIndex = compact.findIndex((item) => item.href === markdownFlowchartHref);
+    if (flowchartIndex === -1) return compact;
+
+    return [
+      ...compact.slice(0, flowchartIndex + 1),
+      ...flowLinks,
+      ...compact.slice(flowchartIndex + 1),
+    ];
   }
 
   if (areaId === "jornada-integracao") {

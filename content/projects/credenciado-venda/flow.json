@@ -33,7 +33,7 @@
         {
           "id": "ids-receita",
           "text": "Conservar todos os IDs retornados e enviá-los em prescriptionIDs no vínculo.",
-          "position": { "x": 1110, "y": 970 },
+          "position": { "x": 1110, "y": 930 },
           "width": 310,
           "targetNodeId": "vincular-receita"
         }
@@ -162,7 +162,7 @@
     {
       "id": "venda-pbm",
       "version": 1,
-      "title": "Fluxo de Venda — PBM no Caixa",
+      "title": "Fluxo de Venda - PBM",
       "description": "Venda PBM no caixa, com elegibilidade, subprocessos de Cadastro e Opt-in quando necessários, e o mesmo núcleo transacional da venda BF.",
       "lanes": [
         {
@@ -177,21 +177,21 @@
         {
           "id": "subprocessos-pbm",
           "text": "Cadastro e Opt-in são subprocessos mantidos em seus respectivos produtos.",
-          "position": { "x": 1240, "y": 790 },
+          "position": { "x": 1400, "y": 820 },
           "width": 350,
           "targetNodeId": "fluxo-cadastro"
         },
         {
           "id": "prescricao-pbm",
           "text": "Se exigida, enviar arquivo JPEG, JPG, PNG ou PDF de até 2 MB. Não é aceita URL.",
-          "position": { "x": 1210, "y": 1950 },
+          "position": { "x": 1420, "y": 1950 },
           "width": 330,
           "targetNodeId": "upload-receita-pbm"
         },
         {
           "id": "ids-receita-pbm",
           "text": "Preservar todos os IDs retornados e enviá-los em prescriptionIDs no vínculo.",
-          "position": { "x": 1210, "y": 2150 },
+          "position": { "x": 1420, "y": 2140 },
           "width": 330,
           "targetNodeId": "vincular-receita-pbm"
         }
