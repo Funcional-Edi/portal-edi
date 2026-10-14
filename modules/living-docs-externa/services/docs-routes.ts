@@ -6,6 +6,8 @@ export const DOCS_HOME_HREF = "/docs";
 
 export const DOCS_API_HREF = "/docs/api";
 
+export const DOCS_JOURNEY_ANCHOR = "jornada-integracao";
+
 export const FAQ_HREF = "/faq";
 
 export const DOCS_NAV_ITEMS = [
@@ -22,8 +24,29 @@ export function docsGuideHref(slug: string): string {
   return `${DOCS_HOME_HREF}/${slug}`;
 }
 
-export function schemaTypeHref(slug: string, typeName: string): string {
-  return `${DOCS_API_HREF}/${slug}/types/${encodeURIComponent(typeName)}`;
+export function docsJourneyHref(slug: string, anchor = DOCS_JOURNEY_ANCHOR): string {
+  return `${docsGuideHref(slug)}#${anchor}`;
+}
+
+/** Aceita apenas retornos internos para uma âncora de jornada do mesmo produto. */
+export function docsReturnHref(slug: string, returnTo?: string | string[]): string {
+  const fallback = docsJourneyHref(slug);
+  if (typeof returnTo !== "string") return fallback;
+
+  const guideHref = docsGuideHref(slug);
+  if (!returnTo.startsWith(`${guideHref}#jornada-`)) return fallback;
+  return returnTo;
+}
+
+function appendReturnTo(href: string, returnTo?: string): string {
+  return returnTo ? `${href}?returnTo=${encodeURIComponent(returnTo)}` : href;
+}
+
+export function schemaTypeHref(slug: string, typeName: string, returnTo?: string): string {
+  return appendReturnTo(
+    `${DOCS_API_HREF}/${slug}/types/${encodeURIComponent(typeName)}`,
+    returnTo
+  );
 }
 
 export function docsPlaygroundHref(slug: string, query?: string): string {
@@ -35,7 +58,8 @@ export function docsPlaygroundHref(slug: string, query?: string): string {
 export function docsOperationHref(
   slug: string,
   kind: ManualOperationKind,
-  name: string
+  name: string,
+  returnTo?: string
 ): string {
-  return `${docsGuideHref(slug)}/operations/${kind}/${name}`;
+  return appendReturnTo(`${docsGuideHref(slug)}/operations/${kind}/${name}`, returnTo);
 }

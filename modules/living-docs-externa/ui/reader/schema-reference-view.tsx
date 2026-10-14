@@ -10,6 +10,7 @@ import { schemaFieldAnchor } from "@/modules/living-docs-externa/services/schema
 
 interface SchemaReferenceViewProps {
   data: PublishedSchemaReference;
+  returnHref: string;
 }
 
 function formatSyncedAt(iso: string): string {
@@ -22,11 +23,12 @@ function manualLinkForField(
   slug: string,
   kind: "query" | "mutation",
   name: string,
-  operations: ManualOperation[]
+  operations: ManualOperation[],
+  returnTo: string
 ): string | null {
   const match = operations.find((op) => op.kind === kind && op.name === name);
   if (!match) return null;
-  return docsOperationHref(slug, kind, name);
+  return docsOperationHref(slug, kind, name, returnTo);
 }
 
 function FieldTable({
@@ -35,12 +37,14 @@ function FieldTable({
   title,
   fields,
   operations,
+  returnTo,
 }: {
   slug: string;
   kind: "query" | "mutation";
   title: string;
   fields: SchemaFieldRef[];
   operations: ManualOperation[];
+  returnTo: string;
 }) {
   if (fields.length === 0) {
     return (
@@ -64,7 +68,7 @@ function FieldTable({
           </thead>
           <tbody>
             {fields.map((field) => {
-              const manualHref = manualLinkForField(slug, kind, field.name, operations);
+              const manualHref = manualLinkForField(slug, kind, field.name, operations, returnTo);
               return (
                 <tr key={field.name} id={schemaFieldAnchor(kind, field.name)} className="border-t border-slate-100 scroll-mt-24">
                   <td className="px-4 py-3">
@@ -97,9 +101,10 @@ function FieldTable({
   );
 }
 
-export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
+export function SchemaReferenceView({ data, returnHref }: SchemaReferenceViewProps) {
   const { project, snapshot, reference } = data;
   const operations = project.manual.operations;
+  const showSnapshotSource = !project.config.slug.startsWith("credenciado-");
 
   return (
     <article>
@@ -114,24 +119,28 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
       <header className="mb-8 border-b border-slate-200 pb-6">
         <p className="text-xs font-medium uppercase text-brand-700">Schema GraphQL</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">{project.config.name}</h1>
-        <p className="mt-2 font-mono text-sm text-slate-500 break-all">
-          {snapshot.source.graphqlUrl}
-        </p>
+        {showSnapshotSource ? (
+          <p className="mt-2 font-mono text-sm text-slate-500 break-all">
+            {snapshot.source.graphqlUrl}
+          </p>
+        ) : null}
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge tone="neutral">{reference.types.length} tipos</Badge>
           <Badge tone="neutral">{reference.queries.length} queries</Badge>
           <Badge tone="neutral">{reference.mutations.length} mutations</Badge>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
-          Sincronizado em {formatSyncedAt(snapshot.syncedAt)} · snapshot read-only (sem
-          introspection live)
-        </p>
+        {showSnapshotSource ? (
+          <p className="mt-3 text-xs text-slate-500">
+            Sincronizado em {formatSyncedAt(snapshot.syncedAt)} · snapshot read-only (sem
+            introspection live)
+          </p>
+        ) : null}
         <div className="mt-4">
           <Link
-            href={docsGuideHref(project.config.slug)}
+            href={returnHref}
             className="text-sm font-medium text-brand-700 hover:underline"
           >
-            Abrir manual curado →
+            ← Voltar para a Jornada da Integração
           </Link>
         </div>
       </header>
@@ -173,6 +182,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
             }
             fields={reference.queries}
             operations={operations}
+            returnTo={returnHref}
           />
           <FieldTable
             slug={project.config.slug}
@@ -184,6 +194,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
             }
             fields={reference.mutations}
             operations={operations}
+            returnTo={returnHref}
           />
 
           <section id="types" className="scroll-mt-24">
@@ -202,7 +213,7 @@ export function SchemaReferenceView({ data }: SchemaReferenceViewProps) {
                     <tr key={type.name} className="border-t border-slate-100">
                       <td className="px-4 py-3">
                         <Link
-                          href={schemaTypeHref(project.config.slug, type.name)}
+                          href={schemaTypeHref(project.config.slug, type.name, returnHref)}
                           className="font-mono text-brand-700 hover:underline"
                         >
                           {type.name}

@@ -37,6 +37,10 @@ next-env.d.ts
 # obsidian — atalhos locais (junction); conteúdo real está em docs/ e content/
 /obsidian/docs
 /obsidian/produtos/*/sections
+# saídas geradas pelo sincronizador; a fonte de verdade permanece em docs/ e content/
+/obsidian/00-MAPA-PORTAL.md
+/obsidian/produtos/*/_index.md
+/obsidian/produtos/*/operations/
 
 # PROMPTS de trabalho, não versionados
 PROMPT_*.md

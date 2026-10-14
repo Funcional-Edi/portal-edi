@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   DOCS_HOME_HREF,
+  docsJourneyHref,
+  docsReturnHref,
   docsFamilyHref,
   docsGuideHref,
   docsOperationHref,
@@ -13,8 +15,17 @@ describe("docs-routes", () => {
     expect(DOCS_HOME_HREF).toBe("/docs");
     expect(docsFamilyHref("edi-pharma")).toBe("/docs/edi-pharma");
     expect(docsGuideHref("im")).toBe("/docs/im");
+    expect(docsJourneyHref("im")).toBe("/docs/im#jornada-integracao");
     expect(docsOperationHref("im", "mutation", "createToken")).toBe(
       "/docs/im/operations/mutation/createToken"
+    );
+  });
+
+  it("preserva o retorno para uma etapa da jornada e rejeita destinos externos", () => {
+    const returnTo = "/docs/im#jornada-operacao-2";
+    expect(docsReturnHref("im", returnTo)).toBe(returnTo);
+    expect(docsReturnHref("im", "https://example.com")).toBe(
+      "/docs/im#jornada-integracao"
     );
   });
 

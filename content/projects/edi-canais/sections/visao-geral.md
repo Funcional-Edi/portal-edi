@@ -1,16 +1,16 @@
 # EDI Canais
 
-Este manual reúne os produtos de **EDI Varejo** hoje documentados em
-`developer.funcionalmais.com/docs/intro`: Gateway de Credenciado, Beneficiários,
-Busca de Preço e Benefício Farmácia. Todos compartilham o **mesmo gateway
+Este manual reúne os produtos de **EDI Varejo** disponíveis neste portal:
+Gateway de Credenciado, Beneficiários, Busca de Preço e Benefício Farmácia.
+Todos compartilham o **mesmo gateway
 GraphQL** (`stores-uat.funcionalmais.com/graphql` em homologação), por isso
 ficam agrupados em um único manual, com uma seção por tema.
 
 ## GraphQL
 
-A integração usa GraphQL. Se você não conhece a tecnologia, veja a
-documentação oficial ou os componentes por linguagem (.NET, Node.js, PHP)
-citados no site legado.
+A integração usa GraphQL. Se você não conhece a tecnologia, consulte os
+conceitos e exemplos apresentados neste portal e use os componentes por
+linguagem (.NET, Node.js, PHP) que fizerem sentido para sua integração.
 
 ### Queries e Mutations
 
@@ -51,11 +51,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## Pendente
 
-O texto acima é o conteúdo real da introdução do site legado. As seções por
-tema (Credenciado, Beneficiários, Busca de Preço, Benefício Farmácia) ainda
-estão como rascunho — o conteúdo detalhado de cada uma depende de:
+O texto acima apresenta a base comum deste portal. As seções por tema
+(Credenciado, Beneficiários, Busca de Preço, Benefício Farmácia) ainda estão em
+evolução — o conteúdo detalhado de cada uma depende de:
 
 1. Conectar o gateway real (`Conectar gateway`, na tela admin deste projeto).
 2. Sincronizar o schema para revelar as queries/mutations disponíveis.
-3. Receber o texto/print de cada página legada correspondente, para curar
-   descrição e regras de negócio de cada operação.
+3. Consolidar os cenários, regras de negócio e exemplos de cada operação
+   diretamente nesta documentação.

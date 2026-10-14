@@ -82,7 +82,7 @@ test("admin monta o manual no editor unificado e distribuidor ve o resultado", a
   await page.getByRole("button", { name: "Nova operação" }).click();
   await page.getByLabel("Nome (campo GraphQL)").fill("listItems");
   await page.getByLabel("Descrição").fill("Lista os itens disponiveis no gateway.");
-  await page.getByLabel("Exemplo GraphQL").fill("query listItems { listItems { id } }");
+  await page.getByLabel("Requisição GraphQL").fill("query listItems { listItems { id } }");
   await page.getByRole("button", { name: "Salvar operação" }).click();
 
   // Checklist aprovado: publicar libera.

@@ -26,7 +26,7 @@ export async function DocsShell({
 
   return (
     <AppShell subtitle={subtitle} navItems={navItems} actions={<SessionActions />}>
-      <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10">
+      <div className="mx-auto w-full max-w-[1800px] px-4 py-6 sm:px-6 lg:py-10">
         <ProductNavigation navigation={navigation}>{children}</ProductNavigation>
       </div>
     </AppShell>

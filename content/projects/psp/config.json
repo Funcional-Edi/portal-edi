@@ -1,7 +1,7 @@
 {
   "slug": "psp",
   "name": "EDI Varejo — PSP",
-  "description": "Acompanhamento de pacientes (PSP) via API REST. Migrado de developer.funcionalmais.com/docs/psp.",
+  "description": "Acompanhamento de pacientes (PSP) via API REST no portal de integração.",
   "family": "edi-varejo",
   "protocol": "rest",
   "environment": "homolog",

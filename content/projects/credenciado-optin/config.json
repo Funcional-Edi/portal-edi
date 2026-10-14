@@ -1,0 +1,13 @@
+{
+  "slug": "credenciado-optin",
+  "name": "Fluxo Opt-in",
+  "description": "Consulta e registro do consentimento do beneficiário por envio de termo ou confirmação em tela.",
+  "productId": "credenciado",
+  "environment": "homolog",
+  "protocol": "graphql",
+  "published": true,
+  "audience": "distribuidor",
+  "manualStatus": "needs-review",
+  "createdAt": "2026-10-05T12:00:00.000Z",
+  "updatedAt": "2026-10-05T12:00:00.000Z"
+}

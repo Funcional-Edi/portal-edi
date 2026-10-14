@@ -1,8 +1,7 @@
 # PSP — Acompanhamento de Pacientes
 
 Documentação de integração com os serviços de **PSP** (acompanhamento de
-pacientes) da Funcional. Migrado de
-`developer.funcionalmais.com/docs/psp`.
+pacientes) da Funcional, organizada neste portal.
 
 ## REST
 
@@ -23,8 +22,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## Pendente
 
-O texto acima é o conteúdo real da introdução do site legado. A lista de
-endpoints (método, caminho, corpo de exemplo) ainda não foi migrada — falta
-receber o print/texto da documentação detalhada de cada endpoint do PSP, ou
-a URL real da API para conectar (tela **Conectar API**, no admin deste
-projeto) e curar as operações a partir das chamadas reais.
+O texto acima apresenta o contexto do produto neste portal. A lista de
+endpoints (método, caminho, corpo de exemplo) ainda está pendente: falta
+conectar a URL real da API pela tela **Conectar API**, no admin deste projeto,
+e consolidar as operações a partir das chamadas reais.

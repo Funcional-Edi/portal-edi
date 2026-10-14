@@ -55,7 +55,7 @@ async function createPublishableProject(page: Page, slug: string, name: string) 
   await page.getByRole("button", { name: "Nova operação" }).click();
   await page.getByLabel("Nome (campo GraphQL)").fill("listItems");
   await page.getByLabel("Descrição").fill("Lista os itens disponiveis no gateway.");
-  await page.getByLabel("Exemplo GraphQL").fill("query listItems { listItems { id } }");
+  await page.getByLabel("Requisição GraphQL").fill("query listItems { listItems { id } }");
   await page.getByRole("button", { name: "Salvar operação" }).click();
 
   await expect(page.getByText(/Pronto para publicar/)).toBeVisible();

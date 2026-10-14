@@ -74,7 +74,7 @@ export function ManualShell({
           </div>
         }
       />
-      <main className={"flex-1 " + (productNavigation ? "mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 lg:py-10" : "mx-auto w-full max-w-7xl px-6 py-10")}>
+      <main className={"flex-1 " + (productNavigation ? "mx-auto w-full max-w-[1800px] px-4 py-6 sm:px-6 lg:py-10" : "mx-auto w-full max-w-7xl px-6 py-10")}>
         {productNavigation ?? (hasRailLayout ? (
           <div className={`grid gap-8 ${railColumns}`}>
             {hasSidebar ? (
