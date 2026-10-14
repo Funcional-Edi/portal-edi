@@ -23,6 +23,7 @@
 | B4 | EDI-14335 | Dev - Evolução Fila de aprovação das alterações da documentação | `edi-14335` |
 | B5 | *(criar)* | Dev - Histórico de versões do manual, versão interna e restauração | `edi-xxxxx` |
 | B6 | *(criar)* | Dev - Incluir requisição nova do Radar no manual via fila de qualidade | `edi-xxxxx` |
+| B8 | EDI-14353 | Dev - Login SSO configurável, conta local de emergência com MFA e auditoria de acessos | `edi-14353` |
 
 ## Ordem e dependências
 

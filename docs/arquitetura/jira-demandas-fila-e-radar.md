@@ -14,6 +14,7 @@ Ordem sugerida: **B1** → (**B2** ∥ **B4**) → **B3** / **B5** → **B6**.
 | B5 | *(criar)* | Dev - Histórico de versões do manual, versão interna e restauração | `edi-xxxxx` |
 | B6 | *(criar)* | Dev - Incluir requisição nova do Radar no manual via fila de qualidade | `edi-xxxxx` |
 | B7 | *(criar)* | Dev - Tela de gestão de acessos (admin master e editor EDI) | `edi-xxxxx` |
+| B8 | **EDI-14353** | Dev - Login SSO configurável, conta local de emergência com MFA e auditoria de acessos | `edi-14353` |
 
 > **Papéis (decisão de 30/09/2026):** só dois papéis internos — **admin master** e
 > **editor EDI**. O papel "revisor" foi descartado para simplificar o fluxo. Quem
@@ -356,3 +357,100 @@ Acesso:
 - Quem não está na lista é cliente.
 
 **Depende de:** EDI-14341
+
+---
+
+## B8 — Dev - Login SSO configurável, conta local de emergência com MFA e auditoria de acessos *(EDI-14353)*
+
+Texto pronto para colar no Jira (modelo em `.cursor/rules/demanda-jira.mdc`). Alinhado em 08/10/2026.
+
+### Resumo
+
+Todo o time EDI passa a entrar pelo SSO, cada um com o seu papel: admin master, editor EDI ou visualizador. Quem libera acesso é o admin master, pela tela Acessos, digitando o e-mail do SSO da pessoa.
+
+Para emergências, quando ninguém consegue entrar pelo SSO, existe uma conta local com senha e código no celular (MFA). A URL do SSO pode ser trocada em tela, só entre endereços permitidos.
+
+### Contexto
+
+Hoje o login pelo SSO funciona, mas o primeiro admin vem de uma variável do servidor e de um e-mail escrito no código. Se o SSO cair ou for configurado errado, ninguém entra como admin. A URL do SSO é fixa. Remover alguém da tela Acessos só vale no próximo login da pessoa, o que pode levar até 8 horas.
+
+A conta local segue o modelo das contas de emergência da Microsoft e do usuário root da AWS.
+
+SSO de homologação: `https://sso-homologa.funcionalhealth.com.br/graphql/`
+
+### Critérios de aceitação
+
+**Login pelo SSO**
+
+- O login valida e-mail e senha no SSO (`createToken`).
+- A senha nunca é gravada nem aparece em log.
+- O token devolvido pelo SSO não é guardado.
+- Erro de login mostra só "Credenciais inválidas", sem dizer se o e-mail existe.
+- O limite de tentativas conta por e-mail e por IP.
+- Em homolog e produção, o contador de tentativas fica no Redis.
+- Quem não está na tela Acessos entra como visualizador.
+
+**Conta local de emergência**
+
+- O link "Entrar com conta local" fica na mesma tela de login.
+- Cada pessoa com conta local tem a própria conta, nunca compartilhada.
+- Senha com no mínimo 16 caracteres, guardada só como hash (embaralhamento que não volta à senha original).
+- Depois da senha, o portal pede o código de 6 dígitos do app Authenticator (MFA).
+- O mesmo código não vale duas vezes.
+- Existem códigos de recuperação de uso único, para quando o celular for perdido.
+- As contas são criadas por script e ficam em variável do servidor. Não existe tela de "primeiro acesso".
+- Limite de 5 tentativas a cada 15 minutos.
+- A sessão dura 1 hora.
+- Cada uso fica registrado e aparece como aviso para os admins master.
+- Saem o admin padrão escrito no código e o primeiro admin por `PERMISSIONS_CONFIG_JSON`.
+
+**Tela Acessos**
+
+- O admin master digita o e-mail do SSO e escolhe Admin master ou Editor EDI.
+- Só e-mail exato, nunca domínio.
+- A coluna "Primeiro acesso" mostra "aguardando" até a pessoa entrar, depois a data.
+- Remover alguém vale na hora, sem esperar novo login.
+- Sempre existe pelo menos 1 admin master.
+
+**URL do SSO em tela**
+
+- O admin master escolhe a URL entre os endereços liberados em `SSO_URL_ALLOWED_HOSTS`.
+- Endereço fora da lista é recusado.
+- Só `https`.
+- O portal testa a conexão antes de salvar.
+- O portal pede a senha de novo antes de salvar.
+- Se a configuração salva tiver problema, vale a URL padrão do servidor.
+
+**Registro e compliance**
+
+- Fica registrado: login da conta local, inclusão e remoção de acesso, troca da URL do SSO.
+- Cada registro tem quem fez, o quê, em quem e quando. Nunca senha ou token.
+- Os novos controles aparecem no painel `/compliance`.
+- Produção não sobe sem a lista de endereços do SSO e sem conta local com MFA.
+
+**Testes**
+
+- Login real no SSO de homolog com um usuário de cada papel.
+- Editor removido é bloqueado na próxima ação.
+- Conta local recusa senha errada, código errado e código repetido.
+- URL do SSO fora da lista é recusada.
+
+### Outras informações
+
+**Ganhos esperados**
+
+- O time testa o portal com o próprio login, cada um no seu papel.
+- Dar e tirar acesso não depende de dev nem de deploy.
+- O portal não fica trancado se o SSO cair.
+- Trocar o ambiente do SSO não exige mudar código.
+- Toda mudança de acesso fica registrada.
+
+**Fora desta demanda**
+
+- Fila de aprovação (EDI-14335).
+- E-mail dos avisos (B3). Até lá, o aviso aparece na tela.
+- MFA dos usuários do SSO: responsabilidade do próprio SSO.
+- Grupos vindos do SSO. Os papéis continuam na tela Acessos.
+
+**Depende de:** EDI-14341
+**Bloqueia:** EDI-14335

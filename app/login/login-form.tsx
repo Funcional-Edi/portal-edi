@@ -1,31 +1,43 @@
 "use client";
 
-import { LogIn, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, LogIn, Lock, Mail } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { getPostLoginPath } from "./actions";
 
-type LoginMethod = "sso" | "dev";
-
 interface LoginFormProps {
   ssoConfigured: boolean;
+  /** Já vem falso quando há SSO configurado (ver `env.isDevLoginAvailable`). */
   devAuthEnabled: boolean;
+  localEmergencyEnabled: boolean;
 }
 
+/** Mensagem por código do erro. Qualquer outro código = "Credenciais inválidas" (não revela se a conta existe). */
+const SSO_ERROR_MESSAGES: Record<string, string> = {
+  sso_rate_limit: "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+  sso_unavailable: "SSO indisponível no momento. Tente novamente em instantes.",
+  local_rate_limit: "Muitas tentativas na conta local. Aguarde 15 minutos e tente novamente.",
+};
+const INVALID_CREDENTIALS = "Credenciais inválidas.";
+
+const inputClass =
+  "w-full rounded-md border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600";
+
 /**
- * Formulário de login compartilhado (home `/` e redirect legado `/login`).
- * Método explícito: aba SSO vs dev local quando ambos configurados.
+ * Formulário de login (home `/`). SSO configurado = e-mail + senha; sem SSO
+ * (só em desenvolvimento) = login dev só com e-mail.
  */
-export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
+export function LoginForm({ ssoConfigured, devAuthEnabled, localEmergencyEnabled }: LoginFormProps) {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
-  const showTabs = ssoConfigured && devAuthEnabled;
+  const [method, setMethod] = useState<"sso" | "dev" | "local">(ssoConfigured ? "sso" : "dev");
 
-  const [method, setMethod] = useState<LoginMethod>(ssoConfigured ? "sso" : "dev");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -58,13 +70,23 @@ export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
             redirect: false,
             callbackUrl: signInCallback,
           })
+        : method === "local"
+          ? await signIn("local", {
+              email,
+              password,
+              mfaCode,
+              redirect: false,
+              callbackUrl: signInCallback,
+            })
         : await signIn("dev", { email, redirect: false, callbackUrl: signInCallback });
 
     if (result?.error) {
       setLoading(false);
+      setPassword("");
+      setMfaCode("");
       setError(
-        method === "sso"
-          ? "Credenciais inválidas ou SSO indisponível."
+        method === "sso" || method === "local"
+          ? (result.code && SSO_ERROR_MESSAGES[result.code]) || INVALID_CREDENTIALS
           : "Login dev falhou. Verifique DEV_AUTH_ENABLED=true no .env.local."
       );
       return;
@@ -75,85 +97,121 @@ export function LoginForm({ ssoConfigured, devAuthEnabled }: LoginFormProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {showTabs ? (
-        <div role="tablist" className="grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={method === "sso"}
-            onClick={() => setMethod("sso")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-              method === "sso" ? "bg-white text-brand-700 shadow-sm" : "text-slate-600"
-            }`}
-          >
-            SSO
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={method === "dev"}
-            onClick={() => setMethod("dev")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-              method === "dev" ? "bg-white text-brand-700 shadow-sm" : "text-slate-600"
-            }`}
-          >
-            Login local (dev)
-          </button>
+    <form
+      onSubmit={handleSubmit}
+      aria-label="Entrar"
+      className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+    >
+      <div className="text-sm">
+        <label htmlFor="login-email" className="font-medium text-slate-700">
+          E-mail
+        </label>
+        <div className="relative mt-1">
+          <Mail
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden="true"
+          />
+          <input
+            id="login-email"
+            type="email"
+            required
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "login-error" : undefined}
+            className={inputClass}
+          />
         </div>
-      ) : null}
+      </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-      >
-        <label className="block text-sm">
-          <span className="font-medium text-slate-700">E-mail</span>
+      {method === "sso" || method === "local" ? (
+        <div className="text-sm">
+          <label htmlFor="login-password" className="font-medium text-slate-700">
+            Senha
+          </label>
           <div className="relative mt-1">
-            <Mail
+            <Lock
               className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
               aria-hidden="true"
             />
             <input
-              type="email"
+              id="login-password"
+              type={showPassword ? "text" : "password"}
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "login-error" : undefined}
+              className={`${inputClass} pr-10`}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              aria-pressed={showPassword}
+              className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Eye className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
           </div>
-        </label>
+        </div>
+      ) : null}
 
-        {method === "sso" ? (
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Senha</span>
-            <div className="relative mt-1">
-              <Lock
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                aria-hidden="true"
-              />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
-              />
-            </div>
+      {method === "local" ? (
+        <div className="text-sm">
+          <label htmlFor="login-mfa-code" className="font-medium text-slate-700">
+            Codigo MFA ou recuperacao
           </label>
-        ) : null}
+          <input
+            id="login-mfa-code"
+            required
+            autoComplete="one-time-code"
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value)}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "login-error" : undefined}
+            className={`${inputClass} pl-3`}
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            Digite o codigo de 6 digitos do Authenticator ou um codigo de recuperacao.
+          </p>
+        </div>
+      ) : null}
 
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {/* Sempre no DOM: leitor de tela só anuncia mudança em região viva que já existe. */}
+      <p id="login-error" aria-live="assertive" aria-atomic="true" className="text-sm text-red-600">
+        {error}
+      </p>
 
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:opacity-50"
+      >
+        <LogIn className="h-4 w-4" aria-hidden="true" />
+        {loading ? "Entrando…" : method === "sso" ? "Entrar com SSO" : method === "local" ? "Entrar com conta local" : "Entrar (dev)"}
+      </button>
+
+      {ssoConfigured && localEmergencyEnabled ? (
         <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-900 disabled:opacity-50"
+          type="button"
+          className="text-sm text-slate-600 underline"
+          onClick={() => {
+            setMethod((current) => (current === "local" ? "sso" : "local"));
+            setError(null);
+            setPassword("");
+            setMfaCode("");
+          }}
         >
-          <LogIn className="h-4 w-4" aria-hidden="true" />
-          {loading ? "Entrando…" : method === "sso" ? "Entrar com SSO" : "Entrar (dev)"}
+          {method === "local" ? "Entrar com SSO" : "Entrar com conta local"}
         </button>
-      </form>
-    </div>
+      ) : null}
+    </form>
   );
 }

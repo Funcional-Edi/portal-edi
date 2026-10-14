@@ -1,5 +1,7 @@
 import { readContentJson, writeContentJson } from "@/core/db/adapters";
+import { appendAccessAuditEvent } from "@/core/auth/access-audit";
 import { getPermissionsConfig } from "@/core/auth/permissions-config";
+import { env } from "@/core/config/env";
 import type { PermissionsConfig } from "@/core/auth/roles";
 
 /** Lista gravada pelo admin master. A variável PERMISSIONS_CONFIG_JSON só cria o primeiro admin. */
@@ -49,6 +51,7 @@ export function buildAccessList(
 
 /** Arquivo salvo, se válido. Senão a variável de bootstrap, senão o padrão do código. */
 export async function loadAccessList(): Promise<PermissionsConfig> {
+  const bootstrap = getPermissionsConfig();
   try {
     const saved = await readContentJson<unknown>(ACCESS_LIST_PATH, { ref: ACCESS_LIST_BRANCH });
     if (saved && typeof saved === "object") {
@@ -67,14 +70,47 @@ export async function loadAccessList(): Promise<PermissionsConfig> {
       console.warn("[permissions] lista salva inválida — usando a variável de bootstrap.");
     }
   }
-  return getPermissionsConfig();
+  if (env.isProduction) {
+    return { ...bootstrap, admins: [], editors: [] };
+  }
+  return bootstrap;
 }
 
-export async function saveAccessList(input: { admins: unknown; editors: unknown }): Promise<PermissionsConfig> {
-  const next = buildAccessList(await loadAccessList(), input);
+export async function saveAccessList(
+  input: { admins: unknown; editors: unknown },
+  actorEmail?: string
+): Promise<PermissionsConfig> {
+  const current = await loadAccessList();
+  const next = buildAccessList(current, input);
   await writeContentJson(ACCESS_LIST_PATH, next, {
     branch: ACCESS_LIST_BRANCH,
     message: "chore(acesso): atualiza admin master e editor EDI",
   });
+
+  if (actorEmail) {
+    const currentAll = [...current.admins, ...current.editors];
+    const nextAll = [...next.admins, ...next.editors];
+    const granted = nextAll.filter((email) => !currentAll.includes(email));
+    const revoked = currentAll.filter((email) => !nextAll.includes(email));
+
+    await Promise.all([
+      ...granted.map((targetEmail) =>
+        appendAccessAuditEvent({
+          action: "access_granted",
+          actorEmail,
+          targetEmail,
+          detail: next.admins.includes(targetEmail) ? "admin" : "editor",
+        })
+      ),
+      ...revoked.map((targetEmail) =>
+        appendAccessAuditEvent({
+          action: "access_revoked",
+          actorEmail,
+          targetEmail,
+          detail: current.admins.includes(targetEmail) ? "admin" : "editor",
+        })
+      ),
+    ]);
+  }
   return next;
 }

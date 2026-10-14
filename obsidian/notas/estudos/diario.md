@@ -24,7 +24,9 @@ Um arquivo por dia em `diario/AAAA-MM-DD.md`, respondendo 4 perguntas:
 - [[2026-09-23|23/09/2026 — Branch EDI-14329, fetch e rebase sem mexer na homolog]]
 - [[2026-09-28|28/09/2026 — Estudo: fila de aprovação de conteúdo com PR como fila]]
 - [[2026-09-29|29/09/2026 — Plano de branches: fila, versões e Radar de requisições]]
+- [[2026-10-08|08/10/2026 — EDI-14353 fase 1: login SSO com limite por e-mail e IP]]
 - [[2026-10-05|05/10/2026 — Ativar Node 24 com o número que o nvm instalou]]
+- [[2026-10-14|14/10/2026 — EDI-14353 B8 completa: conta local + MFA + auditoria]]
 
 ## Template
 
