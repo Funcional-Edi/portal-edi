@@ -23,6 +23,10 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
   const role = session?.user?.role;
+  const isExpiredLocalSession =
+    session?.user?.authMethod === "local" &&
+    typeof session.user.localSessionExpiresAt === "number" &&
+    Date.now() > session.user.localSessionExpiresAt;
 
   if (pathname === "/manual" || pathname.startsWith("/manual/")) {
     const redirectUrl = req.nextUrl.clone();
@@ -31,7 +35,7 @@ export default auth((req) => {
   }
 
   if (pathname.startsWith("/api/") && !isPublicPath(pathname)) {
-    if (!session) {
+    if (!session || isExpiredLocalSession) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
@@ -49,7 +53,7 @@ export default auth((req) => {
     return NextResponse.redirect(homeUrl);
   }
 
-  if (!session && pathRequiresAuth(pathname, modules)) {
+  if ((!session || isExpiredLocalSession) && pathRequiresAuth(pathname, modules)) {
     const loginUrl = new URL("/", req.nextUrl);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);

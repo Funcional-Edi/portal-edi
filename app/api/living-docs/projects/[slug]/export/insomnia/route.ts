@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
+import { resolveCurrentSessionRole } from "@/core/auth/require-role";
 import {
   buildInsomniaExport,
   insomniaDownloadFilename,
@@ -22,12 +23,13 @@ const STATUS_BY_ERROR_CODE: Record<ExportAccessError["code"], number> = {
 /** Exporta workspace Insomnia v4 do manual curado (JSON download). */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth();
-  if (!session?.user) {
+  const role = await resolveCurrentSessionRole(session);
+  if (!role) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { slug } = await params;
-  const isAdmin = isAdminRole(session.user.role);
+  const isAdmin = isAdminRole(role);
 
   try {
     const { project } = await resolveProjectForExport(slug, { isAdmin });

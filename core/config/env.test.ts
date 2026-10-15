@@ -9,6 +9,8 @@ describe("configuração de ambiente", () => {
     delete process.env.DEV_AUTH_ENABLED;
     delete process.env.VERCEL_ENV;
     delete process.env.AI_API_KEY;
+    delete process.env.LOCAL_EMERGENCY_ACCOUNTS_JSON;
+    delete process.env.SSO_URL_ALLOWED_HOSTS;
     process.env.AI_PROVIDER = "stub";
   });
 
@@ -34,8 +36,12 @@ describe("configuração de ambiente", () => {
     vi.stubEnv("NODE_ENV", "production");
     delete process.env.FUNCIONAL_SSO_GRAPHQL_URL;
     delete process.env.GATEWAY_URL_ALLOWED_HOSTS;
+    delete process.env.SSO_URL_ALLOWED_HOSTS;
+    delete process.env.LOCAL_EMERGENCY_ACCOUNTS_JSON;
     expect(validateEnv().join(" ")).toMatch(/FUNCIONAL_SSO_GRAPHQL_URL/);
     expect(validateEnv().join(" ")).toMatch(/GATEWAY_URL_ALLOWED_HOSTS/);
+    expect(validateEnv().join(" ")).toMatch(/SSO_URL_ALLOWED_HOSTS/);
+    expect(validateEnv().join(" ")).toMatch(/LOCAL_EMERGENCY_ACCOUNTS_JSON/);
     vi.unstubAllEnvs();
   });
   it("habilita login dev local quando DEV_AUTH_ENABLED=true", () => {
@@ -54,6 +60,29 @@ describe("configuração de ambiente", () => {
     vi.stubEnv("VERCEL_ENV", "production");
     expect(env.isDevAuthEnabled).toBe(false);
     expect(validateEnv().join(" ")).toMatch(/DEV_AUTH_ENABLED/);
+    vi.unstubAllEnvs();
+  });
+
+  it("esconde o login dev quando há SSO configurado", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("DEV_AUTH_ENABLED", "true");
+    vi.stubEnv("FUNCIONAL_SSO_GRAPHQL_URL", "");
+    expect(env.isDevLoginAvailable).toBe(true);
+    vi.stubEnv("FUNCIONAL_SSO_GRAPHQL_URL", "https://sso.exemplo.test/graphql/");
+    expect(env.isDevLoginAvailable).toBe(false);
+    vi.unstubAllEnvs();
+  });
+
+  it("acusa ausência de Redis em produção, mas não quando está configurado", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("FUNCIONAL_SSO_GRAPHQL_URL", "https://sso.exemplo.test/graphql/");
+    vi.stubEnv("GATEWAY_URL_ALLOWED_HOSTS", "gw.exemplo.test");
+    vi.stubEnv("KV_REST_API_URL", "");
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "");
+    expect(validateEnv().join(" ")).toMatch(/Redis/);
+    vi.stubEnv("KV_REST_API_URL", "https://redis.exemplo.test");
+    vi.stubEnv("KV_REST_API_TOKEN", "token-de-teste");
+    expect(validateEnv().join(" ")).not.toMatch(/Redis/);
     vi.unstubAllEnvs();
   });
 

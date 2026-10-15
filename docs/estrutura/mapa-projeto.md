@@ -47,7 +47,7 @@ Convenção interna de cada módulo: `module.ts`, `schema/`, `repository/`,
 |-----------------|----------|
 | `docs/arquitetura/adr/` | Decisões de arquitetura (ADRs 0001–0010) |
 | `docs/migracao/` | Mapa, cronograma e decisões de UI da migração |
-| `docs/operacao/` | Guias operacionais de release e rotina de validacao |
+| `docs/operacao/` | Guias operacionais: release, comentário diário no Jira e rotina de validação |
 | `docs/estrutura/mapa-projeto.md` | Este arquivo |
 | `docs/estrutura/navbar-produtos.md` | Contrato, rotas e manutenção da navbar de produtos EDI |
 | `content/interno/guides/edi-14331-jornada-integracao.md` | Refinamento da Jornada e do Roteiro de Integração dos subprodutos |

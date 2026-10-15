@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
+import { requireAdmin, resolveCurrentSessionRole } from "@/core/auth/require-role";
 import { getManualRef } from "@/modules/fluxogramas/repository/flow-repository";
 import { saveIntegrationFlowInputSchema } from "@/modules/fluxogramas/schema";
 import { exportFlowToMermaid, validateIntegrationFlow } from "@/modules/fluxogramas/services/flow-validation";
@@ -12,8 +13,8 @@ interface RouteParams {
 
 /** Exporta Mermaid a partir do fluxo enviado (preview) ou validação antes de salvar. */
 export async function POST(request: Request, { params }: RouteParams) {
-  const session = await auth();
-  if (!session?.user?.role || !isAdminRole(session.user.role)) {
+  const session = await requireAdmin();
+  if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -43,13 +44,14 @@ export async function POST(request: Request, { params }: RouteParams) {
 /** Exporta Mermaid do fluxo já persistido. */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth();
-  if (!session?.user) {
+  const role = await resolveCurrentSessionRole(session);
+  if (!role) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { slug } = await params;
   const flowId = new URL(_request.url).searchParams.get("fluxo") ?? undefined;
-  const isAdmin = isAdminRole(session.user.role);
+  const isAdmin = isAdminRole(role);
 
   try {
     const flow = await getProjectFlow(slug, { requirePublished: !isAdmin, flowId });

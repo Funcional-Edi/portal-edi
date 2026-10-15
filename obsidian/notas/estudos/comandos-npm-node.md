@@ -54,6 +54,11 @@ npm run              # lista todos os scripts disponíveis
 
 Lista atual deste projeto em [[comandos-projeto|Comandos do projeto]].
 
+| Comando | Para que serve |
+| --- | --- |
+| `npx playwright test --config=playwright.config.ts tests/e2e/portal-introduction.spec.ts -g "client uses"` | Roda **um** arquivo E2E (e só os testes cujo nome contém o texto de `-g`), em vez dos 37 — bem mais rápido para investigar |
+| `node scripts/run-tsx.cjs scripts/create-local-emergency-account.ts admin@empresa.com "senha-com-16-ou-mais"` | Gera uma conta local de emergência com `passwordHash`, `totpSecret` e códigos de recuperação para preencher `LOCAL_EMERGENCY_ACCOUNTS_JSON` |
+
 ## Prod vs. dev
 
 | Bloco no `package.json` | O que é | Exemplo aqui |

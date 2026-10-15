@@ -90,6 +90,14 @@ Termos que aparecem neste projeto, com o significado **no contexto dele**.
 | **Documentação viva** | Manual que acompanha o schema real da API, não um PDF parado |
 | **Gateway** | API GraphQL da Fidelize que o distribuidor consome |
 | **SSO** | *Single Sign-On*. Login corporativo que abre o portal |
+| **Rate limit** | Limite de tentativas numa janela de tempo. Login: 10 por e-mail e 30 por IP em 15 min (`core/auth/rate-limit.ts`) |
+| **Conta local de emergência** | Login alternativo para contingência do SSO, criado por script e guardado em env server-side com senha hash e MFA |
+| **MFA / TOTP** | Segundo fator por código de 6 dígitos gerado por app Authenticator com janela de tempo curta |
+| **Código de recuperação** | Código de uso único para entrar sem celular; depois de usado fica invalidado permanentemente |
+| **Enumeração de contas** | Descobrir quais e-mails existem pela diferença nas mensagens de erro. Por isso o login diz sempre "Credenciais inválidas" |
+| **Redis** | Banco de chave-valor em memória, compartilhado entre instâncias. Aqui guarda o contador de tentativas em homolog/produção |
+| **`aria-live`** | Atributo que faz o leitor de tela anunciar um texto quando ele muda (ex.: mensagem de erro do login) |
+| **`x-forwarded-for` / `x-real-ip`** | Cabeçalhos em que o proxy informa o IP real do cliente; só são confiáveis atrás de proxy próprio |
 | **Introspection** | Consulta que pede ao GraphQL o próprio schema |
 | **Allowlist** | Lista do que é permitido. Aqui: só operações do `manual.json` no playground |
 | **Manual / Roteiro** | Sequência ordenada de operações que o distribuidor deve seguir |

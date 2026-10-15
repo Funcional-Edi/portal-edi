@@ -16,6 +16,7 @@ problema:
 | `arch` | **Violou a arquitetura** | Import proibido — ver [[fluxo-novo-modulo#As 3 regras que mais quebram o CI]] |
 | `test` | Comportamento mudou | Nome do teste que falhou |
 | `build` | Erro só em produção | Server/client component, env faltando |
+| `arch` com `sem-ciclos` | Dependência circular entre camadas | Quebre o ciclo movendo leitura de `env` para função local simples ou extraindo contrato sem importar módulo pesado |
 
 Rode a etapa isolada para iterar rápido:
 
@@ -86,7 +87,22 @@ Nunca "conserte" apagando a assertion.
 
 1. `AUTH_SECRET` preenchido no `.env.local`?
 2. `DEV_AUTH_ENABLED=true` (só em `NODE_ENV=development`)?
-3. Bateu no limite? São **10 tentativas / 15 min** (ADR-0007) — espere ou reinicie o server.
+3. `FUNCIONAL_SSO_GRAPHQL_URL` vazia? Com ela preenchida o login dev **some** (tela e servidor) — só entra por e-mail e senha do SSO.
+4. Bateu no limite? São **10 tentativas por e-mail e 30 por IP, a cada 15 min** (ADR-0007) — espere ou reinicie o server (sem Redis o contador fica na memória do processo).
+5. A tela diz só "Credenciais inválidas"? É proposital: senha errada, e-mail inexistente e conta bloqueada têm a mesma mensagem.
+
+## Teste E2E falhou — a culpa é da minha mudança?
+
+Rode o **mesmo** teste sem as suas alterações e compare:
+
+```powershell
+git stash push -m "tmp" -- app/login/login-form.tsx core/auth/sso.ts   # guarda só estes arquivos
+npx playwright test --config=playwright.config.ts tests/e2e/portal-introduction.spec.ts -g "client uses"
+git stash pop                                                          # devolve os arquivos
+```
+
+Falhou igual sem a sua mudança = falha que já existia (ex.: o produto "IM" não existe no conteúdo local). Depois do E2E, confira `git status`: o Next
+pode ter mexido em `tsconfig.json` sozinho (`git restore tsconfig.json` desfaz).
 
 ## `nvm use` — version not installed
 

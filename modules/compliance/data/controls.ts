@@ -85,14 +85,25 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
   },
   {
     id: "sso-rate-limit",
-    title: "Rate limit no login SSO (10 / 15 min)",
+    title: "Rate limit no login SSO (10 por e-mail e 30 por IP / 15 min)",
     category: "autenticacao",
     status: "ativo",
     description:
-      "Proteção contra força bruta por e-mail. Redis REST opcional para durabilidade entre instâncias.",
-    verification: "core/auth/rate-limit.ts + ADR-0007",
+      "Proteção contra força bruta por e-mail e por IP; basta um dos dois estourar para bloquear. Em homolog e produção o contador deve ficar no Redis REST (validateEnv acusa a falta); sem Redis cai para memória por instância.",
+    verification: "core/auth/rate-limit.ts + core/auth/rate-limit.test.ts + validateEnv() + ADR-0007",
     reference: "core/auth/sso.ts",
     implementedAt: "2026-03-10",
+  },
+  {
+    id: "sso-generic-login-error",
+    title: "Erro de login genérico (sem enumeração de contas)",
+    category: "confidencialidade",
+    status: "ativo",
+    description:
+      "Senha errada, e-mail inexistente, conta bloqueada ou MFA exigido mostram a mesma mensagem: \"Credenciais inválidas\". Só \"SSO indisponível\" e \"muitas tentativas\" têm texto próprio, pois não revelam se a conta existe. Texto do SSO nunca chega à tela nem ao log.",
+    verification: "core/auth/sso.test.ts (erro genérico) + app/login/login-form.tsx",
+    reference: "core/auth/sso.ts",
+    implementedAt: "2026-10-08",
   },
   {
     id: "dev-auth-restricted",
@@ -100,7 +111,7 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autenticacao",
     status: "ativo",
     description:
-      "DEV_AUTH_ENABLED só funciona em desenvolvimento local ou Preview protegido; validateEnv bloqueia em produção pública. Rate limit também aplicado.",
+      "DEV_AUTH_ENABLED só funciona em desenvolvimento local ou Preview protegido; validateEnv bloqueia em produção pública. Com SSO configurado o provider dev não é registrado (some da tela e do servidor). Rate limit também aplicado.",
     verification: "validateEnv() + core/auth/config.ts",
     reference: ".env.example",
     implementedAt: "2026-08-10",
@@ -111,10 +122,43 @@ export const COMPLIANCE_CONTROLS: ComplianceControl[] = [
     category: "autorizacao",
     status: "ativo",
     description:
-      "O admin master grava admins e editores EDI em data/access/permissions.json pela tela /admin/acessos. O login lê esse arquivo; se ele ainda não existe, usa PERMISSIONS_CONFIG_JSON só para o primeiro admin. Editor só por e-mail exato. Quem não está na lista é cliente.",
-    verification: "Tela /admin/acessos (só admin) + login lê data/access/permissions.json antes da variável.",
+      "O admin master grava admins e editores EDI em data/access/permissions.json pela tela /admin/acessos. Editor só por e-mail exato. Quem não está na lista é cliente.",
+    verification: "Tela /admin/acessos (só admin) + login lê data/access/permissions.json.",
     reference: "data/permissions.example.json",
     implementedAt: "2026-08-10",
+  },
+  {
+    id: "local-emergency-account-mfa",
+    title: "Conta local de emergência com MFA e sessão curta",
+    category: "autenticacao",
+    status: "ativo",
+    description:
+      "Conta local usa senha com hash + TOTP/recovery code de uso único. Limite de 5 tentativas por 15 min e sessão de 1h para reduzir impacto em emergência.",
+    verification: "core/auth/local-account.ts + core/auth/config.ts + middleware.ts",
+    reference: "LOCAL_EMERGENCY_ACCOUNTS_JSON",
+    implementedAt: "2026-10-14",
+  },
+  {
+    id: "sso-url-allowlist-and-reauth",
+    title: "Troca de URL do SSO com allowlist + reautenticação",
+    category: "integridade",
+    status: "ativo",
+    description:
+      "Admin master só grava URL https em host permitido por SSO_URL_ALLOWED_HOSTS, com teste de conexão e confirmação de senha do próprio admin.",
+    verification: "app/api/admin/access/route.ts + core/auth/sso-config.ts",
+    reference: "SSO_URL_ALLOWED_HOSTS",
+    implementedAt: "2026-10-14",
+  },
+  {
+    id: "access-audit-and-revocation",
+    title: "Auditoria de acessos e revogação imediata em ação sensível",
+    category: "autorizacao",
+    status: "ativo",
+    description:
+      "Inclusão/remoção de acesso, uso de conta local e troca de URL do SSO entram em trilha de auditoria. Ações sensíveis recalculam papel no servidor e bloqueiam removidos sem esperar expiração do JWT.",
+    verification: "core/auth/access-audit.ts + core/auth/require-role.ts",
+    reference: "data/access/audit-log.json",
+    implementedAt: "2026-10-14",
   },
   {
     id: "github-cms-write-allowlist",

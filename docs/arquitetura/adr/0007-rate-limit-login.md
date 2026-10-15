@@ -35,5 +35,10 @@ Portamos o mesmo mecanismo para `core/auth`:
   `active` — não existe uma janela de tempo em produção sem essa defesa.
 - **Mais difícil:** nenhuma — a interface é a mesma, só quem chama
   `validateSsoCredentials` ganha a proteção automaticamente.
-- **Revisar quando:** o portal precisar de rate limit por IP (hoje é só por
-  e-mail) ou de um painel de tentativas bloqueadas para o time EDI.
+- **Atualização (EDI-14353, fase 1):** o limite agora conta por e-mail (10) **e**
+  por IP (30) em 15 min; basta um estourar. O IP vem de `x-real-ip` ou da última
+  entrada de `x-forwarded-for` (`getClientIp`) — só confiável atrás de proxy que
+  sobrescreve esses cabeçalhos. Em homolog e produção o Redis é exigido:
+  `validateEnv()` acusa a falta. O contador do IP não zera no login bem-sucedido.
+- **Revisar quando:** o portal precisar de um painel de tentativas bloqueadas
+  para o time EDI, ou se o IP real do cliente não chegar pelo proxy da homolog.

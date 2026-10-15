@@ -9,8 +9,8 @@ import {
 } from "@/core/auth/roles";
 
 describe("RBAC — resolução de papel", () => {
-  it("reconhece admin pela lista de permissões padrão", () => {
-    expect(resolveRole("admin@funcionalcorp.com.br")).toBe("admin");
+  it("não concede admin por padrão", () => {
+    expect(resolveRole("admin@funcionalcorp.com.br")).toBe("client");
   });
 
   it("é insensível a maiúsculas no e-mail", () => {

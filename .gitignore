@@ -25,6 +25,10 @@ architecture.dot
 /data/**/credentials.enc
 /data/permissions.json
 /data/access/permissions.json
+/data/access/first-access.json
+/data/access/sso-config.json
+/data/access/local-account-state.json
+/data/access/audit-log.json
 
 # logs / SO
 *.log
@@ -44,6 +48,11 @@ next-env.d.ts
 
 # PROMPTS de trabalho, não versionados
 PROMPT_*.md
+
+# Local / daily pessoal — não versionar
+.cursor/rules/demanda-jira.mdc
+docs/operacao/daily-jira.md
+obsidian/notas/estudos/diario/2026-10-08.md
 
 # PDFS de trabalho, não versionados
 *.pdf

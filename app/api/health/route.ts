@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/core/auth";
 import { isAdminRole } from "@/core/auth/roles";
+import { resolveCurrentSessionRole } from "@/core/auth/require-role";
 import { getPermissionsConfigSource } from "@/core/auth/permissions-config";
 import { validateEnv } from "@/core/config/env";
 import { runProductionSecurityChecks } from "@/core/security/production-checks";
@@ -21,7 +22,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const envProblems = validateEnv();
   const session = await auth();
-  const isAdmin = session?.user?.role && isAdminRole(session.user.role);
+  const role = await resolveCurrentSessionRole(session);
+  const isAdmin = !!role && isAdminRole(role);
 
   if (!isAdmin) {
     return NextResponse.json({

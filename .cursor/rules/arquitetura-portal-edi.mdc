@@ -38,6 +38,23 @@ Cada módulo em `modules/<contexto>/` com: `module.ts`, `schema/`, `repository/`
 - Módulo `/compliance` (admin): catálogo de controles — atualizar `modules/compliance/data/controls.ts`.
 - Regra Cursor: `.cursor/rules/seguranca-dados.mdc` — IA para e alerta ao detectar risco.
 
+## Configurável em tela, nunca no código
+
+O diferencial do portal: o time EDI opera sem depender de dev. Papéis, URLs
+(SSO, gateway) e conteúdo são configurados em tela, não fixados no código.
+
+Toda configuração em tela precisa de:
+
+- **Trava no servidor:** allowlist em variável de ambiente (ex.: hosts
+  permitidos). A tela escolhe dentro da trava; não amplia a trava.
+- **Quem pode:** papel checado no servidor, relido da lista atual a cada ação
+  sensível. Não confiar só no papel guardado no JWT.
+- **Rastro:** quem alterou, o quê e quando.
+- **Segredo fora do Git:** senha, token e credencial nunca vão para o repositório.
+
+Ao propor uma feature, perguntar: "isso pode ser configuração em vez de código?"
+e "qual a trava de segurança dessa configuração?".
+
 ## IA
 
 Toda IA passa por `core/ai`. Guardrails + custo (`AI_MONTHLY_BUDGET_USD`). Chaves só server-side.
