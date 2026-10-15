@@ -1,19 +1,72 @@
 {
   "version": 1,
-  "title": "Fluxo Wholesaler",
-  "description": "Autenticação, criação do pedido e consulta do status de processamento.",
-  "nodes": [
-    { "id": "start", "type": "start", "label": "Pedido pronto para envio", "position": { "x": 260, "y": 0 } },
-    { "id": "createToken", "type": "operation", "label": "Obter token", "position": { "x": 260, "y": 90 }, "operationRef": { "kind": "mutation", "name": "createToken" } },
-    { "id": "createOrder", "type": "operation", "label": "Criar pedido", "position": { "x": 260, "y": 180 }, "operationRef": { "kind": "mutation", "name": "createOrder" } },
-    { "id": "orderStatus", "type": "operation", "label": "Consultar status", "position": { "x": 260, "y": 270 }, "operationRef": { "kind": "query", "name": "orderStatus" } },
-    { "id": "end", "type": "end", "label": "Pedido acompanhado", "position": { "x": 260, "y": 360 } }
-  ],
-  "edges": [
-    { "id": "e1", "source": "start", "target": "createToken" },
-    { "id": "e2", "source": "createToken", "target": "createOrder" },
-    { "id": "e3", "source": "createOrder", "target": "orderStatus" },
-    { "id": "e4", "source": "orderStatus", "target": "end" }
-  ],
-  "updatedAt": "2026-09-23T00:00:00.000Z"
+  "flows": [
+    {
+      "id": "pedido-faturamento",
+      "version": 1,
+      "title": "Fluxo de pedido e faturamento",
+      "description": "Pedido criado pela Funcional, consulta e resposta do distribuidor, seguido de faturamento ou cancelamento.",
+      "nodes": [
+        { "id": "start", "type": "start", "label": "Inicio", "position": { "x": 40, "y": 740 } },
+        { "id": "order-created", "type": "operation", "label": "[FUNCIONAL]\nPedido criado no portal", "position": { "x": 560, "y": 740 } },
+        { "id": "orders", "type": "operation", "label": "[DISTRIBUIDOR]\nConsulta pedidos disponiveis\norders - ORDER_NOT_IMPORTED", "position": { "x": 560, "y": 60 }, "operationRef": { "kind": "query", "name": "orders" } },
+        { "id": "set-imported", "type": "operation", "label": "[DISTRIBUIDOR]\nImporta o pedido\nsetOrderAsImported", "position": { "x": 880, "y": 60 }, "operationRef": { "kind": "mutation", "name": "setOrderAsImported" } },
+        { "id": "create-response", "type": "operation", "label": "[DISTRIBUIDOR]\nEnvia retorno\ncreateResponse", "position": { "x": 1200, "y": 60 }, "operationRef": { "kind": "mutation", "name": "createResponse" } },
+        { "id": "accepted", "type": "decision", "label": "Pedido aceito?", "position": { "x": 1520, "y": 60 } },
+        { "id": "total-return", "type": "operation", "label": "[DISTRIBUIDOR]\nRetorno total\nTodos os itens faturados", "position": { "x": 1840, "y": 0 } },
+        { "id": "partial-return", "type": "operation", "label": "[DISTRIBUIDOR]\nRetorno parcial\nItens e motivos informados", "position": { "x": 1840, "y": 160 } },
+        { "id": "rejected-return", "type": "operation", "label": "[DISTRIBUIDOR]\nRetorno rejeitado\nMotivo de nao faturamento", "position": { "x": 1840, "y": 320 } },
+        { "id": "process-accepted", "type": "operation", "label": "[FUNCIONAL]\nProcessa retorno aceito\nStatus AWAITING_INVOICE", "position": { "x": 1840, "y": 680 } },
+        { "id": "process-rejected", "type": "operation", "label": "[FUNCIONAL]\nProcessa retorno rejeitado\nStatus REJECTED", "position": { "x": 1840, "y": 920 } },
+        { "id": "rejected-status", "type": "operation", "label": "[FUNCIONAL]\nPedido permanece REJECTED", "position": { "x": 2160, "y": 920 } },
+        { "id": "consult-rejected", "type": "operation", "label": "[DISTRIBUIDOR]\nConsulta o processamento do retorno", "position": { "x": 2480, "y": 320 } },
+        { "id": "consult-response", "type": "operation", "label": "[DISTRIBUIDOR]\nConsulta o processamento do retorno", "position": { "x": 2160, "y": 60 } },
+        { "id": "billing-decision", "type": "decision", "label": "Pedido sera faturado?", "position": { "x": 2480, "y": 60 } },
+        { "id": "create-cancellation", "type": "operation", "label": "[DISTRIBUIDOR]\nEnvia cancelamento\ncreateCancellation", "position": { "x": 2800, "y": 0 }, "operationRef": { "kind": "mutation", "name": "createCancellation" } },
+        { "id": "process-cancellation", "type": "operation", "label": "[FUNCIONAL]\nProcessa cancelamento", "position": { "x": 2800, "y": 680 } },
+        { "id": "cancelled-status", "type": "operation", "label": "[FUNCIONAL]\nPedido CANCELLED", "position": { "x": 3120, "y": 680 } },
+        { "id": "consult-cancellation", "type": "operation", "label": "[DISTRIBUIDOR]\nConsulta o processamento do cancelamento", "position": { "x": 3440, "y": 0 } },
+        { "id": "create-invoice", "type": "operation", "label": "[DISTRIBUIDOR]\nEnvia nota fiscal\ncreateInvoice", "position": { "x": 2800, "y": 160 }, "operationRef": { "kind": "mutation", "name": "createInvoice" } },
+        { "id": "process-invoice", "type": "operation", "label": "[FUNCIONAL]\nProcessa a nota fiscal", "position": { "x": 2800, "y": 920 } },
+        { "id": "invoice-status", "type": "operation", "label": "[FUNCIONAL]\nPedido INVOICE_RECEIVED", "position": { "x": 3120, "y": 920 } },
+        { "id": "consult-invoice", "type": "operation", "label": "[DISTRIBUIDOR]\nConsulta a nota e o ressarcimento", "position": { "x": 3440, "y": 160 } },
+        { "id": "end-rejected", "type": "end", "label": "Fim - pedido rejeitado", "position": { "x": 2800, "y": 320 } },
+        { "id": "end-cancelled", "type": "end", "label": "Fim - pedido cancelado", "position": { "x": 3760, "y": 0 } },
+        { "id": "end-invoice", "type": "end", "label": "Fim - faturamento processado", "position": { "x": 3760, "y": 160 } }
+      ],
+      "edges": [
+        { "id": "e-start-order", "source": "start", "target": "order-created", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-order-orders", "source": "order-created", "target": "orders", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-orders-imported", "source": "orders", "target": "set-imported", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-imported-response", "source": "set-imported", "target": "create-response", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-response-accepted", "source": "create-response", "target": "accepted", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-accepted-total", "source": "accepted", "target": "total-return", "sourceHandle": "out-right-top", "targetHandle": "in-left", "label": "SIM - TOTAL" },
+        { "id": "e-accepted-partial", "source": "accepted", "target": "partial-return", "sourceHandle": "out-right", "targetHandle": "in-left", "label": "SIM - PARCIAL" },
+        { "id": "e-accepted-rejected", "source": "accepted", "target": "rejected-return", "sourceHandle": "out-right-bottom", "targetHandle": "in-left", "label": "NAO" },
+        { "id": "e-total-process", "source": "total-return", "target": "process-accepted", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-partial-process", "source": "partial-return", "target": "process-accepted", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-rejected-process", "source": "rejected-return", "target": "process-rejected", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-rejected-status", "source": "process-rejected", "target": "rejected-status", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-rejected-consult", "source": "rejected-status", "target": "consult-rejected", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-rejected-end", "source": "consult-rejected", "target": "end-rejected", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-accepted-consult", "source": "process-accepted", "target": "consult-response", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-consult-billing", "source": "consult-response", "target": "billing-decision", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-billing-cancel", "source": "billing-decision", "target": "create-cancellation", "sourceHandle": "out-right-top", "targetHandle": "in-left", "label": "NAO" },
+        { "id": "e-cancel-process", "source": "create-cancellation", "target": "process-cancellation", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-cancel-status", "source": "process-cancellation", "target": "cancelled-status", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-cancel-consult", "source": "cancelled-status", "target": "consult-cancellation", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-cancel-end", "source": "consult-cancellation", "target": "end-cancelled", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-billing-invoice", "source": "billing-decision", "target": "create-invoice", "sourceHandle": "out-right-bottom", "targetHandle": "in-left", "label": "SIM" },
+        { "id": "e-invoice-process", "source": "create-invoice", "target": "process-invoice", "sourceHandle": "out", "targetHandle": "in" },
+        { "id": "e-invoice-status", "source": "process-invoice", "target": "invoice-status", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-invoice-consult", "source": "invoice-status", "target": "consult-invoice", "sourceHandle": "out-right", "targetHandle": "in-left" },
+        { "id": "e-invoice-end", "source": "consult-invoice", "target": "end-invoice", "sourceHandle": "out-right", "targetHandle": "in-left" }
+      ],
+      "lanes": [
+        { "id": "distribuidor", "label": "WHOLESALER - DISTRIBUIDOR", "position": { "x": 0, "y": 0 }, "width": 4100, "height": 600 },
+        { "id": "funcional", "label": "WHOLESALER - FUNCIONAL", "position": { "x": 0, "y": 600 }, "width": 4100, "height": 600 }
+      ],
+      "updatedAt": "2026-10-14T12:00:00.000Z"
+    }
+  ]
 }

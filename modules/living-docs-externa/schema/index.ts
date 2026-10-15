@@ -34,6 +34,7 @@ export {
   updateManualOperationInputSchema,
   updateManualMetadataInputSchema,
   findOperation,
+  sortManualSections,
   sortOperations,
   type IntegrationManual,
   type ManualOperation,

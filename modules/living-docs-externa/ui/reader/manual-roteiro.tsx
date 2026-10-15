@@ -1,5 +1,5 @@
 import type { ManualOperation, ManualSection, Project } from "@/modules/living-docs-externa/schema";
-import { sortOperations } from "@/modules/living-docs-externa/schema";
+import { sortManualSections, sortOperations } from "@/modules/living-docs-externa/schema";
 import { docsOperationHref, docsPlaygroundHref } from "@/modules/living-docs-externa/services/docs-routes";
 import type { OperationSchemaDetail } from "@/modules/living-docs-externa/services/schema-reference";
 import { MarkdownBody } from "@/core/ui/markdown-body";
@@ -81,8 +81,9 @@ export function ManualRoteiro({
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
-  const businessRulesSection = sections.find((section) => section.id === "regras-de-negocios");
-  const documentationSections = sections.filter(
+  const orderedSections = sortManualSections(manual, sections);
+  const businessRulesSection = orderedSections.find((section) => section.id === "regras-de-negocios");
+  const documentationSections = orderedSections.filter(
     (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
   );
   const isEditing = editor != null;

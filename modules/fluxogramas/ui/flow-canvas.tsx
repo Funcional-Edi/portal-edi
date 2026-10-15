@@ -102,10 +102,14 @@ export function FlowCanvas({
       ...(annotations ?? []).map((annotation) => annotation.position.y + ANNOTATION_HEIGHT),
     ) + 32,
   };
+  const flowViewportKey =
+    lanes?.map(({ id, position, width, height }) => `${id}:${position.x},${position.y}:${width}x${height}`).join("|") ??
+    "default";
 
   return (
     <div className="h-[min(80vh,52rem)] min-h-[38rem] w-full rounded-lg border border-slate-200 bg-white">
       <ReactFlow
+        key={flowViewportKey}
         nodes={nodes}
         edges={edges}
         nodeTypes={flowNodeTypes}
