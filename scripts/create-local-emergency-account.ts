@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 
+import { loadEnvConfig } from "@next/env";
+
 import { hashLocalPassword, hashRecoveryCode } from "@/core/auth/local-account";
+
+loadEnvConfig(process.cwd());
 
 function usage(): never {
   throw new Error(
@@ -32,6 +36,9 @@ async function main() {
   if (password.length < 16) {
     throw new Error("Senha mínima: 16 caracteres.");
   }
+  if (!process.env.AUTH_SECRET?.trim()) {
+    throw new Error("AUTH_SECRET ausente no .env.local. Sem ele a senha não vai funcionar no portal.");
+  }
 
   const totpSecret = randomTotpSecretBase32();
   const recoveryCodes = Array.from({ length: 8 }, randomRecoveryCode);
@@ -46,8 +53,9 @@ async function main() {
     recoveryCodeHashes,
   };
 
-  console.log("Conta local criada. Salve em LOCAL_EMERGENCY_ACCOUNTS_JSON:");
-  console.log(JSON.stringify([account], null, 2));
+  const envLine = `LOCAL_EMERGENCY_ACCOUNTS_JSON='${JSON.stringify([account]).replaceAll("$", "\\$")}'`;
+  console.log("Conta local criada. Troque a linha inteira no .env.local por esta:");
+  console.log(envLine);
   console.log("\nCodigos de recuperacao (uso unico):");
   for (const code of recoveryCodes) console.log(`- ${code}`);
   console.log(

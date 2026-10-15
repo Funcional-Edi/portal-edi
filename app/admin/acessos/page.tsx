@@ -20,10 +20,8 @@ export default async function AdminAccessPage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Acessos</h1>
         <p className="mt-2 max-w-2xl text-slate-600">
-          Inclua o próximo admin master ou editor EDI pelo e-mail exato. Quem não estiver
-          nestas listas entra como visualizador. A lista fica salva no portal, no mesmo
-          formato da variável PERMISSIONS_CONFIG_JSON. Essa variável só serve para bootstrap.
-          Remoções são aplicadas na próxima ação sensível do usuário.
+          Escolha o SSO e diga quem é admin master ou editor EDI nesse SSO.
+          Quem não estiver na lista entra só para ler.
         </p>
       </header>
       <AccessEditor

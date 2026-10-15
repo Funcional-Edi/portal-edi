@@ -27,6 +27,7 @@ Um arquivo por dia em `diario/AAAA-MM-DD.md`, respondendo 4 perguntas:
 - [[2026-10-08|08/10/2026 — EDI-14353 fase 1: login SSO com limite por e-mail e IP]]
 - [[2026-10-05|05/10/2026 — Ativar Node 24 com o número que o nvm instalou]]
 - [[2026-10-14|14/10/2026 — EDI-14353 B8 completa: conta local + MFA + auditoria]]
+- [[2026-10-15|15/10/2026 — Acessos: pessoas amarradas ao SSO em uso]]
 
 ## Template
 

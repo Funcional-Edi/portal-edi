@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { auth, isAdminRole, isInternalStaffRole } from "@/core/auth";
+import { auth, isInternalStaffRole } from "@/core/auth";
 import { listAccessAuditEvents } from "@/core/auth/access-audit";
 import { isLocalEmergencyConfigured } from "@/core/auth/local-account";
 import { canAccessLevel, canAccessModule } from "@/core/auth/module-access";
@@ -95,9 +95,13 @@ export default async function HomePage() {
 
   const role = session.user.role ?? "client";
   const isAdmin = isInternalStaffRole(role);
-  const localEmergencyWarnings = isAdminRole(role)
-    ? (await listAccessAuditEvents()).filter((event) => event.action === "local_login_success").slice(0, 3)
-    : [];
+  const emergencyEmail = session.user.email?.trim().toLowerCase() ?? "";
+  const localEmergencyWarnings =
+    session.user.authMethod === "local" && emergencyEmail
+      ? (await listAccessAuditEvents())
+          .filter((event) => event.action === "local_login_success" && event.actorEmail === emergencyEmail)
+          .slice(0, 3)
+      : [];
   const accessibleModules = registerAllModules().filter((module) => canAccessModule(role, module));
   const activeModules = accessibleModules.filter((module) => module.status === "active");
   const plannedModules = isAdmin ? accessibleModules.filter((module) => module.status !== "active") : [];

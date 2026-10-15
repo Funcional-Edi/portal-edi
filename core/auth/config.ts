@@ -8,6 +8,9 @@ import {
   authenticateLocalEmergencyUser,
   getLocalLoginIp,
   isLocalEmergencyConfigured,
+  LocalInvalidCredentialsError,
+  LocalLoginRateLimitError,
+  LocalMfaRequiredError,
 } from "@/core/auth/local-account";
 import { checkLoginRateLimit, getClientIp, resetLoginRateLimit } from "@/core/auth/rate-limit";
 import { resolveRole, type UserRole } from "@/core/auth/roles";
@@ -59,15 +62,24 @@ if (isLocalEmergencyConfigured()) {
       async authorize(credentials, request) {
         const email = credentials?.email?.toString().trim().toLowerCase();
         const password = credentials?.password?.toString();
-        const mfaCode = credentials?.mfaCode?.toString();
-        if (!email || !password || !mfaCode) return null;
+        const mfaCode = credentials?.mfaCode?.toString() ?? "";
+        if (!email || !password) return null;
 
-        const user = await authenticateLocalEmergencyUser({
-          email,
-          password,
-          mfaCode,
-          ip: getLocalLoginIp(request.headers),
-        });
+        let user: Awaited<ReturnType<typeof authenticateLocalEmergencyUser>>;
+        try {
+          user = await authenticateLocalEmergencyUser({
+            email,
+            password,
+            mfaCode,
+            ip: getLocalLoginIp(request.headers),
+          });
+        } catch (error) {
+          if (error instanceof LocalMfaRequiredError || error instanceof LocalLoginRateLimitError) {
+            throw error;
+          }
+          if (error instanceof LocalInvalidCredentialsError && !mfaCode.trim()) return null;
+          throw error;
+        }
 
         await markFirstAccess(user.email);
         return {

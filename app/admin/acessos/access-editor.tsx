@@ -2,74 +2,8 @@
 
 import { useState } from "react";
 
-function EmailList({
-  title,
-  hint,
-  emails,
-  onChange,
-}: {
-  title: string;
-  hint: string;
-  emails: string[];
-  onChange: (emails: string[]) => void;
-}) {
-  const [draft, setDraft] = useState("");
-
-  function add() {
-    const email = draft.trim().toLowerCase();
-    if (!email || emails.includes(email)) return;
-    onChange([...emails, email]);
-    setDraft("");
-  }
-
-  return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="mt-1 text-sm text-slate-600">{hint}</p>
-      <ul className="mt-4 space-y-2">
-        {emails.length === 0 ? <li className="text-sm text-slate-500">Nenhum e-mail nesta lista.</li> : null}
-        {emails.map((email) => (
-          <li key={email} className="flex items-center justify-between gap-3 text-sm">
-            <span>{email}</span>
-            <button
-              type="button"
-              className="text-slate-500 underline"
-              onClick={() => onChange(emails.filter((item) => item !== email))}
-            >
-              Remover
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-4 flex gap-2">
-        <input
-          type="email"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder="nome@empresa.com"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-        <button type="button" onClick={add} className="rounded-md border border-slate-300 px-3 py-2 text-sm">
-          Incluir
-        </button>
-      </div>
-    </section>
-  );
-}
-
+type Role = "admin" | "editor";
 type FirstAccessMap = Record<string, string>;
-
-function membersWithRole(admins: string[], editors: string[]) {
-  return [
-    ...admins.map((email) => ({ email, role: "Admin master" })),
-    ...editors.map((email) => ({ email, role: "Editor EDI" })),
-  ];
-}
-
-function FirstAccessColumn({ email, firstAccess }: { email: string; firstAccess: FirstAccessMap }) {
-  const date = firstAccess[email];
-  return <span>{date ? new Date(date).toLocaleString("pt-BR") : "aguardando"}</span>;
-}
 
 export function AccessEditor({
   admins,
@@ -87,23 +21,85 @@ export function AccessEditor({
   const [firstAccessMap, setFirstAccessMap] = useState(firstAccess);
   const [ssoUrl, setSsoUrl] = useState(initialSsoUrl);
   const [savedSsoUrl, setSavedSsoUrl] = useState(initialSsoUrl);
+  const [login, setLogin] = useState("");
+  const [role, setRole] = useState<Role>("editor");
   const [adminPassword, setAdminPassword] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
-  async function save() {
+  const people = [
+    ...adminEmails.map((email) => ({ email, role: "admin" as const })),
+    ...editorEmails.map((email) => ({ email, role: "editor" as const })),
+  ].sort((a, b) => a.email.localeCompare(b.email));
+
+  function addPerson() {
+    const email = login.trim().toLowerCase();
+    if (!email || email.startsWith("@") || !email.includes("@")) {
+      setMessage("Use o login completo, por exemplo nome@empresa.com.");
+      return;
+    }
+    if (adminEmails.includes(email) || editorEmails.includes(email)) {
+      setMessage("Esse login já está neste SSO.");
+      return;
+    }
+    if (role === "admin") setAdminEmails((current) => [...current, email]);
+    else setEditorEmails((current) => [...current, email]);
+    setLogin("");
+    setMessage("");
+  }
+
+  function removePerson(email: string) {
+    setAdminEmails((current) => current.filter((item) => item !== email));
+    setEditorEmails((current) => current.filter((item) => item !== email));
+  }
+
+  function changeRole(email: string, nextRole: Role) {
+    removePerson(email);
+    if (nextRole === "admin") setAdminEmails((current) => [...current.filter((item) => item !== email), email]);
+    else setEditorEmails((current) => [...current.filter((item) => item !== email), email]);
+  }
+
+  async function savePeople() {
+    if (adminEmails.length === 0) {
+      setMessage("Inclua pelo menos um admin master deste SSO.");
+      return;
+    }
     setSaving(true);
     setMessage("");
     try {
       const response = await fetch("/api/admin/access", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admins: adminEmails,
-          editors: editorEmails,
-          ssoUrl: ssoUrl.trim() !== savedSsoUrl.trim() ? ssoUrl.trim() : null,
-          adminPassword,
-        }),
+        body: JSON.stringify({ admins: adminEmails, editors: editorEmails }),
+      });
+      const body = (await response.json()) as {
+        error?: string;
+        admins?: string[];
+        editors?: string[];
+        firstAccess?: FirstAccessMap;
+      };
+      if (!response.ok) {
+        setMessage(body.error ?? "Não foi possível salvar.");
+        return;
+      }
+      setAdminEmails(body.admins ?? []);
+      setEditorEmails(body.editors ?? []);
+      setFirstAccessMap(body.firstAccess ?? {});
+      setMessage("Pessoas deste SSO atualizadas.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function switchSso() {
+    setSwitching(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/access", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ssoUrl: ssoUrl.trim(), adminPassword }),
       });
       const body = (await response.json()) as {
         error?: string;
@@ -113,7 +109,7 @@ export function AccessEditor({
         ssoUrl?: string | null;
       };
       if (!response.ok) {
-        setMessage(body.error ?? "Não foi possível salvar.");
+        setMessage(body.error ?? "Não foi possível trocar o SSO.");
         return;
       }
       setAdminEmails(body.admins ?? []);
@@ -124,77 +120,135 @@ export function AccessEditor({
         setSavedSsoUrl(body.ssoUrl);
       }
       setAdminPassword("");
-      setMessage("Acessos salvos. Remoção bloqueia na próxima ação do usuário.");
+      setMessage("SSO atualizado. A lista abaixo é só deste endereço.");
     } finally {
-      setSaving(false);
+      setSwitching(false);
     }
   }
 
   return (
-    <div className="space-y-4">
-      <EmailList
-        title="Admin master"
-        hint="Acesso a tudo. É preciso manter pelo menos um."
-        emails={adminEmails}
-        onChange={setAdminEmails}
-      />
-      <EmailList
-        title="Editor EDI"
-        hint="Edita e envia. Não publica. E-mail exato, nunca o domínio."
-        emails={editorEmails}
-        onChange={setEditorEmails}
-      />
-      <button
-        type="button"
-        onClick={save}
-        disabled={saving}
-        className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:opacity-60"
-      >
-        {saving ? "Salvando…" : "Salvar"}
-      </button>
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-lg font-semibold">URL do SSO</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          URL permitida por <code>SSO_URL_ALLOWED_HOSTS</code>. O portal pede sua senha para confirmar.
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">SSO em uso</p>
+        <p className="mt-2 break-all text-sm text-slate-900">{savedSsoUrl || "Nenhum SSO configurado"}</p>
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          Os logins abaixo entram por este SSO. Quem não estiver na lista entra só para ler.
+          Se o endereço mudar, a lista deste SSO continua guardada e o novo começa do zero.
+        </p>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Pessoas deste SSO</h2>
+        <p className="mt-1 max-w-2xl text-sm text-slate-600">
+          Digite o login que a pessoa já usa nesse SSO. O portal não consulta a lista de usuários
+          de lá: você informa o login e escolhe o papel.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="email"
+            value={login}
+            onChange={(event) => setLogin(event.target.value)}
+            placeholder="login@empresa.com"
+            aria-label="Login do SSO"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+          <select
+            value={role}
+            onChange={(event) => setRole(event.target.value as Role)}
+            aria-label="Papel"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          >
+            <option value="editor">Editor EDI</option>
+            <option value="admin">Admin master</option>
+          </select>
+          <button
+            type="button"
+            onClick={addPerson}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium"
+          >
+            Incluir
+          </button>
+        </div>
+
+        <ul className="mt-6 divide-y divide-slate-100">
+          {people.length === 0 ? (
+            <li className="py-6 text-sm text-slate-500">Nenhuma pessoa neste SSO.</li>
+          ) : null}
+          {people.map((person) => (
+            <li key={person.email} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-900">{person.email}</p>
+                <p className="text-xs text-slate-500">
+                  Primeiro acesso:{" "}
+                  {firstAccessMap[person.email]
+                    ? new Date(firstAccessMap[person.email]).toLocaleString("pt-BR")
+                    : "aguardando"}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <select
+                  value={person.role}
+                  aria-label={`Papel de ${person.email}`}
+                  onChange={(event) => changeRole(person.email, event.target.value as Role)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                >
+                  <option value="admin">Admin master</option>
+                  <option value="editor">Editor EDI</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => removePerson(person.email)}
+                  className="text-sm text-slate-500 underline"
+                >
+                  Remover
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          onClick={savePeople}
+          disabled={saving}
+          className="mt-2 rounded-lg bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:opacity-60"
+        >
+          {saving ? "Salvando…" : "Salvar pessoas"}
+        </button>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Trocar o SSO</h2>
+        <p className="mt-1 max-w-2xl text-sm text-slate-600">
+          Use outro endereço quando o SSO mudar. Confirme com a sua senha. As pessoas do endereço
+          anterior não passam automaticamente para o novo.
         </p>
         <input
           type="url"
           value={ssoUrl}
           onChange={(event) => setSsoUrl(event.target.value)}
-          className="mt-3 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          aria-label="Endereço do SSO"
+          className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           placeholder="https://sso.exemplo.com.br/graphql/"
         />
         <input
           type="password"
           value={adminPassword}
           onChange={(event) => setAdminPassword(event.target.value)}
-          className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Confirme sua senha do SSO"
+          aria-label="Senha para confirmar a troca"
+          className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          placeholder="Sua senha"
         />
+        <button
+          type="button"
+          onClick={switchSso}
+          disabled={switching}
+          className="mt-3 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium disabled:opacity-60"
+        >
+          {switching ? "Trocando…" : "Usar este SSO"}
+        </button>
       </section>
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-lg font-semibold">Primeiro acesso</h2>
-        <table className="mt-3 w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-600">
-              <th className="py-2">E-mail</th>
-              <th className="py-2">Papel</th>
-              <th className="py-2">Primeiro acesso</th>
-            </tr>
-          </thead>
-          <tbody>
-            {membersWithRole(adminEmails, editorEmails).map((member) => (
-              <tr key={member.email} className="border-b border-slate-100">
-                <td className="py-2">{member.email}</td>
-                <td className="py-2">{member.role}</td>
-                <td className="py-2">
-                  <FirstAccessColumn email={member.email} firstAccess={firstAccessMap} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+
       {message ? <p className="text-sm text-slate-700">{message}</p> : null}
     </div>
   );

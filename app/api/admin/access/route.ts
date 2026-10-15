@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { AccessListError, loadAccessList, saveAccessList } from "@/core/auth/access-list";
+import { AccessListError, keepPeopleOnCurrentSso, loadAccessList, saveAccessList } from "@/core/auth/access-list";
 import { appendAccessAuditEvent } from "@/core/auth/access-audit";
 import { loadFirstAccessMap } from "@/core/auth/first-access";
 import { requireAdmin } from "@/core/auth/require-role";
@@ -47,8 +47,6 @@ export async function PUT(request: Request) {
   const adminPassword = (body as { adminPassword?: unknown })?.adminPassword;
 
   try {
-    const saved = await saveAccessList({ admins, editors }, session.user.email ?? undefined);
-
     let savedSsoUrl: string | null = null;
     if (typeof ssoUrl === "string" && ssoUrl.trim()) {
       if (typeof adminPassword !== "string" || !adminPassword) {
@@ -61,6 +59,7 @@ export async function PUT(request: Request) {
       const urlError = validateSsoUrl(ssoUrl);
       if (urlError) return NextResponse.json({ error: urlError }, { status: 400 });
       await probeSsoUrl(ssoUrl.trim());
+      await keepPeopleOnCurrentSso(ssoUrl.trim());
       const stored = await saveSsoUrl({ url: ssoUrl.trim(), updatedBy: session.user.email });
       await appendAccessAuditEvent({
         action: "sso_url_updated",
@@ -69,6 +68,10 @@ export async function PUT(request: Request) {
       });
       savedSsoUrl = stored.url;
     }
+
+    const saved = Array.isArray(admins) || Array.isArray(editors)
+      ? await saveAccessList({ admins, editors }, session.user.email ?? undefined)
+      : await loadAccessList();
 
     const firstAccess = await loadFirstAccessMap();
     return NextResponse.json({

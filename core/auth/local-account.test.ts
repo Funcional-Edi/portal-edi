@@ -15,6 +15,7 @@ import {
   hashRecoveryCode,
   LocalInvalidCredentialsError,
   LocalLoginRateLimitError,
+  LocalMfaRequiredError,
 } from "@/core/auth/local-account";
 import { resetAllMemoryRateLimits } from "@/core/auth/rate-limit";
 
@@ -48,6 +49,18 @@ describe("conta local de emergencia", () => {
       },
     ]);
   }
+
+  it("senha certa sem codigo pede o codigo antes de entrar", async () => {
+    await setupEnvAccount();
+    await expect(
+      authenticateLocalEmergencyUser({
+        email: EMAIL,
+        password: PASSWORD,
+        mfaCode: "",
+        ip: "1.1.1.9",
+      })
+    ).rejects.toBeInstanceOf(LocalMfaRequiredError);
+  });
 
   it("recusa senha errada", async () => {
     await setupEnvAccount();
@@ -94,9 +107,23 @@ describe("conta local de emergencia", () => {
     ).rejects.toBeInstanceOf(LocalInvalidCredentialsError);
   });
 
-  it("aplica rate limit de 5 tentativas em 15 minutos", async () => {
+  it("pedir o codigo nao consome a trava", async () => {
     await setupEnvAccount();
-    for (let i = 0; i < 5; i += 1) {
+    for (let i = 0; i < 6; i += 1) {
+      await expect(
+        authenticateLocalEmergencyUser({
+          email: EMAIL,
+          password: PASSWORD,
+          mfaCode: "",
+          ip: "3.3.3.3",
+        })
+      ).rejects.toBeInstanceOf(LocalMfaRequiredError);
+    }
+  });
+
+  it("aplica rate limit de 10 senhas erradas em 15 minutos", async () => {
+    await setupEnvAccount();
+    for (let i = 0; i < 10; i += 1) {
       await expect(
         authenticateLocalEmergencyUser({
           email: EMAIL,

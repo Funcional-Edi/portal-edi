@@ -14,7 +14,8 @@ const LOCAL_STATE_PATH = "data/access/local-account-state.json";
 const LOCAL_STATE_BRANCH = "portal-state";
 const TOTP_STEP_SECONDS = 30;
 const TOTP_DIGITS = 6;
-const LOCAL_RATE_LIMIT_MAX = 5;
+const LOCAL_RATE_LIMIT_MAX = 10;
+const LOCAL_IP_RATE_LIMIT_MAX = 30;
 
 const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
@@ -38,6 +39,11 @@ export class LocalLoginRateLimitError extends CredentialsSignin {
 
 export class LocalInvalidCredentialsError extends CredentialsSignin {
   code = "local_invalid_credentials";
+}
+
+/** Senha da conta de emergência confere, mas o código ainda não foi enviado. */
+export class LocalMfaRequiredError extends CredentialsSignin {
+  code = "local_mfa_required";
 }
 
 function normalizeEmail(email: string): string {
@@ -240,8 +246,13 @@ async function verifySecondFactor(account: LocalEmergencyAccount, mfaCode: strin
 
 async function checkLocalRateLimit(email: string, ip: string): Promise<boolean> {
   const byEmail = await checkLoginRateLimit(`local:email:${email}`, LOCAL_RATE_LIMIT_MAX);
-  const byIp = await checkLoginRateLimit(`local:ip:${ip}`, LOCAL_RATE_LIMIT_MAX);
+  const byIp = await checkLoginRateLimit(`local:ip:${ip}`, LOCAL_IP_RATE_LIMIT_MAX);
   return byEmail.allowed && byIp.allowed;
+}
+
+async function resetLocalRateLimit(email: string, ip: string): Promise<void> {
+  await resetLoginRateLimit(`local:email:${email}`);
+  await resetLoginRateLimit(`local:ip:${ip}`);
 }
 
 export async function authenticateLocalEmergencyUser(input: {
@@ -251,19 +262,24 @@ export async function authenticateLocalEmergencyUser(input: {
   ip: string;
 }): Promise<{ id: string; email: string; role: LocalAccountRole; authMethod: "local" }> {
   const email = normalizeEmail(input.email);
-  const canTry = await checkLocalRateLimit(email, input.ip);
-  if (!canTry) throw new LocalLoginRateLimitError();
-
   const account = loadLocalEmergencyAccounts().find((candidate) => candidate.email === email);
   if (!account) throw new LocalInvalidCredentialsError();
+
+  const canTry = await checkLocalRateLimit(email, input.ip);
+  if (!canTry) throw new LocalLoginRateLimitError();
 
   const passwordOk = await verifyLocalPassword(input.password, account.passwordHash);
   if (!passwordOk) throw new LocalInvalidCredentialsError();
 
+  if (!input.mfaCode.trim()) {
+    await resetLocalRateLimit(email, input.ip);
+    throw new LocalMfaRequiredError();
+  }
+
   const secondFactorOk = await verifySecondFactor(account, input.mfaCode);
   if (!secondFactorOk) throw new LocalInvalidCredentialsError();
 
-  await resetLoginRateLimit(`local:email:${email}`);
+  await resetLocalRateLimit(email, input.ip);
   await appendAccessAuditEvent({
     action: "local_login_success",
     actorEmail: email,
