@@ -174,28 +174,34 @@ test("jornadas Credenciado começam pela autenticação do Gateway", async ({ pa
   await loginAsDevUser(page);
   await page.goto("/docs/credenciado-venda#jornada-integracao");
 
-  const upload = page.locator("#jornada-operacao-3");
-  await upload.locator("summary").click();
+  const upload = page.locator("details").filter({
+    has: page.getByRole("heading", { name: "Enviar arquivo da receita", exact: true }),
+  });
+  await expect(upload).toHaveCount(1);
+  await upload.locator("summary").first().click();
+  await expect(upload).toHaveJSProperty("open", true);
   await expect(upload.getByRole("heading", { name: "Estrutura multipart/form-data" })).toBeVisible();
   await expect(upload).toContainText("Prescription_uploadPrescription");
   await expect(upload).toContainText('"uploaded_file":["variables.file"]');
-  await expect(upload).toContainText("Prescription_addPrescription");
+  await expect(upload).not.toContainText("Prescription_addPrescription");
+  await expect(upload).not.toContainText("identity");
+  await expect(upload).not.toContainText("storage");
   await expect(upload.getByRole("link", { name: "Teste de Requisição" })).toHaveCount(0);
 });
 
-test("Credenciado oferece roteiro de homologação e deixa pendências explícitas", async ({ page }) => {
+test("Credenciado oferece roteiro de homologação sem contato pendente", async ({ page }) => {
   await loginAsDevUser(page);
   await page.goto("/docs?produto=credenciado");
   await page.getByRole("button", { name: "Roteiro de Homologação" }).click();
 
   await expect(page.getByRole("heading", { name: "Roteiro de Homologação", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Cenários por subproduto" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Fluxo de Cadastro/ })).toHaveAttribute(
+  await expect(page.locator('a[href="/docs/credenciado-cadastro#roteiro-integracao"]')).toHaveAttribute(
     "href",
     "/docs/credenciado-cadastro#roteiro-integracao"
   );
   await expect(page.getByRole("button", { name: "Documento em preparação" })).toBeDisabled();
-  await expect(page.getByText("E-mail/canal para envio")).toBeVisible();
+  await expect(page.getByText("Contato do time de EDI")).toHaveCount(0);
 });
 
 test("docs/api exige login", async ({ page }) => {

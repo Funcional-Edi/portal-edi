@@ -420,18 +420,6 @@ function CredenciadoHomologationGuide({ links }: { links: DocumentationLinkView[
         </button>
       </section>
 
-      <section aria-labelledby="credenciado-homologation-contact" className="rounded-lg border border-brand-200 bg-brand-50 p-4">
-        <h5 id="credenciado-homologation-contact" className="font-semibold text-brand-900">
-          Contato do time de EDI
-        </h5>
-        <p className="mt-1 text-sm leading-relaxed text-brand-900">
-          Os dados de contato e o canal de envio serão informados após alinhamento com o time responsável.
-        </p>
-        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-          <div><dt className="font-medium text-brand-900">Responsável</dt><dd className="text-brand-800">A definir</dd></div>
-          <div><dt className="font-medium text-brand-900">E-mail/canal para envio</dt><dd className="text-brand-800">A definir</dd></div>
-        </dl>
-      </section>
     </div>
   );
 }

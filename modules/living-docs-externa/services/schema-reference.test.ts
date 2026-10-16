@@ -378,7 +378,7 @@ describe("exemplos de requisição dos subprodutos Credenciado", () => {
       expect(operationNames, slug).toEqual(schemaOperationNames);
 
       for (const operation of manual.operations) {
-        if (operation.name === "Prescription_addPrescription") {
+        if (operation.name === "Prescription_uploadPrescription") {
           const payloadText = operation.exampleQuery.match(/operations: (.+)\n\nmap:/s)?.[1];
           expect(payloadText, operation.name).toBeTruthy();
           if (!payloadText) throw new Error("Payload multipart ausente");

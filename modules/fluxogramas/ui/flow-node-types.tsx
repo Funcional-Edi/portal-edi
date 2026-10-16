@@ -141,6 +141,28 @@ function OperationNode({ data }: NodeProps) {
   );
 }
 
+function BoxNode({ data }: NodeProps) {
+  const nodeData = readNodeData(data);
+  return (
+    <div className={`${baseClass} border-slate-300 bg-white text-slate-800`}>
+      <TargetHandles handles={nodeData.targetHandles} color="!bg-slate-500" />
+      <p className="whitespace-pre-line">{nodeData.label}</p>
+      <PrimarySourceHandles handles={nodeData.sourceHandles} color="!bg-slate-500" />
+    </div>
+  );
+}
+
+function TextNode({ data }: NodeProps) {
+  const nodeData = readNodeData(data);
+  return (
+    <div className="min-w-[10rem] max-w-[20rem] rounded-md border border-dashed border-slate-400 bg-white/90 px-3 py-2 text-xs leading-snug text-slate-700 shadow-sm">
+      <TargetHandles handles={nodeData.targetHandles} color="!bg-slate-400" />
+      <p className="whitespace-pre-line">{nodeData.label}</p>
+      <PrimarySourceHandles handles={nodeData.sourceHandles} color="!bg-slate-400" />
+    </div>
+  );
+}
+
 function DecisionNode({ data }: NodeProps) {
   const nodeData = readNodeData(data);
   return (
@@ -217,6 +239,8 @@ export const flowNodeTypes = {
   start: StartNode,
   operation: OperationNode,
   decision: DecisionNode,
+  box: BoxNode,
+  text: TextNode,
   end: EndNode,
 };
 
@@ -224,5 +248,7 @@ export const FLOW_NODE_TYPE_LABELS: Record<FlowNodeType, string> = {
   start: "Início",
   operation: "Operação GraphQL",
   decision: "Decisão",
+  box: "Caixa",
+  text: "Caixa de texto",
   end: "Fim",
 };

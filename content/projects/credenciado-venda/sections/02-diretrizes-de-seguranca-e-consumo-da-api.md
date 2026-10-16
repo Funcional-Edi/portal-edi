@@ -1,6 +1,5 @@
 # Diretrizes de Segurança e Consumo da API
 
-- Use `POINT_OF_SALES` para ponto de venda e `PARTNERS_ECOMMERCE` para e-commerce, conforme o cenário.
 - Preserve `authorizationID`, `sequenceID`, datas e demais identificadores retornados para continuidade da transação.
 - Use arquivo de receita de teste e mascare identificadores nas evidências.
 

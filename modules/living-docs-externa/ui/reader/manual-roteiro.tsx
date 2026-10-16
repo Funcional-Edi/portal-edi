@@ -81,16 +81,18 @@ export function ManualRoteiro({
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
-  const businessRulesSection = sections.find((section) => section.id === "regras-de-negocios");
+  const isSection = (section: ManualSection, id: string) => section.id === id || section.id.endsWith(`-${id}`);
+  const flowchartSection = sections.find((section) => isSection(section, "fluxogramas"));
+  const businessRulesSection = sections.find((section) => isSection(section, "regras-de-negocios"));
   const documentationSections = sections.filter(
-    (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
+    (section) => !isSection(section, "fluxo-do-pedido") && section.id !== businessRulesSection?.id,
   );
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
   const hasGatewayAuthentication = config.productId === "credenciado";
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
-  const hasFlowchartSection = documentationSections.some((section) => section.id === "fluxogramas");
+  const hasFlowchartSection = flowchartSection !== undefined;
   const flowLinksContent = flowLinks.length > 0 ? (
     <>
       <ul className="mt-4 grid gap-3 md:grid-cols-2">
@@ -146,7 +148,7 @@ export function ManualRoteiro({
       {editor?.renderSectionBody?.(section) ?? (
         <MarkdownBody source={section.body} importanceNotices={config.productId === "credenciado"} />
       )}
-      {section.id === "fluxogramas" ? flowLinksContent : null}
+      {section.id === flowchartSection?.id ? flowLinksContent : null}
     </div>
   );
 
