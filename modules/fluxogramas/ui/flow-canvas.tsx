@@ -26,6 +26,59 @@ interface FlowCanvasProps {
   onNodesChange?: Parameters<typeof ReactFlow>[0]["onNodesChange"];
   onEdgesChange?: Parameters<typeof ReactFlow>[0]["onEdgesChange"];
   onConnect?: Parameters<typeof ReactFlow>[0]["onConnect"];
+  onNodeClick?: Parameters<typeof ReactFlow>[0]["onNodeClick"];
+  onEdgeClick?: Parameters<typeof ReactFlow>[0]["onEdgeClick"];
+  onPaneClick?: Parameters<typeof ReactFlow>[0]["onPaneClick"];
+}
+
+const ANNOTATION_HEIGHT = 42;
+
+function nodeSize(node: Node): { width: number; height: number } {
+  return node.type === "start" || node.type === "end"
+    ? { width: 160, height: 64 }
+    : { width: 240, height: 80 };
+}
+
+function annotationConnector(annotation: FlowAnnotation, target: Node) {
+  const targetSize = nodeSize(target);
+  const annotationCenter = {
+    x: annotation.position.x + annotation.width / 2,
+    y: annotation.position.y + ANNOTATION_HEIGHT / 2,
+  };
+  const targetCenter = {
+    x: target.position.x + targetSize.width / 2,
+    y: target.position.y + targetSize.height / 2,
+  };
+
+  const overlapsHorizontally =
+    annotation.position.x < target.position.x + targetSize.width
+    && annotation.position.x + annotation.width > target.position.x;
+
+  if (!overlapsHorizontally && Math.abs(annotationCenter.x - targetCenter.x) > Math.abs(annotationCenter.y - targetCenter.y)) {
+    const annotationIsRight = annotationCenter.x > targetCenter.x;
+    return {
+      start: {
+        x: annotationIsRight ? annotation.position.x : annotation.position.x + annotation.width,
+        y: annotationCenter.y,
+      },
+      end: {
+        x: annotationIsRight ? target.position.x + targetSize.width : target.position.x,
+        y: targetCenter.y,
+      },
+    };
+  }
+
+  const annotationIsBelow = annotationCenter.y > targetCenter.y;
+  return {
+    start: {
+      x: annotationCenter.x,
+      y: annotationIsBelow ? annotation.position.y : annotation.position.y + ANNOTATION_HEIGHT,
+    },
+    end: {
+      x: targetCenter.x,
+      y: annotationIsBelow ? target.position.y + targetSize.height : target.position.y,
+    },
+  };
 }
 
 export function FlowCanvas({
@@ -37,7 +90,25 @@ export function FlowCanvas({
   onNodesChange,
   onEdgesChange,
   onConnect,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
 }: FlowCanvasProps) {
+  const annotationCanvas = {
+    width: Math.max(
+      1,
+      ...nodes.map((node) => node.position.x + nodeSize(node).width),
+      ...(lanes ?? []).map((lane) => lane.position.x + lane.width),
+      ...(annotations ?? []).map((annotation) => annotation.position.x + annotation.width),
+    ) + 32,
+    height: Math.max(
+      1,
+      ...nodes.map((node) => node.position.y + nodeSize(node).height),
+      ...(lanes ?? []).map((lane) => lane.position.y + lane.height),
+      ...(annotations ?? []).map((annotation) => annotation.position.y + ANNOTATION_HEIGHT),
+    ) + 32,
+  };
+
   return (
     <div className="h-[min(80vh,52rem)] min-h-[38rem] w-full rounded-lg border border-slate-200 bg-white">
       <ReactFlow
@@ -47,6 +118,9 @@ export function FlowCanvas({
         onNodesChange={readOnly ? undefined : onNodesChange}
         onEdgesChange={readOnly ? undefined : onEdgesChange}
         onConnect={readOnly ? undefined : onConnect}
+        onNodeClick={readOnly ? undefined : onNodeClick}
+        onEdgeClick={readOnly ? undefined : onEdgeClick}
+        onPaneClick={readOnly ? undefined : onPaneClick}
         connectionLineType={ConnectionLineType.Step}
         defaultEdgeOptions={{
           type: FLOW_LAYOUT_DEFAULTS.edgeType,
@@ -95,25 +169,22 @@ export function FlowCanvas({
             const target = annotation.targetNodeId
               ? nodes.find((node) => node.id === annotation.targetNodeId)
               : undefined;
-            const lineStartX = annotation.position.x + annotation.width / 2;
-            const lineStartY = annotation.position.y + 42;
-            const lineEndX = target ? target.position.x + 80 : lineStartX;
-            const lineEndY = target ? target.position.y : lineStartY;
+            const connector = target ? annotationConnector(annotation, target) : null;
 
             return (
               <div key={annotation.id}>
-                {target ? (
+                {connector ? (
                   <svg
                     className="pointer-events-none absolute left-0 top-0 z-0 overflow-visible"
-                    width="2400"
-                    height="1800"
+                    width={annotationCanvas.width}
+                    height={annotationCanvas.height}
                     aria-hidden="true"
                   >
                     <line
-                      x1={lineStartX}
-                      y1={lineStartY}
-                      x2={lineEndX}
-                      y2={lineEndY}
+                      x1={connector.start.x}
+                      y1={connector.start.y}
+                      x2={connector.end.x}
+                      y2={connector.end.y}
                       stroke="#64748b"
                       strokeDasharray="5 5"
                     />

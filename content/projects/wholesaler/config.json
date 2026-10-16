@@ -1,7 +1,7 @@
 {
   "slug": "wholesaler",
   "name": "Wholesaler - Pedido e recebimento",
-  "description": "Manual de atacado para criacao, consulta e confirmacao de pedidos.",
+  "description": "Manual de atacado para consulta de pedidos, retornos, faturamento, cancelamento e devolucao.",
   "family": "edi-pharma",
   "environment": "homolog",
   "graphqlUrl": "https://gateway-homologa.fidelize.com.br/graphql",
@@ -10,5 +10,5 @@
   "audience": "distribuidor",
   "manualStatus": "published",
   "createdAt": "2026-08-31T12:00:00.000Z",
-  "updatedAt": "2026-08-31T12:00:00.000Z"
+  "updatedAt": "2026-10-14T12:00:00.000Z"
 }

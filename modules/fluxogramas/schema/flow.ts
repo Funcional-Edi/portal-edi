@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const flowNodeTypeSchema = z.enum(["start", "operation", "decision", "end"]);
+export const flowNodeTypeSchema = z.enum(["start", "operation", "decision", "box", "text", "end"]);
 
 export const flowOperationRefSchema = z.object({
   kind: z.enum(["query", "mutation"]),
@@ -10,6 +10,11 @@ export const flowOperationRefSchema = z.object({
 const flowPositionSchema = z.object({
   x: z.number(),
   y: z.number(),
+});
+
+const flowLabelPositionSchema = flowPositionSchema.extend({
+  width: z.number().positive(),
+  height: z.number().positive(),
 });
 
 export const flowLaneSchema = z.object({
@@ -26,6 +31,8 @@ export const flowAnnotationSchema = z.object({
   position: flowPositionSchema,
   width: z.number().positive(),
   targetNodeId: z.string().min(1).max(64).optional(),
+  /** Trajeto manual da associa��o tracejada entre o coment�rio e a atividade. */
+  associationWaypoints: z.array(flowPositionSchema).min(2).optional(),
 });
 
 export const flowNodeSchema = z.object({
@@ -36,6 +43,8 @@ export const flowNodeSchema = z.object({
     x: z.number(),
     y: z.number(),
   }),
+  /** Posição manual de rótulos externos do BPMN, como decisões e eventos. */
+  labelPosition: flowLabelPositionSchema.optional(),
   /** Vínculo opcional com `manual.json` → `operations[]`. */
   operationRef: flowOperationRefSchema.optional(),
 });
@@ -46,6 +55,10 @@ export const flowEdgeSchema = z.object({
   target: z.string().min(1).max(64),
   sourceHandle: z.string().min(1).max(64).optional(),
   targetHandle: z.string().min(1).max(64).optional(),
+  /** Pontos intermediários desenhados manualmente no editor BPMN. */
+  waypoints: z.array(flowPositionSchema).min(2).optional(),
+  /** Posição manual do rótulo da conexão. */
+  labelPosition: flowLabelPositionSchema.optional(),
   /** Rótulo em arestas de decisão (ex.: "Sim", "Não"). */
   label: z.string().max(64).optional(),
 });

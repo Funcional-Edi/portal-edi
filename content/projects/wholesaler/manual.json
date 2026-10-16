@@ -1,40 +1,711 @@
 {
   "version": 1,
-  "title": "Integracao Wholesaler",
+  "title": "Manual de integração - Wholesaler",
   "productName": "Wholesaler Gateway",
-  "manualVersion": "2.1.0",
+  "manualVersion": "2.3",
+  "versionHistory": [
+    {
+      "date": "2018-04-24",
+      "author": "Equipe EDI",
+      "details": "Especificação inicial",
+      "version": "1.0"
+    },
+    {
+      "date": "2019-11-11",
+      "author": "Renato Filizzola",
+      "details": "Adicionado o campo invoice_item_id em products, na mutation createInvoice.",
+      "version": "1.1"
+    },
+    {
+      "date": "2020-04-01",
+      "author": "Renato Filizzola",
+      "details": "Adicionados formula e formula_variables nas consultas order, invoices e invoice para o cálculo do ressarcimento.",
+      "version": "1.2"
+    },
+    {
+      "date": "2020-04-16",
+      "author": "Gabriel Delgado",
+      "details": "Adicionado tradetools_created_at em Orders e Order; status e industry_code em Orders.",
+      "version": "1.3"
+    },
+    {
+      "date": "2021-05-11",
+      "author": "Gabriel Delgado",
+      "details": "Adicionado filtro de data na query Orders e o campo reason na mutation createResponse.",
+      "version": "1.4"
+    },
+    {
+      "date": "2020-08-17",
+      "author": "Thiago Alves",
+      "details": "Adicionados percentage_discount_return, icms_percentage_transfer e source_product em createResponse.products.",
+      "version": "1.5"
+    },
+    {
+      "date": "2020-11-10",
+      "author": "Richard Venite",
+      "details": "Adicionado destination_customer nas queries order e orders.",
+      "version": "1.6"
+    },
+    {
+      "date": "2020-11-25",
+      "author": "Wanderson Macedo",
+      "details": "Adicionada a mutation createBranchPrices para envio de preço.",
+      "version": "1.7"
+    },
+    {
+      "date": "2021-03-30",
+      "author": "Gabriel Delgado",
+      "details": "Adicionado aceite de cancelamento parcial na mutation createCancellation.",
+      "version": "1.8"
+    },
+    {
+      "date": "2021-12-16",
+      "author": "Marcio Luiz da Silva",
+      "details": "Adicionado scheduled_delivery_order nas queries order e orders para informar entrega segregada.",
+      "version": "1.9"
+    },
+    {
+      "date": "2022-09-19",
+      "author": "Marcio Luiz da Silva",
+      "details": "Adicionado stock_type nas queries order e orders para informar estoque especial.",
+      "version": "2.0"
+    },
+    {
+      "date": "2023-01-16",
+      "author": "Yasmin dos Santos da Paz",
+      "details": "Adicionados dados de Delivery: setOrderDeliveryStatusAs, filtro Source em Orders e resposta de Delivery em Order e Orders; específico para Saúde Petrobras.",
+      "version": "2.1"
+    },
+    {
+      "date": "2023-02-06",
+      "author": "Hugo Nogueira",
+      "details": "Adicionada a query pricingsSearch para consultar cargas de preço.",
+      "version": "2.2"
+    },
+    {
+      "date": "2025-03-20",
+      "author": "Rossano Ramos",
+      "details": "Adicionada a mutation createDevolution e as queries Devolution e Devolutions.",
+      "version": "2.3"
+    }
+  ],
+  "flowSelectionNote": "Fluxo principal: pedido, importação, retorno, faturamento ou cancelamento.",
+  "sectionOrder": ["visao-geral", "regras-comerciais", "seguranca-e-ferramentas", "fluxo-do-pedido"],
+  "flowDetails": [
+    {
+      "flowId": "pedido-faturamento",
+      "requiredOperations": [
+         { "name": "createToken", "description": "Gera o token usado para autenticar as chamadas seguintes." },
+         { "name": "orders", "description": "Consulta os pedidos disponíveis para importação pelo distribuidor." },
+         { "name": "setOrderAsImported", "description": "Marca o pedido como importado e inicia a janela de resposta." },
+         { "name": "createResponse", "description": "Envia o aceite total, o aceite parcial ou a rejeição do pedido." },
+         { "name": "order", "description": "Consulta o estado e os detalhes de um pedido específico." },
+         { "name": "createInvoice", "description": "Envia os dados da nota fiscal para faturar o pedido." },
+         { "name": "createCancellation", "description": "Cancela todos ou parte dos itens antes do faturamento." },
+         { "name": "responses", "description": "Consulta os retornos comerciais processados para o pedido." },
+         { "name": "invoices", "description": "Consulta as notas fiscais e os dados de ressarcimento do pedido." },
+         { "name": "createBranchPrices", "description": "Envia preços e estoque dos produtos por filial." },
+         { "name": "pricingsSearch", "description": "Consulta o processamento das cargas de preço." },
+         { "name": "createInvoiceReversal", "description": "Reverte ou atualiza uma nota fiscal já enviada." },
+         { "name": "createDevolution", "description": "Envia os dados de uma devolução de produtos." },
+         { "name": "devolutions", "description": "Consulta a lista de devoluções processadas." },
+         { "name": "devolution", "description": "Consulta uma devolução específica." }
+      ]
+    }
+  ],
+  "referenceTables": [
+    {
+      "id": "limites-servico",
+      "title": "Limites e cabeçalhos do serviço",
+      "columns": ["Parâmetro", "Descrição"],
+      "rows": [
+        ["x-RateLimit-Limit", "Limite de requisições por minuto."],
+        ["x-RateLimit-Remaining", "Número de requisições restantes no momento."],
+        ["Retry-After", "Tempo em segundos para o envio da próxima requisição."]
+      ]
+    },
+    {
+      "id": "validacao-retorno",
+      "title": "Validação do retorno do serviço",
+      "columns": ["Parâmetro", "Tipo", "Descrição"],
+      "rows": [
+        ["statusCode", "Integer", "0 = requisição válida; diferente de 0 = erro de validação."],
+        ["statusMesage", "String", "Descrição referente ao código de retorno."]
+      ]
+    },
+    {
+      "id": "erros-graphql",
+      "title": "Tratamento de erros GraphQL",
+      "columns": ["Parâmetro", "Tipo", "Descrição"],
+      "rows": [
+        ["errors", "Array", "Array de objetos com message e code."],
+        ["data", "Objeto", "Objeto do tipo solicitado quando a requisição é bem-sucedida."]
+      ]
+    },
+    {
+      "id": "industry-codes",
+      "title": "Códigos de identificação dos projetos",
+      "columns": ["Projeto", "Código"],
+      "rows": [
+        ["Homologação", "FAB"],
+        ["Abbott", "ABT"],
+        ["Abbott ANI", "ABI"],
+        ["Apsen", "APS"],
+        ["AstraZeneca", "AZN"],
+        ["AstraZeneca Institucional", "AZI"],
+        ["Bayer", "BAY"],
+        ["Bausch", "BSH"],
+        ["Biogen", "BGN"],
+        ["Celgene", "CGN"],
+        ["Esanofi", "ESA"],
+        ["Haleon", "HLN"],
+        ["Knight", "KNG"],
+        ["MSD", "MSD"],
+        ["Nestlé", "NTE"],
+        ["Organon", "ORG"],
+        ["Pfizer", "PFZ"],
+        ["Produtos sem OL", "PSO"],
+        ["Reckitt", "RCK"],
+        ["Roche", "RCH"],
+        ["Sankyo", "SKO"],
+        ["Saúde Petrobras", "DLV"],
+        ["Sanofi", "SAN"],
+        ["Servier", "SVR"],
+        ["Viatris", "UPJ"]
+      ]
+    },
+    {
+      "id": "order-status",
+      "title": "Status do pedido",
+      "columns": ["Status", "Tradução"],
+      "rows": [
+        ["ORDER_NOT_IMPORTED", "Pedido não importado"],
+        ["AWAITING_RESPONSE", "Aguardando retorno do pedido"],
+        ["AWAITING_INVOICE", "Aguardando nota do pedido"],
+        ["INVOICE_RECEIVED", "Nota do pedido recebida"],
+        ["CANCELLED", "Pedido cancelado"],
+        ["REJECTED", "Pedido rejeitado"],
+        ["RETURNED", "Pedido devolvido"],
+        ["PARTIALLY_RETURNED", "Pedido parcialmente devolvido"]
+      ]
+    },
+    {
+      "id": "order-motives",
+      "title": "Motivos do retorno do pedido",
+      "columns": ["Código", "Descrição"],
+      "rows": [
+        ["BELOW_THE_MINIMUM", "Abaixo do mínimo"],
+        ["PARTIALLY_BILLED_ORDER", "Pedido parcialmente faturado"],
+        ["ORDER_SUCCESSFULLY_ACCEPTED", "Pedido aceito com sucesso"],
+        ["STOCK_SHORTAGE", "Falta no estoque"],
+        ["CREDIT_SHORTAGE", "Problemas de crédito"],
+        ["CLIENT_NOT_REGISTERED", "Cliente não cadastrado"],
+        ["TIME_EXCEEDED", "Limite de tempo excedido"],
+        ["DUPLICATE_ORDER", "Pedido duplicado"],
+        ["LICENSE_DATE_EXPIRED", "Alvará vencido"],
+        ["REGISTRATION_PROBLEMS", "Problemas cadastrais"],
+        ["CLIENT_BLOCKED", "Cliente bloqueado"],
+        ["INVALID_PAYMENT_CONDITION", "Condição de pagamento inválida"],
+        ["LOGISTICAL_OPERATION_NOT_ALLOWED", "Operação logística não permitida"],
+        ["CLIENT_NOT_REGISTERED_ON_PROMOTION", "Cliente não cadastrado na promoção"],
+        ["INVALID_LAYOUT", "Layout incorreto"],
+        ["ORDER_BILLED_WITH_DIFFERENT_CONDITION", "Pedido faturado com condição diferente"]
+      ]
+    },
+    {
+      "id": "product-considerations",
+      "title": "Motivos do produto",
+      "columns": ["Código", "Motivo"],
+      "rows": [
+        ["000", "Produto aceito com sucesso"],
+        ["001", "Produto não cadastrado"],
+        ["002", "Abaixo do mínimo"],
+        ["003", "Produto parcialmente aceito"],
+        ["004", "Produto não faturado"],
+        ["101", "Produto aceito com sucesso"],
+        ["113", "Faturado com divergência"],
+        ["201", "Falta no estoque"],
+        ["202", "Produto bloqueado"],
+        ["203", "Falta de limite de crédito"],
+        ["204", "Produto alocado"],
+        ["205", "Produto descontinuado"],
+        ["206", "Quantidade pedida inválida"],
+        ["301", "Cliente não cadastrado"],
+        ["304", "Cliente e ou produto não cadastrado na negociação"],
+        ["401", "Pedido duplicado"],
+        ["501", "Data do alvará vencida"],
+        ["503", "Cliente bloqueado"],
+        ["504", "Produto bloqueado por validade curta"],
+        ["505", "Condição de pagamento inválida"],
+        ["601", "Produto bloqueado para esta operação"],
+        ["602", "Produto bloqueado hospitalar"],
+        ["603", "Produto bloqueado por divergência de preço"],
+        ["604", "Produto bloqueado pela logística"]
+      ]
+    },
+    {
+      "id": "devolution-status",
+      "title": "Status da importação da devolução",
+      "columns": ["Status", "Descrição"],
+      "rows": [
+        ["PENDING", "Pendente"],
+        ["SUCCESS", "Sucesso"],
+        ["INVALID", "Inválida"],
+        ["ERROR", "Erro"],
+        ["REFUSED", "Recusada"],
+        ["STANDBY", "Em espera"],
+        ["NO_RESPONSE", "Sem resposta"]
+      ]
+    },
+    {
+      "id": "params-create-token",
+      "title": "Parâmetros da requisição — createToken",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["login", "String", "Sim", "Login informado pelo responsável pela homologação."],
+        ["password", "String", "Sim", "Senha informada pelo responsável pela homologação."]
+      ]
+    },
+    {
+      "id": "params-orders",
+      "title": "Parâmetros da requisição — orders",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["current_page", "Int", "Não", "Página atual da paginação do resultado."],
+        ["per_page", "Int", "Não", "Quantidade de pedidos por página."],
+        ["imported", "Boolean", "Não", "Filtra pedidos importados ou não importados."],
+        ["industry_code", "String", "Não", "Sigla do projeto."],
+        ["order_code", "Int", "Não", "Código do pedido na indústria."],
+        ["status", "OrderStatusEnum", "Não", "Status desejado do pedido."],
+        ["notification_status", "NotificationStatusEnum", "Não", "Status do envio da notificação."],
+        ["filter.begin_date", "Date", "Não", "Data inicial do filtro de pedidos."],
+        ["filter.end_date", "Date", "Não", "Data final do filtro de pedidos."],
+        ["source", "OrderSourceEnum", "Não", "Origem do pedido, como TRADETOOLS ou DELIVERY."],
+        ["wholesaler_branch_code", "String", "Não", "CNPJ da filial do distribuidor."],
+        ["id", "Int", "Não", "ID do pedido na Funcional."],
+        ["customer_code", "String", "Não", "CNPJ do cliente."]
+      ]
+    },
+    {
+      "id": "params-set-order-as-imported",
+      "title": "Parâmetros da requisição — setOrderAsImported",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["id", "Int", "Não", "ID do pedido na Funcional."],
+        ["order_code", "Int", "Não", "Código do pedido."],
+        ["industry_code", "String", "Não", "Sigla do projeto."]
+      ]
+    },
+    {
+      "id": "params-create-response",
+      "title": "Parâmetros da requisição — createResponse",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."],
+        ["wholesaler_code", "String", "Sim", "CNPJ do distribuidor."],
+        ["wholesaler_order_code", "String", "Não", "Código do pedido no distribuidor."],
+        ["payment_term", "String", "Não", "Prazo negociado."],
+        ["reason", "OrderMotiveEnum", "Não", "Motivo do retorno do pedido."],
+        ["consideration", "String", "Não", "Código do motivo do pedido."],
+        ["is_free_good_discount", "Boolean", "Não", "Indica pedido bonificado."],
+        ["processed_at", "String", "Sim", "Data e hora de processamento."],
+        ["invoice_at", "String", "Não", "Data e hora do faturamento."],
+        ["delivery_forecast_at", "String", "Não", "Data e hora prevista para entrega."],
+        ["products", "[ResponseProductInput!]!", "Sim", "Dados dos produtos do retorno."]
+      ]
+    },
+    {
+      "id": "params-order",
+      "title": "Parâmetros da requisição — order",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."]
+      ]
+    },
+    {
+      "id": "params-create-invoice",
+      "title": "Parâmetros da requisição — createInvoice",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."],
+        ["wholesaler_code", "String", "Sim", "CNPJ do distribuidor."],
+        ["customer_code", "String", "Sim", "CNPJ do cliente."],
+        ["wholesaler_order_code", "String", "Não", "Código do pedido no distribuidor."],
+        ["processed_at", "String", "Sim", "Data e hora de processamento."],
+        ["invoice_released_on", "String", "Sim", "Data de emissão da nota."],
+        ["invoice_code", "String", "Sim", "Número da nota."],
+        ["tax_substitution_icms_tax_calc_base", "Float", "Não", "Base de cálculo do ICMS de substituição tributária."],
+        ["icms_tax_calc_base", "Float", "Não", "Base de cálculo do ICMS."],
+        ["invoice_model", "String", "Não", "Modelo da nota."],
+        ["invoice_series", "String", "Não", "Série da nota."],
+        ["invoice_danfe_key", "String", "Sim", "Chave DANFE."],
+        ["invoice_value", "Float", "Sim", "Valor total da nota."],
+        ["invoice_discount", "Float", "Sim", "Valor do desconto da nota."],
+        ["invoice_passed_along_icms_tax_value", "Float", "Não", "Valor de repasse de ICMS."],
+        ["invoice_products_total_value", "Float", "Não", "Valor total dos produtos."],
+        ["invoice_ipi_tax_value", "Float", "Não", "Valor do IPI."],
+        ["invoice_freight_value", "Float", "Não", "Valor do frete."],
+        ["invoice_insurance_value", "Float", "Não", "Valor do seguro."],
+        ["invoice_icms_tax_total_value", "Float", "Não", "Valor total do ICMS."],
+        ["invoice_icms_tax_retained_total_value", "Float", "Não", "Valor total do ICMS retido."],
+        ["invoice_volume_amount", "Float", "Não", "Quantidade de volumes."],
+        ["products", "[InvoiceProductInput!]!", "Sim", "Dados dos produtos da nota, incluindo invoice_item_id quando aplicável."],
+        ["taxes", "[InvoiceTaxRateWEInputType]", "Não", "Dados das taxas de impostos da fatura."],
+        ["batches", "[invoiceBatchWEInputType]", "Não", "Dados dos lotes dos produtos."],
+        ["bank_tickets", "[InvoiceBankTicketWEInputType]", "Não", "Dados dos títulos bancários da nota."],
+        ["total_invoices", "Int", "Não", "Total de notas."],
+        ["invoice_count", "Int", "Não", "Contagem de notas."]
+      ]
+    },
+    {
+      "id": "params-create-cancellation",
+      "title": "Parâmetros da requisição — createCancellation",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."],
+        ["wholesaler_branch_code", "String", "Sim", "CNPJ da filial do distribuidor."],
+        ["entirely_cancelled", "Boolean", "Não", "Indica cancelamento total do pedido."],
+        ["products", "[CancellationProductInput]", "Não", "Produtos que serão cancelados."]
+      ]
+    },
+    {
+      "id": "params-responses",
+      "title": "Parâmetros da requisição — responses",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["current_page", "Int", "Não", "Página atual da paginação."],
+        ["per_page", "Int", "Não", "Quantidade de retornos por página."],
+        ["imported", "Boolean", "Não", "Filtra retornos importados ou não importados."],
+        ["industry_code", "String", "Não", "Sigla do projeto."],
+        ["order_code", "Int", "Não", "Código do pedido na indústria."]
+      ]
+    },
+    {
+      "id": "params-invoices",
+      "title": "Parâmetros da requisição — invoices",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["current_page", "Int", "Não", "Página atual da paginação."],
+        ["per_page", "Int", "Não", "Quantidade de notas por página."],
+        ["imported", "Boolean", "Não", "Filtra notas importadas ou não importadas."],
+        ["industry_code", "String", "Não", "Sigla do projeto."],
+        ["order_code", "Int", "Não", "Código do pedido na indústria."],
+        ["with_reversal", "Boolean", "Não", "Filtra notas com reversão."]
+      ]
+    },
+    {
+      "id": "params-create-branch-prices",
+      "title": "Parâmetros da requisição — createBranchPrices",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["wholesaler_branch_code", "String", "Sim", "CNPJ da filial do distribuidor."],
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["products", "[ProductPriceStockInput]", "Não", "Preços e estoques dos produtos."]
+      ]
+    },
+    {
+      "id": "params-pricings-search",
+      "title": "Parâmetros da requisição — pricingsSearch",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["currentPage", "Int", "Não", "Página selecionada."],
+        ["perPage", "Int", "Não", "Quantidade de resultados por página."],
+        ["filter.id", "ID", "Não", "ID da carga de preços."],
+        ["filter.created_at", "Date", "Não", "Data de criação da carga."],
+        ["filter.import.datetime", "Datetime", "Não", "Data e hora da importação."],
+        ["filter.import.attempts", "Int", "Não", "Quantidade de tentativas de importação."],
+        ["filter.import.status", "ImportationStatusEnum", "Não", "Status da importação."],
+        ["filter.industry.code", "String", "Não", "Código da indústria."],
+        ["filter.wholesaler.code", "String", "Não", "Código do distribuidor."],
+        ["filter.wholesaler_branch.code", "String", "Não", "Código da filial do distribuidor."],
+        ["filter.product.code", "String", "Não", "Código do produto."],
+        ["filter.region_code", "String", "Não", "Código da região."]
+      ]
+    },
+    {
+      "id": "params-create-invoice-reversal",
+      "title": "Parâmetros da requisição — createInvoiceReversal",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["industry_code", "String", "Sim", "Sigla do projeto."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."],
+        ["new_invoices", "[InvoiceInputType!]!", "Sim", "Dados das novas notas fiscais."]
+      ]
+    },
+    {
+      "id": "params-create-devolution",
+      "title": "Parâmetros da requisição — createDevolution",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["customer_code", "String", "Sim", "Código identificador do cliente."],
+        ["wholesaler_branch_code", "String", "Sim", "Código da filial do atacadista."],
+        ["industry_code", "String", "Sim", "Código da indústria."],
+        ["invoice_number", "String", "Sim", "Número da nota fiscal original."],
+        ["invoice_number_devolution", "String", "Sim", "Número da nota fiscal de devolução."],
+        ["invoice_devolution_created_at", "Date", "Não", "Data de criação da nota de devolução."],
+        ["cfop", "String", "Não", "Código Fiscal de Operações e Prestações."],
+        ["danfe", "String", "Não", "Documento Auxiliar da Nota Fiscal Eletrônica."],
+        ["order_code", "Int", "Sim", "Código do pedido na indústria."],
+        ["products", "[DevolutionProductInputType!]!", "Sim", "Produtos devolvidos."]
+      ]
+    },
+    {
+      "id": "params-devolutions",
+      "title": "Parâmetros da requisição — devolutions",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["current_page", "Int", "Não", "Página atual da paginação."],
+        ["per_page", "Int", "Não", "Quantidade de devoluções por página."],
+        ["imported", "Boolean", "Não", "Filtra devoluções importadas ou não importadas."],
+        ["industry_code", "String", "Não", "Sigla do projeto."],
+        ["order_code", "Int", "Não", "Código do pedido na indústria."]
+      ]
+    },
+    {
+      "id": "params-devolution",
+      "title": "Parâmetros da requisição — devolution",
+      "columns": ["Parâmetro", "Tipo", "Obrigatório", "Descrição"],
+      "rows": [
+        ["id", "Int", "Sim", "ID da devolução."],
+        ["imported", "Boolean", "Não", "Filtra devoluções importadas ou não importadas."]
+      ]
+    }
+  ],
+  "homologationValidations": [
+    "Solicite login e senha ao responsável pela homologação; nunca grave credenciais no repositório.",
+    "Gere o token no Altair e reutilize-o como Bearer token; a validade prevista é de 24 horas.",
+    "Consulte pedidos com imported:false e status ORDER_NOT_IMPORTED; marque o pedido como importado.",
+    "Envie o retorno em até uma hora e valide aceite total, parcial ou rejeição.",
+    "Envie a nota fiscal em até 48 horas após o retorno aceito; cancele antes do faturamento quando necessário.",
+    "Registre requisições, respostas, identificadores e status final com dados autorizados para homologação."
+  ],
+  "homologationFlows": [
+    {
+      "title": "Fluxo de pedido e faturamento",
+      "scenarios": [
+        {
+          "title": "Pedido aceito e faturado",
+          "preconditions": ["Credenciais e dados sintéticos liberados para homologação."],
+          "operations": ["createToken", "orders", "setOrderAsImported", "createResponse", "createInvoice", "order"],
+          "expectedResult": "Pedido importado, aceito e faturado; o status final e a nota fiscal podem ser consultados.",
+          "evidence": ["Registrar requisições, respostas e identificadores no Altair."],
+          "approval": "Enviar as evidências para validação da equipe EDI."
+        },
+        {
+          "title": "Pedido rejeitado ou cancelado",
+          "preconditions": ["Credenciais e dados sintéticos liberados para homologação."],
+          "operations": ["orders", "setOrderAsImported", "createResponse", "createCancellation", "order"],
+          "expectedResult": "O pedido recebe o retorno correspondente e fica rejeitado ou cancelado antes do faturamento.",
+          "evidence": ["Registrar requisições, respostas e identificadores no Altair."],
+          "approval": "Enviar as evidências para validação da equipe EDI."
+        },
+        {
+          "title": "Preço, reversão e devolução",
+          "preconditions": ["Credenciais e dados sintéticos liberados para homologação."],
+          "operations": ["createBranchPrices", "pricingsSearch", "createInvoiceReversal", "createDevolution", "devolutions", "devolution"],
+          "expectedResult": "Cada carga ou transação complementar pode ser enviada e consultada pelo status ou identificador.",
+          "evidence": ["Registrar requisições, respostas e identificadores no Altair."],
+          "approval": "Enviar as evidências para validação da equipe EDI."
+        }
+      ]
+    }
+  ],
   "operations": [
     {
       "kind": "mutation",
       "name": "createToken",
       "order": 1,
-      "title": "1. Obter token",
-      "description": "Token para autenticar chamadas do fluxo wholesaler.",
+      "title": "1. Gerar token",
+      "description": "Gera o token de acesso ao gateway GraphQL. O token deve ser enviado como Bearer token nas chamadas seguintes.",
       "authRequired": false,
-      "exampleQuery": "mutation createToken {\n  createToken(login: \"<login>\", password: \"<senha>\") {\n    token\n  }\n}"
-    },
-    {
-      "kind": "mutation",
-      "name": "createOrder",
-      "order": 2,
-      "title": "2. Criar pedido",
-      "description": "Cria pedido no gateway com itens e dados do cliente.",
-      "prerequisites": ["createToken"],
-      "businessNotes": [
-        "Idempotencia por externalOrderId.",
-        "Itens com quantidade zero sao rejeitados."
-      ],
-      "relatedSections": ["regras-comerciais"],
-      "exampleQuery": "mutation createOrder {\n  createOrder(input: {\n    externalOrderId: \"PED-1001\",\n    customerCode: \"CLI-900\",\n    items: [{ sku: \"7891106001946\", quantity: 10 }]\n  }) {\n    status\n    orderId\n    message\n  }\n}"
+      "relatedSections": ["seguranca-e-ferramentas"],
+      "referenceTableIds": ["params-create-token", "limites-servico"],
+      "businessNotes": ["Gere o token uma vez por período e não compartilhe credenciais ou tokens de homologação."],
+      "exampleQuery": "mutation createToken($login: String!, $password: String!) {\n  createToken(login: $login, password: $password) {\n    token\n  }\n}"
     },
     {
       "kind": "query",
-      "name": "orderStatus",
+      "name": "orders",
+      "order": 2,
+      "title": "2. Consultar pedidos",
+      "description": "Consulta os pedidos disponíveis para importação pelo distribuidor.",
+      "authRequired": true,
+      "prerequisites": ["createToken"],
+    "relatedSections": ["visao-geral", "fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-orders", "limites-servico", "industry-codes", "order-status"],
+      "businessNotes": ["Consulte pedidos com imported false e status ORDER_NOT_IMPORTED antes de iniciar o processamento."],
+      "exampleQuery": "query orders($currentPage: Int, $perPage: Int, $imported: Boolean, $industryCode: String, $orderCode: Int, $status: OrderStatusEnum, $notificationStatus: NotificationStatusEnum, $beginDate: Date, $endDate: Date, $source: OrderSourceEnum, $wholesalerBranchCode: String, $id: Int, $customerCode: String) {\n  orders(current_page: $currentPage, per_page: $perPage, imported: $imported, industry_code: $industryCode, order_code: $orderCode, status: $status, notification_status: $notificationStatus, filter: { begin_date: $beginDate, end_date: $endDate }, source: $source, wholesaler_branch_code: $wholesalerBranchCode, id: $id, customer_code: $customerCode) {\n    total\n    from\n    to\n    data {\n      id\n      status\n      order_code\n      tradetools_created_at\n      notification_obs\n      notification_status\n      industry_code\n      customer_code\n      customer_alternative_code\n      distribution_center_code\n      products {\n        ean\n        amount\n        discount_percentage\n        net_value\n        monitored\n        payment_term\n      }\n      responses { id importation_outcome consideration_code }\n      invoices { id importation_status importation_outcome status processed_at released_on danfe_key code value discount products_total_value }\n      cancellations { id imported_at outcome }\n    }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "setOrderAsImported",
       "order": 3,
-      "title": "3. Consultar status do pedido",
-      "description": "Consulta o status de processamento por orderId.",
-      "prerequisites": ["createOrder"],
-      "exampleQuery": "query orderStatus {\n  orderStatus(orderId: \"GW-123456\") {\n    status\n    updatedAt\n    message\n  }\n}"
+      "title": "3. Marcar pedido como importado",
+      "description": "Marca o pedido como importado e inicia o prazo para envio do retorno.",
+      "authRequired": true,
+      "prerequisites": ["orders"],
+      "relatedSections": ["visao-geral", "fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-set-order-as-imported"],
+      "businessNotes": ["Depois desta operação, envie o retorno do pedido em até uma hora."],
+      "exampleQuery": "mutation setOrderAsImported($id: Int, $orderCode: Int, $industryCode: String) {\n  setOrderAsImported(id: $id, order_code: $orderCode, industry_code: $industryCode) {\n    id\n    order_code\n    customer_code\n    customer_alternative_code\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createResponse",
+      "order": 4,
+      "title": "4. Enviar retorno do pedido",
+      "description": "Envia o aceite total, o aceite parcial ou a rejeição do pedido.",
+      "authRequired": true,
+      "prerequisites": ["setOrderAsImported"],
+    "relatedSections": ["fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-create-response", "validacao-retorno", "erros-graphql", "order-motives", "product-considerations"],
+      "businessNotes": ["Informe o resultado por produto e preserve os motivos e quantidades retornados pelo serviço."],
+      "exampleQuery": "mutation createResponse($industryCode: String!, $orderCode: Int!, $wholesalerCode: String!, $wholesalerOrderCode: String, $paymentTerm: String, $reason: OrderMotiveEnum, $consideration: String, $isFreeGoodDiscount: Boolean, $processedAt: String!, $invoiceAt: String, $deliveryForecastAt: String, $products: [ResponseProductInput!]!) {\n  createResponse(industry_code: $industryCode, order_code: $orderCode, wholesaler_code: $wholesalerCode, wholesaler_order_code: $wholesalerOrderCode, payment_term: $paymentTerm, reason: $reason, consideration: $consideration, is_free_good_discount: $isFreeGoodDiscount, processed_at: $processedAt, invoice_at: $invoiceAt, delivery_forecast_at: $deliveryForecastAt, products: $products) {\n    id\n    content\n    imported_at\n    outcome\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "order",
+      "order": 5,
+      "title": "5. Consultar um pedido",
+      "description": "Consulta o pedido, seu processamento, retornos, notas fiscais e cancelamentos.",
+      "authRequired": true,
+      "prerequisites": ["orders"],
+    "relatedSections": ["visao-geral", "fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-order", "limites-servico", "order-status"],
+      "businessNotes": ["Use a consulta para acompanhar o status final antes de faturar ou cancelar."],
+      "exampleQuery": "query order($industryCode: String!, $orderCode: Int!) {\n  order(industry_code: $industryCode, order_code: $orderCode) {\n    id\n    order_code\n    tradetools_created_at\n    industry_code\n    wholesaler_branch_code\n    customer_code\n    notification_obs\n    notification_status\n    status\n    products { ean stock_type amount discount_percentage }\n    responses { id importation_outcome consideration_code products { ean invoice_ean response_amount unit_discount_percentage unit_discount_value unit_net_value monitored industry_consideration wholesaler_consideration } }\n    invoices { id importation_status importation_outcome status processed_at released_on danfe_key code value discount products_total_value products { ean invoice_amount unit_discount_percentage } reimbursement_values { ean value formula formula_variables } }\n    cancellations { id imported_at outcome }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createInvoice",
+      "order": 6,
+      "title": "6. Enviar nota fiscal",
+      "description": "Envia os dados da nota fiscal depois do retorno aceito.",
+      "authRequired": true,
+      "prerequisites": ["createResponse"],
+      "relatedSections": ["fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-create-invoice"],
+      "businessNotes": [
+        "Envie a nota em até 48 horas após o retorno aceito.",
+        "Quando uma mesma DANFE atender mais de um pedido, informe invoice_item_id nos produtos."
+      ],
+      "exampleQuery": "mutation createInvoice($industryCode: String!, $orderCode: Int!, $wholesalerCode: String!, $customerCode: String!, $wholesalerOrderCode: String, $processedAt: String!, $invoiceReleasedOn: String!, $invoiceCode: String!, $taxSubstitutionIcmsTaxCalcBase: Float, $icmsTaxCalcBase: Float, $invoiceModel: String, $invoiceSeries: String, $invoiceDanfeKey: String!, $invoiceValue: Float!, $invoiceDiscount: Float!, $invoicePassedAlongIcmsTaxValue: Float, $invoiceProductsTotalValue: Float, $invoiceIpiTaxValue: Float, $invoiceFreightValue: Float, $invoiceInsuranceValue: Float, $invoiceIcmsTaxTotalValue: Float, $invoiceIcmsTaxRetainedTotalValue: Float, $invoiceVolumeAmount: Float, $products: [InvoiceProductInput!]!, $taxes: [InvoiceTaxRateWEInputType], $batches: [invoiceBatchWEInputType], $bankTickets: [InvoiceBankTicketWEInputType], $totalInvoices: Int, $invoiceCount: Int) {\n  createInvoice(industry_code: $industryCode, order_code: $orderCode, wholesaler_code: $wholesalerCode, customer_code: $customerCode, wholesaler_order_code: $wholesalerOrderCode, processed_at: $processedAt, invoice_released_on: $invoiceReleasedOn, invoice_code: $invoiceCode, tax_substitution_icms_tax_calc_base: $taxSubstitutionIcmsTaxCalcBase, icms_tax_calc_base: $icmsTaxCalcBase, invoice_model: $invoiceModel, invoice_series: $invoiceSeries, invoice_danfe_key: $invoiceDanfeKey, invoice_value: $invoiceValue, invoice_discount: $invoiceDiscount, invoice_passed_along_icms_tax_value: $invoicePassedAlongIcmsTaxValue, invoice_products_total_value: $invoiceProductsTotalValue, invoice_ipi_tax_value: $invoiceIpiTaxValue, invoice_freight_value: $invoiceFreightValue, invoice_insurance_value: $invoiceInsuranceValue, invoice_icms_tax_total_value: $invoiceIcmsTaxTotalValue, invoice_icms_tax_retained_total_value: $invoiceIcmsTaxRetainedTotalValue, invoice_volume_amount: $invoiceVolumeAmount, products: $products, taxes: $taxes, batches: $batches, bank_tickets: $bankTickets, total_invoices: $totalInvoices, invoice_count: $invoiceCount) {\n    id\n    content\n    imported_at\n    outcome\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createCancellation",
+      "order": 7,
+      "title": "7. Enviar cancelamento",
+      "description": "Cancela o pedido total ou parcialmente antes do faturamento.",
+      "authRequired": true,
+      "prerequisites": ["setOrderAsImported"],
+      "relatedSections": ["fluxo-do-pedido", "regras-comerciais"],
+      "referenceTableIds": ["params-create-cancellation"],
+      "businessNotes": ["Envie somente os itens que devem ser cancelados e não envie cancelamento depois da nota fiscal."],
+      "exampleQuery": "mutation createCancellation($orderCode: Int!, $industryCode: String!, $wholesalerBranchCode: String!, $entirelyCancelled: Boolean, $products: [CancellationProductInput]) {\n  createCancellation(order_code: $orderCode, industry_code: $industryCode, wholesaler_branch_code: $wholesalerBranchCode, entirely_cancelled: $entirelyCancelled, products: $products) {\n    id\n    content\n    imported_at\n    outcome\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "responses",
+      "order": 8,
+      "title": "8. Consultar retornos",
+      "description": "Consulta os retornos registrados para um pedido.",
+      "authRequired": true,
+      "prerequisites": ["createResponse"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-responses", "order-motives", "product-considerations"],
+      "exampleQuery": "query responses($currentPage: Int, $perPage: Int, $imported: Boolean, $industryCode: String, $orderCode: Int) {\n  responses(current_page: $currentPage, per_page: $perPage, imported: $imported, industry_code: $industryCode, order_code: $orderCode) {\n    total\n    per_page\n    current_page\n    data { id order_code imported_at outcome wholesaler_branch_code industry_code products { ean response_amount unit_discount_percentage unit_discount_value unit_net_value } }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "invoices",
+      "order": 9,
+      "title": "9. Consultar notas fiscais",
+      "description": "Consulta notas fiscais e valores de ressarcimento do pedido.",
+      "authRequired": true,
+      "prerequisites": ["createInvoice"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-invoices"],
+      "exampleQuery": "query invoices($currentPage: Int, $perPage: Int, $imported: Boolean, $industryCode: String, $orderCode: Int, $withReversal: Boolean) {\n  invoices(current_page: $currentPage, per_page: $perPage, imported: $imported, industry_code: $industryCode, order_code: $orderCode, with_reversal: $withReversal) {\n    total\n    per_page\n    current_page\n    data { id order_code imported_at outcome wholesaler_branch_code industry_code products { ean unit_discount_percentage unit_discount_value unit_net_value } reimbursement_values { ean value formula formula_variables } }\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createBranchPrices",
+      "order": 10,
+      "title": "10. Enviar preços e estoque",
+      "description": "Envia preços e estoque dos produtos por filial.",
+      "authRequired": true,
+      "prerequisites": ["createToken"],
+      "relatedSections": ["visao-geral"],
+      "referenceTableIds": ["params-create-branch-prices"],
+      "businessNotes": ["Preserve o identificador da carga retornado para consultar o processamento."],
+      "exampleQuery": "mutation createBranchPrices($wholesalerBranchCode: String!, $industryCode: String!, $products: [BranchPriceInput!]!) {\n  createBranchPrices(wholesaler_branch_code: $wholesalerBranchCode, industry_code: $industryCode, products: $products) {\n    id\n    content\n    imported_at\n    importation_status\n    importation_outcome\n    wholesaler_branch_code\n    industry_code\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "pricingsSearch",
+      "order": 11,
+      "title": "11. Consultar carga de preços",
+      "description": "Consulta o processamento de uma carga de preços e estoque.",
+      "authRequired": true,
+      "prerequisites": ["createBranchPrices"],
+      "relatedSections": ["visao-geral"],
+      "referenceTableIds": ["params-pricings-search"],
+      "exampleQuery": "query pricingsSearch($currentPage: Int, $perPage: Int, $id: Int, $createdAt: Date, $importDatetime: Datetime, $importAttempts: Int, $importStatus: ImportationStatusEnum, $industryCode: String, $wholesalerCode: String, $wholesalerBranchCode: String, $productCode: String, $regionCode: String) {\n  pricingsSearch(currentPage: $currentPage, perPage: $perPage, filter: { id: $id, created_at: $createdAt, import: { datetime: $importDatetime, attempts: $importAttempts, status: $importStatus }, industry: { code: $industryCode }, wholesaler: { code: $wholesalerCode }, wholesaler_branch: { code: $wholesalerBranchCode }, product: { code: $productCode }, region_code: $regionCode }) {\n    data { id imported_at industry_code content { products { productCode } } wholesaler { code branches { code } } importation_status importation_outcome created_at updated_at }\n    total\n    per_page\n    current_page\n    from\n    last_page\n    has_more_pages\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createInvoiceReversal",
+      "order": 12,
+      "title": "12. Reverter ou atualizar nota fiscal",
+      "description": "Atualiza ou reverte uma nota fiscal já enviada.",
+      "authRequired": true,
+      "prerequisites": ["createInvoice"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-create-invoice-reversal"],
+      "businessNotes": ["Preserve o identificador da nota e consulte o processamento após o envio."],
+      "exampleQuery": "mutation createInvoiceReversal($industryCode: String!, $orderCode: Int!, $newInvoices: [InvoiceInputType!]!) {\n  createInvoiceReversal(industry_code: $industryCode, order_code: $orderCode, new_invoices: $newInvoices) {\n    id\n    imported_at\n    outcome\n    industry_code\n    order_code\n  }\n}"
+    },
+    {
+      "kind": "mutation",
+      "name": "createDevolution",
+      "order": 13,
+      "title": "13. Enviar devolução",
+      "description": "Envia a devolução de produtos de uma nota fiscal.",
+      "authRequired": true,
+      "prerequisites": ["createInvoice"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-create-devolution"],
+      "businessNotes": ["Preserve o identificador da devolução para acompanhar seu processamento."],
+      "exampleQuery": "mutation createDevolution($customerCode: String!, $wholesalerBranchCode: String!, $industryCode: String!, $invoiceNumber: String!, $invoiceNumberDevolution: String!, $invoiceDevolutionCreatedAt: Date, $cfop: String, $danfe: String, $orderCode: Int!, $products: [DevolutionProductInputType!]!) {\n  createDevolution(customer_code: $customerCode, wholesaler_branch_code: $wholesalerBranchCode, industry_code: $industryCode, invoice_number: $invoiceNumber, invoice_number_devolution: $invoiceNumberDevolution, invoice_devolution_created_at: $invoiceDevolutionCreatedAt, cfop: $cfop, danfe: $danfe, order_code: $orderCode, products: $products) {\n    id\n    content\n    imported_at\n    order_code\n    importation_outcome\n    outcome\n    industry_code\n    wholesaler_branch_code\n    importation_status\n    created_at\n    products { ean quantity batch code_reason }\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "devolutions",
+      "order": 14,
+      "title": "14. Consultar devoluções",
+      "description": "Consulta a lista de devoluções enviadas.",
+      "authRequired": true,
+      "prerequisites": ["createDevolution"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-devolutions", "devolution-status"],
+      "exampleQuery": "query devolutions($currentPage: Int, $perPage: Int, $imported: Boolean, $industryCode: String, $orderCode: Int) {\n  devolutions(current_page: $currentPage, per_page: $perPage, imported: $imported, industry_code: $industryCode, order_code: $orderCode) {\n    data { id imported_at order_code industry_code wholesaler_branch_code importation_status products { ean quantity batch code_reason } }\n    total\n    per_page\n    current_page\n  }\n}"
+    },
+    {
+      "kind": "query",
+      "name": "devolution",
+      "order": 15,
+      "title": "15. Consultar uma devolução",
+      "description": "Consulta uma devolução específica pelo identificador retornado no envio.",
+      "authRequired": true,
+      "prerequisites": ["createDevolution"],
+      "relatedSections": ["regras-comerciais"],
+      "referenceTableIds": ["params-devolution", "devolution-status"],
+      "exampleQuery": "query devolution($id: Int!, $imported: Boolean) {\n  devolution(id: $id, imported: $imported) {\n    id\n    imported_at\n    order_code\n    industry_code\n    wholesaler_branch_code\n    importation_status\n    created_at\n  }\n}"
     }
   ]
 }
