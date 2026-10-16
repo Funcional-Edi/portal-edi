@@ -126,6 +126,21 @@ test("exibe todos os fluxos públicos pelo mesmo BPMN do editor", async ({ page 
     await expect.poll(() => viewport.getAttribute("transform")).not.toBe(transformBefore);
     await expect(page.getByRole("button", { name: "Diminuir zoom" })).toBeEnabled();
     await expect(page.getByRole("button", { name: "Ajustar fluxograma à tela" })).toBeEnabled();
+    if (slug === "credenciado-venda" && flowId === "venda-bf") {
+      await viewer.scrollIntoViewIfNeeded();
+      const bounds = await viewer.boundingBox();
+      if (!bounds) throw new Error("Área do visualizador BPMN não encontrada.");
+      const viewportSize = page.viewportSize();
+      if (!viewportSize) throw new Error("Tamanho da janela de teste não encontrado.");
+      const startX = Math.max(24, Math.min(viewportSize.width - 24, bounds.x + bounds.width * 0.84));
+      const startY = Math.max(24, Math.min(viewportSize.height - 24, bounds.y + bounds.height * 0.7));
+      const transformBeforePan = await viewport.getAttribute("transform");
+      await page.mouse.move(startX, startY);
+      await page.mouse.down();
+      await page.mouse.move(Math.max(24, startX - 130), Math.max(24, startY - 90));
+      await page.mouse.up();
+      await expect.poll(() => viewport.getAttribute("transform")).not.toBe(transformBeforePan);
+    }
     await expect(viewer.locator(".djs-palette")).toHaveCount(0);
   }
 });
