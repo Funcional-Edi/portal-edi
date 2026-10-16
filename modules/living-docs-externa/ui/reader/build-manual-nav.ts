@@ -112,7 +112,7 @@ export async function buildManualNav(
     }
     if (operation?.exampleQuery) {
       const isPrescriptionMultipartUpload =
-        slug === "credenciado-venda" && kind === "mutation" && name === "Prescription_addPrescription";
+        slug === "credenciado-venda" && kind === "mutation" && name === "Prescription_uploadPrescription";
       tocItems.push({
         href: isPrescriptionMultipartUpload ? "#estrutura-multipart" : "#exemplo-graphql",
         label: isPrescriptionMultipartUpload ? "Estrutura multipart/form-data" : "Exemplo GraphQL",

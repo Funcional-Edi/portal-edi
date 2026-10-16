@@ -425,7 +425,7 @@
               "deprecationReason": null
             },
             {
-              "name": "Prescription_addPrescription",
+              "name": "Prescription_uploadPrescription",
               "description": null,
               "args": [
                 {

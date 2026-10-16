@@ -106,10 +106,27 @@ function contextualTocItems({
   }
 
   if (areaId === "documentacao") {
-    return items.filter((item) => item.href.startsWith("#section-")
+    const relevant = items.filter((item) => item.href.startsWith("#section-")
       || item.href === "#fluxogramas"
       || item.href.startsWith("/fluxogramas/")
       || item.href === "#versao-subproduto");
+    const markdownFlowchartHref = relevant.find(
+      (item) => item.href.startsWith("#section-") && item.href.endsWith("fluxogramas"),
+    )?.href;
+    if (!markdownFlowchartHref) return relevant;
+
+    const flowLinks = relevant.filter((item) => item.href.startsWith("/fluxogramas/"));
+    const compact = relevant.filter(
+      (item) => item.href !== "#fluxogramas" && !item.href.startsWith("/fluxogramas/"),
+    );
+    const flowchartIndex = compact.findIndex((item) => item.href === markdownFlowchartHref);
+    if (flowchartIndex === -1) return compact;
+
+    return [
+      ...compact.slice(0, flowchartIndex + 1),
+      ...flowLinks,
+      ...compact.slice(flowchartIndex + 1),
+    ];
   }
 
   if (areaId === "jornada-integracao") {
@@ -403,18 +420,6 @@ function CredenciadoHomologationGuide({ links }: { links: DocumentationLinkView[
         </button>
       </section>
 
-      <section aria-labelledby="credenciado-homologation-contact" className="rounded-lg border border-brand-200 bg-brand-50 p-4">
-        <h5 id="credenciado-homologation-contact" className="font-semibold text-brand-900">
-          Contato do time de EDI
-        </h5>
-        <p className="mt-1 text-sm leading-relaxed text-brand-900">
-          Os dados de contato e o canal de envio serão informados após alinhamento com o time responsável.
-        </p>
-        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-          <div><dt className="font-medium text-brand-900">Responsável</dt><dd className="text-brand-800">A definir</dd></div>
-          <div><dt className="font-medium text-brand-900">E-mail/canal para envio</dt><dd className="text-brand-800">A definir</dd></div>
-        </dl>
-      </section>
     </div>
   );
 }

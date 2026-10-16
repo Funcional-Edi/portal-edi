@@ -81,15 +81,58 @@ export function ManualRoteiro({
 }: ManualRoteiroProps) {
   const { config, manual } = project;
   const operations = sortOperations(manual);
-  const businessRulesSection = sections.find((section) => section.id === "regras-de-negocios");
+  const isSection = (section: ManualSection, id: string) => section.id === id || section.id.endsWith(`-${id}`);
+  const flowchartSection = sections.find((section) => isSection(section, "fluxogramas"));
+  const businessRulesSection = sections.find((section) => isSection(section, "regras-de-negocios"));
   const documentationSections = sections.filter(
-    (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
+    (section) => !isSection(section, "fluxo-do-pedido") && section.id !== businessRulesSection?.id,
   );
   const isEditing = editor != null;
   const showContext = documentationSections.length > 0 || isEditing;
   const hasGatewayAuthentication = config.productId === "credenciado";
   const isGraphql = config.protocol !== "rest";
   const gatewayConnected = Boolean(isGraphql ? config.graphqlUrl : config.apiBaseUrl);
+  const hasFlowchartSection = flowchartSection !== undefined;
+  const flowLinksContent = flowLinks.length > 0 ? (
+    <>
+      <ul className="mt-4 grid gap-3 md:grid-cols-2">
+        {flowLinks.map((flow) => {
+          const details = manual.flowDetails?.find((item) => item.flowId === flow.id);
+          return (
+            <li key={flow.id}>
+              <Link
+                href={flow.href}
+                className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:bg-brand-50"
+              >
+                <h3 className="font-semibold text-slate-900">{flow.title}</h3>
+                {flow.description ? (
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{flow.description}</p>
+                ) : null}
+                {details ? (
+                  <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-600">
+                    {details.requiredOperations.map((operation) => (
+                      <li key={operation.name}>
+                        <code className="font-medium text-slate-800">{operation.name}</code>
+                        <span>: {operation.description}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <span className="mt-3 block text-sm font-medium text-brand-700">
+                  Ver explicação e fluxograma →
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      {manual.flowSelectionNote ? (
+        <p className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900">
+          <strong>Importante:</strong> {manual.flowSelectionNote}
+        </p>
+      ) : null}
+    </>
+  ) : null;
   const renderDocumentationSection = (section: ManualSection) => (
     <div
       key={section.id}
@@ -105,6 +148,7 @@ export function ManualRoteiro({
       {editor?.renderSectionBody?.(section) ?? (
         <MarkdownBody source={section.body} importanceNotices={config.productId === "credenciado"} />
       )}
+      {section.id === flowchartSection?.id ? flowLinksContent : null}
     </div>
   );
 
@@ -188,49 +232,14 @@ export function ManualRoteiro({
         </section>
       ) : null}
 
-      {flowLinks.length > 0 ? (
+      {flowLinksContent && !hasFlowchartSection ? (
         <section id="fluxogramas" data-documentation-area="documentacao" className="mt-10 scroll-mt-24">
           <h2 className="text-lg font-semibold">Fluxogramas</h2>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
             Consulte a visão geral do processo e abra cada fluxo para entender as decisões,
             operações e resultados esperados da integração.
           </p>
-          <ul className="mt-4 grid gap-3 md:grid-cols-2">
-            {flowLinks.map((flow) => {
-              const details = manual.flowDetails?.find((item) => item.flowId === flow.id);
-              return (
-                <li key={flow.id}>
-                  <Link
-                    href={flow.href}
-                    className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-600 hover:bg-brand-50"
-                  >
-                    <h3 className="font-semibold text-slate-900">{flow.title}</h3>
-                    {flow.description ? (
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600">{flow.description}</p>
-                    ) : null}
-                    {details ? (
-                      <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-600">
-                        {details.requiredOperations.map((operation) => (
-                          <li key={operation.name}>
-                            <code className="font-medium text-slate-800">{operation.name}</code>
-                            <span>: {operation.description}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <span className="mt-3 block text-sm font-medium text-brand-700">
-                      Ver explicação e fluxograma →
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          {manual.flowSelectionNote ? (
-            <p className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900">
-              <strong>Importante:</strong> {manual.flowSelectionNote}
-            </p>
-          ) : null}
+          {flowLinksContent}
         </section>
       ) : null}
 
