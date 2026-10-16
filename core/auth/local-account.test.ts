@@ -3,6 +3,21 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const writeOverride = vi.hoisted(() => ({
+  fail: null as null | (() => never),
+}));
+
+vi.mock("@/core/db/adapters", async () => {
+  const actual = await vi.importActual<typeof import("@/core/db/adapters")>("@/core/db/adapters");
+  return {
+    ...actual,
+    writeContentJson: (...args: Parameters<typeof actual.writeContentJson>) => {
+      writeOverride.fail?.();
+      return actual.writeContentJson(...args);
+    },
+  };
+});
+
 vi.mock("next-auth", () => ({
   CredentialsSignin: class extends Error {
     code = "credentials";
@@ -18,6 +33,7 @@ import {
   LocalMfaRequiredError,
 } from "@/core/auth/local-account";
 import { resetAllMemoryRateLimits } from "@/core/auth/rate-limit";
+import { GithubContentError } from "@/core/db/adapters/github-content-error";
 
 const EMAIL = "emergency@funcional.com.br";
 const PASSWORD = "senha-super-forte-12345";
@@ -32,6 +48,7 @@ describe("conta local de emergencia", () => {
   });
 
   afterEach(() => {
+    writeOverride.fail = null;
     vi.unstubAllEnvs();
     resetAllMemoryRateLimits();
     rmSync(contentRoot, { recursive: true, force: true });
@@ -84,6 +101,22 @@ describe("conta local de emergencia", () => {
         ip: "1.1.1.2",
       })
     ).rejects.toBeInstanceOf(LocalInvalidCredentialsError);
+  });
+
+  it("entra mesmo quando o GitHub nao grava o acesso", async () => {
+    await setupEnvAccount();
+    writeOverride.fail = () => {
+      throw new GithubContentError("NOT_CONFIGURED", "sem token de escrita");
+    };
+
+    await expect(
+      authenticateLocalEmergencyUser({
+        email: EMAIL,
+        password: PASSWORD,
+        mfaCode: RECOVERY_CODE,
+        ip: "9.9.9.9",
+      })
+    ).resolves.toMatchObject({ email: EMAIL, authMethod: "local" });
   });
 
   it("codigo de recuperacao nao pode ser reutilizado", async () => {
