@@ -24,8 +24,10 @@ type BpmnViewer = {
 };
 
 type BpmnCanvas = {
+  scroll(delta: { dx: number; dy: number }): void;
   zoom(): number;
   zoom(value: "fit-viewport" | number): void;
+  resized(): void;
 };
 
 export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerProps) {
@@ -37,6 +39,13 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
   useEffect(() => {
     let disposed = false;
     let viewer: BpmnViewer | null = null;
+    let container: HTMLDivElement | null = null;
+    let drag: { x: number; y: number } | null = null;
+    let startPan: ((event: MouseEvent) => void) | null = null;
+    let movePan: ((event: MouseEvent) => void) | null = null;
+    let stopPan: (() => void) | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    let animationFrame = 0;
 
     async function mountViewer() {
       if (!canvasRef.current) return;
@@ -44,15 +53,43 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
         setViewerReady(false);
         const { default: Viewer } = await import("bpmn-js/lib/Viewer");
         if (disposed || !canvasRef.current) return;
-        viewer = new Viewer({ container: canvasRef.current }) as unknown as BpmnViewer;
+        container = canvasRef.current;
+        viewer = new Viewer({ container }) as unknown as BpmnViewer;
         viewerRef.current = viewer;
         await viewer.importXML(integrationFlowToBpmnXml(flow));
         if (disposed) return;
+        const canvas = viewer.get("canvas") as BpmnCanvas;
+        stopPan = () => { drag = null; };
+        movePan = (event: MouseEvent) => {
+          if (!drag) return;
+          canvas.scroll({ dx: event.clientX - drag.x, dy: event.clientY - drag.y });
+          drag = { x: event.clientX, y: event.clientY };
+          event.preventDefault();
+        };
+        startPan = (event: MouseEvent) => {
+          if (event.button !== 0) return;
+          drag = { x: event.clientX, y: event.clientY };
+          event.preventDefault();
+        };
+        container.addEventListener("mousedown", startPan, true);
+        document.addEventListener("mousemove", movePan, true);
+        document.addEventListener("mouseup", stopPan, true);
         setError(null);
         setViewerReady(true);
-        requestAnimationFrame(() => {
-          if (!disposed && viewer) (viewer.get("canvas") as BpmnCanvas).zoom("fit-viewport");
+
+        const fitWhenReady = () => {
+          if (disposed || !viewer || !container || !container.clientWidth || !container.clientHeight) return;
+          canvas.resized();
+          canvas.zoom("fit-viewport");
+          resizeObserver?.disconnect();
+        };
+
+        resizeObserver = new ResizeObserver(() => {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = requestAnimationFrame(() => requestAnimationFrame(fitWhenReady));
         });
+        resizeObserver.observe(canvasRef.current);
+        animationFrame = requestAnimationFrame(() => requestAnimationFrame(fitWhenReady));
       } catch (cause) {
         if (!disposed) setError(cause instanceof Error ? cause.message : "Não foi possível carregar o fluxograma.");
       }
@@ -61,6 +98,13 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
     void mountViewer();
     return () => {
       disposed = true;
+      cancelAnimationFrame(animationFrame);
+      resizeObserver?.disconnect();
+      if (container && startPan && movePan && stopPan) {
+        container.removeEventListener("mousedown", startPan, true);
+        document.removeEventListener("mousemove", movePan, true);
+        document.removeEventListener("mouseup", stopPan, true);
+      }
       viewer?.destroy();
       if (viewerRef.current === viewer) viewerRef.current = null;
     };
@@ -73,7 +117,10 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
   }
 
   function fitViewport() {
-    (viewerRef.current?.get("canvas") as BpmnCanvas | undefined)?.zoom("fit-viewport");
+    const canvas = viewerRef.current?.get("canvas") as BpmnCanvas | undefined;
+    if (!canvas) return;
+    canvas.resized();
+    canvas.zoom("fit-viewport");
   }
 
   return (
@@ -97,7 +144,7 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3" data-testid="bpmn-flow-navigation">
         <p className="inline-flex items-center gap-1.5 text-sm text-slate-600">
           <Move className="h-4 w-4" aria-hidden="true" />
-          Modo de visualização: arraste a área vazia para mover o diagrama.
+          Modo de visualização: arraste o diagrama para movimentá-lo.
         </p>
         <div className="flex items-center gap-1" aria-label="Controles de visualização">
           <button
