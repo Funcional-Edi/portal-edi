@@ -11,12 +11,12 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 80,
-            "y": 160
+            "x": 182,
+            "y": 182
           },
           "labelPosition": {
-            "x": 85,
-            "y": 196,
+            "x": 187,
+            "y": 218,
             "width": 27,
             "height": 14
           }
@@ -44,8 +44,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRecebe o pedido via integração/API",
           "position": {
-            "x": 480,
-            "y": 800
+            "x": 620,
+            "y": 870
           }
         },
         {
@@ -53,12 +53,12 @@
           "type": "decision",
           "label": "As regras de negócio\nestão válidas?",
           "position": {
-            "x": 820,
-            "y": 780
+            "x": 1010,
+            "y": 880
           },
           "labelPosition": {
-            "x": 815,
-            "y": 840,
+            "x": 1074,
+            "y": 890,
             "width": 71,
             "height": 40
           }
@@ -68,8 +68,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRegistra que o pedido não foi aceito",
           "position": {
-            "x": 1180,
-            "y": 1100
+            "x": 1320,
+            "y": 750
           }
         },
         {
@@ -86,12 +86,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 1740,
-            "y": 260
+            "x": 1422,
+            "y": 80
           },
           "labelPosition": {
-            "x": 1749,
-            "y": 296,
+            "x": 1431,
+            "y": 116,
             "width": 19,
             "height": 14
           }
@@ -101,8 +101,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nCria o pedido no portal da indústria — TO",
           "position": {
-            "x": 1180,
-            "y": 890
+            "x": 1340,
+            "y": 970
           }
         },
         {
@@ -110,8 +110,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
           "position": {
-            "x": 1660,
-            "y": 600
+            "x": 1600,
+            "y": 590
           }
         },
         {
@@ -119,12 +119,12 @@
           "type": "decision",
           "label": "Qual é o status\ndo pedido?",
           "position": {
-            "x": 1660,
+            "x": 1690,
             "y": 400
           },
           "labelPosition": {
-            "x": 1653,
-            "y": 460,
+            "x": 1633,
+            "y": 506,
             "width": 74,
             "height": 27
           }
@@ -165,8 +165,8 @@
             "y": 500
           },
           "labelPosition": {
-            "x": 2173,
-            "y": 560,
+            "x": 2252,
+            "y": 516,
             "width": 75,
             "height": 27
           }
@@ -185,8 +185,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa o cancelamento no portal TO",
           "position": {
-            "x": 2820,
-            "y": 970
+            "x": 2650,
+            "y": 960
           }
         },
         {
@@ -212,8 +212,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa a nota no portal TO",
           "position": {
-            "x": 2820,
-            "y": 1140
+            "x": 2710,
+            "y": 1130
           }
         },
         {
@@ -221,8 +221,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nAcompanha o status do pedido",
           "position": {
-            "x": 3140,
-            "y": 260
+            "x": 3090,
+            "y": 360
           }
         },
         {
@@ -234,8 +234,8 @@
             "y": 260
           },
           "labelPosition": {
-            "x": 3453,
-            "y": 320,
+            "x": 3533,
+            "y": 276,
             "width": 74,
             "height": 27
           }
@@ -245,7 +245,7 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nConsulta o ressarcimento",
           "position": {
-            "x": 3780,
+            "x": 3660,
             "y": 80
           }
         },
@@ -254,7 +254,7 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa o ressarcimento no portal TO",
           "position": {
-            "x": 4060,
+            "x": 3710,
             "y": 800
           }
         },
@@ -263,8 +263,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nRecebe o valor do ressarcimento",
           "position": {
-            "x": 4340,
-            "y": 80
+            "x": 3970,
+            "y": 580
           }
         },
         {
@@ -272,12 +272,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 3780,
-            "y": 520
+            "x": 3472,
+            "y": 542
           },
           "labelPosition": {
-            "x": 3789,
-            "y": 556,
+            "x": 3481,
+            "y": 578,
             "width": 19,
             "height": 14
           }
@@ -287,12 +287,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 4660,
-            "y": 80
+            "x": 4072,
+            "y": 442
           },
           "labelPosition": {
-            "x": 4669,
-            "y": 116,
+            "x": 4080,
+            "y": 423,
             "width": 19,
             "height": 14
           }
@@ -307,15 +307,7 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 116,
-              "y": 178
-            },
-            {
-              "x": 228,
-              "y": 178
-            },
-            {
-              "x": 228,
+              "x": 218,
               "y": 200
             },
             {
@@ -349,20 +341,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 860,
-              "y": 200
+              "x": 740,
+              "y": 240
             },
             {
-              "x": 900,
-              "y": 200
-            },
-            {
-              "x": 900,
-              "y": 840
-            },
-            {
-              "x": 480,
-              "y": 840
+              "x": 740,
+              "y": 870
             }
           ]
         },
@@ -374,20 +358,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 720,
-              "y": 840
+              "x": 860,
+              "y": 910
             },
             {
-              "x": 770,
-              "y": 840
-            },
-            {
-              "x": 770,
-              "y": 810
-            },
-            {
-              "x": 820,
-              "y": 810
+              "x": 1010,
+              "y": 910
             }
           ]
         },
@@ -399,25 +375,21 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 850,
-              "y": 840
+              "x": 1040,
+              "y": 880
             },
             {
-              "x": 850,
-              "y": 990
+              "x": 1040,
+              "y": 790
             },
             {
-              "x": 1180,
-              "y": 990
-            },
-            {
-              "x": 1180,
-              "y": 1140
+              "x": 1320,
+              "y": 790
             }
           ],
           "labelPosition": {
-            "x": 1003,
-            "y": 965,
+            "x": 1043,
+            "y": 825,
             "width": 24,
             "height": 14
           },
@@ -431,20 +403,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1420,
-              "y": 1140
+              "x": 1440,
+              "y": 750
             },
             {
-              "x": 1460,
-              "y": 1140
-            },
-            {
-              "x": 1460,
-              "y": 280
-            },
-            {
-              "x": 1320,
-              "y": 280
+              "x": 1440,
+              "y": 320
             }
           ]
         },
@@ -456,20 +420,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1560,
-              "y": 280
+              "x": 1440,
+              "y": 240
             },
             {
-              "x": 1650,
-              "y": 280
-            },
-            {
-              "x": 1650,
-              "y": 278
-            },
-            {
-              "x": 1740,
-              "y": 278
+              "x": 1440,
+              "y": 116
             }
           ]
         },
@@ -481,25 +437,21 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 880,
-              "y": 810
+              "x": 1040,
+              "y": 940
             },
             {
-              "x": 1030,
-              "y": 810
+              "x": 1040,
+              "y": 1010
             },
             {
-              "x": 1030,
-              "y": 930
-            },
-            {
-              "x": 1180,
-              "y": 930
+              "x": 1340,
+              "y": 1010
             }
           ],
           "labelPosition": {
-            "x": 1035,
-            "y": 860,
+            "x": 1045,
+            "y": 965,
             "width": 20,
             "height": 14
           },
@@ -513,20 +465,16 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1420,
-              "y": 930
+              "x": 1580,
+              "y": 1010
             },
             {
-              "x": 1540,
-              "y": 930
+              "x": 1720,
+              "y": 1010
             },
             {
-              "x": 1540,
-              "y": 640
-            },
-            {
-              "x": 1660,
-              "y": 640
+              "x": 1720,
+              "y": 670
             }
           ]
         },
@@ -538,20 +486,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1900,
-              "y": 640
+              "x": 1720,
+              "y": 590
             },
             {
-              "x": 1940,
-              "y": 640
-            },
-            {
-              "x": 1940,
-              "y": 430
-            },
-            {
-              "x": 1660,
-              "y": 430
+              "x": 1720,
+              "y": 460
             }
           ]
         },
@@ -564,14 +504,10 @@
           "waypoints": [
             {
               "x": 1720,
-              "y": 415
+              "y": 400
             },
             {
-              "x": 1950,
-              "y": 415
-            },
-            {
-              "x": 1950,
+              "x": 1720,
               "y": 60
             },
             {
@@ -580,10 +516,10 @@
             }
           ],
           "labelPosition": {
-            "x": 1926,
-            "y": 228,
-            "width": 79,
-            "height": 27
+            "x": 1900,
+            "y": 33,
+            "width": 141,
+            "height": 14
           },
           "label": "AGUARDANDO RESPOSTA"
         },
@@ -616,16 +552,12 @@
               "y": 60
             },
             {
-              "x": 2780,
+              "x": 2870,
               "y": 60
             },
             {
-              "x": 2780,
-              "y": 840
-            },
-            {
-              "x": 2820,
-              "y": 840
+              "x": 2870,
+              "y": 800
             }
           ]
         },
@@ -641,16 +573,12 @@
               "y": 840
             },
             {
-              "x": 3100,
+              "x": 3130,
               "y": 840
             },
             {
-              "x": 3100,
-              "y": 280
-            },
-            {
-              "x": 3140,
-              "y": 280
+              "x": 3130,
+              "y": 440
             }
           ]
         },
@@ -662,15 +590,15 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1720,
-              "y": 445
+              "x": 1750,
+              "y": 430
             },
             {
-              "x": 1950,
-              "y": 445
+              "x": 1780,
+              "y": 430
             },
             {
-              "x": 1950,
+              "x": 1780,
               "y": 530
             },
             {
@@ -679,10 +607,10 @@
             }
           ],
           "labelPosition": {
-            "x": 1923,
-            "y": 478,
-            "width": 84,
-            "height": 27
+            "x": 1925,
+            "y": 505,
+            "width": 92,
+            "height": 14
           },
           "label": "CANCELAMENTO"
         },
@@ -698,13 +626,21 @@
               "y": 560
             },
             {
-              "x": 2500,
-              "y": 560
+              "x": 2210,
+              "y": 670
+            },
+            {
+              "x": 2620,
+              "y": 670
+            },
+            {
+              "x": 2620,
+              "y": 600
             }
           ],
           "labelPosition": {
-            "x": 2345,
-            "y": 535,
+            "x": 2405,
+            "y": 645,
             "width": 20,
             "height": 14
           },
@@ -718,20 +654,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 2740,
-              "y": 560
+              "x": 2680,
+              "y": 600
             },
             {
-              "x": 2780,
-              "y": 560
-            },
-            {
-              "x": 2780,
-              "y": 1010
-            },
-            {
-              "x": 2820,
-              "y": 1010
+              "x": 2680,
+              "y": 960
             }
           ]
         },
@@ -743,20 +671,16 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 3060,
-              "y": 1010
+              "x": 2890,
+              "y": 1000
             },
             {
-              "x": 3100,
-              "y": 1010
+              "x": 3210,
+              "y": 1000
             },
             {
-              "x": 3100,
-              "y": 300
-            },
-            {
-              "x": 3140,
-              "y": 300
+              "x": 3210,
+              "y": 440
             }
           ]
         },
@@ -768,25 +692,21 @@
           "targetHandle": "in-bottom",
           "waypoints": [
             {
-              "x": 2240,
-              "y": 530
+              "x": 2210,
+              "y": 500
             },
             {
-              "x": 2750,
-              "y": 530
+              "x": 2210,
+              "y": 400
             },
             {
-              "x": 2750,
-              "y": 340
-            },
-            {
-              "x": 3260,
-              "y": 340
+              "x": 3090,
+              "y": 400
             }
           ],
           "labelPosition": {
-            "x": 2753,
-            "y": 425,
+            "x": 2388,
+            "y": 413,
             "width": 24,
             "height": 14
           },
@@ -801,14 +721,10 @@
           "waypoints": [
             {
               "x": 1720,
-              "y": 430
+              "y": 400
             },
             {
-              "x": 1950,
-              "y": 430
-            },
-            {
-              "x": 1950,
+              "x": 1720,
               "y": 300
             },
             {
@@ -817,10 +733,10 @@
             }
           ],
           "labelPosition": {
-            "x": 1926,
-            "y": 355,
-            "width": 79,
-            "height": 27
+            "x": 1914,
+            "y": 273,
+            "width": 112,
+            "height": 14
           },
           "label": "AGUARDANDO NOTA"
         },
@@ -844,7 +760,7 @@
         {
           "id": "e-send-invoice-process",
           "source": "sendInvoice",
-          "target": "processInvoice",
+          "target": "processCancellation",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
           "waypoints": [
@@ -853,16 +769,12 @@
               "y": 300
             },
             {
-              "x": 2780,
+              "x": 2770,
               "y": 300
             },
             {
-              "x": 2780,
-              "y": 1180
-            },
-            {
-              "x": 2820,
-              "y": 1180
+              "x": 2770,
+              "y": 960
             }
           ]
         },
@@ -874,20 +786,16 @@
           "targetHandle": "in-left-bottom",
           "waypoints": [
             {
-              "x": 3060,
-              "y": 1180
+              "x": 2950,
+              "y": 1170
             },
             {
-              "x": 3100,
-              "y": 1180
+              "x": 3290,
+              "y": 1170
             },
             {
-              "x": 3100,
-              "y": 320
-            },
-            {
-              "x": 3140,
-              "y": 320
+              "x": 3290,
+              "y": 440
             }
           ]
         },
@@ -899,12 +807,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 3380,
-              "y": 300
+              "x": 3330,
+              "y": 400
             },
             {
               "x": 3420,
-              "y": 300
+              "y": 400
             },
             {
               "x": 3420,
@@ -924,25 +832,21 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 3520,
-              "y": 275
+              "x": 3490,
+              "y": 260
             },
             {
-              "x": 3650,
-              "y": 275
-            },
-            {
-              "x": 3650,
+              "x": 3490,
               "y": 120
             },
             {
-              "x": 3780,
+              "x": 3660,
               "y": 120
             }
           ],
           "labelPosition": {
-            "x": 3655,
-            "y": 188,
+            "x": 3495,
+            "y": 180,
             "width": 20,
             "height": 14
           },
@@ -956,25 +860,17 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 3520,
-              "y": 305
+              "x": 3490,
+              "y": 320
             },
             {
-              "x": 3650,
-              "y": 305
-            },
-            {
-              "x": 3650,
-              "y": 538
-            },
-            {
-              "x": 3780,
-              "y": 538
+              "x": 3490,
+              "y": 542
             }
           ],
           "labelPosition": {
-            "x": 3653,
-            "y": 412,
+            "x": 3493,
+            "y": 421,
             "width": 24,
             "height": 14
           },
@@ -988,20 +884,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 4020,
-              "y": 120
+              "x": 3830,
+              "y": 160
             },
             {
-              "x": 4040,
-              "y": 120
-            },
-            {
-              "x": 4040,
-              "y": 840
-            },
-            {
-              "x": 4060,
-              "y": 840
+              "x": 3830,
+              "y": 800
             }
           ]
         },
@@ -1013,20 +901,16 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 4300,
+              "x": 3950,
               "y": 840
             },
             {
-              "x": 4320,
+              "x": 4090,
               "y": 840
             },
             {
-              "x": 4320,
-              "y": 120
-            },
-            {
-              "x": 4340,
-              "y": 120
+              "x": 4090,
+              "y": 660
             }
           ]
         },
@@ -1038,20 +922,27 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 4580,
-              "y": 120
+              "x": 4090,
+              "y": 580
             },
             {
-              "x": 4620,
-              "y": 120
+              "x": 4090,
+              "y": 478
+            }
+          ]
+        },
+        {
+          "id": "Flow_1fefnwy",
+          "source": "processCancellation",
+          "target": "processInvoice",
+          "waypoints": [
+            {
+              "x": 2770,
+              "y": 1040
             },
             {
-              "x": 4620,
-              "y": 98
-            },
-            {
-              "x": 4660,
-              "y": 98
+              "x": 2770,
+              "y": 1130
             }
           ]
         }
@@ -1078,7 +969,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-16T13:09:06.198Z",
+      "updatedAt": "2026-10-16T12:32:05.233Z",
       "id": "retorno-distribuidor"
     },
     {
@@ -1092,12 +983,12 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 80,
-            "y": 160
+            "x": 182,
+            "y": 172
           },
           "labelPosition": {
-            "x": 85,
-            "y": 196,
+            "x": 187,
+            "y": 208,
             "width": 27,
             "height": 14
           }
@@ -1107,8 +998,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nRealiza a venda",
           "position": {
-            "x": 340,
-            "y": 160
+            "x": 490,
+            "y": 150
           }
         },
         {
@@ -1116,8 +1007,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido",
           "position": {
-            "x": 620,
-            "y": 160
+            "x": 490,
+            "y": 360
           },
           "operationRef": {
             "kind": "mutation",
@@ -1129,8 +1020,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRecebe o pedido via integração/API",
           "position": {
-            "x": 580,
-            "y": 940
+            "x": 490,
+            "y": 920
           }
         },
         {
@@ -1142,8 +1033,8 @@
             "y": 930
           },
           "labelPosition": {
-            "x": 895,
-            "y": 990,
+            "x": 944,
+            "y": 1000,
             "width": 71,
             "height": 40
           }
@@ -1171,8 +1062,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
           "position": {
-            "x": 1740,
-            "y": 620
+            "x": 1500,
+            "y": 610
           }
         },
         {
@@ -1180,12 +1071,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 2080,
-            "y": 620
+            "x": 1972,
+            "y": 632
           },
           "labelPosition": {
-            "x": 2089,
-            "y": 656,
+            "x": 1981,
+            "y": 668,
             "width": 19,
             "height": 14
           }
@@ -1195,7 +1086,7 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nCria o pedido no portal",
           "position": {
-            "x": 1260,
+            "x": 1180,
             "y": 920
           }
         },
@@ -1214,7 +1105,7 @@
           "label": "Pedido aguardando resposta\nAWAITING_ORDER_INVOICE",
           "position": {
             "x": 1820,
-            "y": 320
+            "y": 310
           }
         },
         {
@@ -1223,7 +1114,7 @@
           "label": "[DISTRIBUIDOR]\nEnvia a nota fiscal",
           "position": {
             "x": 2160,
-            "y": 320
+            "y": 310
           },
           "operationRef": {
             "kind": "mutation",
@@ -1235,12 +1126,12 @@
           "type": "decision",
           "label": "O pedido será\nfaturado?",
           "position": {
-            "x": 2460,
+            "x": 2500,
             "y": 320
           },
           "labelPosition": {
-            "x": 2455,
-            "y": 380,
+            "x": 2555,
+            "y": 386,
             "width": 70,
             "height": 27
           }
@@ -1250,8 +1141,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nEnvia o cancelamento",
           "position": {
-            "x": 2820,
-            "y": 80
+            "x": 2780,
+            "y": 90
           },
           "operationRef": {
             "kind": "mutation",
@@ -1291,11 +1182,11 @@
           "label": "Fim",
           "position": {
             "x": 4080,
-            "y": 20
+            "y": 42
           },
           "labelPosition": {
-            "x": 4089,
-            "y": 56,
+            "x": 4088,
+            "y": 23,
             "width": 19,
             "height": 14
           }
@@ -1305,8 +1196,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nFatura apenas alguns itens\ninvoice_quantity conforme faturamento; não faturados = 0",
           "position": {
-            "x": 3240,
-            "y": 300
+            "x": 2780,
+            "y": 310
           }
         },
         {
@@ -1314,7 +1205,7 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nFatura todos os itens\ninvoice_quantity igual à quantidade enviada",
           "position": {
-            "x": 2860,
+            "x": 2780,
             "y": 560
           }
         },
@@ -1351,11 +1242,11 @@
           "label": "Fim",
           "position": {
             "x": 4100,
-            "y": 560
+            "y": 582
           },
           "labelPosition": {
-            "x": 4109,
-            "y": 596,
+            "x": 4108,
+            "y": 563,
             "width": 19,
             "height": 14
           }
@@ -1370,20 +1261,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 116,
-              "y": 178
+              "x": 218,
+              "y": 190
             },
             {
-              "x": 228,
-              "y": 178
-            },
-            {
-              "x": 228,
-              "y": 200
-            },
-            {
-              "x": 340,
-              "y": 200
+              "x": 490,
+              "y": 190
             }
           ]
         },
@@ -1395,12 +1278,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 580,
-              "y": 200
+              "x": 610,
+              "y": 230
             },
             {
-              "x": 620,
-              "y": 200
+              "x": 610,
+              "y": 360
             }
           ]
         },
@@ -1412,20 +1295,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 860,
-              "y": 200
+              "x": 610,
+              "y": 440
             },
             {
-              "x": 900,
-              "y": 200
-            },
-            {
-              "x": 900,
-              "y": 980
-            },
-            {
-              "x": 580,
-              "y": 980
+              "x": 610,
+              "y": 920
             }
           ]
         },
@@ -1437,15 +1312,7 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 820,
-              "y": 980
-            },
-            {
-              "x": 860,
-              "y": 980
-            },
-            {
-              "x": 860,
+              "x": 730,
               "y": 960
             },
             {
@@ -1467,11 +1334,7 @@
             },
             {
               "x": 930,
-              "y": 1085
-            },
-            {
-              "x": 1180,
-              "y": 1085
+              "y": 1180
             },
             {
               "x": 1180,
@@ -1480,7 +1343,7 @@
           ],
           "labelPosition": {
             "x": 1043,
-            "y": 1060,
+            "y": 1155,
             "width": 24,
             "height": 14
           },
@@ -1511,12 +1374,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1740,
-              "y": 1180
+              "x": 1620,
+              "y": 1140
             },
             {
-              "x": 1740,
-              "y": 660
+              "x": 1620,
+              "y": 690
             }
           ]
         },
@@ -1528,20 +1391,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1980,
-              "y": 660
+              "x": 1740,
+              "y": 650
             },
             {
-              "x": 2030,
-              "y": 660
-            },
-            {
-              "x": 2030,
-              "y": 638
-            },
-            {
-              "x": 2080,
-              "y": 638
+              "x": 1972,
+              "y": 650
             }
           ]
         },
@@ -1557,12 +1412,12 @@
               "y": 960
             },
             {
-              "x": 1260,
+              "x": 1180,
               "y": 960
             }
           ],
           "labelPosition": {
-            "x": 1100,
+            "x": 1060,
             "y": 935,
             "width": 20,
             "height": 14
@@ -1577,15 +1432,15 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1500,
+              "x": 1420,
               "y": 960
             },
             {
-              "x": 1540,
+              "x": 1440,
               "y": 960
             },
             {
-              "x": 1540,
+              "x": 1440,
               "y": 200
             },
             {
@@ -1611,16 +1466,16 @@
             },
             {
               "x": 1760,
-              "y": 360
+              "y": 350
             },
             {
               "x": 1820,
-              "y": 360
+              "y": 350
             }
           ],
           "labelPosition": {
-            "x": 1733,
-            "y": 270,
+            "x": 1767,
+            "y": 242,
             "width": 85,
             "height": 27
           },
@@ -1635,11 +1490,11 @@
           "waypoints": [
             {
               "x": 2060,
-              "y": 360
+              "y": 350
             },
             {
               "x": 2160,
-              "y": 360
+              "y": 350
             }
           ]
         },
@@ -1652,18 +1507,10 @@
           "waypoints": [
             {
               "x": 2400,
-              "y": 360
-            },
-            {
-              "x": 2430,
-              "y": 360
-            },
-            {
-              "x": 2430,
               "y": 350
             },
             {
-              "x": 2460,
+              "x": 2500,
               "y": 350
             }
           ]
@@ -1676,26 +1523,22 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 2520,
-              "y": 335
+              "x": 2530,
+              "y": 320
             },
             {
-              "x": 2670,
-              "y": 335
+              "x": 2530,
+              "y": 130
             },
             {
-              "x": 2670,
-              "y": 120
-            },
-            {
-              "x": 2820,
-              "y": 120
+              "x": 2780,
+              "y": 130
             }
           ],
           "labelPosition": {
-            "x": 2673,
-            "y": 218,
-            "width": 24,
+            "x": 2536,
+            "y": 183,
+            "width": 27,
             "height": 14
           },
           "label": "NÃO"
@@ -1708,15 +1551,15 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 3060,
-              "y": 120
+              "x": 3020,
+              "y": 130
             },
             {
-              "x": 3120,
-              "y": 120
+              "x": 3090,
+              "y": 130
             },
             {
-              "x": 3120,
+              "x": 3090,
               "y": 880
             },
             {
@@ -1779,16 +1622,8 @@
               "y": 60
             },
             {
-              "x": 4030,
-              "y": 60
-            },
-            {
-              "x": 4030,
-              "y": 38
-            },
-            {
               "x": 4080,
-              "y": 38
+              "y": 60
             }
           ]
         },
@@ -1800,25 +1635,17 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 2520,
+              "x": 2560,
               "y": 350
             },
             {
-              "x": 2880,
+              "x": 2780,
               "y": 350
-            },
-            {
-              "x": 2880,
-              "y": 340
-            },
-            {
-              "x": 3240,
-              "y": 340
             }
           ],
           "labelPosition": {
-            "x": 2853,
-            "y": 335,
+            "x": 2620,
+            "y": 333,
             "width": 85,
             "height": 14
           },
@@ -1832,15 +1659,15 @@
           "targetHandle": "in-left-top",
           "waypoints": [
             {
-              "x": 3480,
-              "y": 340
+              "x": 3020,
+              "y": 350
             },
             {
-              "x": 3520,
-              "y": 340
+              "x": 3060,
+              "y": 350
             },
             {
-              "x": 3520,
+              "x": 3060,
               "y": 1120
             },
             {
@@ -1857,25 +1684,21 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 2520,
-              "y": 365
+              "x": 2530,
+              "y": 380
             },
             {
-              "x": 2690,
-              "y": 365
-            },
-            {
-              "x": 2690,
+              "x": 2530,
               "y": 600
             },
             {
-              "x": 2860,
+              "x": 2780,
               "y": 600
             }
           ],
           "labelPosition": {
-            "x": 2695,
-            "y": 473,
+            "x": 2540,
+            "y": 493,
             "width": 20,
             "height": 14
           },
@@ -1889,15 +1712,11 @@
           "targetHandle": "in-left-bottom",
           "waypoints": [
             {
-              "x": 3100,
-              "y": 600
+              "x": 2900,
+              "y": 640
             },
             {
-              "x": 3140,
-              "y": 600
-            },
-            {
-              "x": 3140,
+              "x": 2900,
               "y": 1160
             },
             {
@@ -1960,16 +1779,8 @@
               "y": 600
             },
             {
-              "x": 4070,
-              "y": 600
-            },
-            {
-              "x": 4070,
-              "y": 578
-            },
-            {
               "x": 4100,
-              "y": 578
+              "y": 600
             }
           ]
         }
@@ -1996,7 +1807,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-16T13:09:08.047Z"
+      "updatedAt": "2026-10-16T12:35:40.062Z"
     }
   ]
 }

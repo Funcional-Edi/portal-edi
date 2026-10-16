@@ -2,6 +2,7 @@
   "version": 1,
   "flows": [
     {
+      "id": "venda-bf",
       "version": 1,
       "title": "Fluxo de Venda — BF",
       "description": "Venda BF com consulta, pré-autorização, prescrição quando exigida, confirmação, dados fiscais e cancelamento.",
@@ -11,12 +12,12 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 710,
-            "y": 40
+            "x": 80,
+            "y": 582
           },
           "labelPosition": {
-            "x": 715,
-            "y": 76,
+            "x": 85,
+            "y": 618,
             "width": 27,
             "height": 14
           }
@@ -26,8 +27,8 @@
           "type": "operation",
           "label": "Gerar token\ncreateToken",
           "position": {
-            "x": 610,
-            "y": 120
+            "x": 150,
+            "y": 560
           }
         },
         {
@@ -35,8 +36,8 @@
           "type": "operation",
           "label": "Consultar beneficiário",
           "position": {
-            "x": 590,
-            "y": 270
+            "x": 440,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -48,8 +49,8 @@
           "type": "operation",
           "label": "Simular preço e regras",
           "position": {
-            "x": 590,
-            "y": 420
+            "x": 720,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -61,8 +62,8 @@
           "type": "operation",
           "label": "Pré-autorizar venda",
           "position": {
-            "x": 590,
-            "y": 570
+            "x": 1000,
+            "y": 560
           },
           "operationRef": {
             "kind": "mutation",
@@ -74,14 +75,14 @@
           "type": "decision",
           "label": "requiredUploadWithPrescription é true?",
           "position": {
-            "x": 675,
-            "y": 750
+            "x": 1280,
+            "y": 570
           },
           "labelPosition": {
-            "x": 661,
-            "y": 810,
-            "width": 89,
-            "height": 40
+            "x": 1227,
+            "y": 520,
+            "width": 165,
+            "height": 27
           }
         },
         {
@@ -89,8 +90,8 @@
           "type": "operation",
           "label": "Enviar receita",
           "position": {
-            "x": 1030,
-            "y": 820
+            "x": 1560,
+            "y": 250
           },
           "operationRef": {
             "kind": "mutation",
@@ -102,8 +103,8 @@
           "type": "operation",
           "label": "Vincular receita à pré-autorização",
           "position": {
-            "x": 1030,
-            "y": 1000
+            "x": 1560,
+            "y": 380
           },
           "operationRef": {
             "kind": "mutation",
@@ -115,8 +116,8 @@
           "type": "operation",
           "label": "Resgatar pré-autorização",
           "position": {
-            "x": 590,
-            "y": 1130
+            "x": 1560,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -128,8 +129,8 @@
           "type": "operation",
           "label": "Confirmar venda",
           "position": {
-            "x": 590,
-            "y": 1280
+            "x": 1860,
+            "y": 560
           },
           "operationRef": {
             "kind": "mutation",
@@ -141,12 +142,12 @@
           "type": "decision",
           "label": "Dados da NF-e já foram enviados?",
           "position": {
-            "x": 675,
-            "y": 1450
+            "x": 2140,
+            "y": 570
           },
           "labelPosition": {
-            "x": 662,
-            "y": 1510,
+            "x": 2186,
+            "y": 536,
             "width": 87,
             "height": 27
           }
@@ -156,8 +157,8 @@
           "type": "operation",
           "label": "Enviar dados da chave DANFE",
           "position": {
-            "x": 1030,
-            "y": 1520
+            "x": 2410,
+            "y": 250
           },
           "operationRef": {
             "kind": "mutation",
@@ -169,12 +170,12 @@
           "type": "decision",
           "label": "A venda será cancelada?",
           "position": {
-            "x": 675,
-            "y": 1690
+            "x": 2500,
+            "y": 570
           },
           "labelPosition": {
-            "x": 673,
-            "y": 1750,
+            "x": 2557,
+            "y": 630,
             "width": 65,
             "height": 27
           }
@@ -184,8 +185,8 @@
           "type": "operation",
           "label": "Cancelar venda",
           "position": {
-            "x": 300,
-            "y": 1800
+            "x": 2410,
+            "y": 1050
           },
           "operationRef": {
             "kind": "mutation",
@@ -197,12 +198,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 710,
-            "y": 1980
+            "x": 2820,
+            "y": 1072
           },
           "labelPosition": {
-            "x": 719,
-            "y": 2016,
+            "x": 2829,
+            "y": 1108,
             "width": 19,
             "height": 14
           }
@@ -213,24 +214,16 @@
           "id": "inicio-token",
           "source": "inicio",
           "target": "gerar-token",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 728,
-              "y": 76
+              "x": 116,
+              "y": 600
             },
             {
-              "x": 728,
-              "y": 98
-            },
-            {
-              "x": 730,
-              "y": 98
-            },
-            {
-              "x": 730,
-              "y": 120
+              "x": 150,
+              "y": 600
             }
           ]
         },
@@ -238,24 +231,16 @@
           "id": "token-beneficiario",
           "source": "gerar-token",
           "target": "consultar-beneficiario",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 730,
-              "y": 200
+              "x": 390,
+              "y": 600
             },
             {
-              "x": 730,
-              "y": 235
-            },
-            {
-              "x": 710,
-              "y": 235
-            },
-            {
-              "x": 710,
-              "y": 270
+              "x": 440,
+              "y": 600
             }
           ]
         },
@@ -263,16 +248,16 @@
           "id": "beneficiario-regras",
           "source": "consultar-beneficiario",
           "target": "simular-regras",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 350
+              "x": 680,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 420
+              "x": 720,
+              "y": 600
             }
           ]
         },
@@ -280,16 +265,16 @@
           "id": "regras-preautorizacao",
           "source": "simular-regras",
           "target": "pre-autorizar",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 500
+              "x": 960,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 570
+              "x": 1000,
+              "y": 600
             }
           ]
         },
@@ -297,24 +282,16 @@
           "id": "preautorizacao-receita",
           "source": "pre-autorizar",
           "target": "receita-exigida",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 650
+              "x": 1240,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 700
-            },
-            {
-              "x": 705,
-              "y": 700
-            },
-            {
-              "x": 705,
-              "y": 750
+              "x": 1280,
+              "y": 600
             }
           ]
         },
@@ -326,25 +303,25 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 780
+              "x": 1340,
+              "y": 600
             },
             {
-              "x": 882.5,
-              "y": 780
+              "x": 1450,
+              "y": 600
             },
             {
-              "x": 882.5,
-              "y": 860
+              "x": 1450,
+              "y": 290
             },
             {
-              "x": 1030,
-              "y": 860
+              "x": 1560,
+              "y": 290
             }
           ],
           "labelPosition": {
-            "x": 888,
-            "y": 810,
+            "x": 1420,
+            "y": 575,
             "width": 19,
             "height": 14
           },
@@ -354,29 +331,29 @@
           "id": "receita-nao-resgate",
           "source": "receita-exigida",
           "target": "resgatar-pre-autorizacao",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
+          "sourceHandle": "out-right-bottom",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 705,
-              "y": 810
+              "x": 1310,
+              "y": 630
             },
             {
-              "x": 705,
-              "y": 970
+              "x": 1310,
+              "y": 670
             },
             {
-              "x": 710,
-              "y": 970
+              "x": 1680,
+              "y": 670
             },
             {
-              "x": 710,
-              "y": 1130
+              "x": 1680,
+              "y": 640
             }
           ],
           "labelPosition": {
-            "x": 697,
-            "y": 945,
+            "x": 1419,
+            "y": 683,
             "width": 21,
             "height": 14
           },
@@ -390,12 +367,12 @@
           "targetHandle": "in",
           "waypoints": [
             {
-              "x": 1150,
-              "y": 900
+              "x": 1680,
+              "y": 330
             },
             {
-              "x": 1150,
-              "y": 1000
+              "x": 1680,
+              "y": 380
             }
           ]
         },
@@ -403,24 +380,16 @@
           "id": "vinculo-resgate",
           "source": "vincular-receita",
           "target": "resgatar-pre-autorizacao",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
+          "sourceHandle": "out",
+          "targetHandle": "in",
           "waypoints": [
             {
-              "x": 1030,
-              "y": 1040
+              "x": 1680,
+              "y": 460
             },
             {
-              "x": 1070,
-              "y": 1040
-            },
-            {
-              "x": 1070,
-              "y": 1170
-            },
-            {
-              "x": 830,
-              "y": 1170
+              "x": 1680,
+              "y": 560
             }
           ]
         },
@@ -428,16 +397,16 @@
           "id": "resgate-confirmacao",
           "source": "resgatar-pre-autorizacao",
           "target": "confirmar-venda",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 1210
+              "x": 1800,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 1280
+              "x": 1860,
+              "y": 600
             }
           ]
         },
@@ -445,24 +414,16 @@
           "id": "confirmacao-nota",
           "source": "confirmar-venda",
           "target": "nota-enviada",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 1360
+              "x": 2100,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 1405
-            },
-            {
-              "x": 705,
-              "y": 1405
-            },
-            {
-              "x": 705,
-              "y": 1450
+              "x": 2140,
+              "y": 600
             }
           ]
         },
@@ -470,21 +431,21 @@
           "id": "nota-sim-cancelamento",
           "source": "nota-enviada",
           "target": "cancelar-venda",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 705,
-              "y": 1510
+              "x": 2200,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 1690
+              "x": 2500,
+              "y": 600
             }
           ],
           "labelPosition": {
-            "x": 711,
-            "y": 1590,
+            "x": 2341,
+            "y": 575,
             "width": 19,
             "height": 14
           },
@@ -494,29 +455,25 @@
           "id": "nota-nao-envio",
           "source": "nota-enviada",
           "target": "enviar-nota",
-          "sourceHandle": "out-right",
+          "sourceHandle": "out-right-top",
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 1480
+              "x": 2170,
+              "y": 570
             },
             {
-              "x": 882.5,
-              "y": 1480
+              "x": 2170,
+              "y": 290
             },
             {
-              "x": 882.5,
-              "y": 1560
-            },
-            {
-              "x": 1030,
-              "y": 1560
+              "x": 2410,
+              "y": 290
             }
           ],
           "labelPosition": {
-            "x": 887,
-            "y": 1510,
+            "x": 2175,
+            "y": 421,
             "width": 21,
             "height": 14
           },
@@ -526,24 +483,16 @@
           "id": "envio-cancelamento",
           "source": "enviar-nota",
           "target": "cancelar-venda",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
+          "sourceHandle": "out",
+          "targetHandle": "in",
           "waypoints": [
             {
-              "x": 1030,
-              "y": 1560
+              "x": 2530,
+              "y": 330
             },
             {
-              "x": 1070,
-              "y": 1560
-            },
-            {
-              "x": 1070,
-              "y": 1720
-            },
-            {
-              "x": 735,
-              "y": 1720
+              "x": 2530,
+              "y": 570
             }
           ]
         },
@@ -551,29 +500,21 @@
           "id": "cancelamento-sim",
           "source": "cancelar-venda",
           "target": "cancelamento",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
+          "sourceHandle": "out-bottom",
+          "targetHandle": "in",
           "waypoints": [
             {
-              "x": 675,
-              "y": 1720
+              "x": 2530,
+              "y": 630
             },
             {
-              "x": 715,
-              "y": 1720
-            },
-            {
-              "x": 715,
-              "y": 1840
-            },
-            {
-              "x": 540,
-              "y": 1840
+              "x": 2530,
+              "y": 1050
             }
           ],
           "labelPosition": {
-            "x": 721,
-            "y": 1770,
+            "x": 2536,
+            "y": 830,
             "width": 19,
             "height": 14
           },
@@ -587,20 +528,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 540,
-              "y": 1840
+              "x": 2650,
+              "y": 1090
             },
             {
-              "x": 625,
-              "y": 1840
-            },
-            {
-              "x": 625,
-              "y": 1998
-            },
-            {
-              "x": 710,
-              "y": 1998
+              "x": 2820,
+              "y": 1090
             }
           ]
         },
@@ -612,25 +545,21 @@
           "targetHandle": "in",
           "waypoints": [
             {
-              "x": 705,
-              "y": 1750
+              "x": 2560,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 1865
+              "x": 2838,
+              "y": 600
             },
             {
-              "x": 728,
-              "y": 1865
-            },
-            {
-              "x": 728,
-              "y": 1980
+              "x": 2838,
+              "y": 1072
             }
           ],
           "labelPosition": {
-            "x": 706,
-            "y": 1840,
+            "x": 2689,
+            "y": 575,
             "width": 21,
             "height": 14
           },
@@ -645,8 +574,8 @@
             "x": 0,
             "y": 0
           },
-          "width": 1560,
-          "height": 2220
+          "width": 3400,
+          "height": 1250
         }
       ],
       "annotations": [
@@ -654,19 +583,19 @@
           "id": "token-diario",
           "text": "Gerar uma vez ao dia.",
           "position": {
-            "x": 910,
-            "y": 155
+            "x": 175,
+            "y": 470
           },
           "width": 190,
           "targetNodeId": "gerar-token",
           "associationWaypoints": [
             {
-              "x": 910,
-              "y": 176
+              "x": 270,
+              "y": 512
             },
             {
-              "x": 850,
-              "y": 160
+              "x": 270,
+              "y": 560
             }
           ]
         },
@@ -674,19 +603,19 @@
           "id": "prescricao",
           "text": "Se exigida, enviar arquivo JPEG, JPG, PNG ou PDF de até 2 MB. Não é aceita URL.",
           "position": {
-            "x": 1100,
-            "y": 770
+            "x": 1860,
+            "y": 269
           },
-          "width": 320,
+          "width": 270,
           "targetNodeId": "upload-receita",
           "associationWaypoints": [
             {
-              "x": 1100,
-              "y": 791
+              "x": 1860,
+              "y": 290
             },
             {
-              "x": 1270,
-              "y": 860
+              "x": 1800,
+              "y": 290
             }
           ]
         },
@@ -694,28 +623,26 @@
           "id": "ids-receita",
           "text": "Conservar todos os IDs retornados e enviá-los em prescriptionIDs no vínculo.",
           "position": {
-            "x": 1110,
-            "y": 930
+            "x": 1865,
+            "y": 399
           },
           "width": 310,
           "targetNodeId": "vincular-receita",
           "associationWaypoints": [
             {
-              "x": 1110,
-              "y": 951
+              "x": 1865,
+              "y": 420
             },
             {
-              "x": 1270,
-              "y": 1040
+              "x": 1800,
+              "y": 420
             }
           ]
         }
       ],
-      "updatedAt": "2026-10-16T13:09:09.974Z",
-      "id": "venda-bf"
+      "updatedAt": "2026-10-16T12:29:17.127Z"
     },
     {
-      "id": "venda-pbm",
       "version": 1,
       "title": "Fluxo de Venda - PBM",
       "description": "Venda PBM no caixa, com elegibilidade, subprocessos de Cadastro e Opt-in quando necessários, e o mesmo núcleo transacional da venda BF.",
@@ -725,12 +652,12 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 710,
-            "y": 40
+            "x": 80,
+            "y": 582
           },
           "labelPosition": {
-            "x": 715,
-            "y": 76,
+            "x": 85,
+            "y": 618,
             "width": 27,
             "height": 14
           }
@@ -740,8 +667,8 @@
           "type": "operation",
           "label": "Gerar token\ncreateToken",
           "position": {
-            "x": 610,
-            "y": 120
+            "x": 160,
+            "y": 560
           }
         },
         {
@@ -749,8 +676,8 @@
           "type": "operation",
           "label": "Consultar programas disponíveis",
           "position": {
-            "x": 590,
-            "y": 270
+            "x": 440,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -762,8 +689,8 @@
           "type": "operation",
           "label": "Consultar regras de desconto",
           "position": {
-            "x": 590,
-            "y": 420
+            "x": 720,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -775,8 +702,8 @@
           "type": "operation",
           "label": "Avaliar elegibilidade\nPharma_assessEligibility",
           "position": {
-            "x": 590,
-            "y": 570
+            "x": 1000,
+            "y": 560
           }
         },
         {
@@ -784,12 +711,12 @@
           "type": "decision",
           "label": "Paciente está cadastrado?",
           "position": {
-            "x": 675,
-            "y": 740
+            "x": 1300,
+            "y": 570
           },
           "labelPosition": {
-            "x": 672,
-            "y": 800,
+            "x": 1297,
+            "y": 630,
             "width": 67,
             "height": 27
           }
@@ -799,8 +726,8 @@
           "type": "operation",
           "label": "Fluxo de Cadastro\n(subprocesso)",
           "position": {
-            "x": 1120,
-            "y": 820
+            "x": 1210,
+            "y": 240
           }
         },
         {
@@ -808,8 +735,8 @@
           "type": "operation",
           "label": "Verificar Opt-in\nPharma_verifyOptIn",
           "position": {
-            "x": 1120,
-            "y": 970
+            "x": 1510,
+            "y": 380
           }
         },
         {
@@ -817,12 +744,12 @@
           "type": "decision",
           "label": "Opt-in é obrigatório?",
           "position": {
-            "x": 675,
-            "y": 970
+            "x": 1600,
+            "y": 570
           },
           "labelPosition": {
-            "x": 676,
-            "y": 1030,
+            "x": 1560,
+            "y": 630,
             "width": 59,
             "height": 27
           }
@@ -832,12 +759,12 @@
           "type": "decision",
           "label": "Opt-in foi aceito?",
           "position": {
-            "x": 675,
-            "y": 1160
+            "x": 1870,
+            "y": 570
           },
           "labelPosition": {
-            "x": 663,
-            "y": 1220,
+            "x": 1858,
+            "y": 637,
             "width": 84,
             "height": 14
           }
@@ -847,8 +774,8 @@
           "type": "operation",
           "label": "Fluxo de Opt-in\n(subprocesso)",
           "position": {
-            "x": 1120,
-            "y": 1240
+            "x": 2170,
+            "y": 240
           }
         },
         {
@@ -856,8 +783,8 @@
           "type": "operation",
           "label": "Exibir regra no balcão\nPharma_displayProduct",
           "position": {
-            "x": 1120,
-            "y": 1430
+            "x": 2430,
+            "y": 560
           }
         },
         {
@@ -865,8 +792,8 @@
           "type": "operation",
           "label": "Simular preço e regras",
           "position": {
-            "x": 590,
-            "y": 1530
+            "x": 2710,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -878,8 +805,8 @@
           "type": "operation",
           "label": "Pré-autorizar venda",
           "position": {
-            "x": 590,
-            "y": 1680
+            "x": 2990,
+            "y": 560
           },
           "operationRef": {
             "kind": "mutation",
@@ -887,53 +814,12 @@
           }
         },
         {
-          "id": "receita-exigida-pbm",
-          "type": "decision",
-          "label": "requiredUploadWithPrescription é true?",
-          "position": {
-            "x": 675,
-            "y": 1860
-          },
-          "labelPosition": {
-            "x": 661,
-            "y": 1920,
-            "width": 89,
-            "height": 40
-          }
-        },
-        {
-          "id": "upload-receita-pbm",
-          "type": "operation",
-          "label": "Enviar receita",
-          "position": {
-            "x": 1120,
-            "y": 1940
-          },
-          "operationRef": {
-            "kind": "mutation",
-            "name": "Prescription_uploadPrescription"
-          }
-        },
-        {
-          "id": "vincular-receita-pbm",
-          "type": "operation",
-          "label": "Vincular receita à pré-autorização",
-          "position": {
-            "x": 1120,
-            "y": 2120
-          },
-          "operationRef": {
-            "kind": "mutation",
-            "name": "Prescription_bindPrescription"
-          }
-        },
-        {
           "id": "resgatar-pre-autorizacao-pbm",
           "type": "operation",
           "label": "Resgatar pré-autorização",
           "position": {
-            "x": 590,
-            "y": 2260
+            "x": 3270,
+            "y": 560
           },
           "operationRef": {
             "kind": "query",
@@ -945,8 +831,8 @@
           "type": "operation",
           "label": "Confirmar venda",
           "position": {
-            "x": 590,
-            "y": 2410
+            "x": 3550,
+            "y": 560
           },
           "operationRef": {
             "kind": "mutation",
@@ -958,12 +844,12 @@
           "type": "decision",
           "label": "Dados da NF-e já foram enviados?",
           "position": {
-            "x": 675,
-            "y": 2580
+            "x": 3920,
+            "y": 570
           },
           "labelPosition": {
-            "x": 662,
-            "y": 2640,
+            "x": 3907,
+            "y": 630,
             "width": 87,
             "height": 27
           }
@@ -973,8 +859,8 @@
           "type": "operation",
           "label": "Enviar dados da chave DANFE",
           "position": {
-            "x": 1120,
-            "y": 2650
+            "x": 4100,
+            "y": 250
           },
           "operationRef": {
             "kind": "mutation",
@@ -986,12 +872,12 @@
           "type": "decision",
           "label": "A venda será cancelada?",
           "position": {
-            "x": 675,
-            "y": 2820
+            "x": 4190,
+            "y": 570
           },
           "labelPosition": {
-            "x": 673,
-            "y": 2880,
+            "x": 4237,
+            "y": 630,
             "width": 65,
             "height": 27
           }
@@ -1001,8 +887,8 @@
           "type": "operation",
           "label": "Cancelar venda",
           "position": {
-            "x": 300,
-            "y": 2930
+            "x": 4100,
+            "y": 1050
           },
           "operationRef": {
             "kind": "mutation",
@@ -1014,12 +900,12 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 710,
-            "y": 3120
+            "x": 4510,
+            "y": 1072
           },
           "labelPosition": {
-            "x": 719,
-            "y": 3156,
+            "x": 4518,
+            "y": 1123,
             "width": 19,
             "height": 14
           }
@@ -1030,24 +916,16 @@
           "id": "inicio-token-pbm",
           "source": "inicio-pbm",
           "target": "gerar-token-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 728,
-              "y": 76
+              "x": 116,
+              "y": 600
             },
             {
-              "x": 728,
-              "y": 98
-            },
-            {
-              "x": 730,
-              "y": 98
-            },
-            {
-              "x": 730,
-              "y": 120
+              "x": 160,
+              "y": 600
             }
           ]
         },
@@ -1055,24 +933,16 @@
           "id": "token-programas",
           "source": "gerar-token-pbm",
           "target": "consultar-programas",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 730,
-              "y": 200
+              "x": 400,
+              "y": 600
             },
             {
-              "x": 730,
-              "y": 235
-            },
-            {
-              "x": 710,
-              "y": 235
-            },
-            {
-              "x": 710,
-              "y": 270
+              "x": 440,
+              "y": 600
             }
           ]
         },
@@ -1080,16 +950,16 @@
           "id": "programas-regras",
           "source": "consultar-programas",
           "target": "consultar-regras-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 350
+              "x": 680,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 420
+              "x": 720,
+              "y": 600
             }
           ]
         },
@@ -1097,16 +967,16 @@
           "id": "regras-elegibilidade",
           "source": "consultar-regras-pbm",
           "target": "avaliar-elegibilidade",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 500
+              "x": 960,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 570
+              "x": 1000,
+              "y": 600
             }
           ]
         },
@@ -1114,24 +984,16 @@
           "id": "elegibilidade-cadastro",
           "source": "avaliar-elegibilidade",
           "target": "paciente-cadastrado",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 650
+              "x": 1240,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 695
-            },
-            {
-              "x": 705,
-              "y": 695
-            },
-            {
-              "x": 705,
-              "y": 740
+              "x": 1300,
+              "y": 600
             }
           ]
         },
@@ -1139,21 +1001,21 @@
           "id": "cadastrado-sim-optin",
           "source": "paciente-cadastrado",
           "target": "optin-obrigatorio",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
+          "sourceHandle": "out-right-bottom",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 705,
-              "y": 800
+              "x": 1360,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 970
+              "x": 1600,
+              "y": 600
             }
           ],
           "labelPosition": {
-            "x": 711,
-            "y": 875,
+            "x": 1471,
+            "y": 575,
             "width": 19,
             "height": 14
           },
@@ -1167,25 +1029,17 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 770
+              "x": 1330,
+              "y": 570
             },
             {
-              "x": 927.5,
-              "y": 770
-            },
-            {
-              "x": 927.5,
-              "y": 860
-            },
-            {
-              "x": 1120,
-              "y": 860
+              "x": 1330,
+              "y": 320
             }
           ],
           "labelPosition": {
-            "x": 932,
-            "y": 805,
+            "x": 1335,
+            "y": 435,
             "width": 21,
             "height": 14
           },
@@ -1199,12 +1053,16 @@
           "targetHandle": "in",
           "waypoints": [
             {
-              "x": 1240,
-              "y": 900
+              "x": 1450,
+              "y": 280
             },
             {
-              "x": 1240,
-              "y": 970
+              "x": 1630,
+              "y": 280
+            },
+            {
+              "x": 1630,
+              "y": 380
             }
           ]
         },
@@ -1212,24 +1070,16 @@
           "id": "verificacao-optin",
           "source": "verificar-optin",
           "target": "optin-obrigatorio",
-          "sourceHandle": "out-left",
+          "sourceHandle": "out",
           "targetHandle": "in-right",
           "waypoints": [
             {
-              "x": 1120,
-              "y": 1010
+              "x": 1630,
+              "y": 460
             },
             {
-              "x": 1160,
-              "y": 1010
-            },
-            {
-              "x": 1160,
-              "y": 1000
-            },
-            {
-              "x": 735,
-              "y": 1000
+              "x": 1630,
+              "y": 570
             }
           ]
         },
@@ -1237,29 +1087,29 @@
           "id": "optin-nao-exibir",
           "source": "optin-obrigatorio",
           "target": "exibir-regra",
-          "sourceHandle": "out-right",
+          "sourceHandle": "out-right-bottom",
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 1000
+              "x": 1630,
+              "y": 630
             },
             {
-              "x": 927.5,
-              "y": 1000
+              "x": 1630,
+              "y": 680
             },
             {
-              "x": 927.5,
-              "y": 1470
+              "x": 2550,
+              "y": 680
             },
             {
-              "x": 1120,
-              "y": 1470
+              "x": 2550,
+              "y": 640
             }
           ],
           "labelPosition": {
-            "x": 932,
-            "y": 1225,
+            "x": 1649,
+            "y": 693,
             "width": 21,
             "height": 14
           },
@@ -1269,21 +1119,29 @@
           "id": "optin-sim-aceito",
           "source": "optin-obrigatorio",
           "target": "optin-aceito",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
+          "sourceHandle": "out-right-top",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 705,
-              "y": 1030
+              "x": 1660,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 1160
+              "x": 1765,
+              "y": 600
+            },
+            {
+              "x": 1765,
+              "y": 602
+            },
+            {
+              "x": 1872,
+              "y": 602
             }
           ],
           "labelPosition": {
-            "x": 711,
-            "y": 1085,
+            "x": 1670,
+            "y": 575,
             "width": 19,
             "height": 14
           },
@@ -1293,105 +1151,40 @@
           "id": "aceito-sim-exibir",
           "source": "optin-aceito",
           "target": "exibir-regra",
-          "sourceHandle": "out-right",
-          "targetHandle": "in-top",
+          "sourceHandle": "out-right-bottom",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 1190
+              "x": 1930,
+              "y": 600
             },
             {
-              "x": 987.5,
-              "y": 1190
-            },
-            {
-              "x": 987.5,
-              "y": 1430
-            },
-            {
-              "x": 1240,
-              "y": 1430
+              "x": 2430,
+              "y": 600
             }
           ],
           "labelPosition": {
-            "x": 993,
-            "y": 1300,
+            "x": 2186,
+            "y": 575,
             "width": 19,
             "height": 14
           },
           "label": "Sim"
         },
         {
-          "id": "aceito-nao-fluxo",
-          "source": "optin-aceito",
-          "target": "fluxo-optin",
+          "id": "exibir-simulacao",
+          "source": "exibir-regra",
+          "target": "simular-regras-pbm",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 1190
+              "x": 2670,
+              "y": 600
             },
             {
-              "x": 927.5,
-              "y": 1190
-            },
-            {
-              "x": 927.5,
-              "y": 1280
-            },
-            {
-              "x": 1120,
-              "y": 1280
-            }
-          ],
-          "labelPosition": {
-            "x": 932,
-            "y": 1225,
-            "width": 21,
-            "height": 14
-          },
-          "label": "Não"
-        },
-        {
-          "id": "fluxo-exibir",
-          "source": "fluxo-optin",
-          "target": "exibir-regra",
-          "sourceHandle": "out",
-          "targetHandle": "in",
-          "waypoints": [
-            {
-              "x": 1240,
-              "y": 1320
-            },
-            {
-              "x": 1240,
-              "y": 1430
-            }
-          ]
-        },
-        {
-          "id": "exibir-simulacao",
-          "source": "exibir-regra",
-          "target": "simular-regras-pbm",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
-          "waypoints": [
-            {
-              "x": 1120,
-              "y": 1470
-            },
-            {
-              "x": 1160,
-              "y": 1470
-            },
-            {
-              "x": 1160,
-              "y": 1570
-            },
-            {
-              "x": 830,
-              "y": 1570
+              "x": 2710,
+              "y": 600
             }
           ]
         },
@@ -1399,147 +1192,33 @@
           "id": "simulacao-preautorizacao",
           "source": "simular-regras-pbm",
           "target": "pre-autorizar-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
-          "waypoints": [
-            {
-              "x": 710,
-              "y": 1610
-            },
-            {
-              "x": 710,
-              "y": 1680
-            }
-          ]
-        },
-        {
-          "id": "preautorizacao-receita-pbm",
-          "source": "pre-autorizar-pbm",
-          "target": "receita-exigida-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
-          "waypoints": [
-            {
-              "x": 710,
-              "y": 1760
-            },
-            {
-              "x": 710,
-              "y": 1810
-            },
-            {
-              "x": 705,
-              "y": 1810
-            },
-            {
-              "x": 705,
-              "y": 1860
-            }
-          ]
-        },
-        {
-          "id": "receita-sim-upload-pbm",
-          "source": "receita-exigida-pbm",
-          "target": "upload-receita-pbm",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 1890
+              "x": 2950,
+              "y": 600
             },
             {
-              "x": 927.5,
-              "y": 1890
-            },
-            {
-              "x": 927.5,
-              "y": 1980
-            },
-            {
-              "x": 1120,
-              "y": 1980
-            }
-          ],
-          "labelPosition": {
-            "x": 933,
-            "y": 1925,
-            "width": 19,
-            "height": 14
-          },
-          "label": "Sim"
-        },
-        {
-          "id": "receita-nao-resgate-pbm",
-          "source": "receita-exigida-pbm",
-          "target": "resgatar-pre-autorizacao-pbm",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
-          "waypoints": [
-            {
-              "x": 705,
-              "y": 1920
-            },
-            {
-              "x": 705,
-              "y": 2090
-            },
-            {
-              "x": 710,
-              "y": 2090
-            },
-            {
-              "x": 710,
-              "y": 2260
-            }
-          ],
-          "labelPosition": {
-            "x": 697,
-            "y": 2065,
-            "width": 21,
-            "height": 14
-          },
-          "label": "Não"
-        },
-        {
-          "id": "upload-vinculo-pbm",
-          "source": "upload-receita-pbm",
-          "target": "vincular-receita-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
-          "waypoints": [
-            {
-              "x": 1240,
-              "y": 2020
-            },
-            {
-              "x": 1240,
-              "y": 2120
+              "x": 2990,
+              "y": 600
             }
           ]
         },
         {
-          "id": "vinculo-resgate-pbm",
-          "source": "vincular-receita-pbm",
+          "id": "preautorizacao-resgate-pbm",
+          "source": "pre-autorizar-pbm",
           "target": "resgatar-pre-autorizacao-pbm",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 1120,
-              "y": 2160
+              "x": 3230,
+              "y": 600
             },
             {
-              "x": 1160,
-              "y": 2160
-            },
-            {
-              "x": 1160,
-              "y": 2300
-            },
-            {
-              "x": 830,
-              "y": 2300
+              "x": 3270,
+              "y": 600
             }
           ]
         },
@@ -1547,16 +1226,16 @@
           "id": "resgate-confirmacao-pbm",
           "source": "resgatar-pre-autorizacao-pbm",
           "target": "confirmar-venda-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 2340
+              "x": 3510,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 2410
+              "x": 3550,
+              "y": 600
             }
           ]
         },
@@ -1564,24 +1243,16 @@
           "id": "confirmacao-nota-pbm",
           "source": "confirmar-venda-pbm",
           "target": "nota-enviada-pbm",
-          "sourceHandle": "out",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 710,
-              "y": 2490
+              "x": 3790,
+              "y": 600
             },
             {
-              "x": 710,
-              "y": 2535
-            },
-            {
-              "x": 705,
-              "y": 2535
-            },
-            {
-              "x": 705,
-              "y": 2580
+              "x": 3920,
+              "y": 600
             }
           ]
         },
@@ -1589,21 +1260,21 @@
           "id": "nota-sim-cancelamento-pbm",
           "source": "nota-enviada-pbm",
           "target": "cancelar-venda-pbm",
-          "sourceHandle": "out-bottom",
-          "targetHandle": "in",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 705,
-              "y": 2640
+              "x": 3980,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 2820
+              "x": 4190,
+              "y": 600
             }
           ],
           "labelPosition": {
-            "x": 711,
-            "y": 2720,
+            "x": 4076,
+            "y": 575,
             "width": 19,
             "height": 14
           },
@@ -1613,29 +1284,25 @@
           "id": "nota-nao-envio-pbm",
           "source": "nota-enviada-pbm",
           "target": "enviar-nota-pbm",
-          "sourceHandle": "out-right",
+          "sourceHandle": "out-right-top",
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 735,
-              "y": 2610
+              "x": 3950,
+              "y": 570
             },
             {
-              "x": 927.5,
-              "y": 2610
+              "x": 3950,
+              "y": 290
             },
             {
-              "x": 927.5,
-              "y": 2690
-            },
-            {
-              "x": 1120,
-              "y": 2690
+              "x": 4100,
+              "y": 290
             }
           ],
           "labelPosition": {
-            "x": 932,
-            "y": 2640,
+            "x": 3955,
+            "y": 420,
             "width": 21,
             "height": 14
           },
@@ -1645,24 +1312,16 @@
           "id": "envio-cancelamento-pbm",
           "source": "enviar-nota-pbm",
           "target": "cancelar-venda-pbm",
-          "sourceHandle": "out-left",
+          "sourceHandle": "out",
           "targetHandle": "in-right",
           "waypoints": [
             {
-              "x": 1120,
-              "y": 2690
+              "x": 4220,
+              "y": 330
             },
             {
-              "x": 1160,
-              "y": 2690
-            },
-            {
-              "x": 1160,
-              "y": 2850
-            },
-            {
-              "x": 735,
-              "y": 2850
+              "x": 4220,
+              "y": 570
             }
           ]
         },
@@ -1670,29 +1329,21 @@
           "id": "cancelamento-sim-pbm",
           "source": "cancelar-venda-pbm",
           "target": "cancelamento-pbm",
-          "sourceHandle": "out-left",
-          "targetHandle": "in-right",
+          "sourceHandle": "out-bottom",
+          "targetHandle": "in",
           "waypoints": [
             {
-              "x": 675,
-              "y": 2850
+              "x": 4221,
+              "y": 629
             },
             {
-              "x": 715,
-              "y": 2850
-            },
-            {
-              "x": 715,
-              "y": 2970
-            },
-            {
-              "x": 540,
-              "y": 2970
+              "x": 4220,
+              "y": 1050
             }
           ],
           "labelPosition": {
-            "x": 721,
-            "y": 2900,
+            "x": 4195,
+            "y": 829,
             "width": 19,
             "height": 14
           },
@@ -1706,20 +1357,12 @@
           "targetHandle": "in-left",
           "waypoints": [
             {
-              "x": 540,
-              "y": 2970
+              "x": 4340,
+              "y": 1090
             },
             {
-              "x": 625,
-              "y": 2970
-            },
-            {
-              "x": 625,
-              "y": 3138
-            },
-            {
-              "x": 710,
-              "y": 3138
+              "x": 4510,
+              "y": 1090
             }
           ]
         },
@@ -1731,29 +1374,74 @@
           "targetHandle": "in",
           "waypoints": [
             {
-              "x": 705,
-              "y": 2880
+              "x": 4250,
+              "y": 600
             },
             {
-              "x": 705,
-              "y": 3000
+              "x": 4528,
+              "y": 600
             },
             {
-              "x": 728,
-              "y": 3000
-            },
-            {
-              "x": 728,
-              "y": 3120
+              "x": 4528,
+              "y": 1072
             }
           ],
           "labelPosition": {
-            "x": 706,
-            "y": 2975,
+            "x": 4379,
+            "y": 575,
             "width": 21,
             "height": 14
           },
           "label": "Não"
+        },
+        {
+          "id": "aceito-nao-fluxo",
+          "source": "optin-aceito",
+          "target": "fluxo-optin",
+          "sourceHandle": "out-right-top",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1900,
+              "y": 570
+            },
+            {
+              "x": 1900,
+              "y": 280
+            },
+            {
+              "x": 2170,
+              "y": 280
+            }
+          ],
+          "labelPosition": {
+            "x": 1905,
+            "y": 415,
+            "width": 21,
+            "height": 14
+          },
+          "label": "Não"
+        },
+        {
+          "id": "fluxo-exibir",
+          "source": "fluxo-optin",
+          "target": "exibir-regra",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 2410,
+              "y": 280
+            },
+            {
+              "x": 2550,
+              "y": 280
+            },
+            {
+              "x": 2550,
+              "y": 560
+            }
+          ]
         }
       ],
       "lanes": [
@@ -1764,8 +1452,8 @@
             "x": 0,
             "y": 0
           },
-          "width": 1760,
-          "height": 3520
+          "width": 4900,
+          "height": 1250
         }
       ],
       "annotations": [
@@ -1773,64 +1461,25 @@
           "id": "subprocessos-pbm",
           "text": "Cadastro e Opt-in são subprocessos mantidos em seus respectivos produtos.",
           "position": {
-            "x": 1400,
-            "y": 820
+            "x": 2140,
+            "y": 170
           },
-          "width": 350,
+          "width": 300,
           "targetNodeId": "fluxo-cadastro",
           "associationWaypoints": [
             {
-              "x": 1400,
-              "y": 841
+              "x": 2140,
+              "y": 191
             },
             {
-              "x": 1360,
-              "y": 860
-            }
-          ]
-        },
-        {
-          "id": "prescricao-pbm",
-          "text": "Se exigida, enviar arquivo JPEG, JPG, PNG ou PDF de até 2 MB. Não é aceita URL.",
-          "position": {
-            "x": 1420,
-            "y": 1950
-          },
-          "width": 330,
-          "targetNodeId": "upload-receita-pbm",
-          "associationWaypoints": [
-            {
-              "x": 1420,
-              "y": 1971
-            },
-            {
-              "x": 1360,
-              "y": 1980
-            }
-          ]
-        },
-        {
-          "id": "ids-receita-pbm",
-          "text": "Preservar todos os IDs retornados e enviá-los em prescriptionIDs no vínculo.",
-          "position": {
-            "x": 1420,
-            "y": 2140
-          },
-          "width": 330,
-          "targetNodeId": "vincular-receita-pbm",
-          "associationWaypoints": [
-            {
-              "x": 1420,
-              "y": 2161
-            },
-            {
-              "x": 1360,
-              "y": 2160
+              "x": 1450,
+              "y": 280
             }
           ]
         }
       ],
-      "updatedAt": "2026-10-16T13:09:11.905Z"
+      "updatedAt": "2026-10-16T12:27:11.799Z",
+      "id": "venda-pbm"
     }
   ]
 }
