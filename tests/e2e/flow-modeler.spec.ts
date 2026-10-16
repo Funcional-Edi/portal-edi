@@ -20,7 +20,7 @@ test("carrega e preserva todos os fluxos no modelador BPMN", async ({ page }) =>
     { slug: "credenciado-venda", flowId: "venda-pbm" },
     { slug: "demo", flowId: "default" },
     { slug: "movimentacao-de-vidas", flowId: "default" },
-    { slug: "wholesaler", flowId: "pedido-faturamento" },
+    { slug: "wholesaler", flowId: "default" },
   ]) {
     await page.goto(`/admin/projects/${slug}/flow?fluxo=${flowId}`);
 
@@ -61,6 +61,10 @@ test("carrega e preserva todos os fluxos no modelador BPMN", async ({ page }) =>
       sourceHandle,
       targetHandle,
     })));
+    expect(saved.nodes.map(({ id, position, labelPosition }) => ({ id, position, labelPosition })))
+      .toEqual(before.nodes.map(({ id, position, labelPosition }) => ({ id, position, labelPosition })));
+    expect(saved.edges.map(({ id, waypoints, labelPosition }) => ({ id, waypoints, labelPosition })))
+      .toEqual(before.edges.map(({ id, waypoints, labelPosition }) => ({ id, waypoints, labelPosition })));
     expect(saved.edges.every((edge: { waypoints?: Array<{ x: number; y: number }> }) =>
       (edge.waypoints?.length ?? 0) >= 2)).toBe(true);
     if (slug === "canal-autorizador") {
@@ -106,13 +110,22 @@ test("exibe todos os fluxos públicos pelo mesmo BPMN do editor", async ({ page 
     { slug: "credenciado-venda", flowId: "venda-pbm" },
     { slug: "demo", flowId: "default" },
     { slug: "movimentacao-de-vidas", flowId: "default" },
-    { slug: "wholesaler", flowId: "pedido-faturamento" },
+    { slug: "wholesaler", flowId: "default" },
   ]) {
     await page.goto(`/fluxogramas/${slug}?fluxo=${flowId}`);
 
     const viewer = page.getByTestId("bpmn-flow-viewer");
     await expect(viewer).toBeVisible();
     await expect(viewer.locator(".djs-container")).toBeVisible();
+    await expect(page.getByTestId("bpmn-flow-navigation")).toBeVisible();
+    const zoomIn = page.getByRole("button", { name: "Aumentar zoom" });
+    await expect(zoomIn).toBeEnabled();
+    const viewport = viewer.locator("g.viewport");
+    const transformBefore = await viewport.getAttribute("transform");
+    await zoomIn.click();
+    await expect.poll(() => viewport.getAttribute("transform")).not.toBe(transformBefore);
+    await expect(page.getByRole("button", { name: "Diminuir zoom" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Ajustar fluxograma à tela" })).toBeEnabled();
     await expect(viewer.locator(".djs-palette")).toHaveCount(0);
   }
 });

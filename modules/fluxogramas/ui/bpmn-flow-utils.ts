@@ -12,6 +12,13 @@ const BPMN_DD_DI_NS = "http://www.omg.org/spec/DD/20100524/DI";
 const BPMN_DC_NS = "http://www.omg.org/spec/DD/20100524/DC";
 const BPMN_MODEL_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
+type BpmnBounds = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+};
+
 type BpmnBusinessObject = {
   $type?: string;
   id?: string;
@@ -30,6 +37,7 @@ export type BpmnElementLike = {
   width?: number;
   height?: number;
   waypoints?: Array<{ x: number; y: number }>;
+  di?: { label?: { bounds?: BpmnBounds } };
   labelTarget?: { id?: string };
   businessObject?: BpmnBusinessObject;
 };
@@ -92,11 +100,16 @@ function shapeBounds(node: FlowNode) {
 type Point = { x: number; y: number };
 type LabelPosition = Point & { width: number; height: number };
 
-function labelPosition(element: BpmnElementLike): LabelPosition | undefined {
+function labelPosition(element: BpmnBounds): LabelPosition | undefined {
   const { x, y, width, height } = element;
   return typeof x === "number" && typeof y === "number" && typeof width === "number" && typeof height === "number" && width > 0 && height > 0
     ? { x, y, width, height }
     : undefined;
+}
+
+function diagramLabelPosition(element: BpmnElementLike): LabelPosition | undefined {
+  const bounds = element.di?.label?.bounds;
+  return bounds ? labelPosition(bounds) : undefined;
 }
 
 function bpmnLabelXml(position: LabelPosition | undefined): string {
@@ -435,7 +448,7 @@ export function bpmnModelerToIntegrationFlow(
       type,
       label: elementLabel(element, type === "start" ? "Início" : type === "end" ? "Fim" : "Atividade"),
       position: { x: element.x ?? 0, y: element.y ?? 0 },
-      labelPosition: labelPositions.get(element.id),
+      labelPosition: diagramLabelPosition(element) ?? labelPositions.get(element.id),
       operationRef:
         operationKind === "query" || operationKind === "mutation"
           ? { kind: operationKind, name: operationName ?? "" }
@@ -458,7 +471,7 @@ export function bpmnModelerToIntegrationFlow(
           element.waypoints && element.waypoints.length >= 2
             ? element.waypoints.map(({ x, y }) => ({ x, y }))
             : undefined,
-        labelPosition: labelPositions.get(element.id),
+        labelPosition: diagramLabelPosition(element) ?? labelPositions.get(element.id),
         label: element.businessObject?.name?.trim().slice(0, 64) || undefined,
       };
     })

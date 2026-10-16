@@ -8,7 +8,7 @@ import "bpmn-js/dist/assets/diagram-js.css";
 
 import type { IntegrationFlow } from "@/modules/fluxogramas/schema";
 import { integrationFlowToBpmnXml } from "@/modules/fluxogramas/ui/bpmn-flow-utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Maximize2, Move, ZoomIn, ZoomOut } from "lucide-react";
 import Link from "next/link";
 
 interface FlowViewerProps {
@@ -23,11 +23,16 @@ type BpmnViewer = {
   destroy(): void;
 };
 
-type BpmnCanvas = { zoom: (value: "fit-viewport") => void };
+type BpmnCanvas = {
+  zoom(): number;
+  zoom(value: "fit-viewport" | number): void;
+};
 
 export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<BpmnViewer | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [viewerReady, setViewerReady] = useState(false);
 
   useEffect(() => {
     let disposed = false;
@@ -36,12 +41,15 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
     async function mountViewer() {
       if (!canvasRef.current) return;
       try {
+        setViewerReady(false);
         const { default: Viewer } = await import("bpmn-js/lib/Viewer");
         if (disposed || !canvasRef.current) return;
         viewer = new Viewer({ container: canvasRef.current }) as unknown as BpmnViewer;
+        viewerRef.current = viewer;
         await viewer.importXML(integrationFlowToBpmnXml(flow));
         if (disposed) return;
         setError(null);
+        setViewerReady(true);
         requestAnimationFrame(() => {
           if (!disposed && viewer) (viewer.get("canvas") as BpmnCanvas).zoom("fit-viewport");
         });
@@ -54,8 +62,19 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
     return () => {
       disposed = true;
       viewer?.destroy();
+      if (viewerRef.current === viewer) viewerRef.current = null;
     };
   }, [flow]);
+
+  function zoomBy(delta: number) {
+    const canvas = viewerRef.current?.get("canvas") as BpmnCanvas | undefined;
+    if (!canvas) return;
+    canvas.zoom(Math.min(4, Math.max(0.2, canvas.zoom() + delta)));
+  }
+
+  function fitViewport() {
+    (viewerRef.current?.get("canvas") as BpmnCanvas | undefined)?.zoom("fit-viewport");
+  }
 
   return (
     <article>
@@ -75,9 +94,44 @@ export function FlowViewer({ flow, projectName, documentationHref }: FlowViewerP
         </Link>
       </header>
 
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3" data-testid="bpmn-flow-navigation">
+        <p className="inline-flex items-center gap-1.5 text-sm text-slate-600">
+          <Move className="h-4 w-4" aria-hidden="true" />
+          Modo de visualização: arraste a área vazia para mover o diagrama.
+        </p>
+        <div className="flex items-center gap-1" aria-label="Controles de visualização">
+          <button
+            type="button"
+            onClick={() => zoomBy(-0.2)}
+            disabled={!viewerReady}
+            aria-label="Diminuir zoom"
+            className="rounded-md border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ZoomOut className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => zoomBy(0.2)}
+            disabled={!viewerReady}
+            aria-label="Aumentar zoom"
+            className="rounded-md border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ZoomIn className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={fitViewport}
+            disabled={!viewerReady}
+            aria-label="Ajustar fluxograma à tela"
+            className="rounded-md border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Maximize2 className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
       <div className="h-[min(80vh,52rem)] min-h-[38rem] w-full rounded-lg border border-slate-200 bg-white">
         {error ? <p className="p-4 text-sm text-red-700">{error}</p> : null}
-        <div ref={canvasRef} data-testid="bpmn-flow-viewer" className="h-full w-full" />
+        <div ref={canvasRef} data-testid="bpmn-flow-viewer" className="h-full w-full cursor-grab active:cursor-grabbing" />
       </div>
     </article>
   );
