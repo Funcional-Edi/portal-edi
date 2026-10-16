@@ -1,0 +1,8 @@
+[
+  {
+    "action": "local_login_success",
+    "actorEmail": "edi@funcionalcorp.com.br",
+    "detail": "Conta local de emergência usada com MFA.",
+    "occurredAt": "2026-10-16T17:12:44.235Z"
+  }
+]
