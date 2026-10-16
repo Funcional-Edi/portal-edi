@@ -26,6 +26,9 @@ interface FlowCanvasProps {
   onNodesChange?: Parameters<typeof ReactFlow>[0]["onNodesChange"];
   onEdgesChange?: Parameters<typeof ReactFlow>[0]["onEdgesChange"];
   onConnect?: Parameters<typeof ReactFlow>[0]["onConnect"];
+  onNodeClick?: Parameters<typeof ReactFlow>[0]["onNodeClick"];
+  onEdgeClick?: Parameters<typeof ReactFlow>[0]["onEdgeClick"];
+  onPaneClick?: Parameters<typeof ReactFlow>[0]["onPaneClick"];
 }
 
 const ANNOTATION_HEIGHT = 42;
@@ -87,6 +90,9 @@ export function FlowCanvas({
   onNodesChange,
   onEdgesChange,
   onConnect,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
 }: FlowCanvasProps) {
   const annotationCanvas = {
     width: Math.max(
@@ -102,20 +108,19 @@ export function FlowCanvas({
       ...(annotations ?? []).map((annotation) => annotation.position.y + ANNOTATION_HEIGHT),
     ) + 32,
   };
-  const flowViewportKey =
-    lanes?.map(({ id, position, width, height }) => `${id}:${position.x},${position.y}:${width}x${height}`).join("|") ??
-    "default";
 
   return (
     <div className="h-[min(80vh,52rem)] min-h-[38rem] w-full rounded-lg border border-slate-200 bg-white">
       <ReactFlow
-        key={flowViewportKey}
         nodes={nodes}
         edges={edges}
         nodeTypes={flowNodeTypes}
         onNodesChange={readOnly ? undefined : onNodesChange}
         onEdgesChange={readOnly ? undefined : onEdgesChange}
         onConnect={readOnly ? undefined : onConnect}
+        onNodeClick={readOnly ? undefined : onNodeClick}
+        onEdgeClick={readOnly ? undefined : onEdgeClick}
+        onPaneClick={readOnly ? undefined : onPaneClick}
         connectionLineType={ConnectionLineType.Step}
         defaultEdgeOptions={{
           type: FLOW_LAYOUT_DEFAULTS.edgeType,
