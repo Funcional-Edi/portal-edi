@@ -1,4 +1,5 @@
 import { readContentJson, writeContentJson } from "@/core/db/adapters";
+import { GithubContentError } from "@/core/db/adapters/github-content-error";
 
 const FIRST_ACCESS_PATH = "data/access/first-access.json";
 const FIRST_ACCESS_BRANCH = "portal-state";
@@ -26,8 +27,13 @@ export async function markFirstAccess(email: string, occurredAt = new Date().toI
   if (map[normalized]) return;
 
   map[normalized] = occurredAt;
-  await writeContentJson(FIRST_ACCESS_PATH, map, {
-    branch: FIRST_ACCESS_BRANCH,
-    message: "chore(acesso): registra primeiro acesso",
-  });
+  try {
+    await writeContentJson(FIRST_ACCESS_PATH, map, {
+      branch: FIRST_ACCESS_BRANCH,
+      message: "chore(acesso): registra primeiro acesso",
+    });
+  } catch (error) {
+    if (!(error instanceof GithubContentError)) throw error;
+    console.warn("[first-access] não foi possível registrar o primeiro acesso.");
+  }
 }
