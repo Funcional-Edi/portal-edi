@@ -1,0 +1,21 @@
+{
+  "admins": [
+    "sfoliveira@funcionalcorp.com.br",
+    "ricardo.ferreira.ext@funcionalcorp.com.br"
+  ],
+  "editors": [],
+  "clients": [
+    "@distribuidor.com"
+  ],
+  "defaultRole": "client",
+  "ssoPortals": [
+    {
+      "url": "https://sso-homologa.funcionalhealth.com.br/graphql/",
+      "admins": [
+        "sfoliveira@funcionalcorp.com.br",
+        "ricardo.ferreira.ext@funcionalcorp.com.br"
+      ],
+      "editors": []
+    }
+  ]
+}
