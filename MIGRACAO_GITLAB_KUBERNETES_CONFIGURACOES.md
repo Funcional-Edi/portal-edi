@@ -10,6 +10,16 @@ As configurações da aplicação serão fornecidas pelo Kubernetes por meio de:
 - `ConfigMap`: URLs, identificadores, branch e demais configurações não sensíveis;
 - `Deployment`: injeção das configurações no container da aplicação.
 
+## Repositório dos manifests não produtivos
+
+O manifesto `configmap.yml` do Portal EDI deverá ser adicionado ao repositório GitLab de infraestrutura não produtiva:
+
+```text
+funcional-health-tech/infra/sre/devsecops/k8s-manifests-nonprod
+```
+
+Esse repositório é o destino das configurações aplicadas em `doc-center-dev.funcionalcorp.net.br`. O `configmap.yml` deve conter somente dados não sensíveis; `GITLAB_TOKEN`, `GITLAB_WRITE_TOKEN`, `AUTH_SECRET` e `LOCAL_EMERGENCY_ACCOUNTS_JSON` permanecem em um `Secret` gerenciado pela infraestrutura.
+
 ## Variáveis atualmente utilizadas pelo GitHub
 
 As variáveis abaixo pertencem à integração atual e deverão ser removidas depois que a integração com o GitLab estiver validada:
