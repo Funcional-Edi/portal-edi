@@ -2,7 +2,6 @@
   "version": 1,
   "flows": [
     {
-      "id": "venda-bf",
       "version": 1,
       "title": "Fluxo de Venda — BF",
       "description": "Venda BF com consulta, pré-autorização, prescrição quando exigida, confirmação, dados fiscais e cancelamento.",
@@ -25,7 +24,7 @@
         {
           "id": "gerar-token",
           "type": "operation",
-          "label": "Gerar token\ncreateToken",
+          "label": "Gerar token\nmutation createToken",
           "position": {
             "x": 150,
             "y": 560
@@ -34,7 +33,7 @@
         {
           "id": "consultar-beneficiario",
           "type": "operation",
-          "label": "Consultar beneficiário",
+          "label": "Consultar beneficiário\nquery Sales_customerMemberships",
           "position": {
             "x": 440,
             "y": 560
@@ -47,7 +46,7 @@
         {
           "id": "simular-regras",
           "type": "operation",
-          "label": "Simular preço e regras",
+          "label": "Simular preço e regras\nquery Pharma_checkPricesAndRules",
           "position": {
             "x": 720,
             "y": 560
@@ -60,7 +59,7 @@
         {
           "id": "pre-autorizar",
           "type": "operation",
-          "label": "Pré-autorizar venda",
+          "label": "Pré-autorizar venda\nmutation Sales_preAuthorizeSale",
           "position": {
             "x": 1000,
             "y": 560
@@ -88,7 +87,7 @@
         {
           "id": "upload-receita",
           "type": "operation",
-          "label": "Enviar receita",
+          "label": "Enviar receita\nmutation Prescription_uploadPrescription",
           "position": {
             "x": 1560,
             "y": 250
@@ -101,7 +100,7 @@
         {
           "id": "vincular-receita",
           "type": "operation",
-          "label": "Vincular receita à pré-autorização",
+          "label": "Vincular receita à pré-autorização\nmutation Prescription_bindPrescription",
           "position": {
             "x": 1560,
             "y": 380
@@ -114,7 +113,7 @@
         {
           "id": "resgatar-pre-autorizacao",
           "type": "operation",
-          "label": "Resgatar pré-autorização",
+          "label": "Resgatar pré-autorização\nquery Sales_transaction",
           "position": {
             "x": 1560,
             "y": 560
@@ -127,7 +126,7 @@
         {
           "id": "confirmar-venda",
           "type": "operation",
-          "label": "Confirmar venda",
+          "label": "Confirmar venda\nmutation Sales_confirmPreAuthorizedSale",
           "position": {
             "x": 1860,
             "y": 560
@@ -155,7 +154,7 @@
         {
           "id": "enviar-nota",
           "type": "operation",
-          "label": "Enviar dados da chave DANFE",
+          "label": "Enviar dados da chave DANFE\nmutation Sales_updateInvoiceCode",
           "position": {
             "x": 2410,
             "y": 250
@@ -183,7 +182,7 @@
         {
           "id": "cancelamento",
           "type": "operation",
-          "label": "Cancelar venda",
+          "label": "Cancelar venda\nmutation Sales_cancel",
           "position": {
             "x": 2410,
             "y": 1050
@@ -640,9 +639,11 @@
           ]
         }
       ],
-      "updatedAt": "2026-10-16T12:29:17.127Z"
+      "updatedAt": "2026-10-19T13:39:11.546Z",
+      "id": "venda-bf"
     },
     {
+      "id": "venda-pbm",
       "version": 1,
       "title": "Fluxo de Venda - PBM",
       "description": "Venda PBM no caixa, com elegibilidade, subprocessos de Cadastro e Opt-in quando necessários, e o mesmo núcleo transacional da venda BF.",
@@ -665,7 +666,7 @@
         {
           "id": "gerar-token-pbm",
           "type": "operation",
-          "label": "Gerar token\ncreateToken",
+          "label": "Gerar token\nmutation createToken",
           "position": {
             "x": 160,
             "y": 560
@@ -674,7 +675,7 @@
         {
           "id": "consultar-programas",
           "type": "operation",
-          "label": "Consultar programas disponíveis",
+          "label": "Consultar programas disponíveis\nquery Pharma_discountPrograms",
           "position": {
             "x": 440,
             "y": 560
@@ -687,7 +688,7 @@
         {
           "id": "consultar-regras-pbm",
           "type": "operation",
-          "label": "Consultar regras de desconto",
+          "label": "Consultar regras de desconto\nquery Pharma_displayProductDiscountRules",
           "position": {
             "x": 720,
             "y": 560
@@ -700,7 +701,7 @@
         {
           "id": "avaliar-elegibilidade",
           "type": "operation",
-          "label": "Avaliar elegibilidade\nPharma_assessEligibility",
+          "label": "Avaliar elegibilidade\nquery Pharma_assessEligibility",
           "position": {
             "x": 1000,
             "y": 560
@@ -733,7 +734,7 @@
         {
           "id": "verificar-optin",
           "type": "operation",
-          "label": "Verificar Opt-in\nPharma_verifyOptIn",
+          "label": "Verificar Opt-in\nquery Pharma_verifyOptIn",
           "position": {
             "x": 1510,
             "y": 380
@@ -781,7 +782,7 @@
         {
           "id": "exibir-regra",
           "type": "operation",
-          "label": "Exibir regra no balcão\nPharma_displayProduct",
+          "label": "Exibir regra no balcão\nquery Pharma_displayProductDiscountRules",
           "position": {
             "x": 2430,
             "y": 560
@@ -790,7 +791,7 @@
         {
           "id": "simular-regras-pbm",
           "type": "operation",
-          "label": "Simular preço e regras",
+          "label": "Simular preço e regras\nquery Pharma_checkPricesAndRules",
           "position": {
             "x": 2710,
             "y": 560
@@ -803,7 +804,7 @@
         {
           "id": "pre-autorizar-pbm",
           "type": "operation",
-          "label": "Pré-autorizar venda",
+          "label": "Pré-autorizar venda\nmutation Sales_preAuthorizeSale",
           "position": {
             "x": 2990,
             "y": 560
@@ -816,7 +817,7 @@
         {
           "id": "resgatar-pre-autorizacao-pbm",
           "type": "operation",
-          "label": "Resgatar pré-autorização",
+          "label": "Resgatar pré-autorização\nquery Sales_transaction",
           "position": {
             "x": 3270,
             "y": 560
@@ -829,7 +830,7 @@
         {
           "id": "confirmar-venda-pbm",
           "type": "operation",
-          "label": "Confirmar venda",
+          "label": "Confirmar venda\nmutation Sales_confirmPreAuthorizedSale",
           "position": {
             "x": 3550,
             "y": 560
@@ -857,7 +858,7 @@
         {
           "id": "enviar-nota-pbm",
           "type": "operation",
-          "label": "Enviar dados da chave DANFE",
+          "label": "Enviar dados da chave DANFE\nmutation Sales_updateInvoiceCode",
           "position": {
             "x": 4100,
             "y": 250
@@ -885,7 +886,7 @@
         {
           "id": "cancelamento-pbm",
           "type": "operation",
-          "label": "Cancelar venda",
+          "label": "Cancelar venda\nmutation Sales_cancel",
           "position": {
             "x": 4100,
             "y": 1050
@@ -1478,8 +1479,7 @@
           ]
         }
       ],
-      "updatedAt": "2026-10-16T12:27:11.799Z",
-      "id": "venda-pbm"
+      "updatedAt": "2026-10-19T13:39:13.704Z"
     }
   ]
 }

@@ -21,7 +21,7 @@
     {
       "id": "createToken",
       "type": "operation",
-      "label": "Criar token",
+      "label": "Criar token\nmutation createToken",
       "position": {
         "x": 260,
         "y": 90
@@ -34,7 +34,7 @@
     {
       "id": "createOrUpdateBeneficiary",
       "type": "operation",
-      "label": "Enviar movimentação",
+      "label": "Enviar movimentação\nmutation BRM_createOrUpdateBeneficiary",
       "position": {
         "x": 260,
         "y": 180
@@ -77,7 +77,7 @@
     {
       "id": "getProcessingStatus",
       "type": "operation",
-      "label": "Consultar status",
+      "label": "Consultar status\nquery BRM_getProcessingStatus",
       "position": {
         "x": 440,
         "y": 390
@@ -257,5 +257,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-10-16T12:27:15.938Z"
+  "updatedAt": "2026-10-19T13:39:17.842Z"
 }

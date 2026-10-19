@@ -33,7 +33,7 @@
         {
           "id": "sendOrder",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido via integração/API",
+          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido\nmutation createGroupedOrder via integração/API\nmutation createGroupedOrder",
           "position": {
             "x": 620,
             "y": 160
@@ -75,7 +75,7 @@
         {
           "id": "rejectedStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1320,
             "y": 240
@@ -108,7 +108,7 @@
         {
           "id": "initialStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1600,
             "y": 590
@@ -141,7 +141,7 @@
         {
           "id": "sendResponse",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a resposta do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia a resposta do pedido\nmutation createGroupedResponse",
           "position": {
             "x": 2500,
             "y": 20
@@ -174,7 +174,7 @@
         {
           "id": "sendCancellation",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a resposta de cancelamento",
+          "label": "[DISTRIBUIDOR]\nEnvia a resposta de cancelamento\nmutation createGroupedCancellation",
           "position": {
             "x": 2500,
             "y": 520
@@ -201,7 +201,7 @@
         {
           "id": "sendInvoice",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a nota do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia a nota do pedido\nmutation createGroupedInvoice",
           "position": {
             "x": 2500,
             "y": 260
@@ -219,7 +219,7 @@
         {
           "id": "followUpStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nAcompanha o status do pedido",
+          "label": "[DISTRIBUIDOR]\nAcompanha o status do pedido\nquery groupedOrder",
           "position": {
             "x": 3090,
             "y": 360
@@ -243,7 +243,7 @@
         {
           "id": "consultReimbursement",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o ressarcimento",
+          "label": "[DISTRIBUIDOR]\nConsulta o ressarcimento\nquery groupedInvoices",
           "position": {
             "x": 3660,
             "y": 80
@@ -969,7 +969,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-16T12:32:05.233Z",
+      "updatedAt": "2026-10-19T13:39:06.939Z",
       "id": "retorno-distribuidor"
     },
     {
@@ -1005,7 +1005,7 @@
         {
           "id": "createOrder",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido\nmutation createGroupedOrder",
           "position": {
             "x": 490,
             "y": 360
@@ -1060,7 +1060,7 @@
         {
           "id": "rejectedStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1500,
             "y": 610
@@ -1093,7 +1093,7 @@
         {
           "id": "orderStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1460,
             "y": 160
@@ -1111,7 +1111,7 @@
         {
           "id": "sendInvoice",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a nota fiscal",
+          "label": "[DISTRIBUIDOR]\nEnvia a nota fiscal\nmutation createGroupedInvoice",
           "position": {
             "x": 2160,
             "y": 310
@@ -1139,7 +1139,7 @@
         {
           "id": "sendCancellation",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia o cancelamento",
+          "label": "[DISTRIBUIDOR]\nEnvia o cancelamento\nmutation createGroupedCancellation",
           "position": {
             "x": 2780,
             "y": 90
@@ -1170,7 +1170,7 @@
         {
           "id": "cancelledQuery",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 3740,
             "y": 20
@@ -1230,7 +1230,7 @@
         {
           "id": "invoiceQuery",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 3800,
             "y": 560
@@ -1807,7 +1807,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-16T12:35:40.062Z"
+      "updatedAt": "2026-10-19T13:39:09.191Z"
     }
   ]
 }

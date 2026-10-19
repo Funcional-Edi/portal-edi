@@ -21,7 +21,7 @@
     {
       "id": "createToken",
       "type": "operation",
-      "label": "Obter token",
+      "label": "Obter token\nmutation createToken",
       "position": {
         "x": 200,
         "y": 100
@@ -34,7 +34,7 @@
     {
       "id": "saveInventories",
       "type": "operation",
-      "label": "Enviar carga de estoque",
+      "label": "Enviar carga de estoque\nmutation saveInventories",
       "position": {
         "x": 180,
         "y": 220
@@ -131,5 +131,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-10-16T12:27:13.843Z"
+  "updatedAt": "2026-10-19T13:39:15.768Z"
 }
