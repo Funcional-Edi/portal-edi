@@ -2,6 +2,7 @@ import type { ManualSection, Project } from "@/modules/living-docs-externa/schem
 import { auth, isAdminRole } from "@/core/auth";
 import {
   manualOperationKindSchema,
+  sortManualSections,
   sortOperations,
 } from "@/modules/living-docs-externa/schema";
 import {
@@ -125,8 +126,9 @@ export async function buildManualNav(
     sectionsInput ?? getPublishedManualSections(slug),
     getIntegrationFlows(slug),
   ]);
-  const businessRulesSection = loadedSections.find((section) => section.id === "regras-de-negocios");
-  const sections = loadedSections.filter(
+  const orderedSections = sortManualSections(project.manual, loadedSections);
+  const businessRulesSection = orderedSections.find((section) => section.id === "regras-de-negocios");
+  const sections = orderedSections.filter(
     (section) => section.id !== "fluxo-do-pedido" && section.id !== "regras-de-negocios",
   );
   const tocItems: ManualTocItem[] = [];

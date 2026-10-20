@@ -19,7 +19,7 @@ export function FlowCatalog({ flows }: FlowCatalogProps) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2">
       {flows.map((flow) => (
-        <li key={flow.slug}>
+        <li key={`${flow.slug}:${flow.flowId}`}>
           <Link
             href={`/fluxogramas/${flow.slug}?fluxo=${encodeURIComponent(flow.flowId)}`}
             className="block rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-600 hover:shadow-md"
