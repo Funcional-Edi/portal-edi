@@ -1,19 +1,857 @@
 {
   "version": 1,
-  "title": "Fluxo Wholesaler",
-  "description": "Autenticação, criação do pedido e consulta do status de processamento.",
-  "nodes": [
-    { "id": "start", "type": "start", "label": "Pedido pronto para envio", "position": { "x": 260, "y": 0 } },
-    { "id": "createToken", "type": "operation", "label": "Obter token", "position": { "x": 260, "y": 90 }, "operationRef": { "kind": "mutation", "name": "createToken" } },
-    { "id": "createOrder", "type": "operation", "label": "Criar pedido", "position": { "x": 260, "y": 180 }, "operationRef": { "kind": "mutation", "name": "createOrder" } },
-    { "id": "orderStatus", "type": "operation", "label": "Consultar status", "position": { "x": 260, "y": 270 }, "operationRef": { "kind": "query", "name": "orderStatus" } },
-    { "id": "end", "type": "end", "label": "Pedido acompanhado", "position": { "x": 260, "y": 360 } }
-  ],
-  "edges": [
-    { "id": "e1", "source": "start", "target": "createToken" },
-    { "id": "e2", "source": "createToken", "target": "createOrder" },
-    { "id": "e3", "source": "createOrder", "target": "orderStatus" },
-    { "id": "e4", "source": "orderStatus", "target": "end" }
-  ],
-  "updatedAt": "2026-09-23T00:00:00.000Z"
+  "flows": [
+    {
+      "id": "pedido-faturamento",
+      "version": 1,
+      "title": "Fluxo de pedido e faturamento",
+      "description": "Pedido criado pela Funcional, consulta e resposta do distribuidor, seguido de faturamento ou cancelamento.",
+      "nodes": [
+        {
+          "id": "start",
+          "type": "start",
+          "label": "Inicio",
+          "position": {
+            "x": 242,
+            "y": 732
+          },
+          "labelPosition": {
+            "x": 247,
+            "y": 768,
+            "width": 26,
+            "height": 14
+          }
+        },
+        {
+          "id": "order-created",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nPedido criado no portal",
+          "position": {
+            "x": 480,
+            "y": 710
+          }
+        },
+        {
+          "id": "orders",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nConsulta pedidos disponiveis\nquery orders - ORDER_NOT_IMPORTED",
+          "position": {
+            "x": 480,
+            "y": 50
+          },
+          "operationRef": {
+            "kind": "query",
+            "name": "orders"
+          }
+        },
+        {
+          "id": "set-imported",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nImporta o pedido\nmutation setOrderAsImported",
+          "position": {
+            "x": 840,
+            "y": 50
+          },
+          "operationRef": {
+            "kind": "mutation",
+            "name": "setOrderAsImported"
+          }
+        },
+        {
+          "id": "create-response",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nEnvia retorno\nmutation createResponse",
+          "position": {
+            "x": 1170,
+            "y": 50
+          },
+          "operationRef": {
+            "kind": "mutation",
+            "name": "createResponse"
+          }
+        },
+        {
+          "id": "accepted",
+          "type": "decision",
+          "label": "Pedido aceito?",
+          "position": {
+            "x": 1520,
+            "y": 60
+          },
+          "labelPosition": {
+            "x": 1483,
+            "y": 33,
+            "width": 73,
+            "height": 14
+          }
+        },
+        {
+          "id": "total-return",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nRetorno total\nTodos os itens faturados",
+          "position": {
+            "x": 1840,
+            "y": 0
+          }
+        },
+        {
+          "id": "partial-return",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nRetorno parcial\nItens e motivos informados",
+          "position": {
+            "x": 1840,
+            "y": 160
+          }
+        },
+        {
+          "id": "rejected-return",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nRetorno rejeitado\nMotivo de nao faturamento",
+          "position": {
+            "x": 1430,
+            "y": 270
+          }
+        },
+        {
+          "id": "process-accepted",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nProcessa retorno aceito\nStatus AWAITING_INVOICE",
+          "position": {
+            "x": 1840,
+            "y": 680
+          }
+        },
+        {
+          "id": "process-rejected",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nProcessa retorno rejeitado\nStatus REJECTED",
+          "position": {
+            "x": 1840,
+            "y": 920
+          }
+        },
+        {
+          "id": "rejected-status",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nPedido permanece REJECTED",
+          "position": {
+            "x": 2160,
+            "y": 920
+          }
+        },
+        {
+          "id": "consult-rejected",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nConsulta o processamento do retorno\nquery responses",
+          "position": {
+            "x": 2480,
+            "y": 320
+          }
+        },
+        {
+          "id": "consult-response",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nConsulta o processamento do retorno\nquery responses",
+          "position": {
+            "x": 2150,
+            "y": 50
+          }
+        },
+        {
+          "id": "billing-decision",
+          "type": "decision",
+          "label": "Pedido sera faturado?",
+          "position": {
+            "x": 2480,
+            "y": 60
+          },
+          "labelPosition": {
+            "x": 2539.5,
+            "y": 115.5,
+            "width": 59,
+            "height": 27
+          }
+        },
+        {
+          "id": "create-cancellation",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nEnvia cancelamento\nmutation createCancellation",
+          "position": {
+            "x": 2900,
+            "y": 50
+          },
+          "operationRef": {
+            "kind": "mutation",
+            "name": "createCancellation"
+          }
+        },
+        {
+          "id": "process-cancellation",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nProcessa cancelamento",
+          "position": {
+            "x": 2900,
+            "y": 680
+          }
+        },
+        {
+          "id": "cancelled-status",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nPedido CANCELLED",
+          "position": {
+            "x": 3220,
+            "y": 680
+          }
+        },
+        {
+          "id": "consult-cancellation",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nConsulta o processamento do cancelamento\nquery order",
+          "position": {
+            "x": 3430,
+            "y": 50
+          }
+        },
+        {
+          "id": "create-invoice",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nEnvia nota fiscal\nmutation createInvoice",
+          "position": {
+            "x": 2650,
+            "y": 160
+          },
+          "operationRef": {
+            "kind": "mutation",
+            "name": "createInvoice"
+          }
+        },
+        {
+          "id": "process-invoice",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nProcessa a nota fiscal",
+          "position": {
+            "x": 2900,
+            "y": 920
+          }
+        },
+        {
+          "id": "invoice-status",
+          "type": "operation",
+          "label": "[FUNCIONAL]\nPedido INVOICE_RECEIVED",
+          "position": {
+            "x": 3220,
+            "y": 920
+          }
+        },
+        {
+          "id": "consult-invoice",
+          "type": "operation",
+          "label": "[DISTRIBUIDOR]\nConsulta a nota e o ressarcimento\nquery invoices",
+          "position": {
+            "x": 3430,
+            "y": 160
+          }
+        },
+        {
+          "id": "end-rejected",
+          "type": "end",
+          "label": "Fim - pedido rejeitado",
+          "position": {
+            "x": 2602,
+            "y": 452
+          },
+          "labelPosition": {
+            "x": 2543,
+            "y": 516,
+            "width": 153,
+            "height": 14
+          }
+        },
+        {
+          "id": "end-cancelled",
+          "type": "end",
+          "label": "Fim - pedido cancelado",
+          "position": {
+            "x": 3792,
+            "y": 72
+          },
+          "labelPosition": {
+            "x": 3750,
+            "y": 123,
+            "width": 120,
+            "height": 14
+          }
+        },
+        {
+          "id": "end-invoice",
+          "type": "end",
+          "label": "Fim - faturamento processado",
+          "position": {
+            "x": 3792,
+            "y": 182
+          },
+          "labelPosition": {
+            "x": 3730,
+            "y": 233,
+            "width": 159,
+            "height": 14
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-start-order",
+          "source": "start",
+          "target": "order-created",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 278,
+              "y": 750
+            },
+            {
+              "x": 480,
+              "y": 750
+            }
+          ]
+        },
+        {
+          "id": "e-order-orders",
+          "source": "order-created",
+          "target": "orders",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 600,
+              "y": 710
+            },
+            {
+              "x": 600,
+              "y": 130
+            }
+          ]
+        },
+        {
+          "id": "e-orders-imported",
+          "source": "orders",
+          "target": "set-imported",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 720,
+              "y": 90
+            },
+            {
+              "x": 840,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-imported-response",
+          "source": "set-imported",
+          "target": "create-response",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1080,
+              "y": 90
+            },
+            {
+              "x": 1170,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-response-accepted",
+          "source": "create-response",
+          "target": "accepted",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1410,
+              "y": 90
+            },
+            {
+              "x": 1520,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-accepted-total",
+          "source": "accepted",
+          "target": "total-return",
+          "sourceHandle": "out-right-top",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1550,
+              "y": 60
+            },
+            {
+              "x": 1710,
+              "y": 60
+            },
+            {
+              "x": 1710,
+              "y": 40
+            },
+            {
+              "x": 1840,
+              "y": 40
+            }
+          ],
+          "labelPosition": {
+            "x": 1728,
+            "y": 23,
+            "width": 64,
+            "height": 14
+          },
+          "label": "SIM - TOTAL"
+        },
+        {
+          "id": "e-accepted-partial",
+          "source": "accepted",
+          "target": "partial-return",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1580,
+              "y": 90
+            },
+            {
+              "x": 1710,
+              "y": 90
+            },
+            {
+              "x": 1710,
+              "y": 200
+            },
+            {
+              "x": 1840,
+              "y": 200
+            }
+          ],
+          "labelPosition": {
+            "x": 1722,
+            "y": 171,
+            "width": 76,
+            "height": 14
+          },
+          "label": "SIM - PARCIAL"
+        },
+        {
+          "id": "e-accepted-rejected",
+          "source": "accepted",
+          "target": "rejected-return",
+          "sourceHandle": "out-right-bottom",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1550,
+              "y": 120
+            },
+            {
+              "x": 1550,
+              "y": 270
+            }
+          ],
+          "labelPosition": {
+            "x": 1568,
+            "y": 193,
+            "width": 24,
+            "height": 14
+          },
+          "label": "NAO"
+        },
+        {
+          "id": "e-total-process",
+          "source": "total-return",
+          "target": "process-accepted",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 1960,
+              "y": 80
+            },
+            {
+              "x": 1960,
+              "y": 680
+            }
+          ]
+        },
+        {
+          "id": "e-partial-process",
+          "source": "partial-return",
+          "target": "process-accepted",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 1960,
+              "y": 240
+            },
+            {
+              "x": 1960,
+              "y": 680
+            }
+          ]
+        },
+        {
+          "id": "e-rejected-process",
+          "source": "rejected-return",
+          "target": "process-rejected",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 1550,
+              "y": 350
+            },
+            {
+              "x": 1550,
+              "y": 960
+            },
+            {
+              "x": 1840,
+              "y": 960
+            }
+          ]
+        },
+        {
+          "id": "e-rejected-status",
+          "source": "process-rejected",
+          "target": "rejected-status",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2080,
+              "y": 960
+            },
+            {
+              "x": 2160,
+              "y": 960
+            }
+          ]
+        },
+        {
+          "id": "e-rejected-consult",
+          "source": "rejected-status",
+          "target": "consult-rejected",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2400,
+              "y": 960
+            },
+            {
+              "x": 2440,
+              "y": 960
+            },
+            {
+              "x": 2440,
+              "y": 360
+            },
+            {
+              "x": 2480,
+              "y": 360
+            }
+          ]
+        },
+        {
+          "id": "e-rejected-end",
+          "source": "consult-rejected",
+          "target": "end-rejected",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2620,
+              "y": 400
+            },
+            {
+              "x": 2620,
+              "y": 452
+            }
+          ]
+        },
+        {
+          "id": "e-accepted-consult",
+          "source": "process-accepted",
+          "target": "consult-response",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2080,
+              "y": 720
+            },
+            {
+              "x": 2120,
+              "y": 720
+            },
+            {
+              "x": 2120,
+              "y": 90
+            },
+            {
+              "x": 2150,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-consult-billing",
+          "source": "consult-response",
+          "target": "billing-decision",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2390,
+              "y": 90
+            },
+            {
+              "x": 2480,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-billing-cancel",
+          "source": "billing-decision",
+          "target": "create-cancellation",
+          "sourceHandle": "out-right-top",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2540,
+              "y": 90
+            },
+            {
+              "x": 2900,
+              "y": 90
+            }
+          ],
+          "labelPosition": {
+            "x": 2722,
+            "y": 72,
+            "width": 24,
+            "height": 14
+          },
+          "label": "NAO"
+        },
+        {
+          "id": "e-cancel-process",
+          "source": "create-cancellation",
+          "target": "process-cancellation",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 3020,
+              "y": 130
+            },
+            {
+              "x": 3020,
+              "y": 680
+            }
+          ]
+        },
+        {
+          "id": "e-cancel-status",
+          "source": "process-cancellation",
+          "target": "cancelled-status",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3140,
+              "y": 720
+            },
+            {
+              "x": 3220,
+              "y": 720
+            }
+          ]
+        },
+        {
+          "id": "e-cancel-consult",
+          "source": "cancelled-status",
+          "target": "consult-cancellation",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3340,
+              "y": 680
+            },
+            {
+              "x": 3340,
+              "y": 90
+            },
+            {
+              "x": 3430,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-cancel-end",
+          "source": "consult-cancellation",
+          "target": "end-cancelled",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3670,
+              "y": 90
+            },
+            {
+              "x": 3792,
+              "y": 90
+            }
+          ]
+        },
+        {
+          "id": "e-billing-invoice",
+          "source": "billing-decision",
+          "target": "create-invoice",
+          "sourceHandle": "out-right-bottom",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2510,
+              "y": 120
+            },
+            {
+              "x": 2510,
+              "y": 200
+            },
+            {
+              "x": 2650,
+              "y": 200
+            }
+          ],
+          "labelPosition": {
+            "x": 2520,
+            "y": 171,
+            "width": 20,
+            "height": 14
+          },
+          "label": "SIM"
+        },
+        {
+          "id": "e-invoice-process",
+          "source": "create-invoice",
+          "target": "process-invoice",
+          "sourceHandle": "out",
+          "targetHandle": "in",
+          "waypoints": [
+            {
+              "x": 2790,
+              "y": 240
+            },
+            {
+              "x": 2790,
+              "y": 960
+            },
+            {
+              "x": 2900,
+              "y": 960
+            }
+          ]
+        },
+        {
+          "id": "e-invoice-status",
+          "source": "process-invoice",
+          "target": "invoice-status",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3140,
+              "y": 960
+            },
+            {
+              "x": 3220,
+              "y": 960
+            }
+          ]
+        },
+        {
+          "id": "e-invoice-consult",
+          "source": "invoice-status",
+          "target": "consult-invoice",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3460,
+              "y": 960
+            },
+            {
+              "x": 3500,
+              "y": 960
+            },
+            {
+              "x": 3500,
+              "y": 240
+            }
+          ]
+        },
+        {
+          "id": "e-invoice-end",
+          "source": "consult-invoice",
+          "target": "end-invoice",
+          "sourceHandle": "out-right",
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3670,
+              "y": 200
+            },
+            {
+              "x": 3792,
+              "y": 200
+            }
+          ]
+        }
+      ],
+      "lanes": [
+        {
+          "id": "distribuidor",
+          "label": "WHOLESALER - DISTRIBUIDOR",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "width": 4100,
+          "height": 600
+        },
+        {
+          "id": "funcional",
+          "label": "WHOLESALER - FUNCIONAL",
+          "position": {
+            "x": 0,
+            "y": 600
+          },
+          "width": 4100,
+          "height": 600
+        }
+      ],
+      "updatedAt": "2026-10-19T13:39:20.276Z"
+    }
+  ]
 }

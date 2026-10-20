@@ -107,6 +107,7 @@ export const integrationManualSchema = z.object({
     )
     .optional(),
   flowSelectionNote: z.string().min(1).optional(),
+  sectionOrder: z.array(z.string().min(1)).optional(),
   homologationFlows: z
     .array(
       z.object({
@@ -153,6 +154,16 @@ export type UpdateManualMetadataInput = z.infer<typeof updateManualMetadataInput
 
 export function sortOperations(manual: IntegrationManual): ManualOperation[] {
   return [...manual.operations].sort((a, b) => a.order - b.order);
+}
+
+export function sortManualSections<T extends { id: string }>(
+  manual: IntegrationManual,
+  sections: readonly T[],
+): T[] {
+  const order = new Map((manual.sectionOrder ?? []).map((id, index) => [id, index]));
+  return [...sections].sort(
+    (a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER),
+  );
 }
 
 export function findOperation(

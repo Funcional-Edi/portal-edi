@@ -11,8 +11,14 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 80,
-            "y": 160
+            "x": 182,
+            "y": 182
+          },
+          "labelPosition": {
+            "x": 187,
+            "y": 218,
+            "width": 27,
+            "height": 14
           }
         },
         {
@@ -27,7 +33,7 @@
         {
           "id": "sendOrder",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido via integração/API",
+          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido\nmutation createGroupedOrder via integração/API\nmutation createGroupedOrder",
           "position": {
             "x": 620,
             "y": 160
@@ -38,8 +44,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRecebe o pedido via integração/API",
           "position": {
-            "x": 480,
-            "y": 800
+            "x": 620,
+            "y": 870
           }
         },
         {
@@ -47,8 +53,14 @@
           "type": "decision",
           "label": "As regras de negócio\nestão válidas?",
           "position": {
-            "x": 820,
-            "y": 780
+            "x": 1010,
+            "y": 880
+          },
+          "labelPosition": {
+            "x": 1074,
+            "y": 890,
+            "width": 71,
+            "height": 40
           }
         },
         {
@@ -56,14 +68,14 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRegistra que o pedido não foi aceito",
           "position": {
-            "x": 1180,
-            "y": 1100
+            "x": 1320,
+            "y": 750
           }
         },
         {
           "id": "rejectedStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1320,
             "y": 240
@@ -74,8 +86,14 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 1740,
-            "y": 260
+            "x": 1422,
+            "y": 80
+          },
+          "labelPosition": {
+            "x": 1431,
+            "y": 116,
+            "width": 19,
+            "height": 14
           }
         },
         {
@@ -83,17 +101,17 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nCria o pedido no portal da indústria — TO",
           "position": {
-            "x": 1180,
-            "y": 890
+            "x": 1340,
+            "y": 970
           }
         },
         {
           "id": "initialStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
-            "x": 1660,
-            "y": 600
+            "x": 1600,
+            "y": 590
           }
         },
         {
@@ -101,8 +119,14 @@
           "type": "decision",
           "label": "Qual é o status\ndo pedido?",
           "position": {
-            "x": 1660,
+            "x": 1690,
             "y": 400
+          },
+          "labelPosition": {
+            "x": 1633,
+            "y": 506,
+            "width": 74,
+            "height": 27
           }
         },
         {
@@ -117,7 +141,7 @@
         {
           "id": "sendResponse",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a resposta do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia a resposta do pedido\nmutation createGroupedResponse",
           "position": {
             "x": 2500,
             "y": 20
@@ -139,12 +163,18 @@
           "position": {
             "x": 2180,
             "y": 500
+          },
+          "labelPosition": {
+            "x": 2252,
+            "y": 516,
+            "width": 75,
+            "height": 27
           }
         },
         {
           "id": "sendCancellation",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a resposta de cancelamento",
+          "label": "[DISTRIBUIDOR]\nEnvia a resposta de cancelamento\nmutation createGroupedCancellation",
           "position": {
             "x": 2500,
             "y": 520
@@ -155,8 +185,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa o cancelamento no portal TO",
           "position": {
-            "x": 2820,
-            "y": 970
+            "x": 2650,
+            "y": 960
           }
         },
         {
@@ -171,7 +201,7 @@
         {
           "id": "sendInvoice",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a nota do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia a nota do pedido\nmutation createGroupedInvoice",
           "position": {
             "x": 2500,
             "y": 260
@@ -182,17 +212,17 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa a nota no portal TO",
           "position": {
-            "x": 2820,
-            "y": 1140
+            "x": 2710,
+            "y": 1130
           }
         },
         {
           "id": "followUpStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nAcompanha o status do pedido",
+          "label": "[DISTRIBUIDOR]\nAcompanha o status do pedido\nquery groupedOrder",
           "position": {
-            "x": 3140,
-            "y": 260
+            "x": 3090,
+            "y": 360
           }
         },
         {
@@ -202,14 +232,20 @@
           "position": {
             "x": 3460,
             "y": 260
+          },
+          "labelPosition": {
+            "x": 3533,
+            "y": 276,
+            "width": 74,
+            "height": 27
           }
         },
         {
           "id": "consultReimbursement",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o ressarcimento",
+          "label": "[DISTRIBUIDOR]\nConsulta o ressarcimento\nquery groupedInvoices",
           "position": {
-            "x": 3780,
+            "x": 3660,
             "y": 80
           }
         },
@@ -218,7 +254,7 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nProcessa o ressarcimento no portal TO",
           "position": {
-            "x": 4060,
+            "x": 3710,
             "y": 800
           }
         },
@@ -227,8 +263,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nRecebe o valor do ressarcimento",
           "position": {
-            "x": 4340,
-            "y": 80
+            "x": 3970,
+            "y": 580
           }
         },
         {
@@ -236,8 +272,14 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 3780,
-            "y": 520
+            "x": 3472,
+            "y": 542
+          },
+          "labelPosition": {
+            "x": 3481,
+            "y": 578,
+            "width": 19,
+            "height": 14
           }
         },
         {
@@ -245,8 +287,14 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 4660,
-            "y": 80
+            "x": 4072,
+            "y": 442
+          },
+          "labelPosition": {
+            "x": 4080,
+            "y": 423,
+            "width": 19,
+            "height": 14
           }
         }
       ],
@@ -256,28 +304,68 @@
           "source": "start",
           "target": "sale",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 218,
+              "y": 200
+            },
+            {
+              "x": 340,
+              "y": 200
+            }
+          ]
         },
         {
           "id": "e-sale-send-order",
           "source": "sale",
           "target": "sendOrder",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 580,
+              "y": 200
+            },
+            {
+              "x": 620,
+              "y": 200
+            }
+          ]
         },
         {
           "id": "e-send-order-receive",
           "source": "sendOrder",
           "target": "receiveOrder",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 740,
+              "y": 240
+            },
+            {
+              "x": 740,
+              "y": 870
+            }
+          ]
         },
         {
           "id": "e-receive-rules",
           "source": "receiveOrder",
           "target": "businessRules",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 860,
+              "y": 910
+            },
+            {
+              "x": 1010,
+              "y": 910
+            }
+          ]
         },
         {
           "id": "e-rules-no",
@@ -285,6 +373,26 @@
           "target": "notAccepted",
           "sourceHandle": "out-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1040,
+              "y": 880
+            },
+            {
+              "x": 1040,
+              "y": 790
+            },
+            {
+              "x": 1320,
+              "y": 790
+            }
+          ],
+          "labelPosition": {
+            "x": 1043,
+            "y": 825,
+            "width": 24,
+            "height": 14
+          },
           "label": "NÃO"
         },
         {
@@ -292,14 +400,34 @@
           "source": "notAccepted",
           "target": "rejectedStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1440,
+              "y": 750
+            },
+            {
+              "x": 1440,
+              "y": 320
+            }
+          ]
         },
         {
           "id": "e-rejected-status-end",
           "source": "rejectedStatus",
           "target": "rejectedEnd",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1440,
+              "y": 240
+            },
+            {
+              "x": 1440,
+              "y": 116
+            }
+          ]
         },
         {
           "id": "e-rules-yes",
@@ -307,6 +435,26 @@
           "target": "orderCreated",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1040,
+              "y": 940
+            },
+            {
+              "x": 1040,
+              "y": 1010
+            },
+            {
+              "x": 1340,
+              "y": 1010
+            }
+          ],
+          "labelPosition": {
+            "x": 1045,
+            "y": 965,
+            "width": 20,
+            "height": 14
+          },
           "label": "SIM"
         },
         {
@@ -314,14 +462,38 @@
           "source": "orderCreated",
           "target": "initialStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1580,
+              "y": 1010
+            },
+            {
+              "x": 1720,
+              "y": 1010
+            },
+            {
+              "x": 1720,
+              "y": 670
+            }
+          ]
         },
         {
           "id": "e-status-decision",
           "source": "initialStatus",
           "target": "statusDecision",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1720,
+              "y": 590
+            },
+            {
+              "x": 1720,
+              "y": 460
+            }
+          ]
         },
         {
           "id": "e-status-response",
@@ -329,6 +501,26 @@
           "target": "awaitingResponse",
           "sourceHandle": "out-right-top",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1720,
+              "y": 400
+            },
+            {
+              "x": 1720,
+              "y": 60
+            },
+            {
+              "x": 2180,
+              "y": 60
+            }
+          ],
+          "labelPosition": {
+            "x": 1900,
+            "y": 33,
+            "width": 141,
+            "height": 14
+          },
           "label": "AGUARDANDO RESPOSTA"
         },
         {
@@ -336,21 +528,59 @@
           "source": "awaitingResponse",
           "target": "sendResponse",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2420,
+              "y": 60
+            },
+            {
+              "x": 2500,
+              "y": 60
+            }
+          ]
         },
         {
           "id": "e-send-response-process",
           "source": "sendResponse",
           "target": "processResponse",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2740,
+              "y": 60
+            },
+            {
+              "x": 2870,
+              "y": 60
+            },
+            {
+              "x": 2870,
+              "y": 800
+            }
+          ]
         },
         {
           "id": "e-response-follow-up",
           "source": "processResponse",
           "target": "followUpStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left-top"
+          "targetHandle": "in-left-top",
+          "waypoints": [
+            {
+              "x": 3060,
+              "y": 840
+            },
+            {
+              "x": 3130,
+              "y": 840
+            },
+            {
+              "x": 3130,
+              "y": 440
+            }
+          ]
         },
         {
           "id": "e-status-cancel",
@@ -358,6 +588,30 @@
           "target": "cancelDecision",
           "sourceHandle": "out-right-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1750,
+              "y": 430
+            },
+            {
+              "x": 1780,
+              "y": 430
+            },
+            {
+              "x": 1780,
+              "y": 530
+            },
+            {
+              "x": 2180,
+              "y": 530
+            }
+          ],
+          "labelPosition": {
+            "x": 1925,
+            "y": 505,
+            "width": 92,
+            "height": 14
+          },
           "label": "CANCELAMENTO"
         },
         {
@@ -366,6 +620,30 @@
           "target": "sendCancellation",
           "sourceHandle": "out-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2210,
+              "y": 560
+            },
+            {
+              "x": 2210,
+              "y": 670
+            },
+            {
+              "x": 2620,
+              "y": 670
+            },
+            {
+              "x": 2620,
+              "y": 600
+            }
+          ],
+          "labelPosition": {
+            "x": 2405,
+            "y": 645,
+            "width": 20,
+            "height": 14
+          },
           "label": "SIM"
         },
         {
@@ -373,14 +651,38 @@
           "source": "sendCancellation",
           "target": "processCancellation",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2680,
+              "y": 600
+            },
+            {
+              "x": 2680,
+              "y": 960
+            }
+          ]
         },
         {
           "id": "e-cancel-process-follow-up",
           "source": "processCancellation",
           "target": "followUpStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2890,
+              "y": 1000
+            },
+            {
+              "x": 3210,
+              "y": 1000
+            },
+            {
+              "x": 3210,
+              "y": 440
+            }
+          ]
         },
         {
           "id": "e-cancel-no-follow-up",
@@ -388,6 +690,26 @@
           "target": "followUpStatus",
           "sourceHandle": "out-right",
           "targetHandle": "in-bottom",
+          "waypoints": [
+            {
+              "x": 2210,
+              "y": 500
+            },
+            {
+              "x": 2210,
+              "y": 400
+            },
+            {
+              "x": 3090,
+              "y": 400
+            }
+          ],
+          "labelPosition": {
+            "x": 2388,
+            "y": 413,
+            "width": 24,
+            "height": 14
+          },
           "label": "NÃO"
         },
         {
@@ -396,6 +718,26 @@
           "target": "awaitingInvoice",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1720,
+              "y": 400
+            },
+            {
+              "x": 1720,
+              "y": 300
+            },
+            {
+              "x": 2180,
+              "y": 300
+            }
+          ],
+          "labelPosition": {
+            "x": 1914,
+            "y": 273,
+            "width": 112,
+            "height": 14
+          },
           "label": "AGUARDANDO NOTA"
         },
         {
@@ -403,28 +745,84 @@
           "source": "awaitingInvoice",
           "target": "sendInvoice",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2420,
+              "y": 300
+            },
+            {
+              "x": 2500,
+              "y": 300
+            }
+          ]
         },
         {
           "id": "e-send-invoice-process",
           "source": "sendInvoice",
-          "target": "processInvoice",
+          "target": "processCancellation",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2740,
+              "y": 300
+            },
+            {
+              "x": 2770,
+              "y": 300
+            },
+            {
+              "x": 2770,
+              "y": 960
+            }
+          ]
         },
         {
           "id": "e-invoice-follow-up",
           "source": "processInvoice",
           "target": "followUpStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left-bottom"
+          "targetHandle": "in-left-bottom",
+          "waypoints": [
+            {
+              "x": 2950,
+              "y": 1170
+            },
+            {
+              "x": 3290,
+              "y": 1170
+            },
+            {
+              "x": 3290,
+              "y": 440
+            }
+          ]
         },
         {
           "id": "e-follow-up-reimbursement",
           "source": "followUpStatus",
           "target": "reimbursementDecision",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3330,
+              "y": 400
+            },
+            {
+              "x": 3420,
+              "y": 400
+            },
+            {
+              "x": 3420,
+              "y": 290
+            },
+            {
+              "x": 3460,
+              "y": 290
+            }
+          ]
         },
         {
           "id": "e-reimbursement-yes",
@@ -432,6 +830,26 @@
           "target": "consultReimbursement",
           "sourceHandle": "out-right-top",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3490,
+              "y": 260
+            },
+            {
+              "x": 3490,
+              "y": 120
+            },
+            {
+              "x": 3660,
+              "y": 120
+            }
+          ],
+          "labelPosition": {
+            "x": 3495,
+            "y": 180,
+            "width": 20,
+            "height": 14
+          },
           "label": "SIM"
         },
         {
@@ -440,6 +858,22 @@
           "target": "noReimbursementEnd",
           "sourceHandle": "out-right-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3490,
+              "y": 320
+            },
+            {
+              "x": 3490,
+              "y": 542
+            }
+          ],
+          "labelPosition": {
+            "x": 3493,
+            "y": 421,
+            "width": 24,
+            "height": 14
+          },
           "label": "NÃO"
         },
         {
@@ -447,21 +881,70 @@
           "source": "consultReimbursement",
           "target": "processReimbursement",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3830,
+              "y": 160
+            },
+            {
+              "x": 3830,
+              "y": 800
+            }
+          ]
         },
         {
           "id": "e-process-receive-reimbursement",
           "source": "processReimbursement",
           "target": "receiveReimbursement",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3950,
+              "y": 840
+            },
+            {
+              "x": 4090,
+              "y": 840
+            },
+            {
+              "x": 4090,
+              "y": 660
+            }
+          ]
         },
         {
           "id": "e-receive-end",
           "source": "receiveReimbursement",
           "target": "end",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 4090,
+              "y": 580
+            },
+            {
+              "x": 4090,
+              "y": 478
+            }
+          ]
+        },
+        {
+          "id": "Flow_1fefnwy",
+          "source": "processCancellation",
+          "target": "processInvoice",
+          "waypoints": [
+            {
+              "x": 2770,
+              "y": 1040
+            },
+            {
+              "x": 2770,
+              "y": 1130
+            }
+          ]
         }
       ],
       "lanes": [
@@ -486,7 +969,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-01T12:13:03.688Z",
+      "updatedAt": "2026-10-19T13:39:06.939Z",
       "id": "retorno-distribuidor"
     },
     {
@@ -500,8 +983,14 @@
           "type": "start",
           "label": "Início",
           "position": {
-            "x": 80,
-            "y": 160
+            "x": 182,
+            "y": 172
+          },
+          "labelPosition": {
+            "x": 187,
+            "y": 208,
+            "width": 27,
+            "height": 14
           }
         },
         {
@@ -509,17 +998,17 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nRealiza a venda",
           "position": {
-            "x": 340,
-            "y": 160
+            "x": 490,
+            "y": 150
           }
         },
         {
           "id": "createOrder",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido",
+          "label": "[DISTRIBUIDOR]\nEnvia os dados do pedido\nmutation createGroupedOrder",
           "position": {
-            "x": 620,
-            "y": 160
+            "x": 490,
+            "y": 360
           },
           "operationRef": {
             "kind": "mutation",
@@ -531,8 +1020,8 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nRecebe o pedido via integração/API",
           "position": {
-            "x": 580,
-            "y": 940
+            "x": 490,
+            "y": 920
           }
         },
         {
@@ -542,6 +1031,12 @@
           "position": {
             "x": 900,
             "y": 930
+          },
+          "labelPosition": {
+            "x": 944,
+            "y": 1000,
+            "width": 71,
+            "height": 40
           }
         },
         {
@@ -565,10 +1060,10 @@
         {
           "id": "rejectedStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
-            "x": 1740,
-            "y": 620
+            "x": 1500,
+            "y": 610
           }
         },
         {
@@ -576,8 +1071,14 @@
           "type": "end",
           "label": "Fim",
           "position": {
-            "x": 2080,
-            "y": 620
+            "x": 1972,
+            "y": 632
+          },
+          "labelPosition": {
+            "x": 1981,
+            "y": 668,
+            "width": 19,
+            "height": 14
           }
         },
         {
@@ -585,14 +1086,14 @@
           "type": "operation",
           "label": "[FUNCIONAL]\nCria o pedido no portal",
           "position": {
-            "x": 1260,
+            "x": 1180,
             "y": 920
           }
         },
         {
           "id": "orderStatus",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 1460,
             "y": 160
@@ -604,16 +1105,16 @@
           "label": "Pedido aguardando resposta\nAWAITING_ORDER_INVOICE",
           "position": {
             "x": 1820,
-            "y": 320
+            "y": 310
           }
         },
         {
           "id": "sendInvoice",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia a nota fiscal",
+          "label": "[DISTRIBUIDOR]\nEnvia a nota fiscal\nmutation createGroupedInvoice",
           "position": {
             "x": 2160,
-            "y": 320
+            "y": 310
           },
           "operationRef": {
             "kind": "mutation",
@@ -625,17 +1126,23 @@
           "type": "decision",
           "label": "O pedido será\nfaturado?",
           "position": {
-            "x": 2460,
+            "x": 2500,
             "y": 320
+          },
+          "labelPosition": {
+            "x": 2555,
+            "y": 386,
+            "width": 70,
+            "height": 27
           }
         },
         {
           "id": "sendCancellation",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nEnvia o cancelamento",
+          "label": "[DISTRIBUIDOR]\nEnvia o cancelamento\nmutation createGroupedCancellation",
           "position": {
-            "x": 2820,
-            "y": 80
+            "x": 2780,
+            "y": 90
           },
           "operationRef": {
             "kind": "mutation",
@@ -663,7 +1170,7 @@
         {
           "id": "cancelledQuery",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 3740,
             "y": 20
@@ -675,7 +1182,13 @@
           "label": "Fim",
           "position": {
             "x": 4080,
-            "y": 20
+            "y": 42
+          },
+          "labelPosition": {
+            "x": 4088,
+            "y": 23,
+            "width": 19,
+            "height": 14
           }
         },
         {
@@ -683,8 +1196,8 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nFatura apenas alguns itens\ninvoice_quantity conforme faturamento; não faturados = 0",
           "position": {
-            "x": 3240,
-            "y": 300
+            "x": 2780,
+            "y": 310
           }
         },
         {
@@ -692,7 +1205,7 @@
           "type": "operation",
           "label": "[DISTRIBUIDOR]\nFatura todos os itens\ninvoice_quantity igual à quantidade enviada",
           "position": {
-            "x": 2860,
+            "x": 2780,
             "y": 560
           }
         },
@@ -717,7 +1230,7 @@
         {
           "id": "invoiceQuery",
           "type": "operation",
-          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido",
+          "label": "[DISTRIBUIDOR]\nConsulta o status do pedido\nquery groupedOrder",
           "position": {
             "x": 3800,
             "y": 560
@@ -729,7 +1242,13 @@
           "label": "Fim",
           "position": {
             "x": 4100,
-            "y": 560
+            "y": 582
+          },
+          "labelPosition": {
+            "x": 4108,
+            "y": 563,
+            "width": 19,
+            "height": 14
           }
         }
       ],
@@ -739,28 +1258,68 @@
           "source": "start",
           "target": "sale",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 218,
+              "y": 190
+            },
+            {
+              "x": 490,
+              "y": 190
+            }
+          ]
         },
         {
           "id": "e-sale-order",
           "source": "sale",
           "target": "createOrder",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 610,
+              "y": 230
+            },
+            {
+              "x": 610,
+              "y": 360
+            }
+          ]
         },
         {
           "id": "e-order-receive",
           "source": "createOrder",
           "target": "receiveOrder",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 610,
+              "y": 440
+            },
+            {
+              "x": 610,
+              "y": 920
+            }
+          ]
         },
         {
           "id": "e-receive-rules",
           "source": "receiveOrder",
           "target": "businessRules",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 730,
+              "y": 960
+            },
+            {
+              "x": 900,
+              "y": 960
+            }
+          ]
         },
         {
           "id": "e-rules-no",
@@ -768,6 +1327,26 @@
           "target": "notAccepted",
           "sourceHandle": "out-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 930,
+              "y": 990
+            },
+            {
+              "x": 930,
+              "y": 1180
+            },
+            {
+              "x": 1180,
+              "y": 1180
+            }
+          ],
+          "labelPosition": {
+            "x": 1043,
+            "y": 1155,
+            "width": 24,
+            "height": 14
+          },
           "label": "NÃO"
         },
         {
@@ -775,21 +1354,51 @@
           "source": "notAccepted",
           "target": "processedStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1420,
+              "y": 1180
+            },
+            {
+              "x": 1500,
+              "y": 1180
+            }
+          ]
         },
         {
           "id": "e-processed-rejected-status",
           "source": "processedStatus",
           "target": "rejectedStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1620,
+              "y": 1140
+            },
+            {
+              "x": 1620,
+              "y": 690
+            }
+          ]
         },
         {
           "id": "e-rejected-status-end",
           "source": "rejectedStatus",
           "target": "rejectedEnd",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1740,
+              "y": 650
+            },
+            {
+              "x": 1972,
+              "y": 650
+            }
+          ]
         },
         {
           "id": "e-rules-yes",
@@ -797,6 +1406,22 @@
           "target": "orderCreated",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 960,
+              "y": 960
+            },
+            {
+              "x": 1180,
+              "y": 960
+            }
+          ],
+          "labelPosition": {
+            "x": 1060,
+            "y": 935,
+            "width": 20,
+            "height": 14
+          },
           "label": "SIM"
         },
         {
@@ -804,7 +1429,25 @@
           "source": "orderCreated",
           "target": "orderStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1420,
+              "y": 960
+            },
+            {
+              "x": 1440,
+              "y": 960
+            },
+            {
+              "x": 1440,
+              "y": 200
+            },
+            {
+              "x": 1460,
+              "y": 200
+            }
+          ]
         },
         {
           "id": "e-order-status-awaiting",
@@ -812,6 +1455,30 @@
           "target": "awaitingInvoice",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 1700,
+              "y": 200
+            },
+            {
+              "x": 1760,
+              "y": 200
+            },
+            {
+              "x": 1760,
+              "y": 350
+            },
+            {
+              "x": 1820,
+              "y": 350
+            }
+          ],
+          "labelPosition": {
+            "x": 1767,
+            "y": 242,
+            "width": 85,
+            "height": 27
+          },
           "label": "AWAITING_ORDER_INVOICE"
         },
         {
@@ -819,14 +1486,34 @@
           "source": "awaitingInvoice",
           "target": "sendInvoice",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2060,
+              "y": 350
+            },
+            {
+              "x": 2160,
+              "y": 350
+            }
+          ]
         },
         {
           "id": "e-send-billing-decision",
           "source": "sendInvoice",
           "target": "billingDecision",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2400,
+              "y": 350
+            },
+            {
+              "x": 2500,
+              "y": 350
+            }
+          ]
         },
         {
           "id": "e-billing-no",
@@ -834,6 +1521,26 @@
           "target": "sendCancellation",
           "sourceHandle": "out-right-top",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2530,
+              "y": 320
+            },
+            {
+              "x": 2530,
+              "y": 130
+            },
+            {
+              "x": 2780,
+              "y": 130
+            }
+          ],
+          "labelPosition": {
+            "x": 2536,
+            "y": 183,
+            "width": 27,
+            "height": 14
+          },
           "label": "NÃO"
         },
         {
@@ -841,28 +1548,84 @@
           "source": "sendCancellation",
           "target": "processCancellation",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3020,
+              "y": 130
+            },
+            {
+              "x": 3090,
+              "y": 130
+            },
+            {
+              "x": 3090,
+              "y": 880
+            },
+            {
+              "x": 3180,
+              "y": 880
+            }
+          ]
         },
         {
           "id": "e-process-cancelled",
           "source": "processCancellation",
           "target": "cancelledStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3420,
+              "y": 880
+            },
+            {
+              "x": 3440,
+              "y": 880
+            }
+          ]
         },
         {
           "id": "e-cancelled-query",
           "source": "cancelledStatus",
           "target": "cancelledQuery",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3680,
+              "y": 880
+            },
+            {
+              "x": 3710,
+              "y": 880
+            },
+            {
+              "x": 3710,
+              "y": 60
+            },
+            {
+              "x": 3740,
+              "y": 60
+            }
+          ]
         },
         {
           "id": "e-cancelled-end",
           "source": "cancelledQuery",
           "target": "cancelledEnd",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3980,
+              "y": 60
+            },
+            {
+              "x": 4080,
+              "y": 60
+            }
+          ]
         },
         {
           "id": "e-billing-partial",
@@ -870,6 +1633,22 @@
           "target": "partialInvoice",
           "sourceHandle": "out-right",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2560,
+              "y": 350
+            },
+            {
+              "x": 2780,
+              "y": 350
+            }
+          ],
+          "labelPosition": {
+            "x": 2620,
+            "y": 333,
+            "width": 85,
+            "height": 14
+          },
           "label": "PARCIALMENTE"
         },
         {
@@ -877,7 +1656,25 @@
           "source": "partialInvoice",
           "target": "processInvoice",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left-top"
+          "targetHandle": "in-left-top",
+          "waypoints": [
+            {
+              "x": 3020,
+              "y": 350
+            },
+            {
+              "x": 3060,
+              "y": 350
+            },
+            {
+              "x": 3060,
+              "y": 1120
+            },
+            {
+              "x": 3180,
+              "y": 1120
+            }
+          ]
         },
         {
           "id": "e-billing-yes",
@@ -885,6 +1682,26 @@
           "target": "allInvoice",
           "sourceHandle": "out-right-bottom",
           "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 2530,
+              "y": 380
+            },
+            {
+              "x": 2530,
+              "y": 600
+            },
+            {
+              "x": 2780,
+              "y": 600
+            }
+          ],
+          "labelPosition": {
+            "x": 2540,
+            "y": 493,
+            "width": 20,
+            "height": 14
+          },
           "label": "SIM"
         },
         {
@@ -892,28 +1709,80 @@
           "source": "allInvoice",
           "target": "processInvoice",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left-bottom"
+          "targetHandle": "in-left-bottom",
+          "waypoints": [
+            {
+              "x": 2900,
+              "y": 640
+            },
+            {
+              "x": 2900,
+              "y": 1160
+            },
+            {
+              "x": 3180,
+              "y": 1160
+            }
+          ]
         },
         {
           "id": "e-invoice-received",
           "source": "processInvoice",
           "target": "invoiceReceivedStatus",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3420,
+              "y": 1140
+            },
+            {
+              "x": 3460,
+              "y": 1140
+            }
+          ]
         },
         {
           "id": "e-invoice-query",
           "source": "invoiceReceivedStatus",
           "target": "invoiceQuery",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 3700,
+              "y": 1140
+            },
+            {
+              "x": 3750,
+              "y": 1140
+            },
+            {
+              "x": 3750,
+              "y": 600
+            },
+            {
+              "x": 3800,
+              "y": 600
+            }
+          ]
         },
         {
           "id": "e-invoice-end",
           "source": "invoiceQuery",
           "target": "invoiceEnd",
           "sourceHandle": "out-right",
-          "targetHandle": "in-left"
+          "targetHandle": "in-left",
+          "waypoints": [
+            {
+              "x": 4040,
+              "y": 600
+            },
+            {
+              "x": 4100,
+              "y": 600
+            }
+          ]
         }
       ],
       "lanes": [
@@ -938,7 +1807,7 @@
           "height": 800
         }
       ],
-      "updatedAt": "2026-10-01T12:15:10.744Z"
+      "updatedAt": "2026-10-19T13:39:09.191Z"
     }
   ]
 }
