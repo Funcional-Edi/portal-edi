@@ -1,5 +1,4 @@
 import { readContentJson, writeContentJson } from "@/core/db/adapters";
-import { GithubContentError } from "@/core/db/adapters/github-content-error";
 
 export const ACCESS_AUDIT_PATH = "data/access/audit-log.json";
 const ACCESS_AUDIT_BRANCH = "portal-state";
@@ -49,26 +48,21 @@ export async function appendAccessAuditEvent(event: {
   detail?: string;
   occurredAt?: string;
 }): Promise<void> {
-  try {
-    const now = event.occurredAt ?? new Date().toISOString();
-    const current = await listAccessAuditEvents();
-    const next: AccessAuditEvent[] = [
-      {
-        action: event.action,
-        actorEmail: normalizeEmail(event.actorEmail),
-        targetEmail: event.targetEmail ? normalizeEmail(event.targetEmail) : undefined,
-        detail: event.detail,
-        occurredAt: now,
-      },
-      ...current,
-    ].slice(0, MAX_AUDIT_EVENTS);
+  const now = event.occurredAt ?? new Date().toISOString();
+  const current = await listAccessAuditEvents();
+  const next: AccessAuditEvent[] = [
+    {
+      action: event.action,
+      actorEmail: normalizeEmail(event.actorEmail),
+      targetEmail: event.targetEmail ? normalizeEmail(event.targetEmail) : undefined,
+      detail: event.detail,
+      occurredAt: now,
+    },
+    ...current,
+  ].slice(0, MAX_AUDIT_EVENTS);
 
-    await writeContentJson(ACCESS_AUDIT_PATH, next, {
-      branch: ACCESS_AUDIT_BRANCH,
-      message: "chore(acesso): registra auditoria de acesso",
-    });
-  } catch (error) {
-    if (!(error instanceof GithubContentError)) throw error;
-    console.warn("[access-audit] não foi possível registrar a auditoria de acesso.");
-  }
+  await writeContentJson(ACCESS_AUDIT_PATH, next, {
+    branch: ACCESS_AUDIT_BRANCH,
+    message: "chore(acesso): registra auditoria de acesso",
+  });
 }
