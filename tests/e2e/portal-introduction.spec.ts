@@ -25,16 +25,6 @@ test("guest sees a focused login and documentation still requires a session", as
   await expect(page).toHaveURL(/callbackUrl=%2Fdocs/);
 });
 
-test("login form is accessible: labeled fields, live error region, no dev tab, no dead local-account link", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByLabel("E-mail")).toBeVisible();
-  await expect(page.getByRole("tab")).toHaveCount(0);
-  await expect(page.getByText("Entrar com conta local")).toHaveCount(0); // Fase 2
-  await expect(page.locator('#login-error[aria-live="assertive"]')).toBeAttached();
-  await page.getByLabel("E-mail").focus();
-  await expect(page.getByLabel("E-mail")).toBeFocused();
-});
-
 test("client uses the shared portal and documentation without gaining privileged access", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await login(page);

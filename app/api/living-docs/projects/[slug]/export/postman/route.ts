@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
-import { resolveCurrentSessionRole } from "@/core/auth/require-role";
 import {
   buildPostmanCollection,
   postmanDownloadFilename,
@@ -23,13 +22,12 @@ const STATUS_BY_ERROR_CODE: Record<ExportAccessError["code"], number> = {
 /** Exporta collection Postman v2.1 do manual curado (JSON download). */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth();
-  const role = await resolveCurrentSessionRole(session);
-  if (!role) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { slug } = await params;
-  const isAdmin = isAdminRole(role);
+  const isAdmin = isAdminRole(session.user.role);
 
   try {
     const { project } = await resolveProjectForExport(slug, { isAdmin });

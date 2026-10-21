@@ -8,8 +8,7 @@
  */
 
 import { CredentialsSignin } from "next-auth";
-import { checkLoginAttempt, emailKey, resetLoginRateLimit } from "@/core/auth/rate-limit";
-import { resolveSsoUrl } from "@/core/auth/sso-config";
+import { checkLoginRateLimit, resetLoginRateLimit } from "@/core/auth/rate-limit";
 
 export interface SsoUser {
   id: string;
@@ -35,7 +34,7 @@ export function isSsoLoginConfigured(): boolean {
   return !!process.env.FUNCIONAL_SSO_GRAPHQL_URL?.trim();
 }
 
-function getDefaultSsoGraphqlUrl(): string {
+function getSsoGraphqlUrl(): string {
   const url = process.env.FUNCIONAL_SSO_GRAPHQL_URL?.trim();
   if (!url) throw new Error("FUNCIONAL_SSO_GRAPHQL_URL não configurada");
   return url;
@@ -43,25 +42,23 @@ function getDefaultSsoGraphqlUrl(): string {
 
 export async function validateSsoCredentials(
   login: string,
-  password: string,
-  ip = "unknown"
+  password: string
 ): Promise<SsoUser> {
   const normalizedLogin = login.trim().toLowerCase();
 
-  const rateLimit = await checkLoginAttempt(normalizedLogin, ip);
+  const rateLimit = await checkLoginRateLimit(normalizedLogin);
   if (!rateLimit.allowed) {
     throw new SsoRateLimitError(rateLimit.retryAfterSec ?? 60);
   }
 
   try {
-    const response = await fetch(await resolveSsoUrl(getDefaultSsoGraphqlUrl()), {
+    const response = await fetch(getSsoGraphqlUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query: CREATE_TOKEN_MUTATION,
         variables: { login, password },
       }),
-      signal: AbortSignal.timeout(10_000), // SSO pendurado vira "indisponível", não trava o login
     });
 
     if (!response.ok) {
@@ -77,22 +74,26 @@ export async function validateSsoCredentials(
     if (!created?.token) throw new Error("createToken não retornou token");
 
     const email = created.user?.email?.trim().toLowerCase() ?? normalizedLogin;
-    resetLoginRateLimit(emailKey(normalizedLogin)).catch(() => undefined);
+    resetLoginRateLimit(normalizedLogin).catch(() => undefined);
     return { id: created.user?.id ?? email, email, name: created.user?.name };
   } catch (err) {
     throw classifySsoLoginError(err);
   }
 }
 
-// --- Erros classificados ---
-// Só 3 códigos chegam ao navegador. Conta bloqueada, MFA e e-mail inexistente
-// viram "credenciais inválidas": a tela não pode dizer se a conta existe.
+// --- Erros classificados (mesma taxonomia do portal atual) ---
 
 export class SsoUnavailableError extends CredentialsSignin {
   code = "sso_unavailable";
 }
 export class SsoInvalidCredentialsError extends CredentialsSignin {
   code = "sso_invalid_credentials";
+}
+export class SsoAccountLockedError extends CredentialsSignin {
+  code = "sso_account_locked";
+}
+export class SsoMfaRequiredError extends CredentialsSignin {
+  code = "sso_mfa_required";
 }
 /** Muitas tentativas de login na janela atual (ver core/auth/rate-limit.ts). */
 export class SsoRateLimitError extends CredentialsSignin {
@@ -116,12 +117,13 @@ export function classifySsoLoginError(err: unknown): CredentialsSignin {
     combined.includes("econnrefused") ||
     combined.includes("fetch failed") ||
     combined.includes("network") ||
-    combined.includes("getaddrinfo") ||
-    combined.includes("timeout") ||
-    combined.includes("aborted") ||
-    /http 5\d\d/.test(combined)
+    combined.includes("getaddrinfo")
   ) {
     return new SsoUnavailableError();
+  }
+  if (combined.includes("mfa")) return new SsoMfaRequiredError();
+  if (combined.includes("bloqueado") || combined.includes("blocked")) {
+    return new SsoAccountLockedError();
   }
   return new SsoInvalidCredentialsError();
 }

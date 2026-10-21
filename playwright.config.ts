@@ -29,10 +29,6 @@ export default defineConfig({
       AUTH_SECRET: "dev-auth-secret-e2e",
       AUTH_URL: e2eUrl,
       DEV_AUTH_ENABLED: "true",
-      PERMISSIONS_CONFIG_JSON:
-        '{"admins":["admin@funcionalcorp.com.br"],"editors":[],"clients":["@distribuidor.com"],"defaultRole":"client"}',
-      // Já definido aqui, o Next não sobrescreve com .env.local — E2E entra por "Entrar (dev)".
-      FUNCIONAL_SSO_GRAPHQL_URL: "",
     },
     timeout: 120 * 1000,
   },

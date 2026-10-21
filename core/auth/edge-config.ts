@@ -22,9 +22,6 @@ export const edgeAuthConfig = {
         token.email = user.email ?? token.email;
         const role = (user as { role?: UserRole }).role;
         if (role) token.role = role;
-        token.authMethod = (user as { authMethod?: string }).authMethod ?? token.authMethod;
-        token.localSessionExpiresAt =
-          (user as { localSessionExpiresAt?: number }).localSessionExpiresAt ?? token.localSessionExpiresAt;
       }
       return token;
     },
@@ -32,10 +29,6 @@ export const edgeAuthConfig = {
       if (session.user) {
         session.user.role = (token.role as UserRole) ?? "client";
         if (token.email) session.user.email = token.email as string;
-        session.user.authMethod = (token.authMethod as "sso" | "dev" | "local" | undefined) ?? "sso";
-        if (typeof token.localSessionExpiresAt === "number") {
-          session.user.localSessionExpiresAt = token.localSessionExpiresAt;
-        }
       }
       return session;
     },

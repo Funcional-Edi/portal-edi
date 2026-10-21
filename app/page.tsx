@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 
 import { auth, isInternalStaffRole } from "@/core/auth";
-import { listAccessAuditEvents } from "@/core/auth/access-audit";
-import { isLocalEmergencyConfigured } from "@/core/auth/local-account";
 import { canAccessLevel, canAccessModule } from "@/core/auth/module-access";
 import { env } from "@/core/config/env";
 import { AppShell } from "@/core/ui/app-shell";
@@ -76,11 +74,7 @@ function LoginShell() {
           <h1 id="login-title" className="mt-3 text-2xl font-semibold text-slate-900">Entre para continuar</h1>
           <p className="mb-6 mt-2 text-sm leading-relaxed text-slate-600">Entre para consultar a documentação e acompanhar os roteiros de integração.</p>
           <Suspense fallback={<p className="text-sm text-slate-500">Carregando…</p>}>
-            <LoginForm
-              ssoConfigured={env.isSsoConfigured}
-              devAuthEnabled={env.isDevLoginAvailable}
-              localEmergencyEnabled={isLocalEmergencyConfigured()}
-            />
+            <LoginForm ssoConfigured={env.isSsoConfigured} devAuthEnabled={env.isDevAuthEnabled} />
           </Suspense>
         </section>
       </main>
@@ -95,13 +89,6 @@ export default async function HomePage() {
 
   const role = session.user.role ?? "client";
   const isAdmin = isInternalStaffRole(role);
-  const emergencyEmail = session.user.email?.trim().toLowerCase() ?? "";
-  const localEmergencyWarnings =
-    session.user.authMethod === "local" && emergencyEmail
-      ? (await listAccessAuditEvents())
-          .filter((event) => event.action === "local_login_success" && event.actorEmail === emergencyEmail)
-          .slice(0, 3)
-      : [];
   const accessibleModules = registerAllModules().filter((module) => canAccessModule(role, module));
   const activeModules = accessibleModules.filter((module) => module.status === "active");
   const plannedModules = isAdmin ? accessibleModules.filter((module) => module.status !== "active") : [];
@@ -123,19 +110,6 @@ export default async function HomePage() {
             </Link>
           ) : null}
         </PortalIntroduction>
-
-        {localEmergencyWarnings.length > 0 ? (
-          <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-            <p className="font-semibold">Aviso de seguranca: conta local de emergencia foi usada.</p>
-            <ul className="mt-2 space-y-1">
-              {localEmergencyWarnings.map((event) => (
-                <li key={`${event.actorEmail}-${event.occurredAt}`}>
-                  {event.actorEmail} em {new Date(event.occurredAt).toLocaleString("pt-BR")}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
 
         {activeModules.length ? (
           <section aria-labelledby="resources-title">

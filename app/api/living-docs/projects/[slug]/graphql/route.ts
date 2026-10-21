@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireAdmin } from "@/core/auth/require-role";
+import { auth, isAdminRole } from "@/core/auth";
 import { recordPlaygroundExecution } from "@/core/metrics/playground-metrics-store";
 import { validateMutationOrigin } from "@/core/security/request-origin";
 import { playgroundRequestInputSchema } from "@/modules/living-docs-externa/schema/playground";
@@ -45,8 +45,8 @@ const PROXY_STATUS_BY_ERROR_CODE: Record<PlaygroundProxyError["code"], number> =
 };
 
 export async function POST(request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
-  if (!session) {
+  const session = await auth();
+  if (!session?.user?.role || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

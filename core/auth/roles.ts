@@ -16,14 +16,14 @@ export interface PermissionsConfig {
  * Defaults em código quando PERMISSIONS_CONFIG_JSON não está definida.
  * Em homolog/prod, defina PERMISSIONS_CONFIG_JSON com o conteúdo de
  * `data/permissions.example.json` preenchido.
- * Não existe admin padrão no código.
+ * O e-mail abaixo é o administrador padrão do ambiente local.
  *
  * Regras: e-mail exato (ex.: `admin@funcionalcorp.com.br`) ou domínio (`@empresa.com`).
  * Domínio = auto-identificação: qualquer e-mail daquele sufixo casa a regra.
  * Exceção: editors só aceitam e-mail exato (papel que escreve conteúdo).
  */
 export const DEFAULT_PERMISSIONS_CONFIG: PermissionsConfig = {
-  admins: [],
+  admins: ["admin@funcionalcorp.com.br"],
   editors: [],
   clients: ["@distribuidor.com"],
   defaultRole: "client",

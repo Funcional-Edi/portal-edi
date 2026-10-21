@@ -13,10 +13,6 @@ export interface ProductionSecurityCheck {
   detail: string;
 }
 
-function hasLocalEmergencyConfigured(): boolean {
-  return !!process.env.LOCAL_EMERGENCY_ACCOUNTS_JSON?.trim();
-}
-
 export function runProductionSecurityChecks(): ProductionSecurityCheck[] {
   if (!env.isProduction) {
     return [{ id: "environment", ok: true, detail: "Ambiente de desenvolvimento — checagens de prod ignoradas." }];
@@ -48,22 +44,6 @@ export function runProductionSecurityChecks(): ProductionSecurityCheck[] {
     detail: process.env.GATEWAY_URL_ALLOWED_HOSTS?.trim()
       ? "Allowlist de hosts de gateway definida."
       : "GATEWAY_URL_ALLOWED_HOSTS ausente — qualquer host HTTPS público é aceito.",
-  });
-
-  checks.push({
-    id: "sso-allowlist",
-    ok: !!process.env.SSO_URL_ALLOWED_HOSTS?.trim(),
-    detail: process.env.SSO_URL_ALLOWED_HOSTS?.trim()
-      ? "Allowlist de hosts de SSO definida."
-      : "SSO_URL_ALLOWED_HOSTS ausente.",
-  });
-
-  checks.push({
-    id: "local-emergency-account",
-    ok: hasLocalEmergencyConfigured(),
-    detail: hasLocalEmergencyConfigured()
-      ? "Conta local de emergencia com MFA configurada."
-      : "LOCAL_EMERGENCY_ACCOUNTS_JSON ausente em produção.",
   });
 
   checks.push({
