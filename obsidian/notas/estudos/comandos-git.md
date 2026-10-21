@@ -109,7 +109,6 @@ Ordem segura: `git status` (limpo?) → `git pull` → resolver conflito se houv
 | Corrigir a mensagem do último commit | `git commit --amend -m "nova msg"` | Só se **não** tiver dado push |
 | Desfazer último commit, manter o código | `git reset --soft HEAD~1` | Commit volta para staging |
 | Guardar tudo temporariamente | `git stash` | Ver [[fluxo-branches#Guardar trabalho pela metade (stash)]] |
-| Guardar só alguns arquivos | `git stash push -m "tmp" -- app/login/login-form.tsx core/auth/sso.ts` | Útil para testar "sem a minha mudança"; devolve com `git stash pop` (usado em [[fluxo-quando-quebra#Teste E2E falhou — a culpa é da minha mudança?]]) |
 
 **Nunca** use `git reset --hard` sem entender: apaga alterações sem volta.
 

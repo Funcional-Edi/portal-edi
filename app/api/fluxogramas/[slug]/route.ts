@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { auth, isAdminRole } from "@/core/auth";
-import { requireAdmin, resolveCurrentSessionRole } from "@/core/auth/require-role";
 import { GetFlowError, getProjectFlow } from "@/modules/fluxogramas/services/get-flow";
 import { SaveFlowError, saveProjectFlow } from "@/modules/fluxogramas/services/save-flow";
 
@@ -24,13 +23,12 @@ interface RouteParams {
 /** Obtém fluxo salvo. Distribuidor só vê projetos publicados. */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth();
-  const role = await resolveCurrentSessionRole(session);
-  if (!role) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { slug } = await params;
-  const isAdmin = isAdminRole(role);
+  const isAdmin = isAdminRole(session.user.role);
   const flowId = new URL(_request.url).searchParams.get("fluxo") ?? undefined;
 
   try {
@@ -46,8 +44,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
 /** Persiste fluxo curado (somente admin). */
 export async function PUT(request: Request, { params }: RouteParams) {
-  const session = await requireAdmin();
-  if (!session) {
+  const session = await auth();
+  if (!session?.user?.role || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
