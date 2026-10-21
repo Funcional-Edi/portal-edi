@@ -7,7 +7,6 @@ import { checkLoginRateLimit, getClientIp, resetLoginRateLimit } from "@/core/au
 import { getRedisRestConfig, redisRestCommand } from "@/core/auth/redis-rest";
 import { type UserRole } from "@/core/auth/roles";
 import { readContentJson, writeContentJson } from "@/core/db/adapters";
-import { GithubContentError } from "@/core/db/adapters/github-content-error";
 
 const scrypt = promisify(scryptCallback);
 
@@ -197,16 +196,10 @@ async function loadLocalState(): Promise<LocalAccountState> {
 }
 
 async function saveLocalState(state: LocalAccountState): Promise<void> {
-  try {
-    await writeContentJson(LOCAL_STATE_PATH, state, {
-      branch: LOCAL_STATE_BRANCH,
-      message: "chore(acesso): atualiza estado da conta local",
-    });
-  } catch (error) {
-    if (!(error instanceof GithubContentError)) throw error;
-    // ponytail: sem token de escrita o código de recuperação continua válido até a gravação existir
-    console.warn("[local-account] não foi possível marcar o código de recuperação como usado.");
-  }
+  await writeContentJson(LOCAL_STATE_PATH, state, {
+    branch: LOCAL_STATE_BRANCH,
+    message: "chore(acesso): atualiza estado da conta local",
+  });
 }
 
 const memoryUsedTotp = new Map<string, number>();
